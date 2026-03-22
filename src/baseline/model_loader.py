@@ -399,6 +399,10 @@ def _generate_qwen_style_batch(
         texts.append(text)
         all_image_inputs.extend(image_inputs)
 
+    # Ensure pad_token is set (Qwen uses eos_token as pad_token)
+    if processor.tokenizer.pad_token_id is None:
+        processor.tokenizer.pad_token_id = processor.tokenizer.eos_token_id
+
     # Ensure left-padding for generation (required for correct batch trimming)
     orig_padding_side = processor.tokenizer.padding_side
     processor.tokenizer.padding_side = "left"
@@ -416,7 +420,11 @@ def _generate_qwen_style_batch(
     input_len = inputs["input_ids"].shape[1]
 
     with torch.inference_mode():
-        generated_ids = model.generate(**inputs, **gen_kwargs)
+        generated_ids = model.generate(
+            **inputs,
+            pad_token_id=processor.tokenizer.pad_token_id,
+            **gen_kwargs,
+        )
 
     answers = []
     for i in range(len(images)):
@@ -451,6 +459,10 @@ def _generate_standard_chat_batch(
     # A flat list is misinterpreted as multiple images for a single sample.
     images_nested = [[img] for img in images]
 
+    # Ensure pad_token is set (SmolVLM2 may use eos_token as pad_token)
+    if processor.tokenizer.pad_token_id is None:
+        processor.tokenizer.pad_token_id = processor.tokenizer.eos_token_id
+
     orig_padding_side = processor.tokenizer.padding_side
     processor.tokenizer.padding_side = "left"
     try:
@@ -462,7 +474,11 @@ def _generate_standard_chat_batch(
     input_len = inputs["input_ids"].shape[1]
 
     with torch.inference_mode():
-        generated_ids = model.generate(**inputs, **gen_kwargs)
+        generated_ids = model.generate(
+            **inputs,
+            pad_token_id=processor.tokenizer.pad_token_id,
+            **gen_kwargs,
+        )
 
     answers = []
     for i in range(len(images)):

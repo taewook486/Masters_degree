@@ -130,7 +130,8 @@
       "Bash(\"/c/Windows/System32/nvidia-smi.exe\")",
       "Bash(/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"Get-Process -Name python -ErrorAction SilentlyContinue | Select-Object Id, CPU, WorkingSet\")",
       "Bash(/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command \"Get-Process -Id 43748 -ErrorAction SilentlyContinue | Select-Object Id, Name, StartTime\")",
-      "Bash(.venv/Scripts/python.exe -u -m src.baseline.run_all --config_dir configs/models --output_dir results/phase1_baseline --seeds 42 --data_dir data --max_samples 10 --batch_size 4 --no_skip_existing)"
+      "Bash(.venv/Scripts/python.exe -u -m src.baseline.run_all --config_dir configs/models --output_dir results/phase1_baseline --seeds 42 --data_dir data --max_samples 10 --batch_size 4 --no_skip_existing)",
+      "Bash(.venv/Scripts/python.exe -c \"import flash_attn; print\\(''flash_attn:'', flash_attn.__version__\\); import torch; print\\(''CUDA available:'', torch.cuda.is_available\\(\\)\\)\")"
     ],
     "deny": [
       "Read(./secrets/**)",
@@ -206,7 +207,10 @@
       "Bash(mongosh:*)",
       "Bash(redis-cli:*)"
     ],
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "bypassPermissions",
+    "additionalDirectories": [
+      "C:\\Users\\taewo\\Downloads"
+    ]
   },
   "enableAllProjectMcpServers": true,
   "hooks": {

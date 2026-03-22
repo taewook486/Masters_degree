@@ -42,6 +42,12 @@ wandb/
 
 # Results (track selectively)
 results/*/logs/
+results/phase1_baseline/run_all*.log
+results/phase1_baseline/run_all_err.log
+results/phase1_baseline/phase1_intermediate.json
+
+# Accidental nested directory
+Masters_degree/
 
 # OS
 .DS_Store

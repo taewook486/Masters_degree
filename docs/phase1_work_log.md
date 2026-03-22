@@ -7,8 +7,8 @@
 Phase 1 of the Medical VQA thesis: zero-shot baseline evaluation of 4 lightweight VLMs on 3 medical VQA datasets. This establishes baseline performance before QLoRA fine-tuning (Phase 2).
 
 - **Hardware**: RTX 5060 Ti 16GB VRAM, Ryzen 5 5600X, 32GB RAM
-- **Framework**: transformers 5.1.0, torch 2.x, omegaconf
-- **Environment**: Windows 11, Python 3.x
+- **Framework**: transformers 5.3.0, torch 2.10.0+cu128, omegaconf
+- **Environment**: Windows 11, Python 3.12 (uv venv, downgraded from 3.13 for package compatibility)
 
 ---
 
@@ -235,8 +235,8 @@ Alternative options (not pursued):
 
 | File | Model | Key Settings |
 |------|-------|-------------|
-| `qwen3_vl_2b.yaml` | Qwen3-VL-2B | float16, device_map=auto, chat_template, requires_vision_info |
-| `qwen25_vl_3b.yaml` | Qwen2.5-VL-3B | float16, device_map=auto, chat_template, requires_vision_info |
+| `qwen3_vl_2b.yaml` | Qwen3-VL-2B | float16, device_map=auto, **sdpa**, max_pixels=401408, chat_template, requires_vision_info |
+| `qwen25_vl_3b.yaml` | Qwen2.5-VL-3B | float16, device_map=auto, **sdpa**, max_pixels=401408, chat_template, requires_vision_info |
 | `florence2_large.yaml` | Florence-2-large | float16, device_map=null, direct_question, trust_remote_code, eager attn, num_beams=3 |
 | `smolvlm2_2b.yaml` | SmolVLM2-2.2B | bfloat16, device_map=auto, chat_template |
 
@@ -244,9 +244,9 @@ Alternative options (not pursued):
 
 | File | Purpose |
 |------|---------|
-| `src/baseline/model_loader.py` | Unified model loading and inference (load_model, generate_answer) |
-| `src/baseline/evaluate_zero_shot.py` | Single condition evaluation CLI |
-| `src/baseline/run_all.py` | All 12 conditions x 3 seeds runner |
+| `src/baseline/model_loader.py` | Model loading + single/batch inference (`load_model`, `generate_answer`, `generate_answers_batch`) |
+| `src/baseline/evaluate_zero_shot.py` | Evaluation engine (`evaluate_with_loaded_model`, `_infer_batch`, `_infer_single`) |
+| `src/baseline/run_all.py` | All conditions runner — model loaded ONCE per config, shared across all dataset+seed combos |
 | `src/data/download.py` | HuggingFace dataset downloader |
 | `src/data/dataset.py` | Unified VQASample dataclass and dataset loading |
 | `src/evaluate/metrics.py` | VQA accuracy metrics (closed/open/overall) |
@@ -256,36 +256,85 @@ Alternative options (not pursued):
 ### 5.3 Inference Path per Model
 
 ```
-Qwen3-VL-2B / Qwen2.5-VL-3B:
-  generate_answer -> _generate_chat_template -> _generate_qwen_style
-  (uses qwen_vl_utils.process_vision_info)
+Single inference:
+  Qwen3-VL-2B / Qwen2.5-VL-3B:
+    generate_answer -> _generate_chat_template -> _generate_qwen_style
+    (uses qwen_vl_utils.process_vision_info)
 
-SmolVLM2-2.2B:
-  generate_answer -> _generate_chat_template -> _generate_standard_chat
-  (two-step: apply_chat_template -> processor)
+  SmolVLM2-2.2B:
+    generate_answer -> _generate_chat_template -> _generate_standard_chat
+    (two-step: apply_chat_template -> processor)
 
-Florence-2-large:
-  generate_answer -> _generate_direct_question
-  (uses <VQA> task prefix + post_process_generation)
+  Florence-2-large:
+    generate_answer -> _generate_direct_question
+    (uses <VQA> task prefix + post_process_generation)
+
+Batch inference (batch_size > 1):
+  Qwen3-VL-2B / Qwen2.5-VL-3B:
+    generate_answers_batch -> _generate_qwen_style_batch
+    (per-sample process_vision_info, left-pad tokenizer, batch generate)
+
+  SmolVLM2-2.2B:
+    generate_answers_batch -> _generate_standard_chat_batch
+    (images as [[img] for img in images] — Idefics3 nested list requirement)
+
+  Florence-2-large:
+    generate_answers_batch -> falls back to single inference (direct_question not batched)
 ```
 
 ---
 
-## 6. Next Steps
+## 6. Performance Optimizations Applied (2026-03-22)
+
+Five bottleneck fixes applied to reduce Phase 1 total runtime from ~12-15h to ~1.5-2h (seed=42 pass).
+
+| Fix | Change | Effect |
+|-----|--------|--------|
+| **Batch inference** | `batch_size=4` in `run_phase1.bat` | 2-4x throughput |
+| **SDPA attention** | `attn_implementation: "sdpa"` in Qwen configs | ~20-30% faster |
+| **Reduced max_pixels** | 802816 → 401408 in Qwen configs | ~40-50% faster image processing |
+| **Model load once** | Load model ONCE per config, share across 9 conditions | Eliminates 30-60s × 8 repeated loads |
+| **Single seed first** | `--single_seed_first` flag, run seed=42 only | ~3x time reduction for representative pass |
+
+**CLI flags added to `run_all.py`**:
+- `--batch_size INT` (default: 4)
+- `--single_seed_first` (run seeds[0] only, add remaining seeds later)
+- `--torch_compile` (optional ~15-30% more speedup via `torch.compile`)
+
+**flash_attn attempt (abandoned)**:
+- Downloaded `flash_attn-2.8.3+cu129sm120-cp312-cp312-win_amd64.whl` (White2Hand HuggingFace)
+- Installed successfully after Python 3.13→3.12 venv downgrade
+- Failed at runtime: `DLL load failed` — cu129 binary incompatible with torch cu128 runtime
+- Decision: Keep SDPA (already provides good speedup, no DLL issues)
+
+**SmolVLM2 batch format bug fixed**:
+- Error: `"The number of images in the text [1,1,1,1] and images [4] should be the same"`
+- Root cause: Idefics3-based processor interprets flat `images=[img1,img2,img3,img4]` as 4 images for ONE sample
+- Fix: `images=[[img] for img in images]` (nested list, one list per sample)
+
+---
+
+## 7. Next Steps
 
 ### Florence-2: CLOSED (2026-03-22)
 - [x] Decision made: **Drop Florence-2** — SA cache non-functional, 5th patch required
 - Evaluation proceeds with 3 models: Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B
 
-### Immediate
-- [ ] Run VQA-RAD 10-sample test with Qwen3-VL-2B and Qwen2.5-VL-3B (verify pipeline)
-- [ ] Add `num2words` to `pyproject.toml` (SmolVLM2 dependency)
-- [ ] Update model configs / run_all.py to remove Florence-2
+### Completed
+- [x] Run 10-sample test with all 3 models (all 9 conditions verified)
+- [x] Add `num2words` to `pyproject.toml`
+- [x] Apply 5 performance optimizations (batch, SDPA, max_pixels, model-once, single_seed)
+- [x] Python venv downgraded 3.13 → 3.12
 
-### Full Evaluation (9 conditions: 3 models × 3 datasets × 3 seeds)
-- [ ] Run full evaluation: `python -m src.baseline.run_all --seeds 42 123 456`
-- [ ] Generate `results/phase1_baseline/phase1_summary.csv`
-- [ ] Verify results against expected VRAM budgets
+### In Progress
+- [🔄] **Phase 1 seed=42 pass running** (`run_phase1.bat`, started 2026-03-22 15:28)
+  - 9 conditions: Qwen3-VL-2B + Qwen2.5-VL-3B + SmolVLM2-2.2B × PathVQA + SLAKE + VQA-RAD
+  - Log: `results/phase1_baseline/run_all.log`
+
+### After seed=42 completes
+- [ ] Check results: verify accuracy and VRAM per model/dataset
+- [ ] Run seeds 123 + 456: remove `--single_seed_first` from `run_phase1.bat`, re-run
+- [ ] Generate final `results/phase1_baseline/phase1_summary.csv`
 
 ### Datasets
 | Dataset | HF ID | Test Size |
@@ -307,3 +356,9 @@ Florence-2-large:
 4. **SmolVLM2 chat template quirk**: Unlike most models, SmolVLM2's `apply_chat_template` does NOT accept `images` parameter. Must use two-step approach: get text first, then pass to `processor()` with images.
 
 5. **Florence-2 requires square images**: DaViT vision encoder only supports square feature maps. Non-square images must be resized before processing.
+
+6. **SmolVLM2 batch format (Idefics3)**: Flat `images=[img1, img2, img3, img4]` is misinterpreted as 4 images for one sample. Must use nested list: `images=[[img] for img in images]` — one list per sample.
+
+7. **Python version matters for prebuilt wheels**: flash_attn prebuilt wheels for sm_120 (Blackwell) only exist for cp312. Python 3.13 (cp313) venv required a downgrade to 3.12 before installation. Even then, cu129-compiled flash_attn DLLs are binary-incompatible with torch cu128 runtime — SDPA is the practical choice on this setup.
+
+8. **uv venv vs pip**: `uv venv` does not install pip by default. Use `uv pip install` instead of `.venv/Scripts/python.exe -m pip install`.

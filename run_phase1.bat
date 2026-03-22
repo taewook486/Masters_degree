@@ -8,6 +8,5 @@ echo Starting Phase 1 evaluation at %DATE% %TIME% >> results\phase1_baseline\run
   --seeds 42 123 456 ^
   --data_dir data ^
   --batch_size 4 ^
-  --single_seed_first ^
   >> results\phase1_baseline\run_all.log 2>&1
 echo Finished Phase 1 evaluation at %DATE% %TIME% >> results\phase1_baseline\run_all.log

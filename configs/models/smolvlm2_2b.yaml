@@ -6,6 +6,7 @@ processor_class: "AutoProcessor"
 torch_dtype: "bfloat16"
 device_map: "auto"
 trust_remote_code: false
+attn_implementation: "sdpa"
 
 generation:
   max_new_tokens: 128
