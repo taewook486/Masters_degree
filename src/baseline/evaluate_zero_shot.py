@@ -280,7 +280,7 @@ def evaluate_single_condition(
             batch_size=batch_size,
         )
     finally:
-        unload_model(model)
+        unload_model(model, processor)
 
 
 def main() -> None:

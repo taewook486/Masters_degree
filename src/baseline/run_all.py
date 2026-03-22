@@ -97,7 +97,7 @@ def run_all_conditions(
             continue
 
         config = load_config(str(config_path))
-        model_name = config_path.stem
+        model_name = config.model_name
         n_conditions = len(DATASETS) * len(active_seeds)
 
         logger.info(f"\n{'=' * 60}")

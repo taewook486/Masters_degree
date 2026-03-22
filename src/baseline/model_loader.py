@@ -327,6 +327,7 @@ def unload_model(model: Any, processor: Any = None) -> None:
         del processor
     gc.collect()
     if torch.cuda.is_available():
+        torch.cuda.synchronize()   # ← 추가
         torch.cuda.empty_cache()
     logger.info("Model unloaded, GPU memory cleared")
 
