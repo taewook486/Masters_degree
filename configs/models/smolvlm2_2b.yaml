@@ -1,0 +1,14 @@
+model_name: "smolvlm2-2b"
+model_id: "HuggingFaceTB/SmolVLM2-2.2B-Instruct"
+model_class: "AutoModelForImageTextToText"
+processor_class: "AutoProcessor"
+
+torch_dtype: "bfloat16"
+device_map: "auto"
+trust_remote_code: false
+
+generation:
+  max_new_tokens: 128
+  do_sample: false
+
+prompt_format: "chat_template"

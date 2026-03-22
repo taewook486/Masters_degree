@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "model_name": "smolvlm2-2b",
+    "model_id": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+    "dataset": "pathvqa",
+    "split": "test",
+    "seed": 42,
+    "num_samples": 10,
+    "batch_size": 4,
+    "timestamp": "2026-03-22T05:53:29.116422+00:00"
+  },
+  "summary": {
+    "closed_accuracy": 0.75,
+    "open_accuracy": 0.1667,
+    "overall_accuracy": 0.4,
+    "closed_count": 4,
+    "open_count": 6,
+    "total_count": 10,
+    "avg_time_ms": 754.8,
+    "peak_vram_mb": 5983.8
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "what are positively charged, thus allowing the compaction of the negatively charged dna?",
+      "gold_answer": "the histone subunits",
+      "predicted_answer": "proteins.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 837.3
+    },
+    {
+      "index": 1,
+      "question": "how are the histone subunits charged?",
+      "gold_answer": "positively charged",
+      "predicted_answer": "positively charged.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 837.3
+    },
+    {
+      "index": 2,
+      "question": "what is showing increased eosinophilia of cytoplasm, and swelling of occasional cells?",
+      "gold_answer": "early (reversible) ischemic injury",
+      "predicted_answer": "lymphoma.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 837.3
+    },
+    {
+      "index": 3,
+      "question": "does mycobacterium avium infection in a duodenal biopsy from a patient with aids show massive intracellular macrophage infection with acid-fast organisms filamentous and pink in this acid-fast stain preparation?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 837.3
+    },
+    {
+      "index": 4,
+      "question": "what shows branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "microscopy",
+      "predicted_answer": "Histology.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 643.3
+    },
+    {
+      "index": 5,
+      "question": "does microscopy show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 643.3
+    },
+    {
+      "index": 6,
+      "question": "does pbf show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 643.3
+    },
+    {
+      "index": 7,
+      "question": "what is involvedd in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "chematic mechanisms",
+      "predicted_answer": "insulin resistance, beta cell dysfunction",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 643.3
+    },
+    {
+      "index": 8,
+      "question": "what is chematic mechanisms involved in?",
+      "gold_answer": "pathogenesis of two main types of diabetes mellitus",
+      "predicted_answer": "glucose metabolism",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 812.8
+    },
+    {
+      "index": 9,
+      "question": "is chematic mechanisms involved in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 812.8
+    }
+  ]
+}

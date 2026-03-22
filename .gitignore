@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Data (large files)
+data/
+*.zip
+*.tar.gz
+*.h5
+*.hdf5
+*.parquet
+
+# Model weights & checkpoints
+checkpoints/
+outputs/
+wandb/
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.gguf
+
+# Results (track selectively)
+results/*/logs/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Secrets
+.env
+*.key
+
+# Temp
+tmp/
+*.tmp

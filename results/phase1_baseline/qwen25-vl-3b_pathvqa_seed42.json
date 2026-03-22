@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "model_name": "qwen25-vl-3b",
+    "model_id": "Qwen/Qwen2.5-VL-3B-Instruct",
+    "dataset": "pathvqa",
+    "split": "test",
+    "seed": 42,
+    "num_samples": 10,
+    "batch_size": 4,
+    "timestamp": "2026-03-22T05:55:05.756575+00:00"
+  },
+  "summary": {
+    "closed_accuracy": 0.75,
+    "open_accuracy": 0.0,
+    "overall_accuracy": 0.3,
+    "closed_count": 4,
+    "open_count": 6,
+    "total_count": 10,
+    "avg_time_ms": 949.6,
+    "peak_vram_mb": 7580.9
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "what are positively charged, thus allowing the compaction of the negatively charged dna?",
+      "gold_answer": "the histone subunits",
+      "predicted_answer": "Histone proteins.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1209.2
+    },
+    {
+      "index": 1,
+      "question": "how are the histone subunits charged?",
+      "gold_answer": "positively charged",
+      "predicted_answer": "Positively.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1209.2
+    },
+    {
+      "index": 2,
+      "question": "what is showing increased eosinophilia of cytoplasm, and swelling of occasional cells?",
+      "gold_answer": "early (reversible) ischemic injury",
+      "predicted_answer": "The image shows increased eosinophilia of cytoplasm and swelling of occasional cells.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1209.2
+    },
+    {
+      "index": 3,
+      "question": "does mycobacterium avium infection in a duodenal biopsy from a patient with aids show massive intracellular macrophage infection with acid-fast organisms filamentous and pink in this acid-fast stain preparation?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the image shows massive intracellular macrophage infection with acid-fast organisms that are filamentous and pink in this acid-fast stain preparation. This is consistent with Mycobacterium avium infection in a duodenal biopsy from an AIDS patient.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1209.2
+    },
+    {
+      "index": 4,
+      "question": "what shows branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "microscopy",
+      "predicted_answer": "The image shows branching papillae with fibrovascular stalks covered by a single layer of cuboidal cells with ground-glass nuclei, which is characteristic of a benign lesion such as a papilloma or a hyperplastic polyp.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 961.5
+    },
+    {
+      "index": 5,
+      "question": "does microscopy show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, microscopy shows branching papillae with fibrovascular stalks covered by a single layer of cuboidal cells with ground-glass nuclei.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 961.5
+    },
+    {
+      "index": 6,
+      "question": "does pbf show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, PBF (Papillary Branching Fibrovascular) shows branching papillae with fibrovascular stalks covered by a single layer of cuboidal cells with ground-glass nuclei.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 961.5
+    },
+    {
+      "index": 7,
+      "question": "what is involvedd in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "chematic mechanisms",
+      "predicted_answer": "Genetic susceptibility, genetic failure, environmental factors.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 961.5
+    },
+    {
+      "index": 8,
+      "question": "what is chematic mechanisms involved in?",
+      "gold_answer": "pathogenesis of two main types of diabetes mellitus",
+      "predicted_answer": "Type 2 diabetes.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 406.7
+    },
+    {
+      "index": 9,
+      "question": "is chematic mechanisms involved in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 406.7
+    }
+  ]
+}

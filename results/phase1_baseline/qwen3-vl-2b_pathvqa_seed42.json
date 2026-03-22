@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "model_name": "qwen3-vl-2b",
+    "model_id": "Qwen/Qwen3-VL-2B-Instruct",
+    "dataset": "pathvqa",
+    "split": "test",
+    "seed": 42,
+    "num_samples": 10,
+    "batch_size": 4,
+    "timestamp": "2026-03-22T05:56:17.112621+00:00"
+  },
+  "summary": {
+    "closed_accuracy": 1.0,
+    "open_accuracy": 0.1667,
+    "overall_accuracy": 0.5,
+    "closed_count": 4,
+    "open_count": 6,
+    "total_count": 10,
+    "avg_time_ms": 1067.2,
+    "peak_vram_mb": 4430.3
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "what are positively charged, thus allowing the compaction of the negatively charged dna?",
+      "gold_answer": "the histone subunits",
+      "predicted_answer": "histones",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 855.3
+    },
+    {
+      "index": 1,
+      "question": "how are the histone subunits charged?",
+      "gold_answer": "positively charged",
+      "predicted_answer": "The histone subunits are charged with positively charged amino acids, such as lysine and arginine, which interact with the negatively charged phosphate groups on DNA.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 855.3
+    },
+    {
+      "index": 2,
+      "question": "what is showing increased eosinophilia of cytoplasm, and swelling of occasional cells?",
+      "gold_answer": "early (reversible) ischemic injury",
+      "predicted_answer": "This is a histopathological image showing increased eosinophilia of cytoplasm and swelling of occasional cells, which is characteristic of a condition such as eosinophilic granulomatous disease or a type of inflammatory condition involving eosinophils.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 855.3
+    },
+    {
+      "index": 3,
+      "question": "does mycobacterium avium infection in a duodenal biopsy from a patient with aids show massive intracellular macrophage infection with acid-fast organisms filamentous and pink in this acid-fast stain preparation?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 855.3
+    },
+    {
+      "index": 4,
+      "question": "what shows branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "microscopy",
+      "predicted_answer": "This is a histological image of the bronchial tree. The branching papillae are the terminal branches of the bronchial tree, and the flbrovascular stalk is the stalk that connects the papilla to the bronchial wall. The single layer of cuboidal cells covering the stalk is characteristic of the bronchial epithelium. The ground-glass nuclei are a feature of the bronchial epithelium, which is composed of cuboidal cells with a ground-glass appearance due to the presence of a dense network of collagen fibers. Therefore, the image shows the bronchial epithelium.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1716.8
+    },
+    {
+      "index": 5,
+      "question": "does microscopy show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1716.8
+    },
+    {
+      "index": 6,
+      "question": "does pbf show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "no",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1716.8
+    },
+    {
+      "index": 7,
+      "question": "what is involvedd in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "chematic mechanisms",
+      "predicted_answer": "The pathogenesis of type 1 and type 2 diabetes mellitus involves a combination of genetic and environmental factors. In type 1 diabetes, the immune system attacks and destroys insulin-producing beta cells in the pancreas, leading to a lack of insulin. In type 2 diabetes, the body becomes resistant to insulin, and the pancreas cannot produce enough insulin to maintain normal blood glucose levels.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1716.8
+    },
+    {
+      "index": 8,
+      "question": "what is chematic mechanisms involved in?",
+      "gold_answer": "pathogenesis of two main types of diabetes mellitus",
+      "predicted_answer": "autoimmune factors",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 191.7
+    },
+    {
+      "index": 9,
+      "question": "is chematic mechanisms involved in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 191.7
+    }
+  ]
+}

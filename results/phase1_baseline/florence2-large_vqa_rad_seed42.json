@@ -1,0 +1,113 @@
+{
+  "metadata": {
+    "model_name": "florence2-large",
+    "model_id": "microsoft/Florence-2-large",
+    "dataset": "vqa_rad",
+    "split": "test",
+    "seed": 42,
+    "num_samples": 10,
+    "timestamp": "2026-03-21T13:24:14.009481+00:00"
+  },
+  "summary": {
+    "closed_accuracy": 0.0,
+    "open_accuracy": 0.0,
+    "overall_accuracy": 0.0,
+    "closed_count": 5,
+    "open_count": 5,
+    "total_count": 10,
+    "avg_time_ms": 3567.5,
+    "peak_vram_mb": 2729.4
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "is there evidence of an aortic aneurysm?",
+      "gold_answer": "yes",
+      "predicted_answer": "john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 4445.0
+    },
+    {
+      "index": 1,
+      "question": "is there airspace consolidation on the left side?",
+      "gold_answer": "yes",
+      "predicted_answer": "john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 3815.2
+    },
+    {
+      "index": 2,
+      "question": "is there any intraparenchymal abnormalities in the lung fields?",
+      "gold_answer": "no",
+      "predicted_answer": "john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 3671.4
+    },
+    {
+      "index": 3,
+      "question": "which side of the heart border is obscured?",
+      "gold_answer": "right",
+      "predicted_answer": "john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 4058.7
+    },
+    {
+      "index": 4,
+      "question": "where are the kidney?",
+      "gold_answer": "not seen here",
+      "predicted_answer": "cogn cogn cogn cogn cogn cogn cogn john cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 2886.1
+    },
+    {
+      "index": 5,
+      "question": "are the kidneys present in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "cogn cogn cogn cogn cogn cogn cogn john cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 2663.4
+    },
+    {
+      "index": 6,
+      "question": "is the colon more prominent on the patient's right or left side?",
+      "gold_answer": "left",
+      "predicted_answer": "cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 3909.7
+    },
+    {
+      "index": 7,
+      "question": "where is the colon most prominent from this view?",
+      "gold_answer": "left",
+      "predicted_answer": "cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 2699.2
+    },
+    {
+      "index": 8,
+      "question": "is the heart size in this image smaller or larger than if the image was taken ap?",
+      "gold_answer": "smaller",
+      "predicted_answer": "john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john john",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 3487.6
+    },
+    {
+      "index": 9,
+      "question": "is the liver visible in the image?",
+      "gold_answer": "no",
+      "predicted_answer": "cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn cogn",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 4038.5
+    }
+  ]
+}

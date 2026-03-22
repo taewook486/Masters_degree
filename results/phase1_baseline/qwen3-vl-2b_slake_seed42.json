@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "model_name": "qwen3-vl-2b",
+    "model_id": "Qwen/Qwen3-VL-2B-Instruct",
+    "dataset": "slake",
+    "split": "test",
+    "seed": 42,
+    "num_samples": 10,
+    "batch_size": 4,
+    "timestamp": "2026-03-22T05:56:22.020240+00:00"
+  },
+  "summary": {
+    "closed_accuracy": 0.75,
+    "open_accuracy": 0.5,
+    "overall_accuracy": 0.6,
+    "closed_count": 4,
+    "open_count": 6,
+    "total_count": 10,
+    "avg_time_ms": 233.4,
+    "peak_vram_mb": 4317.0
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "What modality is used to take this image?",
+      "gold_answer": "CT",
+      "predicted_answer": "CT scan",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 236.3
+    },
+    {
+      "index": 1,
+      "question": "Which part of the body does this image belong to?",
+      "gold_answer": "Chest",
+      "predicted_answer": "chest",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 236.3
+    },
+    {
+      "index": 2,
+      "question": "What is the main organ in the image?",
+      "gold_answer": "Lung, Spinal Cord",
+      "predicted_answer": "The main organ in the image is the lung.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 236.3
+    },
+    {
+      "index": 3,
+      "question": "What is the largest organ in the picture?",
+      "gold_answer": "Lung",
+      "predicted_answer": "The largest organ in the picture is the lung.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 236.3
+    },
+    {
+      "index": 4,
+      "question": "Does the picture contain liver?",
+      "gold_answer": "No",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 133.7
+    },
+    {
+      "index": 5,
+      "question": "Does the picture contain lung?",
+      "gold_answer": "Yes",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 133.7
+    },
+    {
+      "index": 6,
+      "question": "Does the picture contain heart?",
+      "gold_answer": "No",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 133.7
+    },
+    {
+      "index": 7,
+      "question": "What diseases are included in the picture?",
+      "gold_answer": "Lung Cancer",
+      "predicted_answer": "Pneumonia",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 133.7
+    },
+    {
+      "index": 8,
+      "question": "Is the lung healthy?",
+      "gold_answer": "No",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 426.8
+    },
+    {
+      "index": 9,
+      "question": "Where is/are the abnormality located?",
+      "gold_answer": "Left Lung, Right",
+      "predicted_answer": "The abnormality is located in the right lung.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 426.8
+    }
+  ]
+}

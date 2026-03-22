@@ -1,0 +1,10 @@
+model_name,dataset,num_seeds,closed_acc_mean,closed_acc_std,open_acc_mean,open_acc_std,overall_acc_mean,overall_acc_std,avg_time_ms_mean,avg_time_ms_std,peak_vram_mb
+qwen25_vl_3b,pathvqa,1,0.75,0.0,0.0,0.0,0.3,0.0,949.7,0.0,7580.9
+qwen25_vl_3b,slake,1,1.0,0.0,0.3333,0.0,0.6,0.0,241.0,0.0,7433.0
+qwen25_vl_3b,vqa_rad,1,0.4,0.0,0.4,0.0,0.4,0.0,324.7,0.0,7545.2
+qwen3_vl_2b,pathvqa,1,1.0,0.0,0.1667,0.0,0.5,0.0,1087.9,0.0,4430.3
+qwen3_vl_2b,slake,1,0.75,0.0,0.5,0.0,0.6,0.0,252.5,0.0,4317.0
+qwen3_vl_2b,vqa_rad,1,0.2,0.0,0.0,0.0,0.1,0.0,165.7,0.0,4414.1
+smolvlm2_2b,pathvqa,1,0.75,0.0,0.1667,0.0,0.4,0.0,754.8,0.0,5983.8
+smolvlm2_2b,slake,1,0.75,0.0,0.5,0.0,0.6,0.0,770.0,0.0,5979.1
+smolvlm2_2b,vqa_rad,1,0.2,0.0,0.6,0.0,0.4,0.0,714.2,0.0,5982.1

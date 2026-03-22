@@ -1,0 +1,20 @@
+model_name: "qwen25-vl-3b"
+model_id: "Qwen/Qwen2.5-VL-3B-Instruct"
+model_class: "Qwen2_5_VLForConditionalGeneration"
+processor_class: "AutoProcessor"
+
+torch_dtype: "float16"
+device_map: "auto"
+trust_remote_code: false
+attn_implementation: "sdpa"                # Fix 2: PyTorch SDPA (no extra install, ~20-30% speedup)
+
+processor_kwargs:
+  min_pixels: 200704    # 256 * 28 * 28
+  max_pixels: 401408    # 512 * 28 * 28  (Fix 3: halved from 802816, ~40-50% speed gain)
+
+generation:
+  max_new_tokens: 128
+  do_sample: false
+
+prompt_format: "chat_template"
+requires_vision_info_processing: true

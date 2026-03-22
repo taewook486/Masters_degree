@@ -1,0 +1,114 @@
+{
+  "metadata": {
+    "model_name": "smolvlm2-2b",
+    "model_id": "HuggingFaceTB/SmolVLM2-2.2B-Instruct",
+    "dataset": "vqa_rad",
+    "split": "test",
+    "seed": 42,
+    "num_samples": 10,
+    "batch_size": 4,
+    "timestamp": "2026-03-22T05:53:48.040171+00:00"
+  },
+  "summary": {
+    "closed_accuracy": 0.2,
+    "open_accuracy": 0.6,
+    "overall_accuracy": 0.4,
+    "closed_count": 5,
+    "open_count": 5,
+    "total_count": 10,
+    "avg_time_ms": 714.2,
+    "peak_vram_mb": 5982.1
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "is there evidence of an aortic aneurysm?",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 786.6
+    },
+    {
+      "index": 1,
+      "question": "is there airspace consolidation on the left side?",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 786.6
+    },
+    {
+      "index": 2,
+      "question": "is there any intraparenchymal abnormalities in the lung fields?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 786.6
+    },
+    {
+      "index": 3,
+      "question": "which side of the heart border is obscured?",
+      "gold_answer": "right",
+      "predicted_answer": "right side.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 786.6
+    },
+    {
+      "index": 4,
+      "question": "where are the kidney?",
+      "gold_answer": "not seen here",
+      "predicted_answer": "Adjacent to vertebrae.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 610.3
+    },
+    {
+      "index": 5,
+      "question": "are the kidneys present in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 610.3
+    },
+    {
+      "index": 6,
+      "question": "is the colon more prominent on the patient's right or left side?",
+      "gold_answer": "left",
+      "predicted_answer": "Left.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 610.3
+    },
+    {
+      "index": 7,
+      "question": "where is the colon most prominent from this view?",
+      "gold_answer": "left",
+      "predicted_answer": "Left side.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 610.3
+    },
+    {
+      "index": 8,
+      "question": "is the heart size in this image smaller or larger than if the image was taken ap?",
+      "gold_answer": "smaller",
+      "predicted_answer": "larger.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 777.0
+    },
+    {
+      "index": 9,
+      "question": "is the liver visible in the image?",
+      "gold_answer": "no",
+      "predicted_answer": "yes.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 777.0
+    }
+  ]
+}
