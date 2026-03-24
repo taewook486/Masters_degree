@@ -12,8 +12,13 @@ import json
 import logging
 import os
 import re
+import time
 
 logger = logging.getLogger(__name__)
+
+# Retry settings for API resilience
+_MAX_RETRIES = 3
+_RETRY_BASE_DELAY = 2.0  # seconds, exponential backoff
 
 # Search space bounds for validation
 _VALID_RANKS = {4, 8, 16, 32, 64}
@@ -23,18 +28,25 @@ _VALID_TARGETS = {"minimal", "medium", "full"}
 _VALID_EPOCHS = {1, 2, 3, 5}
 
 
-def ask_agent_for_config(program: str, history_text: str) -> dict:
+def ask_agent_for_config(
+    program: str,
+    history_text: str,
+    trial_number: int = 0,
+    total_trials: int = 40,
+) -> dict:
     """Ask the LLM agent to suggest the next hyperparameter config.
 
     Args:
         program: The agent's system prompt (from program.md).
         history_text: Human-readable summary of past trials.
+        trial_number: Current trial index (0-based), used for temp scheduling.
+        total_trials: Total planned trials, used for temp scheduling.
 
     Returns:
         Dict of validated hyperparameters.
 
     Raises:
-        RuntimeError: If API call fails or response cannot be parsed.
+        RuntimeError: If API call fails after all retries.
     """
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -53,27 +65,87 @@ def ask_agent_for_config(program: str, history_text: str) -> dict:
 
     client = anthropic.Anthropic(api_key=api_key)
 
-    user_message = (
-        f"Here are the results from previous experiments:\n\n"
+    # Temperature scheduling: explore early (1.0), exploit later (0.3)
+    progress = trial_number / max(total_trials - 1, 1)
+    temperature = round(1.0 - 0.7 * progress, 2)
+
+    user_message = _build_user_message(history_text, trial_number, total_trials)
+
+    # Retry with exponential backoff
+    last_error = None
+    for attempt in range(_MAX_RETRIES):
+        try:
+            response = client.messages.create(
+                model="claude-sonnet-4-6",
+                max_tokens=512,
+                system=program,
+                messages=[{"role": "user", "content": user_message}],
+                temperature=temperature,
+            )
+            raw_text = response.content[0].text.strip()
+            config = _parse_config(raw_text)
+            config = _validate_config(config)
+            logger.info(
+                f"Trial {trial_number}/{total_trials}, "
+                f"temp={temperature}, config={config}"
+            )
+            return config
+        except Exception as e:
+            last_error = e
+            if attempt < _MAX_RETRIES - 1:
+                delay = _RETRY_BASE_DELAY * (2 ** attempt)
+                logger.warning(
+                    f"API attempt {attempt + 1}/{_MAX_RETRIES} failed: {e}. "
+                    f"Retrying in {delay}s..."
+                )
+                time.sleep(delay)
+            else:
+                logger.error(f"All {_MAX_RETRIES} API attempts failed: {e}")
+
+    raise RuntimeError(f"Agent API failed after {_MAX_RETRIES} retries: {last_error}")
+
+
+def _build_user_message(
+    history_text: str, trial_number: int, total_trials: int
+) -> str:
+    """Build structured user message with analysis guidance."""
+    progress = trial_number / max(total_trials, 1)
+
+    if progress < 0.25:
+        phase_hint = (
+            "EXPLORATION PHASE: Prioritize diverse configurations. "
+            "Try varied rank, learning rate, and target module combinations "
+            "to map the search space broadly."
+        )
+    elif progress < 0.75:
+        phase_hint = (
+            "TRANSITION PHASE: Balance exploration with exploitation. "
+            "Focus on promising regions from top results, "
+            "but still test unexplored parameter combinations."
+        )
+    else:
+        phase_hint = (
+            "EXPLOITATION PHASE: Fine-tune around the best configurations. "
+            "Make small adjustments to top-performing hyperparameters "
+            "to maximize accuracy."
+        )
+
+    return (
+        f"## Experiment Status\n"
+        f"- Trial: {trial_number + 1} / {total_trials}\n"
+        f"- Phase: {phase_hint}\n\n"
+        f"## Previous Results\n\n"
         f"{history_text}\n\n"
-        f"Based on this history, suggest the next hyperparameter configuration. "
+        f"## Analysis Instructions\n"
+        f"Before suggesting, analyze:\n"
+        f"1. Which hyperparameter changes correlated with accuracy gains?\n"
+        f"2. Are there diminishing returns on any parameter (e.g., rank)?\n"
+        f"3. What parameter combinations remain unexplored?\n\n"
+        f"## Response Format\n"
         f"Respond with ONLY a valid JSON object containing these keys: "
         f"lora_rank, lora_alpha, learning_rate, batch_size, grad_accum_steps, "
         f"warmup_ratio, weight_decay, lora_targets, epochs"
     )
-
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=512,
-        system=program,
-        messages=[{"role": "user", "content": user_message}],
-        temperature=0.7,  # Some creativity for exploration
-    )
-
-    raw_text = response.content[0].text.strip()
-    config = _parse_config(raw_text)
-    config = _validate_config(config)
-    return config
 
 
 def _parse_config(raw_text: str) -> dict:

@@ -240,8 +240,13 @@ class AutoresearchStrategy(HPOStrategy):
 
     name = "autoresearch"
 
-    def __init__(self, program_md_path: str = "configs/autoresearch/program.md"):
+    def __init__(
+        self,
+        program_md_path: str = "configs/autoresearch/program.md",
+        total_trials: int = 40,
+    ):
         self.program_md_path = program_md_path
+        self.total_trials = total_trials
         self._program: str | None = None
 
     def _load_program(self) -> str:
@@ -284,8 +289,15 @@ class AutoresearchStrategy(HPOStrategy):
                 lines.append(f"Total completed: {len(completed)}")
                 history_text = "\n".join(lines)
 
+        trial_number = len([t for t in history if t.status == "completed"])
+
         try:
-            config = ask_agent_for_config(program, history_text)
+            config = ask_agent_for_config(
+                program,
+                history_text,
+                trial_number=trial_number,
+                total_trials=self.total_trials,
+            )
             logger.info(f"[Autoresearch] Agent suggested: {config}")
             return config
         except Exception as e:
