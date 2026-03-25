@@ -28,7 +28,7 @@ from typing import Any
 
 import torch
 from omegaconf import DictConfig, OmegaConf
-from transformers import BitsAndBytesConfig
+from transformers import BitsAndBytesConfig, TrainerCallback
 from trl import SFTConfig, SFTTrainer
 
 from src.baseline.evaluate_zero_shot import evaluate_with_loaded_model
@@ -38,6 +38,30 @@ from src.utils.seed import set_seed
 from src.utils.vram_monitor import get_vram_usage, reset_peak_stats
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Time budget callback for HPO
+# ---------------------------------------------------------------------------
+
+
+class TimeBudgetCallback(TrainerCallback):
+    """Stop training when time budget is exceeded."""
+
+    def __init__(self, budget_min: float):
+        self.budget_sec = budget_min * 60
+        self.budget_min = budget_min
+        self.start_time = time.time()
+
+    def on_step_end(self, args, state, control, **kwargs):
+        elapsed = time.time() - self.start_time
+        if elapsed >= self.budget_sec:
+            logger.info(
+                f"Time budget exceeded ({elapsed / 60:.1f}min >= "
+                f"{self.budget_min:.1f}min). Stopping at step {state.global_step}."
+            )
+            control.should_training_stop = True
+        return control
 
 
 # ---------------------------------------------------------------------------
@@ -161,9 +185,15 @@ def _build_trainer_unsloth(
     t = ft_config.training
     output_path = Path(output_dir) / "checkpoints"
 
+    # v0.2: Support max_steps (Phase 3) or num_train_epochs (Phase 2)
+    max_steps_val = t.get("max_steps", -1)
+    epochs_val = t.get("num_train_epochs", 3) if max_steps_val <= 0 else 1
+    save_eval_strategy = "steps" if max_steps_val > 0 else t.get("save_strategy", "epoch")
+
     training_args = SFTConfig(
         output_dir=str(output_path),
-        num_train_epochs=t.get("num_train_epochs", 3),
+        num_train_epochs=epochs_val,
+        max_steps=max_steps_val,
         per_device_train_batch_size=t.get("per_device_train_batch_size", 1),
         gradient_accumulation_steps=t.get("gradient_accumulation_steps", 8),
         learning_rate=t.get("learning_rate", 2e-4),
@@ -174,8 +204,8 @@ def _build_trainer_unsloth(
         fp16=t.get("fp16", True),
         bf16=t.get("bf16", False),
         logging_steps=t.get("logging_steps", 10),
-        save_strategy=t.get("save_strategy", "epoch"),
-        eval_strategy=ft_config.evaluation.get("eval_strategy", "epoch"),
+        save_strategy=save_eval_strategy,
+        eval_strategy=save_eval_strategy,
         seed=seed,
         report_to="wandb",
         run_name=f"{model_name}_{dataset_name}_seed{seed}_unsloth",
@@ -369,9 +399,15 @@ def _build_trainer_standard(
 
     collate_fn = _build_collate_fn(processor, model_config, max_seq_length)
 
+    # v0.2: Support max_steps (Phase 3) or num_train_epochs (Phase 2)
+    max_steps_val = t.get("max_steps", -1)
+    epochs_val = t.get("num_train_epochs", 3) if max_steps_val <= 0 else 1
+    save_eval_strategy = "steps" if max_steps_val > 0 else t.get("save_strategy", "epoch")
+
     training_args = SFTConfig(
         output_dir=str(output_path),
-        num_train_epochs=t.get("num_train_epochs", 3),
+        num_train_epochs=epochs_val,
+        max_steps=max_steps_val,
         per_device_train_batch_size=t.get("per_device_train_batch_size", 1),
         gradient_accumulation_steps=t.get("gradient_accumulation_steps", 8),
         learning_rate=t.get("learning_rate", 2e-4),
@@ -382,8 +418,8 @@ def _build_trainer_standard(
         fp16=t.get("fp16", True),
         bf16=t.get("bf16", False),
         logging_steps=t.get("logging_steps", 10),
-        save_strategy=t.get("save_strategy", "epoch"),
-        eval_strategy=ft_config.evaluation.get("eval_strategy", "epoch"),
+        save_strategy=save_eval_strategy,
+        eval_strategy=save_eval_strategy,
         seed=seed,
         report_to="wandb",
         run_name=f"{model_name}_{dataset_name}_seed{seed}_peft",
@@ -419,6 +455,9 @@ def train_qlora(
     subset_ratio: float | None = None,
     eval_after_training: bool = True,
     force_standard: bool = False,
+    time_budget_min: float | None = None,
+    measure_cf: bool = False,
+    base_vqav2_result: dict | None = None,
 ) -> dict:
     """Run QLoRA fine-tuning for one model on one dataset.
 
@@ -436,6 +475,9 @@ def train_qlora(
         subset_ratio: Use fraction of training data (Ablation A).
         eval_after_training: Run evaluation on test set after training.
         force_standard: Force standard PEFT backend even for Unsloth-supported models.
+        time_budget_min: Max training time in minutes (None = no limit).
+        measure_cf: If True, measure Catastrophic Forgetting on VQAv2 after training.
+        base_vqav2_result: Pre-computed base model VQAv2 result (for CF).
 
     Returns:
         Dictionary with training metrics and evaluation results.
@@ -490,6 +532,11 @@ def train_qlora(
             model, processor, model_config, ft_config,
             train_ds, eval_ds, output_dir, seed, model_name, dataset_name,
         )
+
+    # Add time budget callback if specified
+    if time_budget_min and time_budget_min > 0:
+        trainer.add_callback(TimeBudgetCallback(time_budget_min))
+        logger.info(f"Time budget: {time_budget_min:.1f} minutes")
 
     # Train
     logger.info(f"Starting training with {backend_label} backend...")
@@ -561,6 +608,26 @@ def train_qlora(
             batch_size=4,
         )
         result["eval_summary"] = eval_summary
+
+        # Catastrophic Forgetting measurement (v0.2)
+        if measure_cf and base_vqav2_result is not None:
+            try:
+                from src.evaluate.catastrophic_forgetting import run_cf_measurement
+
+                cf_result = run_cf_measurement(
+                    model=model,
+                    processor=processor,
+                    config=model_config,
+                    base_vqav2_result=base_vqav2_result,
+                    output_dir=output_dir,
+                    model_name=model_name,
+                    dataset_name=dataset_name,
+                    seed=seed,
+                    data_dir=data_dir,
+                )
+                result["catastrophic_forgetting"] = cf_result.get("catastrophic_forgetting", {})
+            except Exception as e:
+                logger.warning(f"[CF] Measurement failed: {e}")
 
     # Save result
     result_file = output_path / "train_result.json"

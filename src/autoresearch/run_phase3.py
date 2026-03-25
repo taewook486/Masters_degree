@@ -169,7 +169,7 @@ def _build_phase3_summary(
             "lora_rank": t.lora_rank,
             "learning_rate": t.learning_rate,
             "lora_targets": t.lora_targets,
-            "epochs": t.epochs,
+            "max_steps": t.max_steps,
         })
     detail_df = pd.DataFrame(detail_rows)
     detail_path = output_path / "phase3_all_trials.csv"

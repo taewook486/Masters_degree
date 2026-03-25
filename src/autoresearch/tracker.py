@@ -31,7 +31,7 @@ class TrialResult:
     warmup_ratio: float = 0.03
     weight_decay: float = 0.01
     lora_targets: str = "minimal"  # "minimal", "medium", "full"
-    epochs: int = 3
+    max_steps: int = 400  # v0.2: max_steps replaces epochs for Phase 3
 
     # Results
     val_accuracy: float = 0.0
@@ -44,6 +44,7 @@ class TrialResult:
     # Meta
     status: str = "pending"  # "pending", "running", "completed", "failed"
     notes: str = ""
+    agent_reasoning: str = ""  # Raw LLM reasoning (autoresearch only)
 
 
 TSV_COLUMNS = [f.name for f in fields(TrialResult)]
@@ -95,7 +96,7 @@ class ExperimentTracker:
                     warmup_ratio=float(row["warmup_ratio"]),
                     weight_decay=float(row["weight_decay"]),
                     lora_targets=row["lora_targets"],
-                    epochs=int(row["epochs"]),
+                    max_steps=int(row["max_steps"]),
                     val_accuracy=float(row["val_accuracy"]),
                     val_closed_acc=float(row["val_closed_acc"]),
                     val_open_acc=float(row["val_open_acc"]),
@@ -104,6 +105,7 @@ class ExperimentTracker:
                     peak_vram_mb=float(row["peak_vram_mb"]),
                     status=row["status"],
                     notes=row.get("notes", ""),
+                    agent_reasoning=row.get("agent_reasoning", ""),
                 )
                 results.append(trial)
         return results
@@ -144,13 +146,13 @@ class ExperimentTracker:
             f"Completed trials: {len(completed)}",
             f"Best val_accuracy: {max(t.val_accuracy for t in completed):.4f}",
             "",
-            "trial_id | rank | alpha | lr       | bs | ga | targets | epochs | val_acc | loss",
+            "trial_id | rank | alpha | lr       | bs | ga | targets | steps | val_acc | loss",
             "-" * 95,
         ]
         for t in sorted(completed, key=lambda x: -x.val_accuracy):
             lines.append(
                 f"{t.trial_id:8d} | {t.lora_rank:4d} | {t.lora_alpha:5d} | "
                 f"{t.learning_rate:.1e} | {t.batch_size:2d} | {t.grad_accum_steps:2d} | "
-                f"{t.lora_targets:7s} | {t.epochs:6d} | {t.val_accuracy:.4f} | {t.train_loss:.4f}"
+                f"{t.lora_targets:7s} | {t.max_steps:5d} | {t.val_accuracy:.4f} | {t.train_loss:.4f}"
             )
         return "\n".join(lines)

@@ -1,9 +1,18 @@
-"""VQA evaluation metrics for medical VQA."""
+"""VQA evaluation metrics for medical VQA.
+
+Metrics:
+  - Closed-ended accuracy (yes/no questions)
+  - Open-ended accuracy: Exact Match + BERTScore F1
+  - Overall weighted accuracy
+"""
 
 from __future__ import annotations
 
+import logging
 import re
 import string
+
+logger = logging.getLogger(__name__)
 
 
 def preprocess_answer(answer: str) -> str:
@@ -99,10 +108,59 @@ def compute_open_accuracy(
     return correct / len(predictions)
 
 
+def compute_open_bertscore(
+    predictions: list[str],
+    gold_answers: list[str],
+    threshold: float = 0.7,
+    model_type: str = "roberta-large",
+) -> dict[str, float]:
+    """Compute BERTScore F1 for open-ended questions.
+
+    Uses roberta-large as the base model (v0.2 spec).
+    A prediction is considered correct if BERTScore F1 >= threshold.
+
+    Args:
+        predictions: Model-generated answers.
+        gold_answers: Ground truth answers.
+        threshold: BERTScore F1 threshold for correctness (default: 0.7).
+        model_type: BERTScore model (default: roberta-large).
+
+    Returns:
+        Dict with mean F1, accuracy at threshold, and per-sample F1 scores.
+    """
+    if not predictions:
+        return {"bertscore_f1_mean": 0.0, "bertscore_accuracy": 0.0, "bertscore_f1_scores": []}
+
+    try:
+        from bert_score import score as bert_score_fn
+    except ImportError:
+        logger.warning("bert-score not installed. Run: pip install bert-score")
+        return {"bertscore_f1_mean": 0.0, "bertscore_accuracy": 0.0, "bertscore_f1_scores": []}
+
+    _, _, f1 = bert_score_fn(
+        predictions,
+        gold_answers,
+        model_type=model_type,
+        verbose=False,
+    )
+
+    f1_list = f1.tolist()
+    f1_mean = sum(f1_list) / len(f1_list)
+    correct = sum(1 for s in f1_list if s >= threshold)
+    accuracy = correct / len(f1_list)
+
+    return {
+        "bertscore_f1_mean": round(f1_mean, 4),
+        "bertscore_accuracy": round(accuracy, 4),
+        "bertscore_f1_scores": [round(s, 4) for s in f1_list],
+    }
+
+
 def compute_overall_accuracy(
     predictions: list[str],
     gold_answers: list[str],
     question_types: list[str],
+    compute_bertscore: bool = False,
 ) -> dict[str, float | int]:
     """Compute closed, open, and overall accuracy.
 
@@ -110,6 +168,7 @@ def compute_overall_accuracy(
         predictions: Model-generated answers.
         gold_answers: Ground truth answers.
         question_types: List of "open" or "closed" for each sample.
+        compute_bertscore: If True, also compute BERTScore F1 for open-ended.
 
     Returns:
         Dictionary with accuracy metrics and counts.
@@ -137,7 +196,7 @@ def compute_overall_accuracy(
 
     overall_acc = total_correct / total if total > 0 else 0.0
 
-    return {
+    result: dict[str, float | int | list] = {
         "closed_accuracy": round(closed_acc, 4),
         "open_accuracy": round(open_acc, 4),
         "overall_accuracy": round(overall_acc, 4),
@@ -145,3 +204,10 @@ def compute_overall_accuracy(
         "open_count": len(open_preds),
         "total_count": total,
     }
+
+    if compute_bertscore and open_preds:
+        bs = compute_open_bertscore(open_preds, open_golds)
+        result["open_bertscore_f1"] = bs["bertscore_f1_mean"]
+        result["open_bertscore_accuracy"] = bs["bertscore_accuracy"]
+
+    return result

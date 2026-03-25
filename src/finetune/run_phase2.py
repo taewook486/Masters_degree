@@ -28,6 +28,9 @@ logger = logging.getLogger(__name__)
 DATASETS = ["pathvqa", "slake", "vqa_rad"]
 ABLATION_DATASET = "pathvqa"
 
+# Cache for base model VQAv2 results (keyed by model_name)
+_BASE_VQAV2_CACHE: dict[str, dict] = {}
+
 
 def _load_existing_result(output_dir: str) -> dict | None:
     """Load existing train_result.json if it exists and has eval results."""
@@ -41,6 +44,61 @@ def _load_existing_result(output_dir: str) -> dict | None:
     return None
 
 
+def _get_base_vqav2_result(
+    model_config_path: str,
+    model_name: str,
+    data_dir: str,
+    output_dir: str,
+) -> dict | None:
+    """Get or compute base model VQAv2 result (cached per model)."""
+    # Check cache
+    if model_name in _BASE_VQAV2_CACHE:
+        return _BASE_VQAV2_CACHE[model_name]
+
+    # Check saved file
+    cache_file = Path(output_dir) / f"{model_name}_base_vqav2.json"
+    if cache_file.exists():
+        with open(cache_file, encoding="utf-8") as f:
+            result = json.load(f)
+        _BASE_VQAV2_CACHE[model_name] = result
+        logger.info(f"[CF] Loaded cached base VQAv2 for {model_name}")
+        return result
+
+    # Compute: load base model, evaluate on VQAv2
+    try:
+        from src.baseline.model_loader import load_model, unload_model
+        from src.evaluate.catastrophic_forgetting import evaluate_on_vqav2
+
+        logger.info(f"[CF] Computing base VQAv2 for {model_name}...")
+        model, processor, config = load_model(model_config_path)
+
+        result = evaluate_on_vqav2(model, processor, config, data_dir=data_dir)
+
+        unload_model(model, processor)
+
+        # Save cache
+        cache_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(cache_file, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2)
+
+        _BASE_VQAV2_CACHE[model_name] = result
+        logger.info(
+            f"[CF] Base VQAv2 for {model_name}: "
+            f"overall={result['overall_accuracy']:.4f}"
+        )
+        return result
+
+    except FileNotFoundError:
+        logger.warning(
+            "[CF] VQAv2 subset not found. "
+            "Run: python -m src.data.general_vqa --download"
+        )
+        return None
+    except Exception as e:
+        logger.error(f"[CF] Failed to compute base VQAv2 for {model_name}: {e}")
+        return None
+
+
 def run_main_conditions(
     config_dir: str,
     finetune_config: str,
@@ -49,8 +107,20 @@ def run_main_conditions(
     data_dir: str = "data",
     skip_existing: bool = True,
     max_train_samples: int | None = None,
+    measure_cf: bool = True,
 ) -> list[dict]:
-    """Run main Phase 2 conditions: all models x all datasets x all seeds."""
+    """Run main Phase 2 conditions: all models x all datasets x all seeds.
+
+    Args:
+        config_dir: Directory with model config YAMLs.
+        finetune_config: Path to base QLoRA config.
+        output_dir: Output directory.
+        seeds: List of random seeds.
+        data_dir: Dataset directory.
+        skip_existing: Skip if results already exist.
+        max_train_samples: Limit training samples (debugging).
+        measure_cf: If True, measure Catastrophic Forgetting on VQAv2.
+    """
     config_files = sorted(Path(config_dir).glob("*.yaml"))
     results = []
 
@@ -62,6 +132,13 @@ def run_main_conditions(
             continue
 
         model_name = raw.get("model_name", config_path.stem)
+
+        # Pre-compute base VQAv2 for CF measurement (once per model)
+        base_vqav2 = None
+        if measure_cf:
+            base_vqav2 = _get_base_vqav2_result(
+                str(config_path), model_name, data_dir, output_dir,
+            )
 
         for dataset_name in DATASETS:
             for seed in seeds:
@@ -85,6 +162,8 @@ def run_main_conditions(
                         seed=seed,
                         data_dir=data_dir,
                         max_train_samples=max_train_samples,
+                        measure_cf=measure_cf,
+                        base_vqav2_result=base_vqav2,
                     )
                     results.append(result)
                 except torch.cuda.OutOfMemoryError:
@@ -312,7 +391,12 @@ def build_summary(results: list[dict], label: str) -> pd.DataFrame:
             "peak_vram_mb": train.get("peak_vram_mb"),
             "closed_acc": eval_s.get("closed_accuracy"),
             "open_acc": eval_s.get("open_accuracy"),
+            "open_bertscore_f1": eval_s.get("open_bertscore_f1"),
             "overall_acc": eval_s.get("overall_accuracy"),
+            # CF metrics (v0.2)
+            "cf_base_overall": cf.get("base_overall_accuracy") if (cf := r.get("catastrophic_forgetting")) else None,
+            "cf_ft_overall": cf.get("finetuned_overall_accuracy") if (cf := r.get("catastrophic_forgetting")) else None,
+            "cf_degradation_pct": cf.get("degradation_overall_accuracy_pct") if (cf := r.get("catastrophic_forgetting")) else None,
         })
     return pd.DataFrame(rows)
 

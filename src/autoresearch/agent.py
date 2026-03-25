@@ -33,7 +33,7 @@ def ask_agent_for_config(
     history_text: str,
     trial_number: int = 0,
     total_trials: int = 40,
-) -> dict:
+) -> tuple[dict, str]:
     """Ask the LLM agent to suggest the next hyperparameter config.
 
     Args:
@@ -43,7 +43,7 @@ def ask_agent_for_config(
         total_trials: Total planned trials, used for temp scheduling.
 
     Returns:
-        Dict of validated hyperparameters.
+        Tuple of (validated hyperparameters dict, raw agent response text).
 
     Raises:
         RuntimeError: If API call fails after all retries.
@@ -89,7 +89,7 @@ def ask_agent_for_config(
                 f"Trial {trial_number}/{total_trials}, "
                 f"temp={temperature}, config={config}"
             )
-            return config
+            return config, raw_text
         except Exception as e:
             last_error = e
             if attempt < _MAX_RETRIES - 1:

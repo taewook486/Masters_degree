@@ -35,7 +35,7 @@ SEARCH_SPACE = {
     "warmup_ratio": (0.0, 0.1),  # continuous
     "weight_decay": (0.0, 0.1),  # continuous
     "lora_targets": ["minimal", "medium", "full"],
-    "epochs": [1, 2, 3, 5],
+    "max_steps": [100, 200, 400, 800],  # v0.2: replaces epochs for Phase 3
 }
 
 
@@ -50,7 +50,7 @@ def config_to_dict(trial: TrialResult) -> dict:
         "warmup_ratio": trial.warmup_ratio,
         "weight_decay": trial.weight_decay,
         "lora_targets": trial.lora_targets,
-        "epochs": trial.epochs,
+        "max_steps": trial.max_steps,
     }
 
 
@@ -62,13 +62,14 @@ class HPOStrategy(ABC):
     """Base class for HPO strategies."""
 
     name: str
+    last_reasoning: str = ""  # Raw LLM reasoning (autoresearch only)
 
     @abstractmethod
     def suggest(self, history: list[TrialResult]) -> dict:
         """Suggest next hyperparameter configuration.
 
         Args:
-            history: List of completed trials (for this strategy+repeat).
+            history: List of all trials (completed + failed) for this strategy+repeat.
 
         Returns:
             Dict of hyperparameters.
@@ -95,7 +96,7 @@ class ManualStrategy(HPOStrategy):
             "warmup_ratio": 0.03,
             "weight_decay": 0.01,
             "lora_targets": "minimal",
-            "epochs": 3,
+            "max_steps": 400,
         }
 
 
@@ -127,7 +128,7 @@ class RandomSearchStrategy(HPOStrategy):
             "warmup_ratio": round(random.uniform(wu_lo, wu_hi), 4),
             "weight_decay": round(random.uniform(wd_lo, wd_hi), 4),
             "lora_targets": random.choice(SEARCH_SPACE["lora_targets"]),
-            "epochs": random.choice(SEARCH_SPACE["epochs"]),
+            "max_steps": random.choice(SEARCH_SPACE["max_steps"]),
         }
 
 
@@ -172,7 +173,7 @@ class OptunaTPEStrategy(HPOStrategy):
                 "warmup_ratio": t.warmup_ratio,
                 "weight_decay": t.weight_decay,
                 "lora_targets": t.lora_targets,
-                "epochs": t.epochs,
+                "max_steps": t.max_steps,
             }
             study.add_trial(
                 optuna.trial.create_trial(
@@ -202,7 +203,7 @@ class OptunaTPEStrategy(HPOStrategy):
             "warmup_ratio": optuna.distributions.FloatDistribution(wu_lo, wu_hi),
             "weight_decay": optuna.distributions.FloatDistribution(wd_lo, wd_hi),
             "lora_targets": optuna.distributions.CategoricalDistribution(SEARCH_SPACE["lora_targets"]),
-            "epochs": optuna.distributions.CategoricalDistribution(SEARCH_SPACE["epochs"]),
+            "max_steps": optuna.distributions.CategoricalDistribution(SEARCH_SPACE["max_steps"]),
         }
 
     def suggest(self, history: list[TrialResult]) -> dict:
@@ -222,7 +223,7 @@ class OptunaTPEStrategy(HPOStrategy):
             "warmup_ratio": round(trial.params["warmup_ratio"], 4),
             "weight_decay": round(trial.params["weight_decay"], 4),
             "lora_targets": trial.params["lora_targets"],
-            "epochs": trial.params["epochs"],
+            "max_steps": trial.params["max_steps"],
         }
 
 
@@ -263,45 +264,59 @@ class AutoresearchStrategy(HPOStrategy):
         from src.autoresearch.agent import ask_agent_for_config
 
         program = self._load_program()
+        completed = [t for t in history if t.status == "completed"]
+        failed = [t for t in history if t.status == "failed"]
 
         # Build history summary for the agent
         if not history:
             history_text = "No previous trials. Start with an exploratory configuration."
+        elif not completed:
+            history_text = "No completed trials yet."
         else:
-            completed = [t for t in history if t.status == "completed"]
-            if not completed:
-                history_text = "No completed trials yet. Start with an exploratory configuration."
-            else:
-                lines = ["Previous experiment results (sorted by val_accuracy desc):", ""]
+            # Chronological order for sequential reasoning
+            lines = ["Previous experiment results (chronological order):", ""]
+            lines.append(
+                "trial | rank | alpha | lr       | bs | ga | targets | steps | val_acc | loss"
+            )
+            lines.append("-" * 90)
+            for t in sorted(completed, key=lambda x: x.trial_id)[-20:]:
                 lines.append(
-                    "trial | rank | alpha | lr       | bs | ga | targets | epochs | val_acc | loss"
+                    f"{t.trial_id:5d} | {t.lora_rank:4d} | {t.lora_alpha:5d} | "
+                    f"{t.learning_rate:.1e} | {t.batch_size:2d} | {t.grad_accum_steps:2d} | "
+                    f"{t.lora_targets:7s} | {t.max_steps:5d} | {t.val_accuracy:.4f} | "
+                    f"{t.train_loss:.4f}"
                 )
-                lines.append("-" * 90)
-                for t in sorted(completed, key=lambda x: -x.val_accuracy)[:20]:
-                    lines.append(
-                        f"{t.trial_id:5d} | {t.lora_rank:4d} | {t.lora_alpha:5d} | "
-                        f"{t.learning_rate:.1e} | {t.batch_size:2d} | {t.grad_accum_steps:2d} | "
-                        f"{t.lora_targets:7s} | {t.epochs:6d} | {t.val_accuracy:.4f} | "
-                        f"{t.train_loss:.4f}"
-                    )
-                best = max(completed, key=lambda x: x.val_accuracy)
-                lines.append(f"\nBest so far: trial {best.trial_id}, val_acc={best.val_accuracy:.4f}")
-                lines.append(f"Total completed: {len(completed)}")
-                history_text = "\n".join(lines)
+            best = max(completed, key=lambda x: x.val_accuracy)
+            lines.append(f"\nBest so far: trial {best.trial_id}, val_acc={best.val_accuracy:.4f}")
+            lines.append(f"Total completed: {len(completed)}")
+            history_text = "\n".join(lines)
 
-        trial_number = len([t for t in history if t.status == "completed"])
+        # Append failed trials so agent avoids re-suggesting OOM configs
+        if failed:
+            fail_lines = [f"\n## Failed Trials ({len(failed)} total - AVOID these configs):"]
+            for t in sorted(failed, key=lambda x: x.trial_id)[-10:]:
+                fail_lines.append(
+                    f"  trial {t.trial_id}: {t.notes} | "
+                    f"rank={t.lora_rank}, alpha={t.lora_alpha}, "
+                    f"targets={t.lora_targets}, bs={t.batch_size}"
+                )
+            history_text += "\n".join(fail_lines)
+
+        trial_number = len(completed)
 
         try:
-            config = ask_agent_for_config(
+            config, reasoning = ask_agent_for_config(
                 program,
                 history_text,
                 trial_number=trial_number,
                 total_trials=self.total_trials,
             )
+            self.last_reasoning = reasoning
             logger.info(f"[Autoresearch] Agent suggested: {config}")
             return config
         except Exception as e:
             logger.warning(f"[Autoresearch] Agent failed ({e}), falling back to random")
+            self.last_reasoning = ""
             return RandomSearchStrategy().suggest(history)
 
 
@@ -343,7 +358,7 @@ Search space:
 - warmup_ratio: [0.0, 0.1]
 - weight_decay: [0.0, 0.1]
 - lora_targets: {"minimal", "medium", "full"}
-- epochs: {1, 2, 3, 5}
+- max_steps: {100, 200, 400, 800}
 
 Strategy guidelines:
 1. Early trials (0-5): Explore diverse configurations

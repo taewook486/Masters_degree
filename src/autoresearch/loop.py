@@ -55,7 +55,12 @@ def _write_trial_config(
     config["training"]["gradient_accumulation_steps"] = hp["grad_accum_steps"]
     config["training"]["warmup_ratio"] = hp["warmup_ratio"]
     config["training"]["weight_decay"] = hp["weight_decay"]
-    config["training"]["num_train_epochs"] = hp["epochs"]
+    # v0.2: Phase 3 uses max_steps instead of epochs
+    if "max_steps" in hp:
+        config["training"]["max_steps"] = hp["max_steps"]
+        config["training"].pop("num_train_epochs", None)
+    elif "epochs" in hp:
+        config["training"]["num_train_epochs"] = hp["epochs"]
 
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
@@ -115,14 +120,15 @@ def run_single_trial(
         **hp,
     )
 
+    steps_label = hp.get("max_steps", hp.get("epochs", "?"))
     logger.info(
         f"Trial {trial_id} [{strategy_name}]: "
         f"rank={hp['lora_rank']}, alpha={hp['lora_alpha']}, "
         f"lr={hp['learning_rate']:.1e}, targets={hp['lora_targets']}, "
-        f"epochs={hp['epochs']}"
+        f"max_steps={steps_label}"
     )
 
-    train_start = time.time()
+    wall_start = time.time()
 
     try:
         result = train_qlora(
@@ -133,9 +139,10 @@ def run_single_trial(
             seed=seed,
             data_dir=data_dir,
             eval_after_training=True,
+            time_budget_min=time_budget_min,
         )
 
-        elapsed_min = (time.time() - train_start) / 60
+        wall_elapsed_min = (time.time() - wall_start) / 60
 
         eval_summary = result.get("eval_summary", {})
         training = result.get("training", {})
@@ -144,7 +151,9 @@ def run_single_trial(
         trial.val_closed_acc = eval_summary.get("closed_accuracy", 0.0)
         trial.val_open_acc = eval_summary.get("open_accuracy", 0.0)
         trial.train_loss = training.get("train_loss", 0.0) or 0.0
-        trial.train_time_min = round(elapsed_min, 1)
+        # v0.2: train_time_min = pure GPU training time (from trainer)
+        gpu_time_sec = training.get("train_runtime_sec", 0.0) or 0.0
+        trial.train_time_min = round(gpu_time_sec / 60, 1)
         trial.peak_vram_mb = training.get("peak_vram_mb", 0.0)
         trial.status = "completed"
 
@@ -152,20 +161,21 @@ def run_single_trial(
             f"Trial {trial_id} COMPLETED: "
             f"val_acc={trial.val_accuracy:.4f}, "
             f"loss={trial.train_loss:.4f}, "
-            f"time={trial.train_time_min:.1f}min"
+            f"gpu_time={trial.train_time_min:.1f}min, "
+            f"wall_time={wall_elapsed_min:.1f}min"
         )
 
     except torch.cuda.OutOfMemoryError:
         trial.status = "failed"
         trial.notes = "OOM"
-        trial.train_time_min = round((time.time() - train_start) / 60, 1)
+        trial.train_time_min = round((time.time() - wall_start) / 60, 1)
         logger.error(f"Trial {trial_id} FAILED: OOM")
         torch.cuda.empty_cache()
 
     except Exception as e:
         trial.status = "failed"
         trial.notes = str(e)[:200]
-        trial.train_time_min = round((time.time() - train_start) / 60, 1)
+        trial.train_time_min = round((time.time() - wall_start) / 60, 1)
         logger.error(f"Trial {trial_id} FAILED: {e}")
 
     # Cleanup
@@ -222,12 +232,11 @@ def run_hpo_loop(
     results: list[TrialResult] = []
 
     for i in range(max_trials):
-        # Get history for this strategy+repeat
+        # Get full history (completed + failed) for this strategy+repeat
         history = tracker.load_by_strategy(strategy_name, repeat_id)
-        completed = [t for t in history if t.status == "completed"]
 
-        # Suggest next config
-        hp = strategy.suggest(completed)
+        # Suggest next config (pass full history so agent sees failed trials)
+        hp = strategy.suggest(history)
 
         trial_id = tracker.next_trial_id()
         trial_seed = seed + i  # Vary seed per trial for diversity
@@ -245,6 +254,11 @@ def run_hpo_loop(
             data_dir=data_dir,
             time_budget_min=time_budget_min,
         )
+
+        # Attach agent reasoning if available (autoresearch strategy)
+        if strategy.last_reasoning:
+            trial.agent_reasoning = strategy.last_reasoning
+            strategy.last_reasoning = ""
 
         tracker.append(trial)
         results.append(trial)

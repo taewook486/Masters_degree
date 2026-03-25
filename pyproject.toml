@@ -39,6 +39,7 @@ dependencies = [
     "scipy>=1.14.0",
     "nltk>=3.9.0",
     "num2words>=0.5.13",
+    "bert-score>=0.3.13",
     # Utilities
     "pyyaml>=6.0",
     "omegaconf>=2.3.0",
