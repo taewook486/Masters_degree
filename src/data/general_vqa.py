@@ -72,33 +72,54 @@ def download_vqav2_subset(
         logger.info(f"VQAv2 subset already exists at {save_path}, skipping.")
         return save_path
 
-    logger.info("Downloading VQAv2 validation split (this may take a while)...")
-    ds = load_dataset(VQAV2_HF_ID, split=VQAV2_SPLIT)
-
-    logger.info(f"Full VQAv2 validation: {len(ds)} samples")
-
-    # Classify by answer_type: "yes/no" → closed, others → open
-    open_indices = []
-    closed_indices = []
-
-    for idx, row in enumerate(ds):
-        answer_type = row.get("answer_type", "")
-        if answer_type == "yes/no":
-            closed_indices.append(idx)
-        else:
-            open_indices.append(idx)
-
-    # Balanced sampling
     import random
-    rng = random.Random(seed)
+    from datasets import Dataset as HFDataset
+
+    logger.info("Downloading VQAv2 validation (streaming mode)...")
+    ds = load_dataset(VQAV2_HF_ID, split=VQAV2_SPLIT, streaming=True)
 
     n_per_type = n_samples // 2
-    sampled_closed = rng.sample(closed_indices, min(n_per_type, len(closed_indices)))
-    sampled_open = rng.sample(open_indices, min(n_per_type, len(open_indices)))
-    sampled_indices = sorted(sampled_closed + sampled_open)
+    max_candidates = n_per_type * 5  # 5x buffer for randomness
 
-    subset = ds.select(sampled_indices)
+    open_rows: list[dict] = []
+    closed_rows: list[dict] = []
+    total_seen = 0
 
+    for row in ds:
+        total_seen += 1
+        answer_type = row.get("answer_type", "")
+        if answer_type == "yes/no":
+            if len(closed_rows) < max_candidates:
+                closed_rows.append(row)
+        else:
+            if len(open_rows) < max_candidates:
+                open_rows.append(row)
+
+        if (len(closed_rows) >= max_candidates
+                and len(open_rows) >= max_candidates):
+            break
+
+        if total_seen % 5000 == 0:
+            logger.info(
+                f"  streamed {total_seen} rows "
+                f"(open={len(open_rows)}, closed={len(closed_rows)})"
+            )
+
+    logger.info(
+        f"Collected candidates from {total_seen} rows: "
+        f"open={len(open_rows)}, closed={len(closed_rows)}"
+    )
+
+    rng = random.Random(seed)
+    sampled_closed = rng.sample(
+        closed_rows, min(n_per_type, len(closed_rows)),
+    )
+    sampled_open = rng.sample(
+        open_rows, min(n_per_type, len(open_rows)),
+    )
+
+    all_samples = sampled_closed + sampled_open
+    subset = HFDataset.from_list(all_samples)
     subset.save_to_disk(str(save_path))
     logger.info(
         f"Saved VQAv2 subset to {save_path}: {len(subset)} samples "

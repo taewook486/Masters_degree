@@ -1,5 +1,5 @@
 @echo off
-cd /d "C:\project\Masters_degree"
+cd /d "d:\project\Masters_degree"
 set PYTHONUNBUFFERED=1
 set WANDB_PROJECT=medical-vqa-vlm
 
