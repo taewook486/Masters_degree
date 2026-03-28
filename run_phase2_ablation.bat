@@ -20,7 +20,7 @@ echo Starting Phase 2 Ablation at %DATE% %TIME% >> results\phase2_finetune\run_p
   --output_dir results/phase2_finetune ^
   --seeds 42 123 456 ^
   --data_dir data ^
-  --best_model_config configs/models/qwen25_vl_3b.yaml ^
+  --best_model_config configs/models/qwen3_vl_2b.yaml ^
   --ablation all ^
   >> results\phase2_finetune\run_phase2.log 2>&1
 

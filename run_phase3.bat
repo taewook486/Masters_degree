@@ -19,7 +19,7 @@ if "%ANTHROPIC_API_KEY%"=="" (
 echo Starting Phase 3 HPO at %DATE% %TIME% >> results\phase3_autoresearch\run_phase3.log
 
 .venv\Scripts\python.exe -u -m src.autoresearch.run_phase3 ^
-  --model_config configs/models/qwen25_vl_3b.yaml ^
+  --model_config configs/models/qwen3_vl_2b.yaml ^
   --finetune_config configs/finetune/base_qlora.yaml ^
   --output_dir results/phase3_autoresearch ^
   --strategies manual random optuna autoresearch ^
