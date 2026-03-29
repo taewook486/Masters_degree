@@ -232,3 +232,6 @@ Masters_degree/
 desktop.ini
 *.key
 tmp/
+
+# Generated PDFs
+docs/*.pdf
