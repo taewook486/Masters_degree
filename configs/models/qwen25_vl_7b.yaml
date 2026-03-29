@@ -1,0 +1,20 @@
+model_name: "qwen25-vl-7b"
+model_id: "Qwen/Qwen2.5-VL-7B-Instruct"
+model_class: "Qwen2_5_VLForConditionalGeneration"
+processor_class: "AutoProcessor"
+
+torch_dtype: "float16"
+device_map: "auto"
+trust_remote_code: false
+attn_implementation: "sdpa"
+
+processor_kwargs:
+  min_pixels: 200704    # 256 * 28 * 28
+  max_pixels: 401408    # 512 * 28 * 28 (OOM 방지를 위해 3B와 동일하게 제한)
+
+generation:
+  max_new_tokens: 128
+  do_sample: false
+
+prompt_format: "chat_template"
+requires_vision_info_processing: true
