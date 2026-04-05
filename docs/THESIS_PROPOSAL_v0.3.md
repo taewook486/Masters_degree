@@ -1,6 +1,6 @@
 # 석사학위 논문 설계서
 
-> **Version**: v0.2 (2026-03-24)
+> **Version**: v0.3 (2026-04-05)
 
 ## 변경 이력
 
@@ -8,6 +8,7 @@
 |------|------|----------|
 | v0.1 | 2026-03-22 | 초안 작성 (4개 모델, 기본 실험 설계) |
 | v0.2 | 2026-03-24 | Florence-2 탈락 (3개 모델), Phase 2: BERTScore 추가 및 CF 대조군 구체화, Phase 3: epochs->max_steps 전환 및 시간 예산 정의 명확화 |
+| v0.3 | 2026-04-05 | Gemma 4 E2B 모델 추가 (4개 모델), transformers 5.5.0 업그레이드, 실험 조건 수 업데이트 |
 
 ## 논문 정보
 
@@ -55,15 +56,17 @@
 
 ## 4. 실험 설계
 
-### 4.1 대상 모델 (3개)
+### 4.1 대상 모델 (4개)
 
 | 모델 | 파라미터 | 아키텍처 특징 | 예상 QLoRA VRAM |
 |------|---------|-------------|:---:|
 | Qwen3-VL-2B | 2B | Thinking mode, DeepStack | ~8-10 GB |
 | Qwen2.5-VL-3B | 3B | Dynamic Resolution, 19개 언어 OCR | ~8-10 GB |
 | SmolVLM-2.2B | 2.2B | HuggingFace 경량 VLM | ~8-10 GB |
+| Gemma4-E2B | 2.3B (active) / 5.1B (total) | PLE(Per-Layer Embeddings), Apache 2.0 | ~12-14 GB |
 
 > **v0.2 변경**: Florence-2-large 탈락. transformers 5.x와의 호환성 문제로 실험 환경에서 정상 동작하지 않음.
+> **v0.3 변경**: Gemma 4 E2B 추가. PLE 기술로 2.3B active 파라미터만으로 5.1B급 표현력 제공. 제로샷 VRAM ~10.3GB 확인 (호환성 테스트 4/4 PASS).
 
 **선정 기준**:
 - 16GB VRAM에서 QLoRA 파인튜닝 가능
@@ -85,7 +88,7 @@
 **목적**: 파인튜닝 전 각 모델의 의료 VQA 제로샷 성능 측정
 
 **실험 조건**:
-- 3개 모델 x 3개 데이터셋 = 9개 조건
+- 4개 모델 x 3개 데이터셋 = 12개 조건
 - 각 조건 3회 반복 (프롬프트 순서 shuffle, seed: 42, 123, 456)
 - 동일 프롬프트 템플릿 사용
 
@@ -103,7 +106,7 @@ Answer concisely.
 - VRAM 사용량 (peak MB)
 
 **통계 검증**:
-- ANOVA (3개 모델 간 성능 차이)
+- ANOVA (4개 모델 간 성능 차이)
 - 사후 검증: Tukey HSD
 - 유의수준: alpha = 0.05
 
@@ -129,7 +132,7 @@ weight_decay: 0.01
 ```
 
 **실험 조건**:
-- 3개 모델 x 3개 데이터셋 = 9개 조건
+- 4개 모델 x 3개 데이터셋 = 12개 조건
 - 각 조건 3회 반복 (seed 변경: 42, 123, 456)
 
 **Ablation Study A - 데이터 크기 영향**:
@@ -159,7 +162,7 @@ weight_decay: 0.01
 - 대조군: VQAv2 validation subset (2,000 샘플, 균형 샘플링)
 - 측정 시점: 파인튜닝 전(Base) 1회 + 파인튜닝 후(QLoRA) 1회
 - 지표: 범용 VQA 정확도 감소율 = (Base - Fine-tuned) / Base x 100%
-- 적용 범위: 9개 조건(3모델 x 3데이터셋) 각각에 대해 측정
+- 적용 범위: 12개 조건(4모델 x 3데이터셋) 각각에 대해 측정
 - Phase 3에서는 최종 best config에서만 측정 (trial 중 매회 측정 시 시간 비용 과다)
 
 **통계 검증**:
