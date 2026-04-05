@@ -1,0 +1,65 @@
+# =============================================================
+# 새 VLM 모델 Config 템플릿
+# =============================================================
+# 이 파일을 복사하여 새 모델 config를 작성하세요.
+# 파일명: <model_name>.yaml (예: gemma4_e2b.yaml)
+#
+# 작성 후 호환성 테스트:
+#   python scripts/test_model_compat.py configs/models/<model_name>.yaml
+# =============================================================
+
+# --- 필수 필드 ---
+
+# 모델 식별자 (결과 파일명에 사용, 하이픈 구분)
+model_name: "your-model-name"
+
+# HuggingFace 모델 ID
+model_id: "organization/model-name"
+
+# transformers 모델 클래스 (아래 중 선택)
+#   - AutoModelForImageTextToText (범용, 대부분 작동)
+#   - Qwen3VLForConditionalGeneration (Qwen3 전용)
+#   - Qwen2_5_VLForConditionalGeneration (Qwen2.5 전용)
+#   - Gemma4ForConditionalGeneration (Gemma4 전용)
+#   - 기타: python -c "import transformers; help(transformers.모델클래스명)"
+model_class: "AutoModelForImageTextToText"
+
+# Processor 클래스 (대부분 AutoProcessor 사용)
+processor_class: "AutoProcessor"
+
+# --- 모델 로딩 설정 ---
+
+# 데이터 타입 (float16 또는 bfloat16)
+#   - float16: 범용 호환, 대부분의 GPU 지원
+#   - bfloat16: Ampere(3090) 이상 GPU, 더 넓은 수치 범위
+torch_dtype: "bfloat16"
+
+# 디바이스 맵핑 (auto 권장)
+device_map: "auto"
+
+# 원격 코드 신뢰 여부 (보안상 false 권장, 모델이 요구하면 true)
+trust_remote_code: false
+
+# Attention 구현 방식 (sdpa 권장, 20-30% 속도 향상)
+attn_implementation: "sdpa"
+
+# --- 생성 설정 ---
+
+generation:
+  max_new_tokens: 128    # 최대 생성 토큰 수
+  do_sample: false       # 결정론적 생성 (재현성)
+
+# --- 프롬프트 설정 ---
+
+# 프롬프트 형식 (현재 chat_template만 지원)
+prompt_format: "chat_template"
+
+# --- 선택적 필드 (필요한 경우만 추가) ---
+
+# Qwen 계열 모델만 해당: Vision 정보 전처리 필요 여부
+# requires_vision_info_processing: true
+
+# Qwen 계열 모델만 해당: Processor 이미지 해상도 설정
+# processor_kwargs:
+#   min_pixels: 200704    # 256 * 28 * 28
+#   max_pixels: 401408    # 512 * 28 * 28
