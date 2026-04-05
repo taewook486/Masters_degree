@@ -7,7 +7,7 @@
 Phase 1 of the Medical VQA thesis: zero-shot baseline evaluation of 4 lightweight VLMs on 3 medical VQA datasets. This establishes baseline performance before QLoRA fine-tuning (Phase 2).
 
 - **Hardware**: RTX 5060 Ti 16GB VRAM, Ryzen 5 5600X, 32GB RAM
-- **Framework**: transformers 5.3.0, torch 2.10.0+cu128, omegaconf
+- **Framework**: transformers 5.5.0, torch 2.10.0+cu128, omegaconf
 - **Environment**: Windows 11, Python 3.12 (uv venv, downgraded from 3.13 for package compatibility)
 
 ---
@@ -20,6 +20,7 @@ Phase 1 of the Medical VQA thesis: zero-shot baseline evaluation of 4 lightweigh
 | 2 | Qwen2.5-VL-3B | `Qwen/Qwen2.5-VL-3B-Instruct` | `Qwen2_5_VLForConditionalGeneration` | ~6.99 GB | **Working** |
 | 3 | Florence-2-large | `microsoft/Florence-2-large` | `AutoModelForCausalLM` | ~2 GB | **Blocked** |
 | 4 | SmolVLM2-2.2B | `HuggingFaceTB/SmolVLM2-2.2B-Instruct` | `AutoModelForImageTextToText` | ~4.72 GB | **Working** |
+| 5 | Gemma4-E2B | `google/gemma-4-E2B-it` | `Gemma4ForConditionalGeneration` | ~10.3 GB | **Working** |
 
 ---
 
@@ -50,6 +51,19 @@ Phase 1 of the Medical VQA thesis: zero-shot baseline evaluation of 4 lightweigh
 - **Prompt format**: `chat_template` with `qwen_vl_utils.process_vision_info()`
 - **dtype**: float16
 - **Test answer** (blank white image): "I cannot see any image as I am a text-based model..."
+
+### 2.5 Gemma4-E2B - PASS (2026-04-05)
+
+- **VRAM**: ~10.3 GB (peak during inference)
+- **Prompt format**: `chat_template` (standard two-step: `apply_chat_template` -> `processor`, SmolVLM2와 동일 경로)
+- **dtype**: bfloat16
+- **Architecture**: Per-Layer Embeddings (PLE), 2.3B active / 5.1B total params
+- **Test answer** (red image, "What color?"): "Red"
+- **Compatibility**: transformers 5.5.0 필요 (5.3.0에서는 `Gemma4ForConditionalGeneration` 미존재)
+- **License**: Apache 2.0
+
+**transformers 업그레이드**: 5.3.0 → 5.5.0 (uv lock --upgrade-package transformers)
+- 기존 모델 클래스 호환성 확인 완료: Qwen3VL, Qwen2.5VL, SmolVLM2 모두 정상
 
 ### 2.4 Florence-2-large - BLOCKED (transformers 5.x incompatibility)
 
@@ -239,6 +253,7 @@ Alternative options (not pursued):
 | `qwen25_vl_3b.yaml` | Qwen2.5-VL-3B | float16, device_map=auto, **sdpa**, max_pixels=401408, chat_template, requires_vision_info |
 | `florence2_large.yaml` | Florence-2-large | float16, device_map=null, direct_question, trust_remote_code, eager attn, num_beams=3 |
 | `smolvlm2_2b.yaml` | SmolVLM2-2.2B | bfloat16, device_map=auto, chat_template |
+| `gemma4_e2b.yaml` | Gemma4-E2B | bfloat16, device_map=auto, **sdpa**, chat_template |
 
 ### 5.2 Core Source Files
 
@@ -261,7 +276,7 @@ Single inference:
     generate_answer -> _generate_chat_template -> _generate_qwen_style
     (uses qwen_vl_utils.process_vision_info)
 
-  SmolVLM2-2.2B:
+  SmolVLM2-2.2B / Gemma4-E2B:
     generate_answer -> _generate_chat_template -> _generate_standard_chat
     (two-step: apply_chat_template -> processor)
 
@@ -274,7 +289,7 @@ Batch inference (batch_size > 1):
     generate_answers_batch -> _generate_qwen_style_batch
     (per-sample process_vision_info, left-pad tokenizer, batch generate)
 
-  SmolVLM2-2.2B:
+  SmolVLM2-2.2B / Gemma4-E2B:
     generate_answers_batch -> _generate_standard_chat_batch
     (images as [[img] for img in images] — Idefics3 nested list requirement)
 
@@ -318,23 +333,19 @@ Five bottleneck fixes applied to reduce Phase 1 total runtime from ~12-15h to ~1
 
 ### Florence-2: CLOSED (2026-03-22)
 - [x] Decision made: **Drop Florence-2** — SA cache non-functional, 5th patch required
-- Evaluation proceeds with 3 models: Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B
+- Evaluation proceeds with 4 models: Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B
 
 ### Completed
 - [x] Run 10-sample test with all 3 models (all 9 conditions verified)
 - [x] Add `num2words` to `pyproject.toml`
 - [x] Apply 5 performance optimizations (batch, SDPA, max_pixels, model-once, single_seed)
 - [x] Python venv downgraded 3.13 → 3.12
+- [x] Phase 1 완료: 기존 3개 모델 × 3 데이터셋 × 3 시드 = 27개 조건 (2026-03-27)
+- [x] Gemma 4 E2B 추가: config 작성, transformers 5.5.0 업그레이드, 호환성 테스트 PASS (2026-04-05)
 
 ### In Progress
-- [🔄] **Phase 1 seed=42 pass running** (`run_phase1.bat`, started 2026-03-22 15:28)
-  - 9 conditions: Qwen3-VL-2B + Qwen2.5-VL-3B + SmolVLM2-2.2B × PathVQA + SLAKE + VQA-RAD
-  - Log: `results/phase1_baseline/run_all.log`
-
-### After seed=42 completes
-- [ ] Check results: verify accuracy and VRAM per model/dataset
-- [ ] Run seeds 123 + 456: remove `--single_seed_first` from `run_phase1.bat`, re-run
-- [ ] Generate final `results/phase1_baseline/phase1_summary.csv`
+- [🔄] **Gemma 4 E2B Phase 1 평가** (9개 조건: 3 데이터셋 × 3 시드)
+  - 기존 27개 조건은 skip_existing으로 건너뜀
 
 ### Datasets
 | Dataset | HF ID | Test Size |
@@ -362,3 +373,7 @@ Five bottleneck fixes applied to reduce Phase 1 total runtime from ~12-15h to ~1
 7. **Python version matters for prebuilt wheels**: flash_attn prebuilt wheels for sm_120 (Blackwell) only exist for cp312. Python 3.13 (cp313) venv required a downgrade to 3.12 before installation. Even then, cu129-compiled flash_attn DLLs are binary-incompatible with torch cu128 runtime — SDPA is the practical choice on this setup.
 
 8. **uv venv vs pip**: `uv venv` does not install pip by default. Use `uv pip install` instead of `.venv/Scripts/python.exe -m pip install`.
+
+9. **Gemma 4 E2B PLE architecture**: Per-Layer Embeddings로 2.3B active 파라미터만으로 5.1B 전체 파라미터급 표현력 제공. VRAM은 ~10.3 GB로 active 파라미터 대비 높으나, 16GB GPU에서 충분히 동작. `_generate_standard_chat` 경로(SmolVLM2와 동일)로 기존 파이프라인과 코드 수정 없이 호환.
+
+10. **transformers 버전 관리**: Gemma 4 지원을 위해 5.3.0 → 5.5.0 업그레이드 필요. `uv lock --upgrade-package transformers && uv sync` 사용. 기존 Qwen, SmolVLM2 클래스 모두 호환 확인.

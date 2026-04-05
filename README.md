@@ -34,7 +34,10 @@
 | Qwen3-VL-2B | 2B | `Qwen/Qwen3-VL-2B-Instruct` | ~3.96 GB | 사용 중 |
 | Qwen2.5-VL-3B | 3B | `Qwen/Qwen2.5-VL-3B-Instruct` | ~6.99 GB | 사용 중 |
 | SmolVLM2-2.2B | 2.2B | `HuggingFaceTB/SmolVLM2-2.2B-Instruct` | ~4.72 GB | 사용 중 |
+| Gemma4-E2B | 2.3B (active) / 5.1B (total) | `google/gemma-4-E2B-it` | ~10.3 GB | 사용 중 |
 | ~~Florence-2-large~~ | ~~0.77B~~ | ~~`microsoft/Florence-2-large`~~ | ~~-~~ | 제외 (transformers 5.x 비호환) |
+
+> Gemma 4 E2B는 Per-Layer Embeddings(PLE) 기술로 2.3B active 파라미터만으로 5.1B급 표현력을 제공하며, Apache 2.0 라이선스로 공개된 최신 멀티모달 모델입니다.
 
 > Florence-2-large는 transformers 5.x 환경에서 SA causal mask 캐시 버그로 인해 정상 추론 불가 판정 후 제외되었습니다.
 
@@ -60,14 +63,14 @@
 | OS | Windows 11 |
 | Python | 3.12 |
 | PyTorch | 2.10.0+cu128 (CUDA 12.8) |
-| Transformers | 5.x |
+| Transformers | 5.5.0 |
 | 패키지 관리자 | uv |
 
 ---
 
 ## 기술 스택
 
-- **딥러닝 프레임워크**: PyTorch 2.10.0+cu128, HuggingFace Transformers 5.x
+- **딥러닝 프레임워크**: PyTorch 2.10.0+cu128, HuggingFace Transformers 5.5.0
 - **미세조정**: PEFT, TRL, BitsAndBytes (4-bit QLoRA)
 - **하이퍼파라미터 최적화**: Optuna (Bayesian HPO)
 - **실험 추적**: WandB
@@ -81,7 +84,7 @@
 ```
 Masters_degree/
 ├── configs/
-│   ├── models/          # 모델별 YAML 설정 (4개 모델)
+│   ├── models/          # 모델별 YAML 설정 (5개 모델)
 │   ├── finetune/        # QLoRA 학습 설정 및 ablation 실험
 │   └── autoresearch/    # HPO 탐색 공간 설정
 ├── src/
@@ -151,7 +154,7 @@ uv sync --extra dev
 ### Phase 1: 제로샷 베이스라인 평가
 
 ```bash
-# 전체 평가 실행 (3개 모델 x 3개 데이터셋 x 3개 시드 = 27개 조건)
+# 전체 평가 실행 (4개 모델 x 3개 데이터셋 x 3개 시드 = 36개 조건)
 .venv/Scripts/python.exe src/baseline/run_all.py
 
 # 특정 모델만 평가
@@ -181,11 +184,11 @@ cat results/phase1_baseline/phase1_summary.csv
 
 | 항목 | 내용 |
 |------|------|
-| 대상 모델 | Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B |
+| 대상 모델 | Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B |
 | 대상 데이터셋 | PathVQA, SLAKE, VQA-RAD |
-| 실험 조건 | 3개 시드 (42, 123, 456) x 27개 조건 |
+| 실험 조건 | 4개 모델 x 3개 시드 (42, 123, 456) = 36개 조건 |
 | 평가 지표 | Closed/Open/Overall Accuracy |
-| 진행 상태 | 진행 중 |
+| 진행 상태 | 진행 중 (기존 3개 모델 27개 조건 완료, Gemma4-E2B 9개 조건 대기) |
 
 ### Phase 2: QLoRA 미세조정 분석
 
