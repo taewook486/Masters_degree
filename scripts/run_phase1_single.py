@@ -13,8 +13,8 @@ RunPod 또는 로컬에서 사용 가능.
     # 디버그 모드 (샘플 수 제한)
     python scripts/run_phase1_single.py --config configs/models/gemma4_e2b.yaml --max_samples 10
 
-    # 기존 결과 건너뛰기
-    python scripts/run_phase1_single.py --config configs/models/gemma4_e2b.yaml --skip_existing
+    # 기존 결과 무시하고 재실행 (기본은 skip)
+    python scripts/run_phase1_single.py --config configs/models/gemma4_e2b.yaml --no_skip_existing
 """
 
 from __future__ import annotations
@@ -55,8 +55,8 @@ def main() -> None:
     parser.add_argument("--batch_size", type=int, default=4)
     parser.add_argument("--max_samples", type=int, default=None)
     parser.add_argument(
-        "--skip_existing", action="store_true",
-        help="기존 결과 파일이 있으면 해당 조건 건너뛰기",
+        "--no_skip_existing", action="store_true",
+        help="기존 결과 파일이 있어도 재실행 (기본: 기존 결과 건너뜀)",
     )
     args = parser.parse_args()
 
@@ -68,12 +68,13 @@ def main() -> None:
     config = load_config(args.config)
     model_name = config.model_name
 
-    # 실행할 조건 계산
+    # 실행할 조건 계산 (기본: 기존 결과 건너뜀, --no_skip_existing 명시 시 재실행)
+    skip_existing = not args.no_skip_existing
     conditions = []
     skipped = 0
     for dataset_name in DATASETS:
         for seed in SEEDS:
-            if args.skip_existing and result_exists(args.output_dir, model_name, dataset_name, seed):
+            if skip_existing and result_exists(args.output_dir, model_name, dataset_name, seed):
                 skipped += 1
                 logger.info(f"  [SKIP] {model_name}/{dataset_name}/seed{seed} (결과 존재)")
             else:

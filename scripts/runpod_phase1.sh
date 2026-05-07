@@ -18,8 +18,8 @@
 #      # 배치 크기 변경 (기본: 8)
 #      bash scripts/runpod_phase1.sh --config configs/models/gemma4_e2b.yaml --batch_size 4
 #
-#      # 기존 결과 건너뛰기
-#      bash scripts/runpod_phase1.sh --config configs/models/gemma4_e2b.yaml --skip_existing
+#      # 기존 결과 무시하고 재실행 (기본은 skip)
+#      bash scripts/runpod_phase1.sh --config configs/models/gemma4_e2b.yaml --no_skip_existing
 #
 #   3. 완료 후 결과 다운로드:
 #      scp 또는 RunPod UI에서 results/phase1_baseline/*.json
@@ -42,8 +42,8 @@ while [[ $# -gt 0 ]]; do
             BATCH_SIZE="$2"
             shift 2
             ;;
-        --skip_existing)
-            EXTRA_ARGS="$EXTRA_ARGS --skip_existing"
+        --no_skip_existing)
+            EXTRA_ARGS="$EXTRA_ARGS --no_skip_existing"
             shift
             ;;
         --max_samples)
