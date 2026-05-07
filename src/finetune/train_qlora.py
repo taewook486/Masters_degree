@@ -625,7 +625,7 @@ def train_qlora(
                     seed=seed,
                     data_dir=data_dir,
                 )
-                result["catastrophic_forgetting"] = cf_result.get("catastrophic_forgetting", {})
+                result["catastrophic_forgetting"] = cf_result.get("summary", {})
             except Exception as e:
                 logger.warning(f"[CF] Measurement failed: {e}")
 

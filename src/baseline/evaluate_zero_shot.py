@@ -23,6 +23,8 @@ from src.baseline.model_loader import (
 )
 from src.data.dataset import load_medical_vqa_dataset
 from src.evaluate.metrics import _extract_yes_no, compute_overall_accuracy, preprocess_answer
+from src.utils.environment import get_environment_info
+from src.utils.logging_config import setup_logging
 from src.utils.seed import set_seed
 from src.utils.vram_monitor import get_vram_usage, reset_peak_stats
 
@@ -90,7 +92,7 @@ def evaluate_with_loaded_model(
 
     # Aggregate metrics
     vram = get_vram_usage()
-    metrics = compute_overall_accuracy(predictions, gold_answers, question_types)
+    metrics = compute_overall_accuracy(predictions, gold_answers, question_types, compute_bertscore=True)
     time_values = [r["time_ms"] for r in per_sample_results if r["time_ms"] > 0]
     avg_time_ms = sum(time_values) / len(time_values) if time_values else 0.0
 
@@ -110,6 +112,7 @@ def evaluate_with_loaded_model(
             "num_samples": len(samples),
             "batch_size": batch_size,
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "environment": get_environment_info(),
         },
         "summary": summary,
         "per_sample": per_sample_results,
@@ -301,10 +304,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
+    setup_logging(log_dir=args.output_dir, experiment_name="evaluate_zero_shot")
 
     evaluate_single_condition(
         model_config_path=args.model_config,

@@ -7,8 +7,10 @@ Provides read/write/query operations for all 4 HPO strategies.
 from __future__ import annotations
 
 import csv
+import json
 import logging
 from dataclasses import asdict, dataclass, fields
+from datetime import datetime, timezone
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -45,6 +47,10 @@ class TrialResult:
     status: str = "pending"  # "pending", "running", "completed", "failed"
     notes: str = ""
     agent_reasoning: str = ""  # Raw LLM reasoning (autoresearch only)
+
+    # REQ-RI-006: 탐색/활용 전환 메타데이터
+    phase: str = ""  # "exploration", "transition", "exploitation"
+    temperature: float = 0.0  # 에이전트 온도 스케줄링 값
 
 
 TSV_COLUMNS = [f.name for f in fields(TrialResult)]
@@ -106,6 +112,8 @@ class ExperimentTracker:
                     status=row["status"],
                     notes=row.get("notes", ""),
                     agent_reasoning=row.get("agent_reasoning", ""),
+                    phase=row.get("phase", "unknown"),
+                    temperature=float(row.get("temperature", 0.0)),
                 )
                 results.append(trial)
         return results
@@ -132,6 +140,50 @@ class ExperimentTracker:
         if not completed:
             return None
         return max(completed, key=lambda t: t.val_accuracy)
+
+    def export_json(self, output_path: str | Path, strategy: str | None = None) -> Path:
+        """결과를 metadata/summary 구조의 JSON으로 내보낸다 (REQ-RI-009).
+
+        Args:
+            output_path: JSON 파일 저장 경로.
+            strategy: 특정 전략만 내보내기 (None이면 전체).
+
+        Returns:
+            저장된 JSON 파일 경로.
+        """
+        trials = self.load_all()
+        if strategy:
+            trials = [t for t in trials if t.strategy == strategy]
+
+        completed = [t for t in trials if t.status == "completed"]
+        best = max(completed, key=lambda t: t.val_accuracy) if completed else None
+
+        result = {
+            "metadata": {
+                "source": "autoresearch_hpo",
+                "strategy": strategy or "all",
+                "total_trials": len(trials),
+                "completed_trials": len(completed),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            },
+            "summary": {
+                "best_val_accuracy": best.val_accuracy if best else 0.0,
+                "best_trial_id": best.trial_id if best else None,
+                "avg_val_accuracy": (
+                    round(sum(t.val_accuracy for t in completed) / len(completed), 4)
+                    if completed else 0.0
+                ),
+            },
+            "trials": [asdict(t) for t in trials],
+        }
+
+        out = Path(output_path)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with open(out, "w", encoding="utf-8") as f:
+            json.dump(result, f, indent=2, ensure_ascii=False)
+
+        logger.info(f"JSON 내보내기 완료: {out} ({len(trials)} trials)")
+        return out
 
     def summary_text(self, strategy: str, repeat_id: int) -> str:
         """Generate a human-readable summary of trials for the LLM agent."""

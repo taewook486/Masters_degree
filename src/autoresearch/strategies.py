@@ -260,6 +260,31 @@ class AutoresearchStrategy(HPOStrategy):
                 self._program = _DEFAULT_PROGRAM
         return self._program
 
+    def _is_duplicate(self, config: dict, history: list[TrialResult]) -> bool:
+        """이전 완료 trial과 동일한 하이퍼파라미터 설정인지 확인한다."""
+        # 비교 대상 키 (연속형 값은 반올림하여 비교)
+        compare_keys = [
+            "lora_rank", "lora_alpha", "batch_size",
+            "grad_accum_steps", "lora_targets", "max_steps",
+        ]
+        for trial in history:
+            if trial.status != "completed":
+                continue
+            existing = config_to_dict(trial)
+            match = True
+            for key in compare_keys:
+                if config.get(key) != existing.get(key):
+                    match = False
+                    break
+            if match:
+                # 연속형 값도 비교 (learning_rate, warmup_ratio, weight_decay)
+                lr_match = abs(config.get("learning_rate", 0) - existing.get("learning_rate", 0)) < 1e-5
+                wu_match = abs(config.get("warmup_ratio", 0) - existing.get("warmup_ratio", 0)) < 1e-4
+                wd_match = abs(config.get("weight_decay", 0) - existing.get("weight_decay", 0)) < 1e-4
+                if lr_match and wu_match and wd_match:
+                    return True
+        return False
+
     def suggest(self, history: list[TrialResult]) -> dict:
         from src.autoresearch.agent import ask_agent_for_config
 
@@ -304,13 +329,28 @@ class AutoresearchStrategy(HPOStrategy):
 
         trial_number = len(completed)
 
+        # REQ-RI-004: 중복 설정 감지 및 재시도 (최대 3회)
+        _MAX_DUPLICATE_RETRIES = 3
         try:
-            config, reasoning = ask_agent_for_config(
-                program,
-                history_text,
-                trial_number=trial_number,
-                total_trials=self.total_trials,
-            )
+            config = None
+            for attempt in range(_MAX_DUPLICATE_RETRIES):
+                config, reasoning = ask_agent_for_config(
+                    program,
+                    history_text,
+                    trial_number=trial_number,
+                    total_trials=self.total_trials,
+                )
+                if not self._is_duplicate(config, history):
+                    break
+                logger.warning(
+                    f"[Autoresearch] Duplicate config detected (attempt {attempt + 1}/{_MAX_DUPLICATE_RETRIES}), "
+                    f"requesting re-proposal"
+                )
+                # 재시도 시 history_text에 중복 경고 추가
+                history_text += (
+                    f"\n\n## WARNING: Your last suggestion was a duplicate of a previous trial. "
+                    f"Please suggest a DIFFERENT configuration."
+                )
             self.last_reasoning = reasoning
             logger.info(f"[Autoresearch] Agent suggested: {config}")
             return config

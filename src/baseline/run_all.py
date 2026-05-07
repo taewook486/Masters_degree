@@ -19,6 +19,7 @@ import yaml
 
 from src.baseline.evaluate_zero_shot import evaluate_with_loaded_model
 from src.baseline.model_loader import load_config, load_model, unload_model
+from src.utils.logging_config import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -187,6 +188,9 @@ def _aggregate_seed_results(
     closed_mean, closed_std = _stat("closed_accuracy")
     open_mean, open_std = _stat("open_accuracy")
     overall_mean, overall_std = _stat("overall_accuracy")
+    # REQ-RI-002: BERTScore 집계 추가
+    bertscore_f1_mean, bertscore_f1_std = _stat("open_bertscore_f1")
+    bertscore_acc_mean, bertscore_acc_std = _stat("open_bertscore_accuracy")
     time_mean, time_std = _stat("avg_time_ms")
     vram_values = [r.get("peak_vram_mb", 0) for r in results]
     peak_vram = max(vram_values) if vram_values else 0
@@ -201,6 +205,10 @@ def _aggregate_seed_results(
         "open_acc_std": open_std,
         "overall_acc_mean": overall_mean,
         "overall_acc_std": overall_std,
+        "open_bertscore_f1_mean": bertscore_f1_mean,
+        "open_bertscore_f1_std": bertscore_f1_std,
+        "open_bertscore_accuracy_mean": bertscore_acc_mean,
+        "open_bertscore_accuracy_std": bertscore_acc_std,
         "avg_time_ms_mean": time_mean,
         "avg_time_ms_std": time_std,
         "peak_vram_mb": peak_vram,
@@ -251,10 +259,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
+    setup_logging(log_dir=args.output_dir, experiment_name="run_all")
 
     df = run_all_conditions(
         config_dir=args.config_dir,

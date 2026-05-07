@@ -85,9 +85,16 @@ def ask_agent_for_config(
             raw_text = response.content[0].text.strip()
             config = _parse_config(raw_text)
             config = _validate_config(config)
+            # REQ-RI-006: 탐색/활용 전환 구조화 로깅
+            if progress < 0.25:
+                phase_label = "exploration"
+            elif progress < 0.75:
+                phase_label = "transition"
+            else:
+                phase_label = "exploitation"
             logger.info(
-                f"Trial {trial_number}/{total_trials}, "
-                f"temp={temperature}, config={config}"
+                f"[HPO] Trial {trial_number}/{total_trials} | "
+                f"phase={phase_label} | temp={temperature} | config={config}"
             )
             return config, raw_text
         except Exception as e:
@@ -175,15 +182,51 @@ def _parse_config(raw_text: str) -> dict:
     raise RuntimeError(f"Could not parse JSON from agent response: {raw_text[:200]}")
 
 
+_VALID_MAX_STEPS = {100, 200, 400, 800}
+
+# REQ-RI-005: 필수 키 정의 및 기본값
+_REQUIRED_KEYS_DEFAULTS = {
+    "lora_rank": 16,
+    "lora_alpha": 32,
+    "learning_rate": 2e-4,
+    "batch_size": 1,
+    "grad_accum_steps": 8,
+    "warmup_ratio": 0.03,
+    "weight_decay": 0.01,
+    "lora_targets": "minimal",
+    "max_steps": 400,
+}
+
+
 def _validate_config(config: dict) -> dict:
-    """Validate and clamp hyperparameters to search space bounds."""
+    """Validate and clamp hyperparameters to search space bounds.
+
+    REQ-RI-005: 필수 키 누락 시 기본값 적용, epochs->max_steps 마이그레이션.
+    """
+    # REQ-RI-005: 필수 키 존재 여부 확인, 누락 시 기본값 적용
+    for key, default_val in _REQUIRED_KEYS_DEFAULTS.items():
+        if key not in config:
+            logger.warning(f"필수 키 '{key}' 누락, 기본값 {default_val} 적용")
+            config[key] = default_val
+
+    # REQ-RI-005: epochs -> max_steps 하위 호환성 마이그레이션
+    if "epochs" in config and "max_steps" not in config:
+        epochs_val = config.pop("epochs")
+        # epochs를 max_steps로 변환 (대략적 매핑)
+        epoch_to_steps = {1: 100, 2: 200, 3: 400, 5: 800}
+        max_steps = epoch_to_steps.get(epochs_val, 400)
+        config["max_steps"] = max_steps
+        logger.warning(f"epochs={epochs_val} -> max_steps={max_steps} 마이그레이션 완료")
+    elif "epochs" in config:
+        # max_steps가 이미 있으면 epochs 키 제거
+        config.pop("epochs", None)
+
     rank = config.get("lora_rank", 16)
     if rank not in _VALID_RANKS:
         rank = min(_VALID_RANKS, key=lambda x: abs(x - rank))
         logger.warning(f"Clamped lora_rank to {rank}")
 
     alpha = config.get("lora_alpha", rank * 2)
-    # Ensure alpha is rank * {1, 2, 4}
     valid_alphas = [rank * r for r in [1, 2, 4]]
     if alpha not in valid_alphas:
         alpha = min(valid_alphas, key=lambda x: abs(x - alpha))
@@ -211,9 +254,10 @@ def _validate_config(config: dict) -> dict:
         targets = "minimal"
         logger.warning("Invalid lora_targets, defaulting to 'minimal'")
 
-    epochs = config.get("epochs", 3)
-    if epochs not in _VALID_EPOCHS:
-        epochs = min(_VALID_EPOCHS, key=lambda x: abs(x - epochs))
+    max_steps = config.get("max_steps", 400)
+    if max_steps not in _VALID_MAX_STEPS:
+        max_steps = min(_VALID_MAX_STEPS, key=lambda x: abs(x - max_steps))
+        logger.warning(f"Clamped max_steps to {max_steps}")
 
     return {
         "lora_rank": rank,
@@ -224,5 +268,5 @@ def _validate_config(config: dict) -> dict:
         "warmup_ratio": round(wu, 4),
         "weight_decay": round(wd, 4),
         "lora_targets": targets,
-        "epochs": epochs,
+        "max_steps": max_steps,
     }

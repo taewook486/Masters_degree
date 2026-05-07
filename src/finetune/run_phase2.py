@@ -394,9 +394,9 @@ def build_summary(results: list[dict], label: str) -> pd.DataFrame:
             "open_bertscore_f1": eval_s.get("open_bertscore_f1"),
             "overall_acc": eval_s.get("overall_accuracy"),
             # CF metrics (v0.2)
-            "cf_base_overall": cf.get("base_overall_accuracy") if (cf := r.get("catastrophic_forgetting")) else None,
-            "cf_ft_overall": cf.get("finetuned_overall_accuracy") if (cf := r.get("catastrophic_forgetting")) else None,
-            "cf_degradation_pct": cf.get("degradation_overall_accuracy_pct") if (cf := r.get("catastrophic_forgetting")) else None,
+            "cf_base_overall": cf.get("base_overall_accuracy") if (cf := r.get("summary")) else None,
+            "cf_ft_overall": cf.get("finetuned_overall_accuracy") if (cf := r.get("summary")) else None,
+            "cf_degradation_pct": cf.get("degradation_overall_accuracy_pct") if (cf := r.get("summary")) else None,
         })
     return pd.DataFrame(rows)
 

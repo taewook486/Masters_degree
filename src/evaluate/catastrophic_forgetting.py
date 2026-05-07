@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 
 from src.data.general_vqa import load_vqav2_subset
@@ -184,13 +185,20 @@ def run_cf_measurement(
 
     cf_metrics = measure_catastrophic_forgetting(base_vqav2_result, ft_result)
 
+    # REQ-RI-009: metadata/summary 통일 스키마
     result = {
-        "model_name": model_name,
-        "train_dataset": dataset_name,
-        "seed": seed,
+        "metadata": {
+            "model_name": model_name,
+            "train_dataset": dataset_name,
+            "seed": seed,
+            "measurement_type": "catastrophic_forgetting",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+        "summary": {
+            **cf_metrics,
+        },
         "base_vqav2": base_vqav2_result,
         "finetuned_vqav2": ft_result,
-        "catastrophic_forgetting": cf_metrics,
     }
 
     # Save
@@ -200,7 +208,7 @@ def run_cf_measurement(
     with open(cf_file, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2, ensure_ascii=False)
 
-    deg = cf_metrics["degradation_overall_accuracy_pct"]
+    deg = result["summary"]["degradation_overall_accuracy_pct"]
     logger.info(
         f"[CF] {model_name}/{dataset_name}/seed={seed}: "
         f"base={base_vqav2_result['overall_accuracy']:.4f} -> "

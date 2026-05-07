@@ -160,7 +160,7 @@ def compute_overall_accuracy(
     predictions: list[str],
     gold_answers: list[str],
     question_types: list[str],
-    compute_bertscore: bool = False,
+    compute_bertscore: bool = True,
 ) -> dict[str, float | int]:
     """Compute closed, open, and overall accuracy.
 

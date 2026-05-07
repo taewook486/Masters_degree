@@ -23,6 +23,7 @@ import yaml
 
 from src.autoresearch.strategies import HPOStrategy
 from src.autoresearch.tracker import ExperimentTracker, TrialResult
+from src.utils.checkpoint import load_checkpoint, save_checkpoint
 from src.utils.seed import set_seed
 from src.utils.vram_monitor import reset_peak_stats
 
@@ -229,9 +230,29 @@ def run_hpo_loop(
     if strategy_name == "manual":
         max_trials = 1
 
+    # REQ-RI-008: 기존 완료된 trial 수를 확인하여 재개 지점 결정
+    existing_history = tracker.load_by_strategy(strategy_name, repeat_id)
+    completed_count = sum(1 for t in existing_history if t.status == "completed")
+    start_index = completed_count
+
+    if start_index > 0:
+        logger.info(
+            f"[Resume] {strategy_name}/repeat{repeat_id}: "
+            f"{completed_count}개 완료된 trial 발견, trial {start_index}부터 재개"
+        )
+
+    # 체크포인트에서 복원 시도
+    checkpoint_dir = str(Path(output_dir) / "checkpoints")
+    ckpt = load_checkpoint(checkpoint_dir)
+    if ckpt and ckpt.get("strategy") == strategy_name and ckpt.get("repeat_id") == repeat_id:
+        ckpt_completed = ckpt.get("completed_trials", 0)
+        if ckpt_completed > start_index:
+            start_index = ckpt_completed
+            logger.info(f"[Resume] 체크포인트에서 {ckpt_completed}개 완료 확인, skip {start_index}개")
+
     results: list[TrialResult] = []
 
-    for i in range(max_trials):
+    for i in range(start_index, max_trials):
         # Get full history (completed + failed) for this strategy+repeat
         history = tracker.load_by_strategy(strategy_name, repeat_id)
 
@@ -262,6 +283,16 @@ def run_hpo_loop(
 
         tracker.append(trial)
         results.append(trial)
+
+        # REQ-RI-008: 완료된 trial에만 체크포인트 저장 (failed trial은 재시도 대상)
+        if trial.status == "completed":
+            completed_so_far = sum(1 for t in tracker.load_by_strategy(strategy_name, repeat_id) if t.status == "completed")
+            save_checkpoint(checkpoint_dir, {
+                "strategy": strategy_name,
+                "repeat_id": repeat_id,
+                "completed_trials": completed_so_far,
+                "last_trial_id": trial.trial_id,
+            })
 
         if trial.status == "completed":
             best = tracker.best_trial(strategy_name, repeat_id)
