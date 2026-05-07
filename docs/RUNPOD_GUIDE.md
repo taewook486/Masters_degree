@@ -28,7 +28,7 @@ Medical VQA VLM 석사 연구 — Phase 1/2/3 전체 파이프라인 실행 매�
 | Container Disk | 80GB 이상 |
 | Volume Disk | 50GB 이상 (`/workspace` 마운트) |
 
-> Phase 2/3에서 Qwen2.5-VL-7B 사용 시 RTX 4090 필수. 3B/2B 모델만 사용 시 A5000(24GB)도 가능.
+> Gemma4-E2B(~10.3GB) 또는 선택 모델 Qwen2.5-VL-7B 사용 시 RTX 4090(24GB) 권장. 2B/3B 모델만 사용 시 A5000(24GB)도 가능.
 
 ---
 
@@ -67,7 +67,9 @@ echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.bashrc
 
 **목표**: 4개 모델 × 3개 데이터셋 × 3개 시드 평가 (BERTScore 포함)
 
-**평가 모델**: Qwen2.5-VL-3B, Qwen3-VL-2B, SmolVLM2-2.2B, Qwen2.5-VL-7B
+**평가 모델 (4개, 논문 대상)**: Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B
+
+**선택 모델**: Qwen2.5-VL-7B (성능 비교용, 논문 대상 아님)
 
 ### 전체 모델 일괄 실행
 
@@ -78,21 +80,23 @@ echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.bashrc
 ### 모델별 개별 실행 (권장)
 
 ```bash
-# Qwen2.5-VL-3B
-bash scripts/runpod_phase1.sh --config configs/models/qwen25_vl_3b.yaml
-
 # Qwen3-VL-2B
 bash scripts/runpod_phase1.sh --config configs/models/qwen3_vl_2b.yaml
+
+# Qwen2.5-VL-3B
+bash scripts/runpod_phase1.sh --config configs/models/qwen25_vl_3b.yaml
 
 # SmolVLM2-2.2B
 bash scripts/runpod_phase1.sh --config configs/models/smolvlm2_2b.yaml
 
-# Qwen2.5-VL-7B (24GB VRAM 필수)
-bash scripts/runpod_phase1.sh --config configs/models/qwen25_vl_7b.yaml
+# Gemma4-E2B (PLE, ~10.3GB VRAM)
+bash scripts/runpod_phase1.sh --config configs/models/gemma4_e2b.yaml
 
-# Gemma 4 (별도 스크립트)
-bash scripts/runpod_phase1_gemma4.sh
+# (선택) Qwen2.5-VL-7B — 24GB VRAM 필수, 논문 대상 외
+bash scripts/runpod_phase1.sh --config configs/models/qwen25_vl_7b.yaml
 ```
+
+> Gemma 4 전용 스크립트(`runpod_phase1_gemma4.sh`)는 deprecated. 위 범용 스크립트를 사용하세요.
 
 ### 기존 결과 덮어쓰기 (BERTScore 재계산)
 
@@ -244,4 +248,4 @@ bash scripts/run_phase3.sh
 
 ---
 
-*최종 업데이트: 2026-05-07*
+*최종 업데이트: 2026-05-07 (Gemma 4 E2B 반영, Phase 1 모델 목록 정정)*

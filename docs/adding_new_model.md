@@ -68,6 +68,8 @@ python scripts/run_phase1_single.py --config configs/models/<model_name>.yaml
 bash scripts/runpod_phase1.sh --config configs/models/<model_name>.yaml --batch_size 8
 ```
 
+> RunPod 인스턴스 세팅, Phase 2/3 실행, 결과 다운로드 등 전체 파이프라인은 [docs/RUNPOD_GUIDE.md](RUNPOD_GUIDE.md)를 참조하세요.
+
 ### Step 4: 문서 업데이트
 
 아래 파일들을 업데이트하세요:
