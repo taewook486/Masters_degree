@@ -118,6 +118,30 @@ cat results/phase1_baseline/phase1_summary.csv
 
 `phase1_summary.csv`의 `overall_acc_mean` 기준으로 최고 성능 모델 선택 후 메모.
 
+### Phase 1.5: 데이터 오염 측정 (v0.5 신설)
+
+Phase 1 결과 산출 후, 사전훈련 데이터 오염 가능성을 능동적으로 측정합니다.
+
+```bash
+# 4개 모델 × 3개 데이터셋 (선택 모델 Qwen2.5-VL-7B 제외)
+for model in qwen3_vl_2b qwen25_vl_3b smolvlm2_2b gemma4_e2b; do
+  for dataset in pathvqa slake vqa_rad; do
+    python scripts/measure_contamination.py \
+      --config configs/models/${model}.yaml \
+      --dataset ${dataset} \
+      --output_dir results/contamination \
+      --k_percent 20
+  done
+done
+```
+
+**예상 소요**: ~4시간 (RTX 4090, 12개 조건 × forward pass)
+
+**결과 분석**:
+- `results/contamination/<model>_<dataset>_minK20.json` 파일 12개
+- summary.mean_minK 값이 calibration set보다 유의미하게 높으면 contamination 의심
+- 의심 sample 제거 후 Phase 1 결과 재계산 필요 (논문 §4.2.1 절차 참조)
+
 ---
 
 ## 4. Phase 2: QLoRA 파인튜닝
@@ -248,4 +272,4 @@ bash scripts/run_phase3.sh
 
 ---
 
-*최종 업데이트: 2026-05-07 (Gemma 4 E2B 반영, Phase 1 모델 목록 정정)*
+*최종 업데이트: 2026-05-16 (v0.5: 데이터 오염 측정 절차 추가)*

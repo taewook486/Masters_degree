@@ -264,9 +264,15 @@ Alternative options (not pursued):
 | `src/baseline/run_all.py` | All conditions runner — model loaded ONCE per config, shared across all dataset+seed combos |
 | `src/data/download.py` | HuggingFace dataset downloader |
 | `src/data/dataset.py` | Unified VQASample dataclass and dataset loading |
-| `src/evaluate/metrics.py` | VQA accuracy metrics (closed/open/overall) |
+| `src/evaluate/metrics.py` | VQA accuracy metrics (closed/open/overall, BERTScore default-enabled) |
+| `src/evaluate/clinical_significance.py` | (v0.5) WCA + ECE clinical significance metrics |
+| `src/evaluate/robust_statistics.py` | (v0.5) BCa Bootstrap + Mixed-Effects + Wilcoxon r |
+| `scripts/measure_contamination.py` | (v0.5) Min-K% Probability data contamination detection |
 | `src/utils/seed.py` | Deterministic seeding |
 | `src/utils/vram_monitor.py` | GPU VRAM monitoring |
+| `src/utils/environment.py` | Experiment environment metadata collection |
+| `src/utils/checkpoint.py` | HPO loop checkpoint save/restore |
+| `src/utils/logging_config.py` | Structured file+console logging |
 
 ### 5.3 Inference Path per Model
 
@@ -344,8 +350,18 @@ Five bottleneck fixes applied to reduce Phase 1 total runtime from ~12-15h to ~1
 - [x] Gemma 4 E2B 추가: config 작성, transformers 5.5.0 업그레이드, 호환성 테스트 PASS (2026-04-05)
 
 ### In Progress
-- [🔄] **Gemma 4 E2B Phase 1 평가** (9개 조건: 3 데이터셋 × 3 시드)
-  - 기존 27개 조건은 skip_existing으로 건너뜀
+- [🔄] **Phase 1 BERTScore 포함 전체 재실행** (4개 모델 × 3 데이터셋 × 3 시드 = 36개 조건)
+  - 기존 결과는 `results/phase1_baseline_pre_bertscore/`로 백업 완료
+  - BERTScore 기본 활성화 + `metadata.environment` 자동 기록
+  - RunPod RTX 4090에서 일괄 실행 예정
+
+### 논문 v0.5 신규 작업 (2026-05-16)
+- [x] **Run-level 통계 분석 도입** (Phase 3 sequential optimization 독립성 위반 해소)
+- [x] **Robust 통계 모듈** (`src/evaluate/robust_statistics.py`): BCa Bootstrap + Mixed-Effects + Wilcoxon r
+- [x] **임상적 의미 분석 모듈** (`src/evaluate/clinical_significance.py`): WCA + ECE
+- [x] **데이터 오염 측정 스크립트** (`scripts/measure_contamination.py`): Min-K% Probability
+- [ ] Phase 1 완료 후 `measure_contamination.py` 실행 (4모델 × 3데이터셋)
+- [ ] Phase 2 결과에 robust_statistics + clinical_significance 통합 적용
 
 ### Datasets
 | Dataset | HF ID | Test Size |
@@ -377,3 +393,11 @@ Five bottleneck fixes applied to reduce Phase 1 total runtime from ~12-15h to ~1
 9. **Gemma 4 E2B PLE architecture**: Per-Layer Embeddings로 2.3B active 파라미터만으로 5.1B 전체 파라미터급 표현력 제공. VRAM은 ~10.3 GB로 active 파라미터 대비 높으나, 16GB GPU에서 충분히 동작. `_generate_standard_chat` 경로(SmolVLM2와 동일)로 기존 파이프라인과 코드 수정 없이 호환.
 
 10. **transformers 버전 관리**: Gemma 4 지원을 위해 5.3.0 → 5.5.0 업그레이드 필요. `uv lock --upgrade-package transformers && uv sync` 사용. 기존 Qwen, SmolVLM2 클래스 모두 호환 확인.
+
+11. **Sequential optimization의 통계적 함정 (v0.5)**: Autoresearch/Optuna는 trial t의 결과가 t+1 제안에 영향 → 40개 trial을 독립 관측치로 KW 검정 시 가정 위반. 해결: 분석 단위를 **run-level**(10회 독립 반복)로 격상. Trial-level은 시각화 전용.
+
+12. **n=9 paired t-test의 Cohen's d 신뢰도 (v0.5)**: 3 seeds × 3 datasets로는 Cohen's d 추정 노이즈 큼. 해결: **3중 검증** — t-test (primary) + BCa Bootstrap CI (robust) + Mixed-Effects (random effects) + Wilcoxon r (non-parametric). scipy.stats.bootstrap의 BCa method 사용.
+
+13. **Min-K% Probability 데이터 오염 통제 (v0.5)**: PathVQA(2018) 등이 사전훈련 데이터 포함 가능성. 해결: Shi et al. (NAACL 2024) 방법으로 정답 토큰 하위 K%의 평균 log-prob을 contamination indicator로 사용. Forward pass만 필요하며 GPU 시간 ~4시간 (4모델 × 3데이터셋).
+
+14. **임상적 의미 보조 지표 (v0.5)**: 단순 accuracy로는 의료 AI 가치 포착 어려움. PathVQA의 7개 질문 유형 라벨(Where/What/Why/How/...)을 활용한 **WCA (Weighted Clinical Accuracy)**와 **ECE (Expected Calibration Error)** 추가. WCA 가중치는 본 연구자 임시 척도(향후 임상 검증 필요).

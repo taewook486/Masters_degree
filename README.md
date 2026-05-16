@@ -187,8 +187,10 @@ cat results/phase1_baseline/phase1_summary.csv
 | 대상 모델 | Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B |
 | 대상 데이터셋 | PathVQA, SLAKE, VQA-RAD |
 | 실험 조건 | 4개 모델 x 3개 시드 (42, 123, 456) = 36개 조건 |
-| 평가 지표 | Closed/Open/Overall Accuracy |
-| 진행 상태 | 진행 중 (기존 3개 모델 27개 조건 완료, Gemma4-E2B 9개 조건 대기) |
+| 평가 지표 | Closed/Open/Overall Accuracy, BERTScore F1 (roberta-large + BioBERT) |
+| 보조 지표 | WCA (Weighted Clinical Accuracy), ECE (Expected Calibration Error) |
+| 오염 통제 | Min-K% Probability Attack (Shi et al., NAACL 2024) |
+| 진행 상태 | BERTScore 재계산 준비 완료, RunPod에서 4개 모델 12개 조건 일괄 재실행 예정 |
 
 ### Phase 2: QLoRA 미세조정 분석
 
@@ -249,3 +251,20 @@ MIT License
 ## 작업 로그
 
 상세 작업 내역 및 실험 기록은 [`docs/phase1_work_log.md`](docs/phase1_work_log.md)를 참조하세요.
+
+---
+
+## 논문 설계 문서
+
+| 버전 | 날짜 | 주요 변경 |
+|------|------|----------|
+| [v0.5](docs/THESIS_PROPOSAL_FINAL_v0.5.md) (현재) | 2026-05-16 | 동료 심사 미해결 5건 처리 (run-level 통계, BCa Bootstrap, Min-K%, WCA+ECE, 의료 특화 VLM 간접 비교) |
+| [v0.4](docs/THESIS_PROPOSAL_FINAL_v0.4.md) | 2026-05-15 | 동료 심사 1차 반영 (RQ3 Optuna 격상, BioBERT 병기, cross-dataset CF) |
+| [v0.3](docs/THESIS_PROPOSAL_v0.3.md) | 2026-04-05 | Gemma 4 E2B 추가 (4개 모델) |
+| [v0.2](docs/THESIS_PROPOSAL_v0.2.md) | 2026-03-24 | Florence-2 탈락, BERTScore 추가 |
+
+**참조 문서**:
+- [동료 심사 의견서](docs/동료_심사_의견서.md): 9개 지적사항 (Major Revision Required)
+- [REVIEW_FEEDBACK.md](docs/REVIEW_FEEDBACK.md): 5개 비판적 검토
+- [adding_new_model.md](docs/adding_new_model.md): 새 VLM 추가 가이드
+- [RUNPOD_GUIDE.md](docs/RUNPOD_GUIDE.md): RunPod 실행 매뉴얼
