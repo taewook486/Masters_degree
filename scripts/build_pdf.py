@@ -203,18 +203,39 @@ table, pre {
 
 
 # 교수 제출본 양식 정리에 사용할 정규식 패턴
+#
+# PDF는 외부 버전(v1.X)만 표기하고, 내부 작업 버전(v0.X) 흔적은 모두 제거한다.
+# 마크다운 원본은 그대로 두고 PDF 생성 시에만 적용한다.
+
+# 1. <!-- pdf:strip-meta --> ... <!-- /pdf:strip-meta --> 블록 (버전 메타 정보)
 _RE_META_BLOCK = re.compile(
     r"<!--\s*pdf:strip-meta\s*-->.*?<!--\s*/pdf:strip-meta\s*-->",
     re.DOTALL,
 )
-# "> **v0.X 변경**:" 또는 "> v0.X 변경:" 으로 시작하는 인용 블록 (한 줄 또는 다음 ">" 줄까지)
-_RE_VERSION_NOTE = re.compile(
-    r"^>\s*\*?\*?v\d+\.\d+\s*변경\*?\*?[^\n]*(?:\n>[^\n]*)*\n?",
+
+# 2. 인용(>) 줄 중 vX.Y 또는 Internal 텍스트 포함 — 변경 사유 박스, 메타 줄
+_RE_VERSION_QUOTE = re.compile(
+    r"^>\s*[^\n]*(?:v\d+\.\d+|Internal|External)[^\n]*(?:\n>[^\n]*)*\n?",
     re.MULTILINE,
 )
-# (v0.X 신설), (v0.X 강화) 등 헤딩 옆 메타 마커
-_RE_HEADING_META = re.compile(
-    r"\s*\(\s*v\d+\.\d+\s*(?:신설|강화|변경|추가)\s*\)",
+
+# 3. 괄호 안 "v0.X 신설/강화/변경/추가" — 헤딩 또는 강조 옆 메타 마커
+#    예: "(v0.5 신설)", "(간접 비교, v0.5 신설)", "통계 검증 (v0.5 강화)"
+_RE_VERSION_PAREN = re.compile(
+    r"\s*\([^()]*?v\d+\.\d+\s*(?:신설|강화|변경|추가)\s*\)",
+)
+
+# 4. dash/hyphen 뒤 "— v0.X 신설" 형식 — 리스트 항목 끝
+#    예: "- 3.8.3 임상적 의미 분석 (WCA + ECE) — v0.5 신설"
+_RE_VERSION_DASH = re.compile(
+    r"\s*[—\-]+\s*v\d+\.\d+\s*(?:신설|강화|변경|추가)\s*$",
+    re.MULTILINE,
+)
+
+# 5. 일반 본문 내 단순 vX.Y 언급 (단독, 콤마 또는 괄호로 둘러싸인) — 안전망
+#    예: ", v0.5 변경)" 또는 부분 매칭이 남은 경우
+_RE_VERSION_INLINE = re.compile(
+    r"\s*,?\s*v\d+\.\d+\s*(?:신설|강화|변경|추가)",
 )
 
 
@@ -235,15 +256,22 @@ def _find_chrome() -> Path | None:
 def clean_for_pdf(md_text: str) -> str:
     """교수 제출본 양식에 맞춰 본문을 정리한다.
 
+    PDF에는 외부 버전(v1.X)만 노출되며 내부 작업 버전(v0.X) 흔적은 모두 제거된다.
+    마크다운 원본은 변경되지 않는다.
+
     제거 항목:
-        - <!-- pdf:strip-meta --> ~ <!-- /pdf:strip-meta --> 블록 (버전 정보)
-        - "> v0.X 변경" 형식의 인용 박스 (변경 이력)
-        - 헤딩에 붙은 "(v0.X 신설/강화)" 메타 마커
+        - <!-- pdf:strip-meta --> ~ <!-- /pdf:strip-meta --> 블록
+        - "> ... v0.X ... 변경" 형식의 인용 박스
+        - "(v0.X 신설)" "(간접 비교, v0.5 신설)" 등 괄호 메타 마커
+        - "— v0.X 신설" 같은 dash 뒤 메타 마커
+        - "Internal v0.5 / External v1.1" 등 버전 라인
         - 연속된 빈 줄 정리
     """
     text = _RE_META_BLOCK.sub("", md_text)
-    text = _RE_VERSION_NOTE.sub("", text)
-    text = _RE_HEADING_META.sub("", text)
+    text = _RE_VERSION_QUOTE.sub("", text)
+    text = _RE_VERSION_PAREN.sub("", text)
+    text = _RE_VERSION_DASH.sub("", text)
+    text = _RE_VERSION_INLINE.sub("", text)
     # 3줄 이상 연속된 빈 줄 → 2줄로
     text = re.sub(r"\n{3,}", "\n\n", text)
     return text.strip() + "\n"
