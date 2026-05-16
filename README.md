@@ -268,3 +268,4 @@ MIT License
 - [REVIEW_FEEDBACK.md](docs/REVIEW_FEEDBACK.md): 5개 비판적 검토
 - [adding_new_model.md](docs/adding_new_model.md): 새 VLM 추가 가이드
 - [RUNPOD_GUIDE.md](docs/RUNPOD_GUIDE.md): RunPod 실행 매뉴얼
+- [RUNPOD_COST_ESTIMATE.md](docs/RUNPOD_COST_ESTIMATE.md): RunPod 시간 및 비용 추정 (Phase 1~3)
