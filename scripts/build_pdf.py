@@ -343,9 +343,20 @@ def build_pdf(
     version_external: str,
     submission_date: str,
     author_name: str = "황태욱",
+    doc_name: str = "석사학위논문설계서",
     clean: bool = True,
 ) -> Path:
-    """전체 파이프라인 실행: Markdown → 정리 → HTML → PDF."""
+    """전체 파이프라인 실행: Markdown → 정리 → HTML → PDF.
+
+    Args:
+        md_path: 입력 마크다운 경로.
+        out_dir: 출력 디렉토리.
+        version_external: 외부 버전 (예: v1.1).
+        submission_date: 제출일 (YYYY-MM-DD).
+        author_name: 저자명 (파일명 앞부분).
+        doc_name: 문서명 (파일명 중간 부분).
+        clean: True이면 본문에서 변경 이력/메타 마커 제거.
+    """
     chrome = _find_chrome()
     if chrome is None:
         raise RuntimeError(
@@ -355,7 +366,7 @@ def build_pdf(
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    base_name = f"{author_name}_석사학위논문설계서_{version_external}_{submission_date}"
+    base_name = f"{author_name}_{doc_name}_{version_external}_{submission_date}"
     html_path = out_dir / f"{base_name}.html"
     pdf_path = out_dir / f"{base_name}.pdf"
 
@@ -396,7 +407,12 @@ def main() -> int:
     parser.add_argument(
         "--author",
         default="황태욱",
-        help="저자명 (PDF 파일명에 사용)",
+        help="저자명 (PDF 파일명 앞부분)",
+    )
+    parser.add_argument(
+        "--doc-name",
+        default="석사학위논문설계서",
+        help="문서명 (PDF 파일명 중간 부분, 예: 논문설계서변경사항보고)",
     )
     parser.add_argument(
         "--keep-changelog",
@@ -422,6 +438,7 @@ def main() -> int:
         version_external=args.version,
         submission_date=args.date,
         author_name=args.author,
+        doc_name=args.doc_name,
         clean=not args.keep_changelog,
     )
 
