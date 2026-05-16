@@ -1,28 +1,35 @@
 """마크다운 → PDF 변환 스크립트 (Chrome headless 사용).
 
-교수님 제출본(`정보통신대학원_황태욱_석사학위논문설계서.pdf`)과 유사한
-양식의 PDF를 생성한다. Python markdown 라이브러리로 HTML 변환 후,
+교수님 제출본(`정보통신대학원_황태욱_석사학위논문설계서.pdf`) 양식과 일치하는
+PDF를 생성한다. Python markdown 라이브러리로 HTML 변환 후,
 Chrome headless 모드로 PDF 출력.
 
+본문 내 변경 이력 표/v0.X 인용 박스/메타 마커는 자동으로 제거하여
+교수 제출본 양식과 동일한 깔끔한 본문만 PDF에 포함한다.
+
 사용법:
-    # 기본 (v0.5 마크다운 → 황태욱_석사학위논문설계서_v1.1_2026-05-16.pdf)
+    # 기본 (v0.5 마크다운 → 황태욱_석사학위논문설계서_v1.1_<today>.pdf)
     python scripts/build_pdf.py
 
-    # 다른 입력/출력
+    # 버전/날짜/저자 지정
     python scripts/build_pdf.py \\
         --input docs/THESIS_PROPOSAL_FINAL_v0.6.md \\
         --version v1.2 \\
         --date 2026-06-01
 
+    # 변경 이력/인용 박스 그대로 두기 (디버그)
+    python scripts/build_pdf.py --keep-changelog
+
 요구사항:
     - Python markdown library (uv pip install markdown)
-    - Google Chrome (Windows 기본 경로 자동 탐색)
+    - Google Chrome 또는 Microsoft Edge (Windows 기본 경로 자동 탐색)
 """
 
 from __future__ import annotations
 
 import argparse
 import logging
+import re
 import subprocess
 import sys
 from datetime import date as date_type
@@ -33,62 +40,70 @@ import markdown
 logger = logging.getLogger(__name__)
 
 
-# 교수 제출본 양식과 유사한 CSS (한글 시스템 폰트 사용, 표/리스트 스타일)
+# 교수 제출본(v1.0) 양식 — 미니멀, 본문 중심
 _CSS = """
 @page {
     size: A4;
-    margin: 25mm 20mm;
+    margin: 25mm 22mm;
     @bottom-center {
         content: counter(page);
-        font-size: 10pt;
-        color: #666;
+        font-size: 9pt;
+        color: #888;
+        font-family: 'Malgun Gothic', sans-serif;
     }
 }
 
 body {
     font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
     font-size: 10.5pt;
-    line-height: 1.55;
-    color: #222;
-    max-width: 170mm;
-    margin: 0 auto;
+    line-height: 1.6;
+    color: #1a1a1a;
+    margin: 0;
 }
 
+/* 제목: 가운데 정렬, 큰 글자, 두꺼운 가로선으로 구분 */
 h1 {
-    font-size: 22pt;
+    font-size: 24pt;
+    font-weight: 700;
     text-align: center;
-    margin-top: 0;
-    margin-bottom: 8mm;
-    padding-bottom: 4mm;
-    border-bottom: 2px solid #333;
+    margin: 0 0 12mm 0;
+    padding-bottom: 6mm;
+    border-bottom: 2px solid #1a1a1a;
+    letter-spacing: -0.5pt;
 }
 
+/* 절 제목: 좌측 정렬, 굵게, 하단 얇은 선 */
 h2 {
     font-size: 15pt;
-    margin-top: 10mm;
-    margin-bottom: 4mm;
+    font-weight: 700;
+    margin: 9mm 0 4mm 0;
     padding-bottom: 2mm;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #d0d0d0;
+    color: #1a1a1a;
 }
 
+/* 소절 제목 */
 h3 {
     font-size: 12pt;
-    margin-top: 6mm;
-    margin-bottom: 3mm;
-    color: #2a4d7f;
+    font-weight: 700;
+    margin: 6mm 0 2.5mm 0;
+    color: #1a1a1a;
 }
 
 h4 {
     font-size: 11pt;
-    margin-top: 4mm;
-    margin-bottom: 2mm;
-    color: #444;
+    font-weight: 600;
+    margin: 4mm 0 2mm 0;
+    color: #2a2a2a;
 }
 
-p, li {
+/* 본문 */
+p {
+    margin: 2mm 0;
     text-align: justify;
 }
 
+/* 리스트 */
 ul, ol {
     margin: 2mm 0;
     padding-left: 6mm;
@@ -96,8 +111,10 @@ ul, ol {
 
 li {
     margin-bottom: 1mm;
+    line-height: 1.55;
 }
 
+/* 표 — 교수 제출본 양식: 얇은 회색 테두리, 헤더 약한 음영 */
 table {
     border-collapse: collapse;
     margin: 3mm 0;
@@ -107,70 +124,102 @@ table {
 }
 
 th {
-    background-color: #f0f0f0;
+    background-color: #ebebeb;
     border: 1px solid #888;
-    padding: 1.5mm 2mm;
+    padding: 1.8mm 2.5mm;
     font-weight: 600;
     text-align: left;
+    color: #1a1a1a;
 }
 
 td {
-    border: 1px solid #aaa;
-    padding: 1.5mm 2mm;
+    border: 1px solid #b0b0b0;
+    padding: 1.5mm 2.5mm;
+    line-height: 1.5;
 }
 
+/* 강조 */
+strong, b {
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+/* 인라인 코드 */
 code {
-    background-color: #f6f8fa;
-    padding: 1px 5px;
-    border-radius: 3px;
+    background-color: #f5f5f5;
+    padding: 0.5px 4px;
+    border-radius: 2px;
     font-family: 'Consolas', 'D2Coding', monospace;
     font-size: 9.5pt;
+    color: #c7254e;
 }
 
+/* 코드 블록 */
 pre {
-    background-color: #f6f8fa;
-    padding: 3mm;
-    border-radius: 4px;
+    background-color: #f7f7f7;
+    padding: 3mm 4mm;
+    border-radius: 3px;
+    border-left: 3px solid #888;
     overflow-x: auto;
     font-size: 9pt;
-    line-height: 1.4;
+    line-height: 1.5;
     page-break-inside: avoid;
+    margin: 3mm 0;
 }
 
 pre code {
     background-color: transparent;
     padding: 0;
+    color: #1a1a1a;
 }
 
+/* 인용 (남은 것이 있다면 부드럽게) */
 blockquote {
-    border-left: 3px solid #5a9;
-    padding-left: 4mm;
-    color: #555;
     margin: 3mm 0;
-    background-color: #f7fcfa;
-    padding-top: 1mm;
-    padding-bottom: 1mm;
+    padding: 2mm 5mm;
+    color: #555;
+    border-left: 2px solid #b0b0b0;
+    background-color: #fafafa;
+    font-style: normal;
 }
 
+/* 가로선 */
 hr {
     border: 0;
-    border-top: 1px solid #ccc;
-    margin: 6mm 0;
-}
-
-strong {
-    color: #1a1a1a;
+    border-top: 1px solid #cccccc;
+    margin: 8mm 0;
 }
 
 /* 페이지 나누기 방지 */
 h1, h2, h3, h4 {
     page-break-after: avoid;
+    page-break-inside: avoid;
+}
+
+table, pre {
+    page-break-inside: avoid;
 }
 """
 
 
+# 교수 제출본 양식 정리에 사용할 정규식 패턴
+_RE_META_BLOCK = re.compile(
+    r"<!--\s*pdf:strip-meta\s*-->.*?<!--\s*/pdf:strip-meta\s*-->",
+    re.DOTALL,
+)
+# "> **v0.X 변경**:" 또는 "> v0.X 변경:" 으로 시작하는 인용 블록 (한 줄 또는 다음 ">" 줄까지)
+_RE_VERSION_NOTE = re.compile(
+    r"^>\s*\*?\*?v\d+\.\d+\s*변경\*?\*?[^\n]*(?:\n>[^\n]*)*\n?",
+    re.MULTILINE,
+)
+# (v0.X 신설), (v0.X 강화) 등 헤딩 옆 메타 마커
+_RE_HEADING_META = re.compile(
+    r"\s*\(\s*v\d+\.\d+\s*(?:신설|강화|변경|추가)\s*\)",
+)
+
+
 def _find_chrome() -> Path | None:
-    """Windows Chrome 실행 파일 경로 자동 탐색."""
+    """Windows Chrome/Edge 실행 파일 경로 자동 탐색."""
     candidates = [
         Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
         Path(r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"),
@@ -183,25 +232,41 @@ def _find_chrome() -> Path | None:
     return None
 
 
-def markdown_to_html(md_path: Path, version_external: str, submission_date: str) -> str:
+def clean_for_pdf(md_text: str) -> str:
+    """교수 제출본 양식에 맞춰 본문을 정리한다.
+
+    제거 항목:
+        - <!-- pdf:strip-meta --> ~ <!-- /pdf:strip-meta --> 블록 (버전 정보)
+        - "> v0.X 변경" 형식의 인용 박스 (변경 이력)
+        - 헤딩에 붙은 "(v0.X 신설/강화)" 메타 마커
+        - 연속된 빈 줄 정리
+    """
+    text = _RE_META_BLOCK.sub("", md_text)
+    text = _RE_VERSION_NOTE.sub("", text)
+    text = _RE_HEADING_META.sub("", text)
+    # 3줄 이상 연속된 빈 줄 → 2줄로
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip() + "\n"
+
+
+def markdown_to_html(md_path: Path, *, clean: bool = True) -> str:
     """마크다운 파일을 스타일이 적용된 HTML 문자열로 변환한다.
 
     Args:
         md_path: 마크다운 파일 경로.
-        version_external: 외부 버전 라벨 (예: v1.1).
-        submission_date: 제출일자 문자열 (예: 2026-05-16).
+        clean: True이면 본문에서 변경 이력/메타 마커 제거 (PDF 출력용).
 
     Returns:
         완성된 HTML 문서 문자열.
     """
     md_text = md_path.read_text(encoding="utf-8")
+    if clean:
+        md_text = clean_for_pdf(md_text)
 
     md = markdown.Markdown(extensions=[
         "tables",
         "fenced_code",
-        "toc",
         "sane_lists",
-        "attr_list",
     ])
     body_html = md.convert(md_text)
 
@@ -209,7 +274,7 @@ def markdown_to_html(md_path: Path, version_external: str, submission_date: str)
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>석사학위 논문 설계서 {version_external}</title>
+<title>석사학위 논문 설계서</title>
 <style>
 {_CSS}
 </style>
@@ -222,13 +287,7 @@ def markdown_to_html(md_path: Path, version_external: str, submission_date: str)
 
 
 def html_to_pdf(html_path: Path, pdf_path: Path, chrome_path: Path) -> None:
-    """Chrome headless 모드로 HTML 파일을 PDF로 변환한다.
-
-    Args:
-        html_path: 입력 HTML 절대 경로.
-        pdf_path: 출력 PDF 절대 경로.
-        chrome_path: Chrome 또는 Edge 실행 파일 절대 경로.
-    """
+    """Chrome headless 모드로 HTML 파일을 PDF로 변환한다."""
     file_url = html_path.resolve().as_uri()
     cmd = [
         str(chrome_path),
@@ -240,7 +299,6 @@ def html_to_pdf(html_path: Path, pdf_path: Path, chrome_path: Path) -> None:
         file_url,
     ]
     logger.info(f"Chrome 실행: {chrome_path.name}")
-    # Windows 콘솔 출력이 cp949 등으로 깨질 수 있어 errors="replace" 사용
     result = subprocess.run(
         cmd, capture_output=True, text=True,
         encoding="utf-8", errors="replace",
@@ -257,19 +315,9 @@ def build_pdf(
     version_external: str,
     submission_date: str,
     author_name: str = "황태욱",
+    clean: bool = True,
 ) -> Path:
-    """전체 파이프라인 실행: Markdown → HTML → PDF.
-
-    Args:
-        md_path: 입력 마크다운 경로.
-        out_dir: 출력 디렉토리 (PDF 저장 위치).
-        version_external: 외부 버전 (예: v1.1).
-        submission_date: 제출일 (YYYY-MM-DD).
-        author_name: PDF 파일명에 사용할 저자명.
-
-    Returns:
-        생성된 PDF 파일 경로.
-    """
+    """전체 파이프라인 실행: Markdown → 정리 → HTML → PDF."""
     chrome = _find_chrome()
     if chrome is None:
         raise RuntimeError(
@@ -279,12 +327,12 @@ def build_pdf(
 
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # HTML 중간 산출물
-    html_path = out_dir / f"{author_name}_석사학위논문설계서_{version_external}_{submission_date}.html"
-    pdf_path = out_dir / f"{author_name}_석사학위논문설계서_{version_external}_{submission_date}.pdf"
+    base_name = f"{author_name}_석사학위논문설계서_{version_external}_{submission_date}"
+    html_path = out_dir / f"{base_name}.html"
+    pdf_path = out_dir / f"{base_name}.pdf"
 
-    logger.info(f"Markdown → HTML: {md_path.name}")
-    html_content = markdown_to_html(md_path, version_external, submission_date)
+    logger.info(f"Markdown → HTML: {md_path.name} (clean={clean})")
+    html_content = markdown_to_html(md_path, clean=clean)
     html_path.write_text(html_content, encoding="utf-8")
     logger.info(f"HTML 저장: {html_path}")
 
@@ -322,6 +370,11 @@ def main() -> int:
         default="황태욱",
         help="저자명 (PDF 파일명에 사용)",
     )
+    parser.add_argument(
+        "--keep-changelog",
+        action="store_true",
+        help="변경 이력 및 v0.X 인용 박스를 그대로 유지 (디버그용)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -341,6 +394,7 @@ def main() -> int:
         version_external=args.version,
         submission_date=args.date,
         author_name=args.author,
+        clean=not args.keep_changelog,
     )
 
     size_kb = pdf_path.stat().st_size / 1024

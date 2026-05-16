@@ -1,36 +1,9 @@
 # 석사학위 논문 설계서
 
-> **Version**: v0.5 (Internal) / **v1.1** (External, 교수 제출용)
-> **Submission Date**: 2026-05-16
-> **Previous Submission**: v1.0 (2026-03-22)
-
-## 버전 관리
-
-본 연구는 **이중 버전 체계(Dual Versioning)**를 사용합니다.
-
-| 구분 | 형식 | 용도 |
-|------|------|------|
-| **Internal** | v0.X | git 커밋 단위 작업 추적, 마크다운 파일 |
-| **External** | v1.X, v2.X | 교수님/심사위원 제출 단위, PDF |
-
-### 매핑
-
-| Internal | External | 시점 | 트리거 |
-|---------|----------|------|--------|
-| v0.1 | **v1.0** | 2026-03-22 | 첫 교수 제출 (완료) |
-| v0.2 ~ v0.4 | (보고 안 함) | 2026-03 ~ 04 | 동료 심사 반영 작업 중 |
-| v0.5 | **v1.1** | 2026-05-16 | 동료 심사 9건 + 잔여 치명적 4건 처리 (현재 본 문서) |
-| (예정) | **v2.0** | 2026-07 예상 | Phase 1/2 실험 결과 포함 본 심사용 |
-
-## 변경 이력
-
-| 버전 | 날짜 | 변경 내용 |
-|------|------|----------|
-| v0.1 | 2026-03-22 | 교수 제출용 초안 (3개 모델 기준) |
-| v0.2 | 2026-03-24 | 리뷰 피드백 반영: Phase 2 평가 지표 정교화(BERTScore, CF 대조군), Phase 3 탐색 공간 개선(max_steps), 시간 예산 정의 명확화 |
-| v0.3 | 2026-04-05 | Gemma 4 E2B 모델 추가 (4개 모델), transformers 5.5.0, 실험 조건 수 업데이트 |
-| v0.4 | 2026-05-15 | 동료 심사 피드백 반영: RQ3 귀무가설 격상(Optuna), Phase 3 반복 10회, 하드웨어 이원화, BioBERT 병기, cross-dataset CF 추가, max_steps 고정, LLM 재현성 조치, 데이터 오염 한계점 추가 |
-| v0.5 | 2026-05-16 | 잔여 치명적 지적사항 처리: (1) Run-level 통계로 sequential optimization 독립성 위반 해소, (2) Bootstrap+Mixed-effects로 Phase 2 n=9 robust 분석, (3) Min-K% Probability 능동적 데이터 오염 통제, (4) WCA+ECE 임상적 의미 분석, (5) 의료 특화 VLM 선행 연구 수치 비교 |
+<!-- pdf:strip-meta -->
+> 본문 버전: Internal v0.5 / External v1.1 (2026-05-16)
+> 변경 이력은 [THESIS_CHANGELOG.md](THESIS_CHANGELOG.md) 참조
+<!-- /pdf:strip-meta -->
 
 ## 논문 정보
 
