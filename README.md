@@ -266,6 +266,7 @@ MIT License
 **참조 문서**:
 - [동료 심사 의견서](docs/동료_심사_의견서.md): 9개 지적사항 (Major Revision Required)
 - [REVIEW_FEEDBACK.md](docs/REVIEW_FEEDBACK.md): 5개 비판적 검토
+- [THESIS_REVISION_COMPARISON.md](docs/THESIS_REVISION_COMPARISON.md): 교수님 제출본(v0.1) vs v0.5 변경사항 비교표
 - [adding_new_model.md](docs/adding_new_model.md): 새 VLM 추가 가이드
 - [RUNPOD_GUIDE.md](docs/RUNPOD_GUIDE.md): RunPod 실행 매뉴얼
 - [RUNPOD_COST_ESTIMATE.md](docs/RUNPOD_COST_ESTIMATE.md): RunPod 시간 및 비용 추정 (Phase 1~3)
