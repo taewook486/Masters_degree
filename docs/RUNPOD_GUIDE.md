@@ -183,7 +183,9 @@ bash scripts/run_phase2_ablation.sh
 
 ## 6. Phase 3: Autonomous HPO
 
-**목표**: 4개 전략 × 5회 반복 × 40 trial = HPO 비교 실험
+**목표**: 4개 전략(Manual/RS/Optuna/Autoresearch) × 10회 반복 × 40 trial = HPO 비교 실험
+
+**예상 규모**: ~1,210 trials, ~200 GPU-hours (RTX 4090 기준 약 8-9일), 비용 ~$78-107 (Community Cloud)
 
 > Phase 2 완료 및 ANTHROPIC_API_KEY 설정 후 실행
 
@@ -272,4 +274,17 @@ bash scripts/run_phase3.sh
 
 ---
 
-*최종 업데이트: 2026-05-16 (v0.5: 데이터 오염 측정 절차 추가)*
+## 예상 실험 시간 및 비용 (RTX 4090 기준)
+
+| Phase | GPU-hours | 일수 (24h) | 비용 (Community) |
+|-------|:---------:|:---------:|:---------------:|
+| Phase 1 | ~9h | 0.4일 | ~$4 |
+| Phase 2 | ~65h | 2.7일 | ~$25 |
+| Phase 3 | ~200h | 8.3일 | ~$78 |
+| **합계** | **~274h** | **~11.4일** | **~$107** |
+
+> RTX 4090 2대 병렬 시 기간 약 절반으로 단축 (비용 동일)
+
+---
+
+*최종 업데이트: 2026-05-18 (v0.5 데이터 오염 측정 절차 + v0.4 예상 시간/비용 테이블 통합)*

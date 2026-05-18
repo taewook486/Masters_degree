@@ -1,6 +1,6 @@
 # 위험 요소 분석 및 대응 방안
 
-> **Version**: v0.3 (2026-04-05)
+> **Version**: v0.4 (2026-05-15)
 
 ## 변경 이력
 
@@ -9,6 +9,7 @@
 | v0.1 | 2026-03-22 | 초안 작성 (7개 위험 요소) |
 | v0.2 | 2026-03-24 | Florence-2 탈락 반영, BERTScore/CF 관련 신규 위험 추가, Phase 3 시간 예산 위험 구체화 |
 | v0.3 | 2026-04-05 | Gemma 4 E2B 모델 추가 반영 (4개 모델), VRAM 위험 업데이트 |
+| v0.4 | 2026-05-15 | 동료 심사 피드백 반영: 하드웨어 이원화, BioBERT VRAM 충돌, cross-dataset CF, Phase 3 n=10 규모 증가, LLM 재현성 위험 추가 |
 
 ---
 
@@ -47,18 +48,22 @@
 - **영향**: 파인튜닝 모델의 범용 성능 크게 저하
 - **대응**:
   1. VQAv2 validation subset (2,000 샘플)으로 사전/사후 성능 비교
-  2. 학습률 낮춤, epoch 수 제한
-  3. NeurIPS 2025 논문의 simple recipe 적용
+  2. 의료 도메인 내 cross-dataset 일반화 측정 (훈련 데이터셋 ≠ 평가 데이터셋)
+  3. 학습률 낮춤, epoch 수 제한
+  4. NeurIPS 2025 논문의 simple recipe 적용
 
 > **v0.2 변경**: 대조군을 "MMMU 등"에서 **VQAv2 validation subset (2,000 샘플)**로 구체화. 측정 시점도 "파인튜닝 전후 각 1회"로 명확화.
+> **v0.4 변경**: 의료 cross-dataset 일반화 측정 추가 (12조건 x 2개 cross-dataset = 24회 추가 평가). 추가 소요: ~6 GPU-hours.
 
 ### 위험 8: BERTScore 의존성 및 VRAM 충돌 (v0.2 신규)
-- **확률**: 낮음
-- **영향**: BERTScore 모델(roberta-large)이 VLM과 동시에 VRAM 점유 시 OOM
+- **확률**: 낮음-중간
+- **영향**: BERTScore 모델(roberta-large + BioBERT)이 VLM과 동시에 VRAM 점유 시 OOM
 - **대응**:
   1. BERTScore 평가는 VLM 모델 unload 후 별도 실행
   2. CPU fallback 옵션 (`device="cpu"`) 제공
   3. Phase 3 trial 중에는 BERTScore 생략, 최종 best config에서만 측정
+
+> **v0.4 변경**: BioBERT(dmis-lab/biobert-v1.1) 추가로 BERTScore 이중 보고. BioBERT는 roberta-large보다 경량(~110M)이므로 VRAM 부담 증가는 미미하나, 두 모델을 순차 실행하여 VRAM 충돌 방지.
 
 ### 위험 9: VQAv2 데이터셋 추가 준비 부담 (v0.2 신규)
 - **확률**: 낮음 (공개 데이터셋)
@@ -68,14 +73,34 @@
   2. 2,000 샘플 subset만 사용하므로 저장/처리 부담 최소
   3. subset 선정 시 seed 고정하여 재현성 보장
 
-### 위험 10: Phase 3 max_steps 기반 전환에 따른 비교 공정성 (v0.2 신규)
+### 위험 10: Phase 3 max_steps 기반 비교 공정성 (v0.2 신규)
 - **확률**: 중간
 - **영향**: 전략 간 비교의 유효성 저하
 - **대응**:
-  1. 모든 전략에 동일 max_steps 탐색 공간 적용
+  1. max_steps=200으로 고정 (모든 전략 동일)
   2. HuggingFace Trainer에서 max_steps > 0이면 epochs 무시 → 일관된 동작 보장
-  3. 15분 시간 예산 = 순수 학습 시간으로 통일 (모델 로드/평가 제외)
-  4. wall-clock 시간도 별도 기록하여 전체 비용 비교 가능
+  3. effective_batch_size, total_samples_seen, wall-clock 시간을 별도 보고
+  4. confounding variable(batch_size별 데이터 처리량 차이)은 한계점에 명시
+
+> **v0.4 변경**: "15분 시간 예산"에서 "max_steps=200 고정"으로 변경. 시간이 아닌 학습 step 수로 통일하여 confounding 완화.
+
+### 위험 12: Phase 3 실험 규모 증가 (v0.4 신규)
+- **확률**: 중간
+- **영향**: 실험 기간 장기화, RunPod 비용 증가
+- **대응**:
+  1. 총 ~1,210 trials, ~200 GPU-hours → RunPod RTX 4090 기준 약 8-9일
+  2. RunPod Community Cloud 활용 시 ~$78-107
+  3. RTX 4090 2대 병렬 시 ~4일로 단축 (비용 동일)
+  4. 긴급 시 반복 횟수 10회 → 7회 축소 가능 (power ~0.5 유지)
+
+### 위험 13: Autoresearch LLM API 비결정성 (v0.4 신규)
+- **확률**: 높음 (LLM API 본질적 비결정성)
+- **영향**: 실험 재현 불가능성
+- **대응**:
+  1. temperature=0, top_p=1 고정
+  2. 모델 ID 및 스냅샷 날짜 고정
+  3. 전체 API 요청/응답 JSON 로깅
+  4. 10회 독립 반복으로 변동성을 통계적으로 흡수
 
 ---
 
@@ -87,10 +112,12 @@
 - **대응**:
   1. 데이터셋 3개 -> 2개 축소 (VQA-RAD 제외, 규모 너무 작음)
   2. Ablation study 범위 축소
-  3. Phase 3 Optuna/Random Search를 반복 횟수 줄임 (40 -> 20회)
+  3. Phase 3 반복 횟수 10회 → 7회 축소 가능
+  4. Phase 3 trial 수 40 → 20회 축소 가능
 
 > **v0.2 변경**: "모델 수 4개 -> 3개 축소" 옵션 삭제 (이미 3개로 확정). BERTScore + CF 추가로 Phase 2에 약 +2-3시간 추가 예상되나, Phase 3에서는 최종 best에만 적용하여 영향 최소화.
 > **v0.3 변경**: Gemma 4 E2B 추가로 4개 모델 확정. Phase 1 추가 소요: ~5-6시간 (RunPod RTX 4090 기준). Phase 2 추가 소요: ~3-4시간 (QLoRA 학습). 시간 초과 시 축소 옵션: 모델 4개 → 3개 (Gemma4-E2B 제외).
+> **v0.4 변경**: 전체 실험 규모 추정 — Phase 1(~9h) + Phase 2(~65h) + Phase 3(~200h) = ~274 GPU-hours. RunPod RTX 4090 기준 ~11-12일, 비용 ~$107 (Community Cloud).
 
 ### 위험 6: 지도교수 피드백으로 방향 변경
 - **확률**: 중-높음

@@ -12,9 +12,9 @@
 
 ## 프로젝트 개요
 
-본 연구는 RTX 5060 Ti (16GB VRAM) 수준의 소비자용 GPU 환경에서 경량 비전-언어 모델(VLM)을 의료 시각 질의응답(VQA) 태스크에 도메인 적응시키는 방법론을 탐구합니다.
+본 연구는 소비자용 GPU(16-24GB VRAM) 환경에서 경량 비전-언어 모델(VLM)을 의료 시각 질의응답(VQA) 태스크에 도메인 적응시키는 방법론을 탐구합니다.
 
-4-bit NF4 양자화 기반 QLoRA 미세조정과 Optuna 기반 자율 하이퍼파라미터 최적화를 결합하여, 제한된 연산 자원에서도 의료 VQA 성능을 향상시킬 수 있음을 실증합니다.
+4-bit NF4 양자화 기반 QLoRA 미세조정과 LLM 에이전트 기반 자율 하이퍼파라미터 최적화(autoresearch)를 결합하여, 제한된 연산 자원에서도 의료 VQA 성능을 향상시킬 수 있음을 실증합니다.
 
 ---
 
@@ -22,8 +22,8 @@
 
 1. 경량 VLM의 의료 VQA 제로샷(zero-shot) 성능 기준치 확립
 2. QLoRA 미세조정을 통한 도메인 특화 성능 향상 분석
-3. Bayesian 최적화 기반 하이퍼파라미터 자율 탐색 파이프라인 구현
-4. 16GB VRAM 환경에서 재현 가능하고 실용적인 의료 AI 적응 방법론 제시
+3. LLM 에이전트 기반 자율 HPO(autoresearch)와 Optuna(TPE) 비교 — 성능 경쟁력 및 해석 가능성 평가
+4. 소비자 GPU(16-24GB) 환경에서 재현 가능하고 실용적인 의료 AI 적응 방법론 제시
 
 ---
 
@@ -55,16 +55,18 @@
 
 ## 실험 환경
 
-| 항목 | 사양 |
-|------|------|
-| GPU | NVIDIA RTX 5060 Ti 16GB GDDR7 |
-| CPU | AMD Ryzen 5 5600X |
-| RAM | 32GB |
-| OS | Windows 11 |
-| Python | 3.12 |
-| PyTorch | 2.10.0+cu128 (CUDA 12.8) |
-| Transformers | 5.5.0 |
-| 패키지 관리자 | uv |
+| 항목 | 로컬 | 클라우드 (RunPod) |
+|------|------|-------------------|
+| GPU | NVIDIA RTX 5060 Ti 16GB | NVIDIA RTX 4090 24GB |
+| CPU | AMD Ryzen 5 5600X | - |
+| RAM | 32GB | - |
+| OS | Windows 11 | Ubuntu (RunPod) |
+| Python | 3.12 | 3.12 |
+| PyTorch | 2.10.0+cu128 (CUDA 12.8) | 2.10.0+cu128 |
+| Transformers | 5.5.0 | 5.5.0 |
+| 패키지 관리자 | uv | pip |
+
+> 로컬은 16GB 재현성 검증용, 클라우드(RunPod RTX 4090)는 주 실험 환경.
 
 ---
 
@@ -72,10 +74,11 @@
 
 - **딥러닝 프레임워크**: PyTorch 2.10.0+cu128, HuggingFace Transformers 5.5.0
 - **미세조정**: PEFT, TRL, BitsAndBytes (4-bit QLoRA)
-- **하이퍼파라미터 최적화**: Optuna (Bayesian HPO)
+- **하이퍼파라미터 최적화**: Optuna (TPE), LLM 에이전트 기반 autoresearch
 - **실험 추적**: WandB
 - **설정 관리**: OmegaConf (YAML)
-- **통계 분석**: SciPy, scikit-learn (ANOVA, t-test, Bootstrap CI)
+- **평가 지표**: BERTScore (roberta-large + BioBERT)
+- **통계 분석**: SciPy, scikit-learn (ANOVA, Kruskal-Wallis, Mann-Whitney U, Bootstrap CI)
 
 ---
 
@@ -204,11 +207,11 @@ cat results/phase1_baseline/phase1_summary.csv
 
 ### Phase 3: 자율 하이퍼파라미터 최적화
 
-**목표**: Optuna 기반 Bayesian 최적화로 자율 하이퍼파라미터 탐색 파이프라인 구현
+**목표**: 4개 HPO 전략(Manual, Random Search, Optuna TPE, Autoresearch) 비교 — 각 전략 10회 독립 반복
 
-- 탐색 공간 정의 및 Bayesian HPO 구현
-- Phase 2 수동 분석 결과와 자율 탐색 결과 비교
-- 최적 하이퍼파라미터 조합 도출
+- Manual / Random Search / Optuna(TPE) / LLM 에이전트 기반 autoresearch 비교
+- max_steps 고정(200 steps), effective_batch_size/total_samples_seen 별도 보고
+- 예상 실험 규모: ~1,210 trials, ~200 GPU-hours (RunPod RTX 4090 기준 약 8-9일)
 
 **진행 상태**: 대기 중 (Phase 2 완료 후 착수)
 
@@ -216,7 +219,7 @@ cat results/phase1_baseline/phase1_summary.csv
 
 ## 재현성
 
-모든 실험은 3개의 고정 시드(42, 123, 456)로 수행됩니다. 통계 검증에는 ANOVA + Tukey HSD (다군 비교), Paired t-test + Cohen's d (전후 비교), Bootstrap 95% CI (강건성 검증)를 적용합니다.
+모든 실험은 3개의 고정 시드(42, 123, 456)로 수행됩니다. Phase 3는 각 전략 10회 독립 반복. 통계 검증에는 ANOVA + Tukey HSD (다군 비교), Paired t-test + Cohen's d (전후 비교), Kruskal-Wallis + Mann-Whitney U (HPO 전략 비교), Bootstrap 95% CI (강건성 검증)를 적용합니다. Autoresearch의 LLM 비결정성은 temperature=0, 모델 버전 고정, API 응답 로깅으로 통제합니다.
 
 ```python
 # 시드 고정 예시
