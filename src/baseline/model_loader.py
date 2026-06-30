@@ -12,14 +12,9 @@ import transformers
 from omegaconf import DictConfig, OmegaConf
 from PIL import Image
 
-logger = logging.getLogger(__name__)
+from src.utils.constants import MEDICAL_PROMPT
 
-MEDICAL_PROMPT = (
-    "You are a medical AI assistant. "
-    "Look at this medical image and answer the following question.\n"
-    "Question: {question}\n"
-    "Answer concisely."
-)
+logger = logging.getLogger(__name__)
 
 DTYPE_MAP = {
     "float16": torch.float16,

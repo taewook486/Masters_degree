@@ -15,15 +15,9 @@ from typing import Any
 from datasets import Dataset
 
 from src.data.dataset import load_medical_vqa_dataset
+from src.utils.constants import MEDICAL_PROMPT
 
 logger = logging.getLogger(__name__)
-
-MEDICAL_PROMPT = (
-    "You are a medical AI assistant. "
-    "Look at this medical image and answer the following question.\n"
-    "Question: {question}\n"
-    "Answer concisely."
-)
 
 
 def prepare_chat_dataset(

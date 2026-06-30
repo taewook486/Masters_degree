@@ -71,7 +71,7 @@ def evaluate_on_vqav2(
                 processor=processor,
                 config=config,
                 image=sample.image,
-                prompt=prompt,
+                question=prompt,
             )
         except Exception as e:
             logger.warning(f"Inference failed: {e}")
