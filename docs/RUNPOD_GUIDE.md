@@ -114,6 +114,33 @@ ls results/phase1_baseline/*.json | wc -l
 cat results/phase1_baseline/phase1_summary.csv
 ```
 
+### Phase 1 전체 재실행 (BERTScore 포함 / 결과 덮어쓰기)
+
+기존 결과가 BERTScore 없이 집계됐거나 STD=0.0 버그가 의심될 경우 전체 재실행한다.
+
+`--no_skip_existing` 플래그는 `runpod_phase1.sh`와 `src/baseline/run_all.py` 모두에 구현되어 있으므로 아래 명령어를 그대로 사용하면 된다.
+
+```bash
+# summary/intermediate 파일 초기화 (JSON 결과는 실행 중 덮어씌워짐)
+rm -f results/phase1_baseline/phase1_summary.csv
+rm -f results/phase1_baseline/phase1_intermediate.json
+
+# 4개 모델 순차 실행 (BERTScore 포함, 기존 결과 무시)
+bash scripts/runpod_phase1.sh --config configs/models/qwen3_vl_2b.yaml  --no_skip_existing
+bash scripts/runpod_phase1.sh --config configs/models/qwen25_vl_3b.yaml --no_skip_existing
+bash scripts/runpod_phase1.sh --config configs/models/smolvlm2_2b.yaml  --no_skip_existing
+bash scripts/runpod_phase1.sh --config configs/models/gemma4_e2b.yaml   --no_skip_existing
+```
+
+완료 후 확인:
+
+```bash
+ls results/phase1_baseline/*.json | wc -l   # 36개여야 함
+cat results/phase1_baseline/phase1_summary.csv  # STD != 0.0 확인
+```
+
+> **주의**: 기존 `results/phase1_baseline_pre_bertscore/` 폴더는 건드리지 않는다. 재실행 결과는 `results/phase1_baseline/`에 저장된다.
+
 ### Best Model 선택
 
 `phase1_summary.csv`의 `overall_acc_mean` 기준으로 최고 성능 모델 선택 후 메모.
