@@ -31,8 +31,8 @@ def _load_module():
             os.path.join(os.path.dirname(__file__), "..", "src", "data")
         ]
         sys.modules["src.data"] = data_pkg
-    if "src.data.general_vqa" not in sys.modules or sys.modules.get("src.data.general_vqa") is None:
-        sys.modules["src.data.general_vqa"] = MagicMock()
+    saved["src.data.general_vqa"] = sys.modules.get("src.data.general_vqa")
+    sys.modules["src.data.general_vqa"] = MagicMock()
 
     # src.baseline.model_loader mock (generate_answer)
     saved["transformers"] = sys.modules.get("transformers")

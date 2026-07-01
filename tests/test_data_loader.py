@@ -10,23 +10,10 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-# Mock heavy modules before importing src
-_mock_torch = MagicMock()
-_mock_torch.cuda.is_available.return_value = False
-_mock_torch.device = MagicMock()
-_mock_torch.Generator = MagicMock
-sys.modules.setdefault("torch", _mock_torch)
-sys.modules.setdefault("torch.cuda", _mock_torch.cuda)
-sys.modules.setdefault("torch.backends", MagicMock())
-sys.modules.setdefault("torch.backends.cudnn", MagicMock())
-sys.modules.setdefault("transformers", MagicMock())
-
+# datasets가 설치되어 있지 않으므로 mock으로 대체한다.
+# torch/transformers는 src.data.general_vqa에서 사용하지 않으므로 모킹하지 않는다.
 _mock_datasets = MagicMock()
 sys.modules.setdefault("datasets", _mock_datasets)
-
-_mock_pil = MagicMock()
-sys.modules.setdefault("PIL", _mock_pil)
-sys.modules.setdefault("PIL.Image", _mock_pil.Image)
 
 from src.data.general_vqa import (  # noqa: E402, I001
     VQAv2Sample,
