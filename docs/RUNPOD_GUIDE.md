@@ -24,9 +24,11 @@ Medical VQA VLM 석사 연구 — Phase 1/2/3 전체 파이프라인 실행 매�
 | 항목 | 권장 |
 |------|------|
 | GPU | RTX 4090 24GB |
-| Template | RunPod PyTorch 2.4+ (CUDA 12.x) |
+| Template | RunPod PyTorch 2.6+ (CUDA 12.8) |
 | Container Disk | 80GB 이상 |
 | Volume Disk | 50GB 이상 (`/workspace` 마운트) |
+
+> **[중요] torch 2.6 / CUDA 12.8 템플릿 필수**: `pyproject.toml`의 unsloth 의존성이 `unsloth[cu128-torch2.6]`(torch 2.6 + CUDA 12.8 빌드)이다. torch 2.4/cu124 템플릿을 쓰면 unsloth가 파이썬 시작 시 transformers를 패치하다 실패해 `AutoProcessor`·`Qwen3VLForConditionalGeneration` import가 깨진다(§8 참조). 반드시 torch 2.6 이상 / CUDA 12.8 템플릿을 선택할 것. (Container 60GB / Volume 40GB 조합으로도 배포 확인됨)
 
 > Gemma4-E2B(~10.3GB) 또는 선택 모델 Qwen2.5-VL-7B 사용 시 RTX 4090(24GB) 권장. 2B/3B 모델만 사용 시 A5000(24GB)도 가능.
 
@@ -298,6 +300,7 @@ bash scripts/run_phase3.sh
 | Phase 3 random fallback | API key 없음 | `export ANTHROPIC_API_KEY=sk-ant-...` |
 | 데이터셋 로드 실패 | `runpod_setup.sh` 미실행 | `bash scripts/runpod_setup.sh` 재실행 |
 | `wandb` 오류 | WANDB 미설정 | `export WANDB_MODE=offline` |
+| `AutoProcessor`/`Qwen3VLForConditionalGeneration` import 실패 | torch 2.4 템플릿 + unsloth(cu128-torch2.6) 버전 불일치로 transformers 손상 | torch 2.6/cu128 템플릿으로 재생성. Phase 1(추론)만 급하면 `pip uninstall -y unsloth unsloth_zoo` 후 `pip install --force-reinstall --no-deps transformers==4.57.2` (unsloth는 Phase 2 전용) |
 
 ---
 
