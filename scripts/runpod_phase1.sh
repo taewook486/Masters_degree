@@ -2,12 +2,12 @@
 # =============================================================
 # RunPod Phase 1: 범용 단일 모델 Zero-Shot 평가
 # =============================================================
-# Template: RunPod PyTorch 2.6+ (CUDA 12.8)  # unsloth[cu128-torch2.6] 호환
+# Template: CUDA 12.8 드라이버 + Python 3.12 (uv sync가 torch 2.10.0+cu128 설치)
 # GPU: RTX 4090 (24GB) 권장
 # Disk: 50GB+ Container (모델 + 데이터셋 + 패키지)
 #
 # 사용법:
-#   1. RunPod에서 Pod 생성 (PyTorch 2.6+ / CUDA 12.8 템플릿, RTX 4090)
+#   1. RunPod에서 Pod 생성 (CUDA 12.8 / Python 3.12 템플릿, RTX 4090)
 #   2. 터미널 접속 후:
 #      git clone https://github.com/taewook486/Masters_degree.git
 #      cd Masters_degree
@@ -82,11 +82,16 @@ if [ -z "$HF_TOKEN" ]; then
     echo ""
 fi
 
-# 1. 의존성 설치
+# 1. 의존성 설치 (uv.lock 재현 — transformers 5.5.0 + torch 2.10.0+cu128)
 echo "=========================================="
-echo " Step 1: 의존성 설치"
+echo " Step 1: 의존성 설치 (uv sync)"
 echo "=========================================="
-pip install -e . 2>&1 | tail -5
+if ! command -v uv >/dev/null 2>&1; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+fi
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
+uv sync   # Phase 1(추론)은 unsloth 불필요 → base 의존성만
+source .venv/bin/activate
 
 # 2. 환경 확인
 echo ""
