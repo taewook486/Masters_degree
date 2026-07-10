@@ -222,7 +222,7 @@ dist-ssr/
 *$py.class
 .eggs/
 .ipynb_checkpoints/
-data/
+/data/
 *.zip
 *.tar.gz
 *.h5

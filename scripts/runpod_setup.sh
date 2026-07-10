@@ -38,7 +38,7 @@ import torch
 print(f'PyTorch: {torch.__version__}')
 print(f'CUDA:    {torch.version.cuda}')
 print(f'GPU:     {torch.cuda.get_device_name(0)}')
-print(f'VRAM:    {torch.cuda.get_device_properties(0).total_mem / 1024**3:.1f} GB')
+print(f'VRAM:    {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB')
 "
 
 # 4. Download datasets (first run only)
@@ -46,12 +46,7 @@ echo ""
 echo "=========================================="
 echo " Dataset Check"
 echo "=========================================="
-python -c "
-from src.data.medical_datasets import load_medical_vqa
-for ds in ['pathvqa', 'slake', 'vqa_rad']:
-    samples = load_medical_vqa(ds, split='train', data_dir='data')
-    print(f'{ds} train: {len(samples)} samples')
-"
+python -m src.data.download
 
 # 5. Download VQAv2 subset for CF measurement
 python -c "
