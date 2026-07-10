@@ -2,12 +2,12 @@
 # =============================================================
 # RunPod Phase 1: 범용 단일 모델 Zero-Shot 평가
 # =============================================================
-# Template: RunPod PyTorch 2.4+ (CUDA 12.x)
+# Template: RunPod PyTorch 2.6+ (CUDA 12.8)  # unsloth[cu128-torch2.6] 호환
 # GPU: RTX 4090 (24GB) 권장
 # Disk: 50GB+ Container (모델 + 데이터셋 + 패키지)
 #
 # 사용법:
-#   1. RunPod에서 Pod 생성 (PyTorch 2.4+ 템플릿, RTX 4090)
+#   1. RunPod에서 Pod 생성 (PyTorch 2.6+ / CUDA 12.8 템플릿, RTX 4090)
 #   2. 터미널 접속 후:
 #      git clone https://github.com/taewook486/Masters_degree.git
 #      cd Masters_degree

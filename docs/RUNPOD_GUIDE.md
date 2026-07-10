@@ -73,13 +73,20 @@ echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.bashrc
 
 **선택 모델**: Qwen2.5-VL-7B (성능 비교용, 논문 대상 아님)
 
-### 전체 모델 일괄 실행
+### 전체 모델 일괄 실행 (권장 — 요약 CSV 자동 생성)
+
+`run_all.py`는 대상 4개 모델(`enabled: false`인 7B·`_template` 자동 제외)을 각 1회씩 로드해 3 데이터셋 × 3 시드를 평가하고, best model 선택에 필요한 **`phase1_summary.csv`를 생성**한다.
 
 ```bash
-# 미구현 — 모델별 개별 실행 권장 (아래 참고)
+python -m src.baseline.run_all \
+  --output_dir results/phase1_baseline \
+  --data_dir data \
+  --batch_size 8
 ```
 
-### 모델별 개별 실행 (권장)
+> **[중요] 요약 CSV는 `run_all.py`만 생성한다.** 아래 모델별 개별 실행(`runpod_phase1.sh`)은 개별 JSON만 만들고 `phase1_summary.csv`는 만들지 않는다. 개별 실행 방식을 택했다면, **마지막에 위 `run_all` 을 한 번 더 실행**해 요약을 생성한다(기존 JSON 결과는 skip되고 집계만 수행).
+
+### 모델별 개별 실행 (OOM 디버깅·모델 격리용)
 
 ```bash
 # Qwen3-VL-2B
@@ -176,6 +183,10 @@ done
 ## 4. Phase 2: QLoRA 파인튜닝
 
 **목표**: 4개 모델 × 3개 데이터셋 × 3개 시드 = 36개 조건
+
+**대상 4개 모델 (THESIS v0.5)**: Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B
+
+> `run_phase2_main.sh`는 `configs/models/*.yaml`을 전부 글롭하되 `enabled: false`는 건너뛴다. 논문 비대상인 `qwen25_vl_7b`와 `_template`은 `enabled: false`로 지정돼 자동 제외되므로, 위 4개 모델만 36개 조건으로 실행된다. (Florence-2는 v0.2에서 탈락 → `_excluded/` 유지)
 
 > Phase 1 완료 및 best model 확인 후 실행
 

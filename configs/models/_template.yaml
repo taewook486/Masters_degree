@@ -11,6 +11,7 @@
 # --- 필수 필드 ---
 
 # 모델 식별자 (결과 파일명에 사용, 하이픈 구분)
+enabled: false  # 템플릿 파일 — 실제 모델 아님. run_phase2/run_all의 glob 대상에서 제외. 복사 후 새 config에서 true로.
 model_name: "your-model-name"
 
 # HuggingFace 모델 ID

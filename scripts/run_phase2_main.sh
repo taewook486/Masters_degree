@@ -1,7 +1,8 @@
 #!/bin/bash
 # =============================================================
 # Phase 2 Main: 4 models x 3 datasets x 3 seeds = 36 conditions
-# Models: Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Qwen2.5-VL-7B
+# Models (THESIS v0.5): Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B
+# (configs/models/*.yaml 중 enabled:false 제외 → qwen25-vl-7b, _template 제외됨)
 # Estimated: ~35-50 hours on RTX 4090
 # =============================================================
 

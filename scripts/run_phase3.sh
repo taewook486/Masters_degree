@@ -1,7 +1,9 @@
 #!/bin/bash
 # =============================================================
-# Phase 3: HPO Strategy Comparison (4 strategies x 5 repeats)
-# Estimated: ~50-80 hours on RTX 4090
+# Phase 3: HPO Strategy Comparison (4 strategies x 10 repeats)
+# THESIS v0.5 Section 4.5: 10 independent repeats per strategy
+# (statistical power ~0.6-0.7, Mann-Whitney U test)
+# Estimated: ~100-160 hours on RTX 4090
 #
 # IMPORTANT: Set ANTHROPIC_API_KEY for autoresearch strategy.
 #            Update --model_config with the best model from Phase 2.
@@ -14,11 +16,24 @@ export PYTHONUNBUFFERED=1
 export WANDB_PROJECT=medical-vqa-vlm
 
 # --- REQUIRED: Set your Anthropic API key ---
-if [ -z "${ANTHROPIC_API_KEY}" ]; then
-    echo "WARNING: ANTHROPIC_API_KEY not set."
-    echo "Autoresearch strategy will fail without it."
-    echo "Set it with: export ANTHROPIC_API_KEY=sk-ant-..."
-    echo ""
+# Preflight: if 'autoresearch' is among the strategies, verify the API works.
+# Without this, a bad key silently degrades autoresearch to random search,
+# invalidating the core HPO comparison (strategies.py fallback).
+STRATEGIES="manual random optuna autoresearch"
+if echo "${STRATEGIES}" | grep -qw autoresearch; then
+    if [ -z "${ANTHROPIC_API_KEY}" ]; then
+        echo "ABORT: autoresearch requested but ANTHROPIC_API_KEY is not set."
+        echo "Set it with: export ANTHROPIC_API_KEY=sk-ant-..."
+        exit 1
+    fi
+    echo "[preflight] Verifying Anthropic API (autoresearch)..."
+    python -c "
+import anthropic
+c = anthropic.Anthropic()
+c.messages.create(model='claude-sonnet-4-6', max_tokens=8,
+                  messages=[{'role': 'user', 'content': 'ping'}])
+print('[preflight] Anthropic API OK')
+" || { echo "ABORT: Anthropic API preflight failed. Fix the key/quota before running autoresearch (else it silently falls back to random)."; exit 1; }
 fi
 
 # --- UPDATE THIS after Phase 2 results ---
@@ -37,7 +52,7 @@ python -u -m src.autoresearch.run_phase3 \
   --finetune_config configs/finetune/base_qlora.yaml \
   --output_dir results/phase3_autoresearch \
   --strategies manual random optuna autoresearch \
-  --repeats 5 \
+  --repeats 10 \
   --trials_per_repeat 40 \
   --seed 42 \
   --data_dir data \

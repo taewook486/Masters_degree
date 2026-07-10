@@ -1,7 +1,7 @@
 """Run all Phase 3 HPO experiments.
 
-THESIS_PROPOSAL.md Section 4.5:
-  - 4 strategies x 5 independent repeats
+THESIS_PROPOSAL.md Section 4.5 (v0.5):
+  - 4 strategies x 10 independent repeats (v0.4: 5 -> 10 for statistical power)
   - ~40 trials per strategy per repeat (manual = 1 trial)
   - Fixed model (best from Phase 2) + fixed dataset (PathVQA)
 
@@ -36,7 +36,7 @@ def run_phase3(
     base_finetune_config: str,
     output_dir: str,
     strategies: list[str],
-    n_repeats: int = 5,
+    n_repeats: int = 10,
     trials_per_repeat: int = 40,
     seed: int = 42,
     data_dir: str = "data",
@@ -194,7 +194,7 @@ def main() -> None:
         default=["manual", "random", "optuna", "autoresearch"],
         choices=["manual", "random", "optuna", "autoresearch"],
     )
-    parser.add_argument("--repeats", type=int, default=5)
+    parser.add_argument("--repeats", type=int, default=10)
     parser.add_argument("--trials_per_repeat", type=int, default=40)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--data_dir", default="data")

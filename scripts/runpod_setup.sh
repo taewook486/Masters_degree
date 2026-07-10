@@ -2,7 +2,7 @@
 # =============================================================
 # RunPod Phase 2 & 3 Setup Script
 # =============================================================
-# Template: RunPod PyTorch 2.4+ (CUDA 12.x)
+# Template: RunPod PyTorch 2.6+ (CUDA 12.8)  # unsloth[cu128-torch2.6] 호환
 # GPU: RTX 4090 (24GB) recommended (required for 7B QLoRA)
 # Disk: 80GB+ Container, 50GB+ Volume (7B model ~15GB)
 # =============================================================
