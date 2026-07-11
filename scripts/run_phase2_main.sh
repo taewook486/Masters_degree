@@ -24,6 +24,7 @@ python -u -m src.finetune.run_phase2 \
   --output_dir results/phase2_finetune \
   --seeds 42 123 456 \
   --data_dir data \
+  --max_eval_samples 500 \
   2>&1 | tee results/phase2_finetune/run_phase2.log
 
 echo ""

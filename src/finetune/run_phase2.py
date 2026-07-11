@@ -107,6 +107,7 @@ def run_main_conditions(
     data_dir: str = "data",
     skip_existing: bool = True,
     max_train_samples: int | None = None,
+    max_eval_samples: int | None = None,
     measure_cf: bool = True,
 ) -> list[dict]:
     """Run main Phase 2 conditions: all models x all datasets x all seeds.
@@ -162,6 +163,7 @@ def run_main_conditions(
                         seed=seed,
                         data_dir=data_dir,
                         max_train_samples=max_train_samples,
+                        max_eval_samples=max_eval_samples,
                         measure_cf=measure_cf,
                         base_vqav2_result=base_vqav2,
                     )
@@ -186,6 +188,7 @@ def run_ablation_a(
     seeds: list[int],
     data_dir: str = "data",
     skip_existing: bool = True,
+    max_eval_samples: int | None = None,
 ) -> list[dict]:
     """Ablation A: Training data size impact (5%, 10%, 25%, 50%, 100%)."""
     ratios = [0.05, 0.10, 0.25, 0.50, 1.0]
@@ -218,6 +221,7 @@ def run_ablation_a(
                     output_dir=str(run_dir),
                     seed=seed,
                     data_dir=data_dir,
+                    max_eval_samples=max_eval_samples,
                     subset_ratio=ratio,
                 )
                 results.append(result)
@@ -238,6 +242,7 @@ def run_ablation_b(
     seeds: list[int],
     data_dir: str = "data",
     skip_existing: bool = True,
+    max_eval_samples: int | None = None,
 ) -> list[dict]:
     """Ablation B: LoRA rank impact (4, 8, 16, 32, 64)."""
     ranks = [4, 8, 16, 32, 64]
@@ -274,6 +279,7 @@ def run_ablation_b(
                     output_dir=str(run_dir),
                     seed=seed,
                     data_dir=data_dir,
+                    max_eval_samples=max_eval_samples,
                 )
                 results.append(result)
             except Exception as e:
@@ -292,6 +298,7 @@ def run_ablation_c(
     seeds: list[int],
     data_dir: str = "data",
     skip_existing: bool = True,
+    max_eval_samples: int | None = None,
 ) -> list[dict]:
     """Ablation C: Target modules impact (minimal, medium, full)."""
     configs_dir = Path("configs/finetune/ablation")
@@ -333,6 +340,7 @@ def run_ablation_c(
                     output_dir=str(run_dir),
                     seed=seed,
                     data_dir=data_dir,
+                    max_eval_samples=max_eval_samples,
                 )
                 results.append(result)
             except Exception as e:
@@ -409,6 +417,11 @@ def main() -> None:
     parser.add_argument("--seeds", nargs="+", type=int, default=[42, 123, 456])
     parser.add_argument("--data_dir", default="data")
     parser.add_argument("--max_train_samples", type=int, default=None)
+    parser.add_argument(
+        "--max_eval_samples", type=int, default=None,
+        help="epoch 평가/best-checkpoint 선택용 validation 샘플 상한 "
+             "(최종 지표는 test셋이라 결과 불변, 학습 중 평가 비용만 절감)",
+    )
     parser.add_argument("--no_skip_existing", action="store_true")
     parser.add_argument(
         "--best_model_config", default=None,
@@ -443,6 +456,7 @@ def main() -> None:
         data_dir=args.data_dir,
         skip_existing=skip,
         max_train_samples=args.max_train_samples,
+        max_eval_samples=args.max_eval_samples,
     )
     if main_results:
         all_dfs.append(build_summary(main_results, "main"))
@@ -460,6 +474,7 @@ def main() -> None:
             ab_a = run_ablation_a(
                 args.best_model_config, args.finetune_config,
                 args.output_dir, args.seeds, args.data_dir, skip,
+                max_eval_samples=args.max_eval_samples,
             )
             if ab_a:
                 all_dfs.append(build_summary(ab_a, "ablation_a"))
@@ -471,6 +486,7 @@ def main() -> None:
             ab_b = run_ablation_b(
                 args.best_model_config, args.finetune_config,
                 args.output_dir, args.seeds, args.data_dir, skip,
+                max_eval_samples=args.max_eval_samples,
             )
             if ab_b:
                 all_dfs.append(build_summary(ab_b, "ablation_b"))
@@ -482,6 +498,7 @@ def main() -> None:
             ab_c = run_ablation_c(
                 args.best_model_config, args.output_dir,
                 args.seeds, args.data_dir, skip,
+                max_eval_samples=args.max_eval_samples,
             )
             if ab_c:
                 all_dfs.append(build_summary(ab_c, "ablation_c"))

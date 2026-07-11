@@ -30,6 +30,7 @@ python -u -m src.finetune.run_phase2 \
   --data_dir data \
   --best_model_config "${BEST_MODEL_CONFIG}" \
   --ablation all \
+  --max_eval_samples 500 \
   2>&1 | tee -a results/phase2_finetune/run_phase2.log
 
 echo ""

@@ -452,6 +452,7 @@ def train_qlora(
     seed: int = 42,
     data_dir: str = "data",
     max_train_samples: int | None = None,
+    max_eval_samples: int | None = None,
     subset_ratio: float | None = None,
     eval_after_training: bool = True,
     force_standard: bool = False,
@@ -472,6 +473,9 @@ def train_qlora(
         seed: Random seed for reproducibility.
         data_dir: Base directory for datasets.
         max_train_samples: Limit training samples (for debugging).
+        max_eval_samples: Limit validation samples used for epoch eval /
+            best-checkpoint selection. 최종 보고 지표는 학습 후 test셋 평가라
+            이 값은 결과 수치에 영향을 주지 않고 학습 중 평가 비용만 줄인다.
         subset_ratio: Use fraction of training data (Ablation A).
         eval_after_training: Run evaluation on test set after training.
         force_standard: Force standard PEFT backend even for Unsloth-supported models.
@@ -512,10 +516,15 @@ def train_qlora(
     )
 
     try:
-        eval_ds = prepare_fn(dataset_name, split="validation", data_dir=data_dir)
+        eval_ds = prepare_fn(
+            dataset_name, split="validation", data_dir=data_dir,
+            max_samples=max_eval_samples,
+        )
     except (ValueError, KeyError):
         logger.info(f"{dataset_name} has no validation split; using last 10% of train")
         n_eval = max(50, len(train_ds) // 10)
+        if max_eval_samples is not None:
+            n_eval = min(n_eval, max_eval_samples)
         eval_ds = train_ds.select(range(len(train_ds) - n_eval, len(train_ds)))
         train_ds = train_ds.select(range(len(train_ds) - n_eval))
 
