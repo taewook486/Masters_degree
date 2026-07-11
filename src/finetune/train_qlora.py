@@ -425,6 +425,7 @@ def _build_trainer_standard(
         run_name=f"{model_name}_{dataset_name}_seed{seed}_peft",
         remove_unused_columns=False,
         dataset_text_field=None,
+        dataset_kwargs={"skip_prepare_dataset": True},  # VLM: custom collate_fn이 처리, trl 준비 건너뜀
         max_length=max_seq_length,  # trl 0.24: max_seq_length→max_length
     )
 
