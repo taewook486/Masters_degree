@@ -11,6 +11,53 @@ import math
 from scipy import stats
 
 
+def bootstrap_accuracy_ci(
+    correctness: list[int] | list[float],
+    confidence_level: float = 0.95,
+    n_resamples: int = 10_000,
+    seed: int = 42,
+) -> tuple[float, float]:
+    """정확도(0/1 정오 벡터 평균)의 퍼센타일 부트스트랩 신뢰구간.
+
+    zero-shot greedy 평가는 결정적이므로 시드 재실행으로는 분산이 생기지 않는다.
+    결정적 평가의 올바른 불확실성 정량화는 '테스트셋 표본 변동'이며, 이를
+    per-sample 정오 벡터의 부트스트랩 CI로 보고한다.
+
+    Args:
+        correctness: 샘플별 정오 (1=정답, 0=오답).
+        confidence_level: 신뢰수준 (기본 0.95).
+        n_resamples: 부트스트랩 재표본 수.
+        seed: 재현성을 위한 난수 시드.
+
+    Returns:
+        (ci_low, ci_high) 튜플. 표본이 비었으면 (0.0, 0.0),
+        전부 동일(정답 전부/오답 전부)하면 (point, point).
+    """
+    import numpy as np
+
+    arr = np.asarray(correctness, dtype=float)
+    n = arr.size
+    if n == 0:
+        return (0.0, 0.0)
+    point = float(arr.mean())
+    # 축퇴 케이스: 전부 0 또는 전부 1이면 부트스트랩 분산이 0 → 점추정 반환
+    if float(arr.min()) == float(arr.max()):
+        return (round(point, 4), round(point, 4))
+
+    res = stats.bootstrap(
+        (arr,),
+        np.mean,
+        confidence_level=confidence_level,
+        n_resamples=n_resamples,
+        method="percentile",
+        random_state=seed,
+    )
+    return (
+        round(float(res.confidence_interval.low), 4),
+        round(float(res.confidence_interval.high), 4),
+    )
+
+
 def run_anova_models(results: dict[str, list[float]]) -> dict:
     """One-way ANOVA + Tukey HSD post-hoc 검정.
 

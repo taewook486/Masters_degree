@@ -78,7 +78,7 @@ echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.bashrc
 
 ### 전체 모델 일괄 실행 (권장 — 요약 CSV 자동 생성)
 
-`run_all.py`는 대상 4개 모델(`enabled: false`인 7B·`_template` 자동 제외)을 각 1회씩 로드해 3 데이터셋 × 3 시드를 평가하고, best model 선택에 필요한 **`phase1_summary.csv`를 생성**한다.
+`run_all.py`는 대상 4개 모델(`enabled: false`인 7B·`_template` 자동 제외)을 각 1회씩 로드해 3 데이터셋 × **1 시드(42)**를 평가하고, best model 선택에 필요한 **`phase1_summary.csv`를 생성**한다.
 
 ```bash
 python -m src.baseline.run_all \
@@ -86,6 +86,8 @@ python -m src.baseline.run_all \
   --data_dir data \
   --batch_size 8
 ```
+
+> **[방법론] zero-shot은 1시드 + 부트스트랩 95% CI**: zero-shot은 greedy 디코딩이라 결정적이므로 시드를 바꿔도 결과가 동일하다(seed-std ≡ 0). 따라서 3시드 반복 대신 **1시드(42)**로 평가하고, 불확실성은 각 조건의 per-sample 정오에 대한 **부트스트랩 95% CI**로 보고한다. 요약 CSV에 `overall_acc_ci_low/high`, `closed_acc_ci_low/high`, `open_acc_ci_low/high` 열이 포함된다. (Phase 2/3은 학습이 확률적이므로 다중 시드/반복 유지 — 변경 없음)
 
 > **[중요] 요약 CSV는 `run_all.py`만 생성한다.** 아래 모델별 개별 실행(`runpod_phase1.sh`)은 개별 JSON만 만들고 `phase1_summary.csv`는 만들지 않는다. 개별 실행 방식을 택했다면, **마지막에 위 `run_all` 을 한 번 더 실행**해 요약을 생성한다(기존 JSON 결과는 skip되고 집계만 수행).
 

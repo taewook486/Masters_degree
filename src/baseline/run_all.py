@@ -188,6 +188,8 @@ def _aggregate_seed_results(
     closed_mean, closed_std = _stat("closed_accuracy")
     open_mean, open_std = _stat("open_accuracy")
     overall_mean, overall_std = _stat("overall_accuracy")
+    # Bootstrap CI는 결정적 조건 단위 값이므로 (시드 무관) 첫 결과에서 전달
+    first = results[0]
     # REQ-RI-002: BERTScore 집계 추가
     bertscore_f1_mean, bertscore_f1_std = _stat("open_bertscore_f1")
     bertscore_acc_mean, bertscore_acc_std = _stat("open_bertscore_accuracy")
@@ -201,10 +203,16 @@ def _aggregate_seed_results(
         "num_seeds": len(results),
         "closed_acc_mean": closed_mean,
         "closed_acc_std": closed_std,
+        "closed_acc_ci_low": first.get("closed_acc_ci_low"),
+        "closed_acc_ci_high": first.get("closed_acc_ci_high"),
         "open_acc_mean": open_mean,
         "open_acc_std": open_std,
+        "open_acc_ci_low": first.get("open_acc_ci_low"),
+        "open_acc_ci_high": first.get("open_acc_ci_high"),
         "overall_acc_mean": overall_mean,
         "overall_acc_std": overall_std,
+        "overall_acc_ci_low": first.get("overall_acc_ci_low"),
+        "overall_acc_ci_high": first.get("overall_acc_ci_high"),
         "open_bertscore_f1_mean": bertscore_f1_mean,
         "open_bertscore_f1_std": bertscore_f1_std,
         "open_bertscore_accuracy_mean": bertscore_acc_mean,
@@ -238,7 +246,9 @@ def main() -> None:
     )
     parser.add_argument("--config_dir", default="configs/models")
     parser.add_argument("--output_dir", default="results/phase1_baseline")
-    parser.add_argument("--seeds", nargs="+", type=int, default=[42, 123, 456])
+    # zero-shot은 결정적이라 시드 반복은 동일 결과 → 기본 1시드.
+    # 불확실성은 seed-std가 아니라 per-condition 부트스트랩 95% CI로 보고한다.
+    parser.add_argument("--seeds", nargs="+", type=int, default=[42])
     parser.add_argument("--data_dir", default="data")
     parser.add_argument("--max_samples", type=int, default=None)
     parser.add_argument(

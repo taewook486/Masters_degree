@@ -33,7 +33,8 @@ from src.baseline.model_loader import load_config, load_model, unload_model
 logger = logging.getLogger(__name__)
 
 DATASETS = ["pathvqa", "slake", "vqa_rad"]
-SEEDS = [42, 123, 456]
+# zero-shot은 결정적 → 1시드. 불확실성은 부트스트랩 95% CI로 보고 (run_all 참조).
+SEEDS = [42]
 
 
 def result_exists(output_dir: str, model_name: str, dataset: str, seed: int) -> bool:

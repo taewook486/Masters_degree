@@ -23,6 +23,7 @@ from src.baseline.model_loader import (
 )
 from src.data.dataset import load_medical_vqa_dataset
 from src.evaluate.metrics import _extract_yes_no, compute_overall_accuracy, preprocess_answer
+from src.evaluate.statistics import bootstrap_accuracy_ci
 from src.utils.environment import get_environment_info
 from src.utils.logging_config import setup_logging
 from src.utils.seed import set_seed
@@ -96,8 +97,26 @@ def evaluate_with_loaded_model(
     time_values = [r["time_ms"] for r in per_sample_results if r["time_ms"] > 0]
     avg_time_ms = sum(time_values) / len(time_values) if time_values else 0.0
 
+    # Bootstrap 95% CI over test samples (deterministic zero-shot eval:
+    # uncertainty comes from test-set sampling, not from seed repetition).
+    correctness = [
+        1 if _is_correct(p, g, qt) else 0
+        for p, g, qt in zip(predictions, gold_answers, question_types)
+    ]
+    closed_flags = [c for c, qt in zip(correctness, question_types) if qt == "closed"]
+    open_flags = [c for c, qt in zip(correctness, question_types) if qt != "closed"]
+    overall_ci = bootstrap_accuracy_ci(correctness)
+    closed_ci = bootstrap_accuracy_ci(closed_flags)
+    open_ci = bootstrap_accuracy_ci(open_flags)
+
     summary = {
         **metrics,
+        "overall_acc_ci_low": overall_ci[0],
+        "overall_acc_ci_high": overall_ci[1],
+        "closed_acc_ci_low": closed_ci[0],
+        "closed_acc_ci_high": closed_ci[1],
+        "open_acc_ci_low": open_ci[0],
+        "open_acc_ci_high": open_ci[1],
         "avg_time_ms": round(avg_time_ms, 1),
         "peak_vram_mb": vram["peak_mb"],
     }
