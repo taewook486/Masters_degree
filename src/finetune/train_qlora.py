@@ -212,7 +212,7 @@ def _build_trainer_unsloth(
         remove_unused_columns=False,
         dataset_text_field=None,
         dataset_kwargs={"skip_prepare_dataset": True},
-        max_seq_length=None,  # Unsloth VLM: None to avoid truncating image tokens
+        max_length=None,  # Unsloth VLM: None to avoid truncating image tokens (trl 0.24: max_seq_length→max_length)
     )
 
     trainer = SFTTrainer(
@@ -425,7 +425,7 @@ def _build_trainer_standard(
         run_name=f"{model_name}_{dataset_name}_seed{seed}_peft",
         remove_unused_columns=False,
         dataset_text_field=None,
-        max_seq_length=max_seq_length,
+        max_length=max_seq_length,  # trl 0.24: max_seq_length→max_length
     )
 
     trainer = SFTTrainer(
