@@ -55,6 +55,8 @@
 - `src/evaluate/statistics.py`: `bootstrap_accuracy_ci`, `run_cochran_q`, `run_mcnemar` 추가
 - `src/baseline/evaluate_zero_shot.py`: 조건별 overall/closed/open 부트스트랩 CI를 summary에 기록
 - `src/baseline/run_all.py`, `scripts/run_phase1_single.py`: 기본 시드 [42,123,456] → [42], 요약 CSV에 CI 열 추가
+- `scripts/analyze_phase1.py`: Phase 1 RQ1 분석 실행기 (Cochran's Q + McNemar + 부트스트랩 CI)
+- `src/evaluate/metrics.py`: 답변 매처 `_extract_yes_no` 개선 — 장황한 출력 속 yes/no 추출 + 회피 문구("not possible", "cannot" 등) 비확답 처리. 특정 모델(예: gemma4-E2B)이 확답을 회피/장황하게 답하는 경우의 매처 공정성 확보. `scripts/rescore_phase1.py`로 저장된 예측을 재채점(GPU 불필요, 4모델 일관 적용)하여 결과 왜곡을 방지
 
 ### 지도교수 확인 필요
 

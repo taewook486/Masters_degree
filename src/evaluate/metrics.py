@@ -58,11 +58,22 @@ def compute_closed_accuracy(
     return correct / len(predictions)
 
 
-def _extract_yes_no(text: str) -> str:
-    """Extract yes/no from a text string.
+# v0.6: 확답 회피/불확실성 문구 — 이런 답은 yes/no로 매핑하지 않고 비확답 처리한다.
+# (장황한 출력에서 yes/no를 추출할 때 오탐을 막기 위한 가드)
+_REFUSAL_MARKERS = (
+    "not possible", "cannot", "can not", "unable", "not able",
+    "insufficient", "impossible", "not enough", "cannot be determined",
+    "difficult to determine", "cannot determine",
+)
 
-    Handles variations like 'yeah', 'yep', 'nope', 'nah', and
-    model outputs like 'yes the image shows...' or 'no there is no...'.
+
+def _extract_yes_no(text: str) -> str:
+    """Extract yes/no from a (preprocessed, lowercased, no-punct) answer string.
+
+    Handles short forms ('yeah', 'nope', ...), leading yes/no, and — v0.6 —
+    yes/no embedded in verbose outputs (e.g. 'the answer is yes'). Refusal /
+    uncertainty phrasing ('not possible to determine', 'cannot ...') is treated
+    as a non-answer so it does not spuriously map to yes/no.
     """
     text = text.strip()
 
@@ -71,11 +82,28 @@ def _extract_yes_no(text: str) -> str:
     if text in {"no", "nope", "nah", "incorrect", "false"}:
         return "no"
 
-    # Check if the answer starts with yes/no
+    # Leading yes/no (기존 동작 유지)
     if text.startswith("yes"):
         return "yes"
     if text.startswith("no"):
         return "no"
+
+    # v0.6: 회피/불확실 문구는 비확답 → 원문 반환 (yes/no와 불일치 처리)
+    if any(marker in text for marker in _REFUSAL_MARKERS):
+        return text
+
+    # v0.6: 문장 속 단어 경계 yes/no 추출 (한쪽만 있을 때만 채택)
+    has_yes = re.search(r"\byes\b", text) is not None
+    has_no = re.search(r"\bno\b", text) is not None
+    if has_yes and not has_no:
+        return "yes"
+    if has_no and not has_yes:
+        return "no"
+
+    # 둘 다/둘 다 없음 → 'answer is yes/no' 명시 패턴만 마지막으로 확인
+    m = re.search(r"answer(?:\s+is|:)?\s+(yes|no)\b", text)
+    if m:
+        return m.group(1)
 
     return text
 
