@@ -26,6 +26,15 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+# [HARD] Unsloth must be imported BEFORE transformers/trl/peft. Otherwise unsloth's
+# runtime patching overwrites the tokenizer eos_token/pad_token to the placeholder
+# '<EOS_TOKEN>', which trl 0.24 SFTTrainer then rejects as "not in vocabulary"
+# (unslothai/unsloth#2797). Import order is the documented fix.
+try:
+    import unsloth  # noqa: F401
+except ImportError:
+    unsloth = None
+
 import torch
 from omegaconf import DictConfig, OmegaConf
 from transformers import BitsAndBytesConfig, TrainerCallback
@@ -68,7 +77,9 @@ class TimeBudgetCallback(TrainerCallback):
 # Unsloth detection & model compatibility
 # ---------------------------------------------------------------------------
 
-_UNSLOTH_SUPPORTED_PATTERNS = ["qwen2.5-vl", "qwen3-vl", "qwen2-vl"]
+# Gemma 4/3n E2B: PEFT는 Gemma4ClippableLinear(nn.Linear 미상속)를 거부하므로
+# (huggingface/peft#3129) unsloth backend로 라우팅해 ClippableLinear 문제를 우회한다.
+_UNSLOTH_SUPPORTED_PATTERNS = ["qwen2.5-vl", "qwen3-vl", "qwen2-vl", "gemma-4", "gemma-3n"]
 
 
 def _unsloth_available() -> bool:
@@ -435,7 +446,7 @@ def _build_trainer_standard(
         train_dataset=train_ds,
         eval_dataset=eval_ds,
         data_collator=collate_fn,
-        processing_class=processor.tokenizer,
+        processing_class=processor,  # full multimodal processor so trl detects VLM
     )
 
     return trainer
