@@ -23,6 +23,7 @@
 | v0.3 | (보고 안 함) | 2026-04-05 | Gemma 4 E2B 추가 |
 | v0.4 | (보고 안 함) | 2026-05-15 | 동료 심사 9건 중 5건 처리 |
 | v0.5 | **v1.1** | 2026-05-16 | 잔여 치명적 4건 처리 |
+| v0.6 | (보고 예정) | 2026-07-11 | Phase 1 방법론 정정 (결정적 평가: 1시드 + 부트스트랩 CI, ANOVA→Cochran's Q/McNemar) |
 | (예정) | **v2.0** | 2026-07 예상 | Phase 1/2 실험 결과 포함 본 심사용 |
 
 ### 시맨틱 버전 규칙 (External)
@@ -30,6 +31,34 @@
 - **MAJOR (v1, v2, ...)**: 연구 방향, RQ, 또는 큰 결과 추가 (예: Phase 1 실험 결과 포함)
 - **MINOR (v1.1, v1.2)**: 방법론 추가/개선 (예: 동료 심사 반영, 모델 추가)
 - **PATCH (v1.1.1)**: 오타, 표 형식 수정
+
+---
+
+## Internal v0.6 — 2026-07-11
+
+**Phase 1 방법론 정정** — RunPod 실험 착수 중 발견된 결정성(determinism) 이슈 대응.
+
+### 문제
+
+- Phase 1 zero-shot은 greedy 디코딩이라 **결정적**이다. 따라서 seed 42/123/456 반복이 완전히 동일한 결과를 낸다(seed-std ≡ 0).
+- 그 결과 (1) 설계서의 "3회 반복 → 평균±표준편차"는 항상 ±0.00이 되고, (2) RQ1의 **ANOVA(모델 간 차이)는 그룹내 분산=0으로 F값이 degenerate**해져 원래 설계대로 작동하지 않는다. 이는 v0.6 이전부터 잠재해 있던 결함이다.
+
+### 정정 (Phase 1에 한정)
+
+- **반복**: 3시드 → **단일 시드(42)** (결정적이므로 반복이 무의미, GPU 시간 1/3)
+- **불확실성**: seed-std → 각 조건 per-sample 정오의 **부트스트랩 95% CI** (테스트셋 표본 변동 기반, Efron & Tibshirani 1993)
+- **모델 비교 검정(RQ1)**: 시드-분산 ANOVA/Tukey → **Cochran's Q**(4모델 공유 테스트셋 이진 정오) + **McNemar 쌍별 post-hoc**(Bonferroni). 동일 샘플 짝지은 검정이라 더 적절하고 검정력도 높다.
+- **Phase 2·3은 변경 없음** — 학습이 확률적이라 다중 시드/반복의 분산이 실재한다.
+
+### 코드 산출물
+
+- `src/evaluate/statistics.py`: `bootstrap_accuracy_ci`, `run_cochran_q`, `run_mcnemar` 추가
+- `src/baseline/evaluate_zero_shot.py`: 조건별 overall/closed/open 부트스트랩 CI를 summary에 기록
+- `src/baseline/run_all.py`, `scripts/run_phase1_single.py`: 기본 시드 [42,123,456] → [42], 요약 CSV에 CI 열 추가
+
+### 지도교수 확인 필요
+
+방법론 변경(특히 RQ1 검정)이므로 다음 보고 시 승인 확인. 별도 가이드는 미제공 상태에서 연구자 재량으로 정정.
 
 ---
 

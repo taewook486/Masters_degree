@@ -58,8 +58,105 @@ def bootstrap_accuracy_ci(
     )
 
 
+def run_cochran_q(model_correctness: dict[str, list[int]]) -> dict:
+    """Cochran's Q 검정: 동일 테스트셋에서 k개 모델의 이진 정오 비교 (RQ1).
+
+    결정적 zero-shot 평가에서는 모든 모델이 '같은 샘플'로 평가되므로,
+    시드-분산 ANOVA가 아니라 반복측정 짝지은 검정(Cochran's Q)이 적절하다.
+    H0: 모든 모델의 정확도가 동일하다.
+
+    Args:
+        model_correctness: {"model": [샘플별 0/1 정오], ...}.
+            모든 모델의 리스트 길이와 샘플 순서가 동일해야 한다.
+
+    Returns:
+        dict: q_stat, p_value, df, k, significant (alpha=0.05)
+    """
+    import numpy as np
+
+    names = list(model_correctness.keys())
+    mat = np.asarray([model_correctness[n] for n in names], dtype=int).T  # (n_samples, k)
+    k = mat.shape[1]
+
+    try:
+        from statsmodels.stats.contingency_tables import cochrans_q
+
+        res = cochrans_q(mat)
+        q_stat, p_value = float(res.statistic), float(res.pvalue)
+    except ImportError:
+        # statsmodels 미설치 시 수동 계산 + chi2 근사
+        col = mat.sum(axis=0)  # 모델별 정답 수
+        row = mat.sum(axis=1)  # 샘플별 정답 모델 수
+        n_total = int(mat.sum())
+        denom = k * n_total - int((row ** 2).sum())
+        q_stat = (
+            (k - 1) * (k * int((col ** 2).sum()) - n_total ** 2) / denom
+            if denom != 0 else 0.0
+        )
+        p_value = float(1 - stats.chi2.cdf(q_stat, k - 1))
+
+    return {
+        "q_stat": float(q_stat),
+        "p_value": float(p_value),
+        "df": k - 1,
+        "k": k,
+        "significant": bool(p_value < 0.05),
+    }
+
+
+def run_mcnemar(correct_a: list[int], correct_b: list[int]) -> dict:
+    """McNemar 검정: 동일 테스트셋에서 두 모델의 짝지은 이진 정오 비교.
+
+    Cochran's Q가 유의할 때 쌍별 post-hoc으로 사용한다.
+    불일치 샘플 수가 작으면(<25) 정확검정(binomial), 크면 chi2 근사.
+
+    Args:
+        correct_a: 모델 A의 샘플별 0/1 정오.
+        correct_b: 모델 B의 샘플별 0/1 정오 (A와 같은 순서).
+
+    Returns:
+        dict: stat, p_value, n_discordant, b01, b10, significant
+    """
+    import numpy as np
+
+    a = np.asarray(correct_a, dtype=int)
+    b = np.asarray(correct_b, dtype=int)
+    b01 = int(((a == 1) & (b == 0)).sum())  # A만 정답
+    b10 = int(((a == 0) & (b == 1)).sum())  # B만 정답
+    n_disc = b01 + b10
+
+    try:
+        from statsmodels.stats.contingency_tables import mcnemar
+
+        table = [
+            [int(((a == 1) & (b == 1)).sum()), b01],
+            [b10, int(((a == 0) & (b == 0)).sum())],
+        ]
+        res = mcnemar(table, exact=n_disc < 25)
+        stat, p_value = float(res.statistic), float(res.pvalue)
+    except ImportError:
+        if n_disc == 0:
+            stat, p_value = 0.0, 1.0
+        else:
+            stat = float(min(b01, b10))
+            p_value = float(stats.binomtest(min(b01, b10), n_disc, 0.5).pvalue)
+
+    return {
+        "stat": float(stat),
+        "p_value": float(p_value),
+        "n_discordant": n_disc,
+        "b01": b01,
+        "b10": b10,
+        "significant": bool(p_value < 0.05),
+    }
+
+
 def run_anova_models(results: dict[str, list[float]]) -> dict:
     """One-way ANOVA + Tukey HSD post-hoc 검정.
+
+    NOTE (v0.6): Phase 1 zero-shot은 결정적이라 시드-분산이 0이므로 이 함수 대신
+    run_cochran_q / run_mcnemar(공유 테스트셋 짝지은 검정)를 사용한다.
+    이 함수는 시드-분산이 실재하는 맥락(예: 학습 기반 다중 시드)에서만 유효하다.
 
     Args:
         results: {"model_name": [acc_seed42, acc_seed123, acc_seed456], ...}
