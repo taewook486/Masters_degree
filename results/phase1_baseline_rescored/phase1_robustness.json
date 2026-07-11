@@ -1,0 +1,328 @@
+{
+  "seed": 42,
+  "models": [
+    "gemma4-e2b",
+    "qwen25-vl-3b",
+    "qwen3-vl-2b",
+    "smolvlm2-2b"
+  ],
+  "removed_per_dataset": {
+    "pathvqa": 1020,
+    "slake": 233,
+    "vqa_rad": 73
+  },
+  "per_dataset": {
+    "pathvqa": {
+      "n_removed": 1020,
+      "models": {
+        "gemma4-e2b": {
+          "full": {
+            "n": 6719,
+            "acc": 0.1075,
+            "ci": [
+              0.1,
+              0.1149
+            ]
+          },
+          "clean": {
+            "n": 5699,
+            "acc": 0.0546,
+            "ci": [
+              0.049,
+              0.0605
+            ]
+          }
+        },
+        "qwen25-vl-3b": {
+          "full": {
+            "n": 6719,
+            "acc": 0.3242,
+            "ci": [
+              0.3131,
+              0.3353
+            ]
+          },
+          "clean": {
+            "n": 5699,
+            "acc": 0.2385,
+            "ci": [
+              0.2272,
+              0.2493
+            ]
+          }
+        },
+        "qwen3-vl-2b": {
+          "full": {
+            "n": 6719,
+            "acc": 0.348,
+            "ci": [
+              0.3368,
+              0.3591
+            ]
+          },
+          "clean": {
+            "n": 5699,
+            "acc": 0.2704,
+            "ci": [
+              0.2588,
+              0.282
+            ]
+          }
+        },
+        "smolvlm2-2b": {
+          "full": {
+            "n": 6719,
+            "acc": 0.3079,
+            "ci": [
+              0.2971,
+              0.3188
+            ]
+          },
+          "clean": {
+            "n": 5699,
+            "acc": 0.2409,
+            "ci": [
+              0.2295,
+              0.2521
+            ]
+          }
+        }
+      },
+      "cochran_q_full": {
+        "q_stat": 2034.742586365026,
+        "p_value": 0.0,
+        "significant": true
+      },
+      "cochran_q_clean": {
+        "q_stat": 1528.3882037533513,
+        "p_value": 0.0,
+        "significant": true
+      }
+    },
+    "slake": {
+      "n_removed": 233,
+      "models": {
+        "gemma4-e2b": {
+          "full": {
+            "n": 1061,
+            "acc": 0.492,
+            "ci": [
+              0.4609,
+              0.5221
+            ]
+          },
+          "clean": {
+            "n": 828,
+            "acc": 0.3877,
+            "ci": [
+              0.3551,
+              0.4215
+            ]
+          }
+        },
+        "qwen25-vl-3b": {
+          "full": {
+            "n": 1061,
+            "acc": 0.5598,
+            "ci": [
+              0.5287,
+              0.5891
+            ]
+          },
+          "clean": {
+            "n": 828,
+            "acc": 0.465,
+            "ci": [
+              0.4312,
+              0.4988
+            ]
+          }
+        },
+        "qwen3-vl-2b": {
+          "full": {
+            "n": 1061,
+            "acc": 0.5693,
+            "ci": [
+              0.5391,
+              0.5985
+            ]
+          },
+          "clean": {
+            "n": 828,
+            "acc": 0.471,
+            "ci": [
+              0.4372,
+              0.506
+            ]
+          }
+        },
+        "smolvlm2-2b": {
+          "full": {
+            "n": 1061,
+            "acc": 0.4618,
+            "ci": [
+              0.4317,
+              0.492
+            ]
+          },
+          "clean": {
+            "n": 828,
+            "acc": 0.3587,
+            "ci": [
+              0.3273,
+              0.3913
+            ]
+          }
+        }
+      },
+      "cochran_q_full": {
+        "q_stat": 72.43250327653998,
+        "p_value": 1.3322676295501878e-15,
+        "significant": true
+      },
+      "cochran_q_clean": {
+        "q_stat": 59.79414032382421,
+        "p_value": 6.504796701278792e-13,
+        "significant": true
+      }
+    },
+    "vqa_rad": {
+      "n_removed": 73,
+      "models": {
+        "gemma4-e2b": {
+          "full": {
+            "n": 451,
+            "acc": 0.3814,
+            "ci": [
+              0.337,
+              0.4257
+            ]
+          },
+          "clean": {
+            "n": 378,
+            "acc": 0.3201,
+            "ci": [
+              0.2725,
+              0.3677
+            ]
+          }
+        },
+        "qwen25-vl-3b": {
+          "full": {
+            "n": 451,
+            "acc": 0.4922,
+            "ci": [
+              0.4457,
+              0.5388
+            ]
+          },
+          "clean": {
+            "n": 378,
+            "acc": 0.4365,
+            "ci": [
+              0.3862,
+              0.4868
+            ]
+          }
+        },
+        "qwen3-vl-2b": {
+          "full": {
+            "n": 451,
+            "acc": 0.5011,
+            "ci": [
+              0.4545,
+              0.5477
+            ]
+          },
+          "clean": {
+            "n": 378,
+            "acc": 0.4471,
+            "ci": [
+              0.3968,
+              0.5
+            ]
+          }
+        },
+        "smolvlm2-2b": {
+          "full": {
+            "n": 451,
+            "acc": 0.5122,
+            "ci": [
+              0.4656,
+              0.5588
+            ]
+          },
+          "clean": {
+            "n": 378,
+            "acc": 0.4444,
+            "ci": [
+              0.3942,
+              0.4947
+            ]
+          }
+        }
+      },
+      "cochran_q_full": {
+        "q_stat": 31.57176196032672,
+        "p_value": 6.442038099629954e-07,
+        "significant": true
+      },
+      "cochran_q_clean": {
+        "q_stat": 25.660501981505945,
+        "p_value": 1.1233009425959395e-05,
+        "significant": true
+      }
+    }
+  },
+  "pooled_ranking": {
+    "full": [
+      [
+        "qwen3-vl-2b",
+        0.3849
+      ],
+      [
+        "qwen25-vl-3b",
+        0.3637
+      ],
+      [
+        "smolvlm2-2b",
+        0.339
+      ],
+      [
+        "gemma4-e2b",
+        0.172
+      ]
+    ],
+    "clean": [
+      [
+        "qwen3-vl-2b",
+        0.3041
+      ],
+      [
+        "qwen25-vl-3b",
+        0.2765
+      ],
+      [
+        "smolvlm2-2b",
+        0.2662
+      ],
+      [
+        "gemma4-e2b",
+        0.1091
+      ]
+    ],
+    "best_full": "qwen3-vl-2b",
+    "best_clean": "qwen3-vl-2b",
+    "ranking_preserved": true,
+    "cochran_q_pooled_full": {
+      "q_stat": 1884.7753361757952,
+      "p_value": 0.0,
+      "significant": true
+    },
+    "cochran_q_pooled_clean": {
+      "q_stat": 1399.4542779062435,
+      "p_value": 0.0,
+      "significant": true
+    }
+  }
+}
