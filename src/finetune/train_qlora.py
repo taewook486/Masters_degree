@@ -525,6 +525,8 @@ def train_qlora(
         n_eval = max(50, len(train_ds) // 10)
         if max_eval_samples is not None:
             n_eval = min(n_eval, max_eval_samples)
+        # train 크기를 넘지 않도록 clamp (소량 스모크에서 n_eval > len(train) 방지)
+        n_eval = min(n_eval, max(1, len(train_ds) // 2))
         eval_ds = train_ds.select(range(len(train_ds) - n_eval, len(train_ds)))
         train_ds = train_ds.select(range(len(train_ds) - n_eval))
 
