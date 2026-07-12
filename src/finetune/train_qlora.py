@@ -321,15 +321,6 @@ def _load_model_standard(
         use_gradient_checkpointing=ft_config.training.get("gradient_checkpointing", True),
     )
 
-    # prepare_model_for_kbit_training은 안정성을 위해 norm 파라미터를 float32로 업캐스트한다.
-    # 하지만 SmolVLM2는 vision tower의 (float32) 이미지 features를 bf16 텍스트 임베딩에
-    # 병합하다 실패한다(RuntimeError: Index put ... BFloat16 dest, Float source).
-    # 업캐스트된 float32 파라미터를 모델 dtype으로 되돌려 병합 dtype을 일치시킨다.
-    # (logits fp32 stability는 CastOutputToFloat 모듈 래퍼가 담당하므로 영향 없음)
-    for _param in model.parameters():
-        if _param.dtype == torch.float32:
-            _param.data = _param.data.to(torch_dtype)
-
     # Resolve target modules
     target_modules = list(lora.target_modules)
     if target_modules == ["minimal"]:
@@ -348,6 +339,26 @@ def _load_model_standard(
         task_type=TaskType.CAUSAL_LM,
     )
     model = get_peft_model(model, lora_config)
+
+    # SmolVLM2 dtype 정합 패치: 학습 첫 forward에서 inputs_merger가
+    #   image_embeds[image_mask] = image_hidden_states[...]  (modeling_smolvlm.py L516)
+    # 를 수행하는데, autocast 하에서 vision 경로가 float32 image features를 만들어
+    # bf16 텍스트 임베딩(image_embeds)과 dtype이 어긋나 실패한다
+    # (RuntimeError: Index put ... BFloat16 dest, Float source). 모델 자체 버그로
+    # get_image_features 경로(L635)는 device만 캐스트하고 dtype 캐스트를 빠뜨린다.
+    # get_image_features 출력을 모델 dtype으로 캐스트해 병합 dtype을 일치시킨다.
+    # (모델 구조에 관계없이 해당 메서드를 가진 서브모듈을 찾아 인스턴스 메서드를 래핑)
+    for _submodule in model.modules():
+        if hasattr(_submodule, "get_image_features") and hasattr(_submodule, "inputs_merger"):
+            _orig_get_image_features = _submodule.get_image_features
+
+            def _cast_image_features(*a, __orig=_orig_get_image_features, __dt=torch_dtype, **k):
+                out = __orig(*a, **k)
+                return out.to(__dt) if hasattr(out, "to") else out
+
+            _submodule.get_image_features = _cast_image_features
+            logger.info("[Standard PEFT] Patched get_image_features to cast outputs to model dtype (VLM merge fix)")
+            break
 
     trainable_params, total_params = model.get_nb_trainable_parameters()
     trainable_pct = 100 * trainable_params / total_params if total_params > 0 else 0
