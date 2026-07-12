@@ -321,6 +321,15 @@ def _load_model_standard(
         use_gradient_checkpointing=ft_config.training.get("gradient_checkpointing", True),
     )
 
+    # prepare_model_for_kbit_training은 안정성을 위해 norm 파라미터를 float32로 업캐스트한다.
+    # 하지만 SmolVLM2는 vision tower의 (float32) 이미지 features를 bf16 텍스트 임베딩에
+    # 병합하다 실패한다(RuntimeError: Index put ... BFloat16 dest, Float source).
+    # 업캐스트된 float32 파라미터를 모델 dtype으로 되돌려 병합 dtype을 일치시킨다.
+    # (logits fp32 stability는 CastOutputToFloat 모듈 래퍼가 담당하므로 영향 없음)
+    for _param in model.parameters():
+        if _param.dtype == torch.float32:
+            _param.data = _param.data.to(torch_dtype)
+
     # Resolve target modules
     target_modules = list(lora.target_modules)
     if target_modules == ["minimal"]:
