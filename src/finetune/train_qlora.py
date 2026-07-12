@@ -212,8 +212,9 @@ def _build_trainer_unsloth(
         warmup_ratio=t.get("warmup_ratio", 0.03),
         weight_decay=t.get("weight_decay", 0.01),
         optim=t.get("optim", "paged_adamw_8bit"),
-        fp16=t.get("fp16", True),
-        bf16=t.get("bf16", False),
+        # 모델 dtype에 맞춰 정밀도 자동 설정 (bf16 모델에 fp16 강제 시 crash: smolvlm2/gemma4)
+        fp16=DTYPE_MAP.get(model_config.torch_dtype, torch.float16) != torch.bfloat16,
+        bf16=DTYPE_MAP.get(model_config.torch_dtype, torch.float16) == torch.bfloat16,
         logging_steps=t.get("logging_steps", 10),
         save_strategy=save_eval_strategy,
         eval_strategy=save_eval_strategy,
@@ -242,10 +243,15 @@ def _build_trainer_unsloth(
 # Standard HF PEFT backend (fallback)
 # ---------------------------------------------------------------------------
 
-def _build_bnb_config(ft_config: DictConfig) -> BitsAndBytesConfig:
-    """Build BitsAndBytesConfig from finetune YAML."""
+def _build_bnb_config(ft_config: DictConfig, compute_dtype_override: Any = None) -> BitsAndBytesConfig:
+    """Build BitsAndBytesConfig from finetune YAML.
+
+    compute_dtype_override: 지정 시 bnb 4bit 연산 dtype을 강제(모델 dtype과 정합).
+    """
     q = ft_config.quantization
-    compute_dtype = DTYPE_MAP.get(q.get("bnb_4bit_compute_dtype", "float16"), torch.float16)
+    compute_dtype = compute_dtype_override or DTYPE_MAP.get(
+        q.get("bnb_4bit_compute_dtype", "float16"), torch.float16
+    )
     return BitsAndBytesConfig(
         load_in_4bit=q.get("load_in_4bit", True),
         bnb_4bit_quant_type=q.get("bnb_4bit_quant_type", "nf4"),
@@ -278,7 +284,7 @@ def _load_model_standard(
     model_cls = getattr(transformers, model_class_name)
     processor_cls = getattr(transformers, processor_class_name)
 
-    bnb_config = _build_bnb_config(ft_config)
+    bnb_config = _build_bnb_config(ft_config, compute_dtype_override=torch_dtype)
 
     model_kwargs: dict[str, Any] = {
         "quantization_config": bnb_config,
@@ -426,8 +432,9 @@ def _build_trainer_standard(
         warmup_ratio=t.get("warmup_ratio", 0.03),
         weight_decay=t.get("weight_decay", 0.01),
         optim=t.get("optim", "paged_adamw_8bit"),
-        fp16=t.get("fp16", True),
-        bf16=t.get("bf16", False),
+        # 모델 dtype에 맞춰 정밀도 자동 설정 (bf16 모델에 fp16 강제 시 crash: smolvlm2/gemma4)
+        fp16=DTYPE_MAP.get(model_config.torch_dtype, torch.float16) != torch.bfloat16,
+        bf16=DTYPE_MAP.get(model_config.torch_dtype, torch.float16) == torch.bfloat16,
         logging_steps=t.get("logging_steps", 10),
         save_strategy=save_eval_strategy,
         eval_strategy=save_eval_strategy,
