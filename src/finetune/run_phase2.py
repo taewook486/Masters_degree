@@ -15,13 +15,17 @@ import argparse
 import gc
 import json
 import logging
+import subprocess
+import sys
 from pathlib import Path
 
 import pandas as pd
 import torch
 import yaml
 
-from src.finetune.train_qlora import train_qlora
+# NOTE: train_qlora는 직접 import하지 않는다. train_qlora import 시 unsloth가
+# trl.SFTTrainer를 전역 패치해 standard backend를 오염시키기 때문. 각 조건은
+# src.finetune.train_one을 별도 프로세스로 실행해 격리한다(_train_condition).
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +46,63 @@ def _load_existing_result(output_dir: str) -> dict | None:
     if data.get("eval_summary") and data["training"].get("peak_vram_mb", 0) > 0:
         return data
     return None
+
+
+def _train_condition(
+    run_dir: str,
+    model_config_path: str,
+    finetune_config: str,
+    dataset_name: str,
+    seed: int,
+    data_dir: str,
+    max_train_samples: int | None = None,
+    max_eval_samples: int | None = None,
+    max_test_samples: int | None = None,
+    subset_ratio: float | None = None,
+    measure_cf: bool = False,
+    base_vqav2: dict | None = None,
+) -> dict:
+    """한 조건을 src.finetune.train_one 서브프로세스로 격리 실행한다.
+
+    unsloth 전역 SFTTrainer 패치가 standard backend를 오염시키지 않도록 조건마다
+    독립 프로세스를 띄운다. 학습 로그는 부모 stdout으로 스트리밍되고, 결과는
+    result_out JSON으로 회수한다. 실패 시 CalledProcessError를 던져 호출부의
+    try/except가 FAILED로 처리하게 한다.
+    """
+    run_path = Path(run_dir)
+    run_path.mkdir(parents=True, exist_ok=True)
+
+    cmd = [
+        sys.executable, "-m", "src.finetune.train_one",
+        "--model_config_path", str(model_config_path),
+        "--finetune_config_path", str(finetune_config),
+        "--dataset_name", dataset_name,
+        "--output_dir", str(run_dir),
+        "--seed", str(seed),
+        "--data_dir", data_dir,
+    ]
+    if max_train_samples is not None:
+        cmd += ["--max_train_samples", str(max_train_samples)]
+    if max_eval_samples is not None:
+        cmd += ["--max_eval_samples", str(max_eval_samples)]
+    if max_test_samples is not None:
+        cmd += ["--max_test_samples", str(max_test_samples)]
+    if subset_ratio is not None:
+        cmd += ["--subset_ratio", str(subset_ratio)]
+    if measure_cf:
+        cmd += ["--measure_cf"]
+    if base_vqav2 is not None:
+        base_path = run_path / "_base_vqav2.json"
+        with open(base_path, "w", encoding="utf-8") as f:
+            json.dump(base_vqav2, f, ensure_ascii=False)
+        cmd += ["--base_vqav2_json", str(base_path)]
+
+    subprocess.run(cmd, check=True)  # 로그는 부모로 스트리밍; 비정상 종료 시 예외
+
+    # train_qlora가 기록한 정본 결과를 읽는다.
+    result_file = run_path / "train_result.json"
+    with open(result_file, encoding="utf-8") as f:
+        return json.load(f)
 
 
 def _get_base_vqav2_result(
@@ -157,18 +218,18 @@ def run_main_conditions(
                         continue
 
                 try:
-                    result = train_qlora(
+                    result = _train_condition(
+                        run_dir=str(run_dir),
                         model_config_path=str(config_path),
-                        finetune_config_path=finetune_config,
+                        finetune_config=finetune_config,
                         dataset_name=dataset_name,
-                        output_dir=str(run_dir),
                         seed=seed,
                         data_dir=data_dir,
                         max_train_samples=max_train_samples,
                         max_eval_samples=max_eval_samples,
                         max_test_samples=max_test_samples,
                         measure_cf=measure_cf,
-                        base_vqav2_result=base_vqav2,
+                        base_vqav2=base_vqav2,
                     )
                     results.append(result)
                 except torch.cuda.OutOfMemoryError:
@@ -217,11 +278,11 @@ def run_ablation_a(
                     continue
 
             try:
-                result = train_qlora(
+                result = _train_condition(
+                    run_dir=str(run_dir),
                     model_config_path=model_config_path,
-                    finetune_config_path=finetune_config,
+                    finetune_config=finetune_config,
                     dataset_name=ABLATION_DATASET,
-                    output_dir=str(run_dir),
                     seed=seed,
                     data_dir=data_dir,
                     max_eval_samples=max_eval_samples,
@@ -275,11 +336,11 @@ def run_ablation_b(
                     continue
 
             try:
-                result = train_qlora(
+                result = _train_condition(
+                    run_dir=str(run_dir),
                     model_config_path=model_config_path,
-                    finetune_config_path=str(ablation_config),
+                    finetune_config=str(ablation_config),
                     dataset_name=ABLATION_DATASET,
-                    output_dir=str(run_dir),
                     seed=seed,
                     data_dir=data_dir,
                     max_eval_samples=max_eval_samples,
@@ -336,11 +397,11 @@ def run_ablation_c(
                     continue
 
             try:
-                result = train_qlora(
+                result = _train_condition(
+                    run_dir=str(run_dir),
                     model_config_path=model_config_path,
-                    finetune_config_path=config_path,
+                    finetune_config=config_path,
                     dataset_name=ABLATION_DATASET,
-                    output_dir=str(run_dir),
                     seed=seed,
                     data_dir=data_dir,
                     max_eval_samples=max_eval_samples,

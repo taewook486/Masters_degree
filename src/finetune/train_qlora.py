@@ -26,14 +26,25 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+import os
+
 # [HARD] Unsloth must be imported BEFORE transformers/trl/peft. Otherwise unsloth's
 # runtime patching overwrites the tokenizer eos_token/pad_token to the placeholder
 # '<EOS_TOKEN>', which trl 0.24 SFTTrainer then rejects as "not in vocabulary"
 # (unslothai/unsloth#2797). Import order is the documented fix.
-try:
-    import unsloth  # noqa: F401
-except ImportError:
+#
+# BUT unsloth import also monkey-patches trl.SFTTrainer GLOBALLY, which hijacks the
+# standard (non-unsloth) backend's native VLM collation. So we import unsloth ONLY when
+# the caller has NOT set MOAI_SKIP_UNSLOTH=1. train_one.py sets this env for standard
+# models to keep them on pure trl; unsloth models (qwen) leave it unset so the eos fix
+# and unsloth backend work. Phase 3/direct callers (env unset) keep the eos fix intact.
+if os.environ.get("MOAI_SKIP_UNSLOTH") == "1":
     unsloth = None
+else:
+    try:
+        import unsloth  # noqa: F401
+    except ImportError:
+        unsloth = None
 
 import torch
 from omegaconf import DictConfig, OmegaConf
@@ -83,7 +94,9 @@ _UNSLOTH_SUPPORTED_PATTERNS = ["qwen2.5-vl", "qwen3-vl", "qwen2-vl", "gemma-4", 
 
 
 def _unsloth_available() -> bool:
-    """Check if Unsloth is installed."""
+    """Check if Unsloth is installed (and not explicitly skipped)."""
+    if os.environ.get("MOAI_SKIP_UNSLOTH") == "1":
+        return False
     try:
         from unsloth import FastVisionModel  # noqa: F401
         return True
@@ -98,10 +111,16 @@ def _model_supports_unsloth(model_id: str) -> bool:
 
 
 def _should_use_unsloth(model_id: str, force_standard: bool = False) -> bool:
-    """Determine whether to use Unsloth backend."""
+    """Determine whether to use Unsloth backend.
+
+    Pattern match FIRST (cheap, no import) so that non-unsloth models never trigger
+    `_unsloth_available()`, which would import unsloth and globally patch trl.SFTTrainer.
+    """
     if force_standard:
         return False
-    return _unsloth_available() and _model_supports_unsloth(model_id)
+    if not _model_supports_unsloth(model_id):
+        return False
+    return _unsloth_available()
 
 
 # ---------------------------------------------------------------------------
