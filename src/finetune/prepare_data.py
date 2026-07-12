@@ -68,7 +68,11 @@ def prepare_chat_dataset(
             },
         ]
         records.append({
-            "image": s.image,
+            # trl 0.24 native VLM collator(DataCollatorForVisionLanguageModeling)는
+            # "images"(복수 리스트) 컬럼을 읽는다. messages content는 이미 리스트라
+            # prepare_multimodal_messages가 no-op → 이미지 토큰 이중 삽입 없음.
+            # 단수 "image"는 collator가 안 읽으므로 제거(대용량 train셋 이미지 중복 저장/RAM 방지).
+            "images": [s.image],
             "question": s.question,
             "answer": s.answer,
             "question_type": s.question_type,

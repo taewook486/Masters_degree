@@ -352,51 +352,6 @@ def _load_model_standard(
     return model, processor, lora_info
 
 
-def _build_collate_fn(processor: Any, model_config: DictConfig, max_seq_length: int):
-    """Build data collation function for standard PEFT backend."""
-    is_qwen = model_config.get("requires_vision_info_processing", False)
-
-    def collate_fn(examples: list[dict]) -> dict:
-        texts = []
-        images = []
-
-        for ex in examples:
-            msgs = ex["messages"]
-
-            if is_qwen:
-                text = processor.apply_chat_template(
-                    msgs, tokenize=False, add_generation_prompt=False,
-                )
-                from qwen_vl_utils import process_vision_info
-                img_inputs, _ = process_vision_info(msgs)
-                images.extend(img_inputs)
-            else:
-                text = processor.apply_chat_template(
-                    msgs, tokenize=False, add_generation_prompt=False,
-                )
-                images.append(ex["image"])
-
-            texts.append(text)
-
-        batch = processor(
-            text=texts,
-            images=images if images else None,
-            padding=True,
-            truncation=True,
-            max_length=max_seq_length,
-            return_tensors="pt",
-        )
-
-        labels = batch["input_ids"].clone()
-        if processor.tokenizer.pad_token_id is not None:
-            labels[labels == processor.tokenizer.pad_token_id] = -100
-        batch["labels"] = labels
-
-        return batch
-
-    return collate_fn
-
-
 def _build_trainer_standard(
     model: Any,
     processor: Any,
@@ -413,8 +368,6 @@ def _build_trainer_standard(
     t = ft_config.training
     max_seq_length = t.get("max_seq_length", 2048)
     output_path = Path(output_dir) / "checkpoints"
-
-    collate_fn = _build_collate_fn(processor, model_config, max_seq_length)
 
     # v0.2: Support max_steps (Phase 3) or num_train_epochs (Phase 2)
     max_steps_val = t.get("max_steps", -1)
@@ -442,18 +395,19 @@ def _build_trainer_standard(
         report_to="wandb",
         run_name=f"{model_name}_{dataset_name}_seed{seed}_peft",
         remove_unused_columns=False,
-        dataset_text_field=None,
-        dataset_kwargs={"skip_prepare_dataset": True},  # VLM: custom collate_fn이 처리, trl 준비 건너뜀
         max_length=max_seq_length,  # trl 0.24: max_seq_length→max_length
     )
 
+    # trl 0.24 native VLM 경로: data_collator=None → 데이터셋에 "images" 컬럼이 있으면
+    # SFTTrainer가 자동으로 DataCollatorForVisionLanguageModeling(processor)을 생성하고
+    # vision 데이터셋은 prepare를 자동 skip한다. 커스텀 collate_fn을 넘기던 방식은
+    # trl 0.24에서 raw 컬럼이 tokenizer.pad()로 넘어가 실패했음("supply input_ids").
     trainer = SFTTrainer(
         model=model,
         args=training_args,
         train_dataset=train_ds,
         eval_dataset=eval_ds,
-        data_collator=collate_fn,
-        processing_class=processor,  # full multimodal processor so trl detects VLM
+        processing_class=processor,  # ProcessorMixin → trl이 VLM으로 인식
     )
 
     return trainer
