@@ -465,6 +465,7 @@ def train_qlora(
     data_dir: str = "data",
     max_train_samples: int | None = None,
     max_eval_samples: int | None = None,
+    max_test_samples: int | None = None,
     subset_ratio: float | None = None,
     eval_after_training: bool = True,
     force_standard: bool = False,
@@ -629,6 +630,7 @@ def train_qlora(
             seed=seed,
             data_dir=data_dir,
             batch_size=4,
+            max_samples=max_test_samples,  # 스모크: 소량으로 제한 (None=full test, 논문용)
         )
         result["eval_summary"] = eval_summary
 

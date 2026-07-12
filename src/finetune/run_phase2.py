@@ -109,6 +109,7 @@ def run_main_conditions(
     skip_existing: bool = True,
     max_train_samples: int | None = None,
     max_eval_samples: int | None = None,
+    max_test_samples: int | None = None,
     measure_cf: bool = True,
 ) -> list[dict]:
     """Run main Phase 2 conditions: all models x all datasets x all seeds.
@@ -165,6 +166,7 @@ def run_main_conditions(
                         data_dir=data_dir,
                         max_train_samples=max_train_samples,
                         max_eval_samples=max_eval_samples,
+                        max_test_samples=max_test_samples,
                         measure_cf=measure_cf,
                         base_vqav2_result=base_vqav2,
                     )
@@ -423,6 +425,10 @@ def main() -> None:
         help="epoch 평가/best-checkpoint 선택용 validation 샘플 상한 "
              "(최종 지표는 test셋이라 결과 불변, 학습 중 평가 비용만 절감)",
     )
+    parser.add_argument(
+        "--max_test_samples", type=int, default=None,
+        help="학습 후 test셋 평가 샘플 상한 (스모크 가속용; 논문 실행은 생략=full test)",
+    )
     parser.add_argument("--no_skip_existing", action="store_true")
     parser.add_argument(
         "--best_model_config", default=None,
@@ -458,6 +464,7 @@ def main() -> None:
         skip_existing=skip,
         max_train_samples=args.max_train_samples,
         max_eval_samples=args.max_eval_samples,
+        max_test_samples=args.max_test_samples,
     )
     if main_results:
         all_dfs.append(build_summary(main_results, "main"))
