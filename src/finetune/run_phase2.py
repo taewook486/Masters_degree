@@ -66,11 +66,12 @@ def _get_base_vqav2_result(
 
     # Compute: load base model, evaluate on VQAv2
     try:
-        from src.baseline.model_loader import load_model, unload_model
+        from src.baseline.model_loader import load_config, load_model, unload_model
         from src.evaluate.catastrophic_forgetting import evaluate_on_vqav2
 
         logger.info(f"[CF] Computing base VQAv2 for {model_name}...")
-        model, processor, config = load_model(model_config_path)
+        config = load_config(model_config_path)  # load_model은 config 객체를 받음(경로 str 아님)
+        model, processor = load_model(config)
 
         result = evaluate_on_vqav2(model, processor, config, data_dir=data_dir)
 
