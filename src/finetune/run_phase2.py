@@ -440,6 +440,10 @@ def main() -> None:
         default=None,
         help="Which ablation studies to run (default: none, use 'all' for all)",
     )
+    parser.add_argument(
+        "--no_cf", action="store_true",
+        help="Catastrophic Forgetting 베이스라인(VQAv2 평가) 생략 (스모크 가속용)",
+    )
     args = parser.parse_args()
 
     logging.basicConfig(
@@ -465,6 +469,7 @@ def main() -> None:
         max_train_samples=args.max_train_samples,
         max_eval_samples=args.max_eval_samples,
         max_test_samples=args.max_test_samples,
+        measure_cf=not args.no_cf,
     )
     if main_results:
         all_dfs.append(build_summary(main_results, "main"))
