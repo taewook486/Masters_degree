@@ -38,6 +38,9 @@ def _model_supports_unsloth(model_id: str) -> bool:
 
 
 def main() -> int:
+    import logging
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
     parser = argparse.ArgumentParser(description="Single-condition QLoRA training (subprocess-isolated)")
     parser.add_argument("--model_config_path", required=True)
     parser.add_argument("--finetune_config_path", required=True)

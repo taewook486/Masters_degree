@@ -362,24 +362,31 @@ def _load_model_standard(
     )
     model = get_peft_model(model, lora_config)
 
-    # SmolVLM2 dtype 정합 패치: 학습 첫 forward에서 inputs_merger가
+    # VLM dtype 정합 패치: 학습 첫 forward에서 inputs_merger가
     #   image_embeds[image_mask] = image_hidden_states[...]  (modeling_smolvlm.py L516)
-    # 를 수행하는데, autocast 하에서 vision 경로가 float32 image features를 만들어
-    # bf16 텍스트 임베딩(image_embeds)과 dtype이 어긋나 실패한다
-    # (RuntimeError: Index put ... BFloat16 dest, Float source). 모델 자체 버그로
-    # get_image_features 경로(L635)는 device만 캐스트하고 dtype 캐스트를 빠뜨린다.
-    # get_image_features 출력을 모델 dtype으로 캐스트해 병합 dtype을 일치시킨다.
-    # (모델 구조에 관계없이 해당 메서드를 가진 서브모듈을 찾아 인스턴스 메서드를 래핑)
+    # 를 수행하는데, autocast 하에서 vision post_layernorm이 float32를 출력해
+    # image_hidden_states가 fp32가 되고 bf16 텍스트 임베딩(image_embeds)과 어긋나 실패한다
+    # (RuntimeError: Index put ... BFloat16 dest, Float source).
+    # get_image_features 출력을 모델 dtype으로 캐스트해 병합 dtype을 맞춘다.
+    # [중요] SmolVLM은 get_image_features가 텐서가 아니라 BaseModelOutputWithPooling 객체를
+    # 반환하고 forward는 .pooler_output을 쓴다(L631). Gemma4는 텐서를 반환한다. 두 경우를 모두
+    # 처리: 텐서면 직접 캐스트, ModelOutput이면 pooler_output/last_hidden_state를 캐스트.
     for _submodule in model.modules():
         if hasattr(_submodule, "get_image_features") and hasattr(_submodule, "inputs_merger"):
             _orig_get_image_features = _submodule.get_image_features
 
             def _cast_image_features(*a, __orig=_orig_get_image_features, __dt=torch_dtype, **k):
                 out = __orig(*a, **k)
-                return out.to(__dt) if hasattr(out, "to") else out
+                if isinstance(out, torch.Tensor):
+                    return out.to(__dt)
+                for _attr in ("pooler_output", "last_hidden_state"):
+                    _v = getattr(out, _attr, None)
+                    if isinstance(_v, torch.Tensor):
+                        setattr(out, _attr, _v.to(__dt))
+                return out
 
             _submodule.get_image_features = _cast_image_features
-            logger.info("[Standard PEFT] Patched get_image_features to cast outputs to model dtype (VLM merge fix)")
+            logger.info("[Standard PEFT] Patched get_image_features to cast image features to model dtype (VLM merge fix)")
             break
 
     trainable_params, total_params = model.get_nb_trainable_parameters()
