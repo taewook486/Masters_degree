@@ -28,7 +28,8 @@ import yaml
 
 # train_qlora._UNSLOTH_SUPPORTED_PATTERNS와 동일해야 한다. 여기서는 무거운 import
 # (transformers/unsloth) 없이 yaml만 읽어 backend를 판정하기 위해 패턴을 복제한다.
-_UNSLOTH_SUPPORTED_PATTERNS = ["qwen2.5-vl", "qwen3-vl", "qwen2-vl", "gemma-4", "gemma-3n"]
+# gemma4는 unsloth 미지원이라 제외 → standard backend(순수 trl)로 라우팅된다.
+_UNSLOTH_SUPPORTED_PATTERNS = ["qwen2.5-vl", "qwen3-vl", "qwen2-vl"]
 
 
 def _model_supports_unsloth(model_id: str) -> bool:

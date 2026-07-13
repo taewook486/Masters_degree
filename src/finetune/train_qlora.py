@@ -88,9 +88,11 @@ class TimeBudgetCallback(TrainerCallback):
 # Unsloth detection & model compatibility
 # ---------------------------------------------------------------------------
 
-# Gemma 4/3n E2B: PEFT는 Gemma4ClippableLinear(nn.Linear 미상속)를 거부하므로
-# (huggingface/peft#3129) unsloth backend로 라우팅해 ClippableLinear 문제를 우회한다.
-_UNSLOTH_SUPPORTED_PATTERNS = ["qwen2.5-vl", "qwen3-vl", "qwen2-vl", "gemma-4", "gemma-3n"]
+# Gemma4-E2B는 standard backend로 처리한다. unsloth가 google/gemma-4-E2B-it를 미지원하고
+# ("not supported in your current Unsloth version"), PEFT의 Gemma4ClippableLinear 거부
+# (huggingface/peft#3129)는 _load_model_standard에서 LoRA 타깃을 실제 nn.Linear(텍스트
+# 모델)로 한정해 해결한다(vision/audio 타워의 ClippableLinear 자동 제외).
+_UNSLOTH_SUPPORTED_PATTERNS = ["qwen2.5-vl", "qwen3-vl", "qwen2-vl"]
 
 
 def _unsloth_available() -> bool:
@@ -329,6 +331,26 @@ def _load_model_standard(
         target_modules = ["q_proj", "k_proj", "v_proj", "o_proj"]
     elif target_modules == ["full"] or target_modules == ["all_linear"]:
         target_modules = "all-linear"
+
+    # 접미사 리스트(q_proj 등)를 실제 nn.Linear 모듈의 전체 경로로 해석한다.
+    # Gemma4는 vision/audio 타워에 nn.Linear가 아닌 래퍼(Gemma4ClippableLinear)를 같은
+    # 이름(q_proj/v_proj)으로 써서, 단순 접미사 매칭 시 PEFT가 이를 LoRA 대상으로 잡으려다
+    # 거부한다(peft#3129). isinstance(nn.Linear) 필터로 텍스트 모델의 (4bit 포함) Linear만
+    # 남긴다 — bnb Linear4bit는 nn.Linear 서브클래스라 유지되고 ClippableLinear는 제외된다.
+    # (VLM QLoRA 표준: vision/audio 인코더 freeze, 언어 모델만 적응). "all-linear"는 PEFT가
+    # 자체 처리하므로 건너뛴다.
+    if isinstance(target_modules, list):
+        _suffixes = set(target_modules)
+        _resolved = [
+            name for name, mod in model.named_modules()
+            if isinstance(mod, torch.nn.Linear) and name.rsplit(".", 1)[-1] in _suffixes
+        ]
+        if _resolved:
+            target_modules = _resolved
+            logger.info(
+                f"[Standard PEFT] Resolved {len(_resolved)} nn.Linear target modules "
+                f"(non-Linear wrappers e.g. Gemma4ClippableLinear excluded)"
+            )
 
     lora_config = LoraConfig(
         r=lora.get("rank", 16),
