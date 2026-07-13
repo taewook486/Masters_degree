@@ -136,7 +136,15 @@ def _get_base_vqav2_result(
 
         result = evaluate_on_vqav2(model, processor, config, data_dir=data_dir)
 
+        # CF baseline은 메인 프로세스에서 돈다. 학습은 서브프로세스가 GPU에 모델을 또
+        # 올리므로, baseline 모델을 반드시 GPU에서 해제해야 한다(안 그러면 모델 2개 → OOM).
+        # unload_model의 `del`은 자기 지역 참조만 지우므로, 호출자 쪽 참조도 끊고 캐시를 비운다.
         unload_model(model, processor)
+        model = processor = None
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.synchronize()
+            torch.cuda.empty_cache()
 
         # Save cache
         cache_file.parent.mkdir(parents=True, exist_ok=True)
@@ -203,6 +211,10 @@ def run_main_conditions(
             base_vqav2 = _get_base_vqav2_result(
                 str(config_path), model_name, data_dir, output_dir,
             )
+            # 학습 서브프로세스가 GPU 전체를 쓸 수 있도록 메인 프로세스 GPU 캐시를 확실히 비운다.
+            gc.collect()
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
 
         for dataset_name in DATASETS:
             for seed in seeds:

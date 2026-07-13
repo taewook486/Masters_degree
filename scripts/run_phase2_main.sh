@@ -12,6 +12,7 @@ cd /workspace/Masters_degree
 export PYTHONUNBUFFERED=1
 export WANDB_PROJECT=medical-vqa-vlm
 export WANDB_MODE=offline  # 온라인 동기화 시도로 멈추지 않도록 (다일 실행 안정성)
+export PYTORCH_ALLOC_CONF=expandable_segments:True  # GPU 메모리 파편화 완화 (다조건 반복)
 
 mkdir -p results/phase2_finetune
 
