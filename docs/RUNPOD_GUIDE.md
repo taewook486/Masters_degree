@@ -205,7 +205,7 @@ Phase 2 학습 코드는 라이브러리 스택(transformers 5.5 / trl 0.24 / un
 **모델별 검증 상태:**
 - ✅ **qwen3-vl-2b(best), qwen25-vl-3b**: 스모크 학습 완주 확인(train_loss + eval 정상).
 - 🔵 **smolvlm2-2b**: dtype 최종 수정 push 완료, **재검증 필요(다음 세션 첫 작업, 아래 절차 1)**.
-- ⏸️ **gemma4-e2b**: unsloth 미지원("not supported in your current Unsloth version") + standard는 Gemma4ClippableLinear(peft#3129) 거부. **결정 필요**: (a) `peft≥0.19` 업그레이드, (b) ClippableLinear unwrap, (c) Phase 2 대상 제외(qwen×2+smolvlm2 = 3모델로 진행). 미해결 시 Main에서 gemma4 3조건만 FAILED로 남고 격리 덕에 나머지는 정상 진행.
+- 🔵 **gemma4-e2b**: 수정 완료(검증 대기). unsloth 라우팅 제거 → standard backend. PEFT가 vision/audio 타워의 Gemma4ClippableLinear를 거부하던 문제(peft#3129)는 LoRA 타깃을 실제 nn.Linear(텍스트 모델)로 한정해 해결(VLM QLoRA 표준: 인코더 freeze). **다음 스모크에서 smolvlm2와 함께 학습되는지 확인**(gemma4 자체 이미지 병합 dtype 이슈가 추가로 나올 수 있음 — 나오면 SmolVLM2와 동일 패턴으로 대응).
 
 **Main 실행 전 검증 절차 (순서대로):**
 ```bash
@@ -219,14 +219,14 @@ python -m src.finetune.train_one \
   --max_train_samples 20 --max_eval_samples 20 --max_test_samples 20
 ls results/_smoke_smolvlm2/train_result.json && echo "smolvlm2 OK"
 
-# 2) 전체 초고속 스모크 (--no_cf로 CF 생략, ~10분) — train_result 9개(qwen×2+smolvlm2) 기대
+# 2) 전체 초고속 스모크 (--no_cf로 CF 생략, ~12분) — train_result 12개(4모델×3데이터셋) 기대
 python -m src.finetune.run_phase2 --config_dir configs/models \
   --finetune_config configs/finetune/base_qlora.yaml \
   --output_dir results/_phase2_smoke --seeds 42 --data_dir data \
   --max_train_samples 20 --max_eval_samples 20 --max_test_samples 20 --no_cf
-ls results/_phase2_smoke/*/train_result.json | wc -l
+ls results/_phase2_smoke/*/train_result.json | wc -l   # 12 기대 (gemma4 포함 4모델 다 학습 시)
 ```
-스모크가 통과하면 gemma4 처리 방침을 정한 뒤 아래 Main을 tmux에서 실행한다(스모크 플래그 없이 → CF·full test 포함).
+스모크에서 4모델 12조건이 다 학습되면 아래 Main을 tmux에서 실행한다(스모크 플래그 없이 → CF·full test 포함). gemma4에서 새 에러가 나면 그 조건만 FAILED로 남고(서브프로세스 격리) 나머지는 정상 진행되므로, 우선 3모델 결과를 확보한 뒤 gemma4를 개별 대응할 수 있다.
 
 **환경 주의:** RTX 3090 기준 **컨테이너 RAM 117GB 필요**(31GB는 OOM). `uv sync`로 transformers 5.5.0 / torch 2.10.0+cu128 / trl 0.24 / peft 0.18.1 고정. `WANDB_MODE=offline` 필수.
 
