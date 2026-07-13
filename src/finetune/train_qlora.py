@@ -18,6 +18,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import contextlib
 import gc
 import json
 import logging
@@ -650,38 +651,49 @@ def train_qlora(
             model = model.merge_and_unload()
         model.eval()
 
-        eval_summary = evaluate_with_loaded_model(
-            model=model,
-            processor=processor,
-            config=model_config,
-            dataset_name=dataset_name,
-            output_dir=str(output_path),
-            seed=seed,
-            data_dir=data_dir,
-            batch_size=4,
-            max_samples=max_test_samples,  # 스모크: 소량으로 제한 (None=full test, 논문용)
+        # standard backend는 prepare_model_for_kbit_training이 lm_head/norm을 fp32로 두어
+        # (LoRA 병합 후에도 유지) autocast 없는 generation에서 bf16 hidden state와 충돌한다
+        # (F.linear: expected scalar type Float but found BFloat16). 학습은 Trainer의 autocast
+        # 덕에 통과하므로, 평가·CF generation도 동일하게 autocast로 감싼다.
+        # unsloth 경로는 FastVisionModel.for_inference가 dtype을 정리하므로 감싸지 않는다.
+        _compute_dtype = DTYPE_MAP.get(model_config.torch_dtype, torch.float16)
+        _eval_ctx = (
+            contextlib.nullcontext() if use_unsloth
+            else torch.autocast("cuda", dtype=_compute_dtype)
         )
-        result["eval_summary"] = eval_summary
+        with _eval_ctx:
+            eval_summary = evaluate_with_loaded_model(
+                model=model,
+                processor=processor,
+                config=model_config,
+                dataset_name=dataset_name,
+                output_dir=str(output_path),
+                seed=seed,
+                data_dir=data_dir,
+                batch_size=4,
+                max_samples=max_test_samples,  # 스모크: 소량으로 제한 (None=full test, 논문용)
+            )
+            result["eval_summary"] = eval_summary
 
-        # Catastrophic Forgetting measurement (v0.2)
-        if measure_cf and base_vqav2_result is not None:
-            try:
-                from src.evaluate.catastrophic_forgetting import run_cf_measurement
+            # Catastrophic Forgetting measurement (v0.2)
+            if measure_cf and base_vqav2_result is not None:
+                try:
+                    from src.evaluate.catastrophic_forgetting import run_cf_measurement
 
-                cf_result = run_cf_measurement(
-                    model=model,
-                    processor=processor,
-                    config=model_config,
-                    base_vqav2_result=base_vqav2_result,
-                    output_dir=output_dir,
-                    model_name=model_name,
-                    dataset_name=dataset_name,
-                    seed=seed,
-                    data_dir=data_dir,
-                )
-                result["catastrophic_forgetting"] = cf_result.get("summary", {})
-            except Exception as e:
-                logger.warning(f"[CF] Measurement failed: {e}")
+                    cf_result = run_cf_measurement(
+                        model=model,
+                        processor=processor,
+                        config=model_config,
+                        base_vqav2_result=base_vqav2_result,
+                        output_dir=output_dir,
+                        model_name=model_name,
+                        dataset_name=dataset_name,
+                        seed=seed,
+                        data_dir=data_dir,
+                    )
+                    result["catastrophic_forgetting"] = cf_result.get("summary", {})
+                except Exception as e:
+                    logger.warning(f"[CF] Measurement failed: {e}")
 
     # Save result
     result_file = output_path / "train_result.json"
