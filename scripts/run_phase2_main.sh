@@ -13,6 +13,9 @@ export PYTHONUNBUFFERED=1
 export WANDB_PROJECT=medical-vqa-vlm
 export WANDB_MODE=offline  # 온라인 동기화 시도로 멈추지 않도록 (다일 실행 안정성)
 export PYTORCH_ALLOC_CONF=expandable_segments:True  # GPU 메모리 파편화 완화 (다조건 반복)
+# HF 모델 캐시를 컨테이너 디스크(/hf_cache, 60GB)로. 미설정 시 /workspace 볼륨(50GB)이
+# 모델 4개(~27GB)로 꽉 차 'Disk quota exceeded' 발생.
+export HF_HOME=/hf_cache
 
 mkdir -p results/phase2_finetune
 
