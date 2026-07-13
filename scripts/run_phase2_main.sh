@@ -11,6 +11,7 @@ cd /workspace/Masters_degree
 
 export PYTHONUNBUFFERED=1
 export WANDB_PROJECT=medical-vqa-vlm
+export WANDB_MODE=offline  # 온라인 동기화 시도로 멈추지 않도록 (다일 실행 안정성)
 
 mkdir -p results/phase2_finetune
 
