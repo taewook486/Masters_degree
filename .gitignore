@@ -7,11 +7,6 @@
 # ============================================
 
 # ===========================================
-# Thesis PDF Build Artifacts (재생성 가능)
-# ===========================================
-docs/submitted/*.html
-
-# ===========================================
 # Go Build Artifacts
 # ===========================================
 bin/
@@ -109,7 +104,8 @@ ehthumbs.db
 # Logs & Temporary Files
 # ===========================================
 *.log
-logs/
+logs/*
+!logs/.gitkeep
 *.tmp
 *.temp
 *.bak
@@ -119,6 +115,7 @@ logs/
 # Backups
 # ===========================================
 .moai-backups/
+.moai/backups/
 *.backup/
 *-backup/
 *_backup_*/
@@ -160,6 +157,10 @@ secret-*.*
 .aws/config
 .aws/credentials
 
+# MINK agent credentials (plaintext API keys, per AC-CR-026).
+# Ignored anywhere in the tree so per-project auth dirs are never committed.
+**/.mink/auth/
+
 # ===========================================
 # Claude Code Configuration
 # ===========================================
@@ -186,6 +187,21 @@ secret-*.*
 .moai/status_line.sh
 .moai/memory/
 .moai/worktrees/
+.moai/branches/
+
+# ===========================================
+# Update Noise-Suppression Ledgers (per-machine, never tracked)
+# Per-machine state + cache ledgers used to suppress redundant update noise.
+# ===========================================
+.moai/state/
+.moai/cache/
+
+# ===========================================
+# Plan Audit Reports (local artifacts)
+# Plan-audit verdict reports are local artifacts; only .gitkeep is tracked.
+# ===========================================
+.moai/reports/plan-audit/*.md
+!.moai/reports/plan-audit/.gitkeep
 
 # ===========================================
 # Evolution Telemetry (local-only usage data)
@@ -216,34 +232,3 @@ dist-ssr/
 .vercel/
 .netlify/
 .firebase/
-
-# User Custom Patterns (preserved by moai update)
-*.py[cod]
-*$py.class
-.eggs/
-.ipynb_checkpoints/
-/data/
-*.zip
-*.tar.gz
-*.h5
-*.hdf5
-*.parquet
-checkpoints/
-outputs/
-wandb/
-*.safetensors
-*.bin
-*.pt
-*.pth
-*.gguf
-results/*/logs/
-results/phase1_baseline/run_all*.log
-results/phase1_baseline/run_all_err.log
-results/phase1_baseline/phase1_intermediate.json
-Masters_degree/
-desktop.ini
-*.key
-tmp/
-
-# Generated PDFs
-docs/*.pdf

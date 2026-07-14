@@ -1,7 +1,31 @@
 {
   "permissions": {
     "allow": [
-      "Bash(python -c \":*)"
+      "Bash(python -c \":*)",
+      "Bash(where python:*)",
+      "Bash(where python3:*)",
+      "Bash(where uv:*)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/ --cov=src --cov-report=term-missing -q)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/ --ignore=tests/florence2_step_test.py --cov=src --cov-report=term-missing -q)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/ --cov=src --cov-report=term-missing -q --tb=short)",
+      "Bash(.venv/Scripts/python.exe -m ruff check tests/ --select E,F,I,W)",
+      "Bash(d:/project/Masters_degree/.venv/Scripts/pip.exe install:*)",
+      "Bash(/c/Users/taewo/.local/bin/uvx ruff:*)",
+      "Bash(python.exe -m pytest --tb=no -q)",
+      "Bash(.venv/Scripts/python.exe -m pytest --tb=no -q)",
+      "Bash(.venv/Scripts/python.exe -m pytest --tb=no -q --co)",
+      "Bash(.venv/Scripts/python.exe -m pytest -q --tb=short)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_loop.py::test_run_single_trial_success -v --tb=long)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_reproducibility.py -v --tb=short)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_environment.py -v --tb=short)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_reproducibility.py tests/test_loop.py::test_run_single_trial_success -v --tb=short)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_data_loader.py -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_reproducibility.py -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/ -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_environment.py tests/test_metrics.py -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_metrics.py -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/ --collect-only -q)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_agent.py tests/test_catastrophic_forgetting.py tests/test_data_loader.py -v)"
     ],
     "defaultMode": "bypassPermissions"
   }

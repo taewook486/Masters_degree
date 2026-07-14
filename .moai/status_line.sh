@@ -16,17 +16,26 @@ if [ -f "$HOME/.moai/.env.glm" ]; then
 	source "$HOME/.moai/.env.glm"
 fi
 
-# Try moai command in PATH first
+# Try moai command in PATH first.
+# Note: `exec` replaces the shell process, so any code after exec is unreachable.
+# Vertical padding is controlled via settings.json `statusLine.padding: N` (M1: REQ-SLV-002).
 if command -v moai &> /dev/null; then
 	exec moai statusline < "$temp_file"
 fi
 
-# Try detected Go bin path from initialization
-if [ -f "C:/Users/taewo/go/bin/moai" ]; then
-	exec "C:/Users/taewo/go/bin/moai" statusline < "$temp_file"
+# Try the installed binary's own resolved path (captured at init/update time).
+# Resolves the binary even when it is not on PATH (e.g. an installer location
+# whose directory was not propagated to an already-running process).
+if [ -f "C:/Users/taewo/AppData/Local/Programs/moai/moai.exe" ]; then
+	exec "C:/Users/taewo/AppData/Local/Programs/moai/moai.exe" statusline < "$temp_file"
 fi
 
-# Try user local bin directory
+# Try the Go bin directory ($HOME-relative for portability).
+if [ -f "$HOME/go/bin/moai" ]; then
+	exec "$HOME/go/bin/moai" statusline < "$temp_file"
+fi
+
+# Try user local bin directory.
 if [ -f "$HOME/.local/bin/moai" ]; then
 	exec "$HOME/.local/bin/moai" statusline < "$temp_file"
 fi
