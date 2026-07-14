@@ -1,7 +1,7 @@
 ---
 id: SPEC-EVAL-METRICS-001
 version: 0.1.1
-status: in-progress
+status: completed
 created_at: 2026-07-14
 updated: 2026-07-14
 author: manager-spec
@@ -17,6 +17,7 @@ labels: [evaluation, bertscore, statistics, phase2, phase3]
 - 2026-07-14: 초기 SPEC 생성. 동료 심사(`docs/비판적_동료심사_v0.5.md`) 및 설계서(`docs/THESIS_PROPOSAL_FINAL_v0.6.md`) 대조 결과 발견된 설계-구현 gap 중 **코드 산출물 2건**(Phase 2 BioBERT 이중 BERTScore, Phase 3 Mann-Whitney U 검정)을 대상으로 함. 문서 개정(item 3: §5.3 한계점 재작성)은 본 SPEC 범위 외(비-SPEC manager-docs 태스크로 별도 추적). 검토자 확정 결정 반영: 상관계수 = Spearman 주 + Pearson 병기, BioBERT 레이어 수 고정, rank-biserial 부호 규약 명시.
 - 2026-07-14: plan-audit iteration 1 지적사항 반영(v0.1.0 → v0.1.1). MP-2(acceptance.md EARS 표현화), MP-3(frontmatter `created_at`/`labels` 추가, priority 소문자화), RQ-4(REQ 본문에서 코드 식별자·라이브러리 버전·함수 시그니처·dict 키를 제거하고 `plan.md`로 이관). 요구사항의 관찰 가능 조건(테스트 내용)은 불변.
 - 2026-07-14: iteration 3 감사에서 지적된 REQ-EM-004의 미트리거 후행 문장을 단일 EARS 트리거 문장으로 병합 (사용자 승인 하에 4차 감사 생략).
+- 2026-07-14: sync-phase 종료(status → completed). run-phase 코드 산출물(Phase 2 BioBERT 이중 BERTScore + Phase 3 Mann-Whitney U 검정) 검증 완료 — 커밋 `4736d20`(M1)/`b2a5a00`(M2)/`01471de`(M3+M4) 전 구간 27/27 테스트 green. item 3(문서 개정, §5.3 한계점 + §4.4 primary 규칙 한 줄)은 본 SPEC 범위 외 별도 태스크로 `docs/THESIS_PROPOSAL_FINAL_v0.7.md`에 반영 완료.
 
 ---
 
