@@ -25,7 +25,18 @@
       "Bash(.venv/Scripts/python.exe -m pytest tests/test_environment.py tests/test_metrics.py -v)",
       "Bash(.venv/Scripts/python.exe -m pytest tests/test_metrics.py -v)",
       "Bash(.venv/Scripts/python.exe -m pytest tests/ --collect-only -q)",
-      "Bash(.venv/Scripts/python.exe -m pytest tests/test_agent.py tests/test_catastrophic_forgetting.py tests/test_data_loader.py -v)"
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_agent.py tests/test_catastrophic_forgetting.py tests/test_data_loader.py -v)",
+      "Bash(.venv/Scripts/python.exe -m pytest tests/test_metrics.py -q)",
+      "Bash(.venv/Scripts/python.exe -m ruff check src/evaluate/ src/baseline/evaluate_zero_shot.py src/finetune/train_qlora.py)",
+      "Bash(.venv/Scripts/ruff.exe --version)",
+      "Bash(.venv/Scripts/ruff --version)",
+      "Bash(.venv/Scripts/python.exe -m mypy --version)",
+      "Bash(.venv/Scripts/python.exe -m pip install ruff mypy --quiet)",
+      "Bash(.venv/Scripts/python.exe *)",
+      "Bash(command -v jq)",
+      "Bash(bash .claude/hooks/moai/handle-stop.sh)",
+      "Bash(bash .claude/hooks/moai/sync-phase-quality-gate.sh)",
+      "Bash(bash .claude/hooks/moai/handle-stop-goal.sh)"
     ],
     "defaultMode": "bypassPermissions"
   }
