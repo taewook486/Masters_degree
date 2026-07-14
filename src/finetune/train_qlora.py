@@ -672,6 +672,9 @@ def train_qlora(
                 data_dir=data_dir,
                 batch_size=4,
                 max_samples=max_test_samples,  # 스모크: 소량으로 제한 (None=full test, 논문용)
+                # REQ-EM-001: Phase 2는 BioBERT 이중 BERTScore를 opt-in으로 활성화한다
+                # (§4.4). roberta-large는 REQ-EM-004에 따라 항상 primary로 유지된다.
+                bertscore_models=["roberta-large", "dmis-lab/biobert-v1.1"],
             )
             result["eval_summary"] = eval_summary
 

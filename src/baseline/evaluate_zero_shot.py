@@ -42,6 +42,7 @@ def evaluate_with_loaded_model(
     data_dir: str = "data",
     max_samples: int | None = None,
     batch_size: int = 4,
+    bertscore_models: list[str] | None = None,
 ) -> dict:
     """Run zero-shot evaluation with a pre-loaded model (no load/unload).
 
@@ -58,6 +59,11 @@ def evaluate_with_loaded_model(
         data_dir: Base directory where datasets are stored.
         max_samples: Limit number of samples (for debugging).
         batch_size: Inference batch size (1 = per-sample, >1 = batched).
+        bertscore_models: Optional opt-in list of BERTScore models to score in
+            addition to roberta-large (REQ-EM-001, Phase 2 opt-in only). When
+            None (default), behavior is unchanged from before this parameter
+            existed — Phase 1's single roberta-large scoring path and result
+            schema are preserved byte-for-byte (REQ-EM-002).
 
     Returns:
         Dictionary with summary metrics.
@@ -93,7 +99,13 @@ def evaluate_with_loaded_model(
 
     # Aggregate metrics
     vram = get_vram_usage()
-    metrics = compute_overall_accuracy(predictions, gold_answers, question_types, compute_bertscore=True)
+    metrics = compute_overall_accuracy(
+        predictions,
+        gold_answers,
+        question_types,
+        compute_bertscore=True,
+        bertscore_models=bertscore_models,
+    )
     time_values = [r["time_ms"] for r in per_sample_results if r["time_ms"] > 0]
     avg_time_ms = sum(time_values) / len(time_values) if time_values else 0.0
 
