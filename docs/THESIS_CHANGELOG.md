@@ -24,6 +24,7 @@
 | v0.4 | (보고 안 함) | 2026-05-15 | 동료 심사 9건 중 5건 처리 |
 | v0.5 | **v1.1** | 2026-05-16 | 잔여 치명적 4건 처리 |
 | v0.6 | (보고 예정) | 2026-07-11 | Phase 1 방법론 정정 (결정적 평가: 1시드 + 부트스트랩 CI, ANOVA→Cochran's Q/McNemar) |
+| v0.7 | (보고 예정) | 2026-07-14 | SPEC-EVAL-METRICS-001: BioBERT 이중 BERTScore primary 규칙 명시 + 동료심사 v0.5 잔여 4건(WCA/다중비교/CF개념/Gemma4) 한계점 반영 |
 | (예정) | **v2.0** | 2026-07 예상 | Phase 1/2 실험 결과 포함 본 심사용 |
 
 ### 시맨틱 버전 규칙 (External)
@@ -31,6 +32,25 @@
 - **MAJOR (v1, v2, ...)**: 연구 방향, RQ, 또는 큰 결과 추가 (예: Phase 1 실험 결과 포함)
 - **MINOR (v1.1, v1.2)**: 방법론 추가/개선 (예: 동료 심사 반영, 모델 추가)
 - **PATCH (v1.1.1)**: 오타, 표 형식 수정
+
+---
+
+## Internal v0.7 — 2026-07-14
+
+**동료 심사 v0.5 잔여 지적 4건 문서 반영 + BioBERT primary 규칙 명시** — `SPEC-EVAL-METRICS-001`의 Exclusion #1(item 3, 비-SPEC manager-docs 태스크)로 별도 추적되던 문서 개정. 코드 산출물(BioBERT 이중 BERTScore, Mann-Whitney U 검정)은 동일 SPEC의 run-phase에서 이미 구현 완료(커밋 `4736d20`/`b2a5a00`/`01471de`).
+
+### 반영 내용
+
+- **§4.4 primary 지표 규칙 명시**: REQ-EM-004 확정에 따라 "roberta-large @ 0.7이 정확도·통계 검정의 유일 결정 지표, BioBERT F1은 보조 지표로만 병기(이중 게이팅 없음)"를 한 줄로 명시.
+- **§5.3 한계점 4건 반영** (`docs/비판적_동료심사_v0.5.md` 기준):
+  - WCA 임시 가중치(항목 5): 기존 서술을 "절대적 임상 중요도 척도로 해석 불가"로 강화.
+  - 다중 비교 보정 부재(항목 8): 신규 — Phase 1~3 통합 20회 이상 검정의 FWER 누적 위험 명시, Phase 1 McNemar만 Bonferroni 적용됨을 밝힘.
+  - Cross-dataset CF 개념 오용(항목 9): 신규 — PathVQA(병리)-SLAKE/VQA-RAD(방사선) 도메인 상이로 인해 (B) 측정을 "cross-dataset 일반화" 지표로 재명명, CF 엄밀 판정은 (A) VQAv2로 한정.
+  - Gemma4-E2B MoE 공정성(항목 6): 신규 — 활성 파라미터 기준 선정임을 명시하고, 저장 파라미터 5.1B로 인한 확대 해석 경계.
+
+### 문서 산출물
+
+- `docs/THESIS_PROPOSAL_FINAL_v0.7.md` 신규 (v0.6 기반)
 
 ---
 
