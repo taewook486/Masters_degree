@@ -12,7 +12,16 @@ import logging
 import re
 import string
 
+from scipy import stats
+
 logger = logging.getLogger(__name__)
+
+# REQ-EM-001, REQ-EM-005: BioBERT는 dual BERTScore의 유일한 지원 secondary
+# (의료 특화) 모델이다. bert-score 0.3.13의 model2layers 레지스트리에 미등록
+# 가능성이 높아 명시적 num_layers가 필요하다 (BioBERT-v1.1 = BERT-base 12층,
+# BERTScore 원논문의 bert-base 경험적 최적 레이어 = 9. plan.md 참조).
+_BIOBERT_MODEL_ID = "dmis-lab/biobert-v1.1"
+_BIOBERT_NUM_LAYERS = 9
 
 
 def preprocess_answer(answer: str) -> str:
@@ -141,10 +150,11 @@ def compute_open_bertscore(
     gold_answers: list[str],
     threshold: float = 0.7,
     model_type: str = "roberta-large",
+    num_layers: int | None = None,
 ) -> dict[str, float]:
     """Compute BERTScore F1 for open-ended questions.
 
-    Uses roberta-large as the base model (v0.2 spec).
+    Uses roberta-large as the base model by default (v0.2 spec).
     A prediction is considered correct if BERTScore F1 >= threshold.
 
     Args:
@@ -152,6 +162,11 @@ def compute_open_bertscore(
         gold_answers: Ground truth answers.
         threshold: BERTScore F1 threshold for correctness (default: 0.7).
         model_type: BERTScore model (default: roberta-large).
+        num_layers: Explicit embedding layer count passed to the BERTScore
+            backend (REQ-EM-005). Required for models not registered in
+            bert-score's model2layers registry (e.g. dmis-lab/biobert-v1.1).
+            Left unspecified (None, default) for registry-covered models such
+            as roberta-large, whose layer count is not redefined.
 
     Returns:
         Dict with mean F1, accuracy at threshold, and per-sample F1 scores.
@@ -165,12 +180,14 @@ def compute_open_bertscore(
         logger.warning("bert-score not installed. Run: pip install bert-score")
         return {"bertscore_f1_mean": 0.0, "bertscore_accuracy": 0.0, "bertscore_f1_scores": []}
 
-    _, _, f1 = bert_score_fn(
-        predictions,
-        gold_answers,
-        model_type=model_type,
-        verbose=False,
-    )
+    score_kwargs: dict[str, str | int | bool] = {
+        "model_type": model_type,
+        "verbose": False,
+    }
+    if num_layers is not None:
+        score_kwargs["num_layers"] = num_layers
+
+    _, _, f1 = bert_score_fn(predictions, gold_answers, **score_kwargs)
 
     f1_list = f1.tolist()
     f1_mean = sum(f1_list) / len(f1_list)
@@ -189,6 +206,7 @@ def compute_overall_accuracy(
     gold_answers: list[str],
     question_types: list[str],
     compute_bertscore: bool = True,
+    bertscore_models: list[str] | None = None,
 ) -> dict[str, float | int]:
     """Compute closed, open, and overall accuracy.
 
@@ -197,6 +215,18 @@ def compute_overall_accuracy(
         gold_answers: Ground truth answers.
         question_types: List of "open" or "closed" for each sample.
         compute_bertscore: If True, also compute BERTScore F1 for open-ended.
+        bertscore_models: Optional list of BERTScore model identifiers to
+            score in addition to the primary roberta-large model (REQ-EM-001,
+            Phase 2 opt-in only). When None or omitted (default), behavior is
+            unchanged from before this parameter existed: only roberta-large
+            is scored and only the primary result keys (`open_bertscore_f1`,
+            `open_bertscore_accuracy`) are produced (REQ-EM-002 — Phase 1
+            backward compatibility). roberta-large is ALWAYS the primary/
+            decision metric (REQ-EM-004) regardless of this list's contents;
+            any other entry (e.g. "dmis-lab/biobert-v1.1") is treated as a
+            secondary (informational-only) model and reported under the
+            `_biobert` result keys plus Spearman/Pearson correlation against
+            the primary per-sample F1 vector (REQ-EM-003).
 
     Returns:
         Dictionary with accuracy metrics and counts.
@@ -234,8 +264,41 @@ def compute_overall_accuracy(
     }
 
     if compute_bertscore and open_preds:
-        bs = compute_open_bertscore(open_preds, open_golds)
+        # REQ-EM-004: roberta-large는 항상 primary/결정 지표 — bertscore_models
+        # 인자의 내용과 무관하게 재정의되지 않는다 (비-게이팅).
+        bs = compute_open_bertscore(open_preds, open_golds, model_type="roberta-large")
         result["open_bertscore_f1"] = bs["bertscore_f1_mean"]
         result["open_bertscore_accuracy"] = bs["bertscore_accuracy"]
+
+        # REQ-EM-001: roberta-large 외 요청된 모델은 secondary(정보 제공용)로
+        # 계산한다. 현재 지원 대상은 BioBERT 하나뿐이며(결과 키 스키마가
+        # `_biobert`로 고정), 그 외 항목이 있으면 첫 번째만 secondary로 취급한다.
+        secondary_models = [m for m in (bertscore_models or []) if m != "roberta-large"]
+        if secondary_models:
+            secondary_model = secondary_models[0]
+            secondary_num_layers = (
+                _BIOBERT_NUM_LAYERS if secondary_model == _BIOBERT_MODEL_ID else None
+            )
+            bs_secondary = compute_open_bertscore(
+                open_preds,
+                open_golds,
+                model_type=secondary_model,
+                num_layers=secondary_num_layers,
+            )
+            result["open_bertscore_f1_biobert"] = bs_secondary["bertscore_f1_mean"]
+            result["open_bertscore_accuracy_biobert"] = bs_secondary[
+                "bertscore_accuracy"
+            ]
+
+            # REQ-EM-003: Spearman(주 보고값) + Pearson(병기). 표본 < 2이면
+            # 상관이 정의되지 않으므로 계산을 생략한다(키 자체를 만들지 않음).
+            primary_scores = bs["bertscore_f1_scores"]
+            secondary_scores = bs_secondary["bertscore_f1_scores"]
+            same_len = len(primary_scores) == len(secondary_scores)
+            if len(primary_scores) >= 2 and same_len:
+                spearman = stats.spearmanr(primary_scores, secondary_scores).correlation
+                pearson = stats.pearsonr(primary_scores, secondary_scores)[0]
+                result["open_bertscore_spearman"] = round(float(spearman), 4)
+                result["open_bertscore_pearson"] = round(float(pearson), 4)
 
     return result
