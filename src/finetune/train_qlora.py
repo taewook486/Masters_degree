@@ -241,6 +241,10 @@ def _build_trainer_unsloth(
         logging_steps=t.get("logging_steps", 10),
         save_strategy=save_eval_strategy,
         eval_strategy=save_eval_strategy,
+        # max_steps 사용 시 끝에서 1회만 eval/save (미지정 시 매 logging_steps=10마다 eval → 낭비).
+        # epoch 전략일 땐 무시됨.
+        save_steps=max_steps_val if max_steps_val > 0 else 500,
+        eval_steps=max_steps_val if max_steps_val > 0 else 500,
         seed=seed,
         report_to="wandb",
         run_name=f"{model_name}_{dataset_name}_seed{seed}_unsloth",
@@ -461,6 +465,10 @@ def _build_trainer_standard(
         logging_steps=t.get("logging_steps", 10),
         save_strategy=save_eval_strategy,
         eval_strategy=save_eval_strategy,
+        # max_steps 사용 시 끝에서 1회만 eval/save (미지정 시 매 logging_steps=10마다 eval → 낭비).
+        # epoch 전략일 땐 무시됨.
+        save_steps=max_steps_val if max_steps_val > 0 else 500,
+        eval_steps=max_steps_val if max_steps_val > 0 else 500,
         seed=seed,
         report_to="wandb",
         run_name=f"{model_name}_{dataset_name}_seed{seed}_peft",

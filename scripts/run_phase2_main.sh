@@ -16,6 +16,8 @@ export PYTORCH_ALLOC_CONF=expandable_segments:True  # GPU 메모리 파편화 �
 # HF 모델 캐시를 컨테이너 디스크(/hf_cache, 60GB)로. 미설정 시 /workspace 볼륨(50GB)이
 # 모델 4개(~27GB)로 꽉 차 'Disk quota exceeded' 발생.
 export HF_HOME=/hf_cache
+# 준비된 chat 데이터셋 캐시도 컨테이너 디스크로(이미지 재저장이라 용량 큼 → /workspace quota 회피).
+export MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache
 
 mkdir -p results/phase2_finetune
 

@@ -10,6 +10,7 @@ Supports both Qwen-style (with vision info) and standard chat template formats.
 from __future__ import annotations
 
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -40,7 +41,11 @@ def _chat_cache_dir(
         parts.append(f"sub{subset_ratio}")
     if max_samples is not None:
         parts.append(f"max{max_samples}")
-    return Path(data_dir) / "_chat_cache" / "_".join(parts)
+    # 캐시는 이미지를 재저장하므로 용량이 큰다. /workspace 볼륨(quota)이 아니라
+    # 여유 있는 컨테이너 디스크에 두도록 MOAI_CHAT_CACHE_DIR로 재지정 가능
+    # (run_phase2_main.sh가 /hf_cache/chat_cache로 설정). 미설정 시 data_dir 하위.
+    base = os.environ.get("MOAI_CHAT_CACHE_DIR") or str(Path(data_dir) / "_chat_cache")
+    return Path(base) / "_".join(parts)
 
 
 def prepare_chat_dataset(
