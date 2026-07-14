@@ -10,7 +10,7 @@
 | 우선순위 | High |
 | 생성일 | 2026-04-28 |
 | 완료일 | 2026-07-01 |
-| 구현 범위 | 10/12 REQ 완료 (REQ-005, REQ-006 스킵 — 실험 재실행 필요/선택사항) |
+| 구현 범위 | 10/12 REQ 완료, 1/12 대체 경로로 해결 (REQ-005 — 원 인수 조건은 미충족이나 Internal v0.6 방법론 수정으로 근본 문제 해결), 1/12 스킵 (REQ-006 — 선택사항, 미구현) |
 
 ---
 
@@ -121,6 +121,8 @@
 - [ ] 재실행 후 `phase1_summary.csv`에 `num_seeds=3`, 비-제로 std 값 확인
 - [ ] SmolVLM-2.2B의 누락된 시드 결과(slake seed123/456, vqa_rad seed123/456, pathvqa seed456) 완성
 
+**2026-07-14 재검증 주석**: 위 인수 조건은 문자 그대로는 충족되지 않았다 (`num_seeds=3` 재실행은 수행되지 않음). 그러나 이 REQ가 다루려던 근본 문제 — Phase 1 결과 신뢰도 확보 — 는 다른 경로로 해결되었다. Internal v0.6 방법론 수정(`docs/THESIS_CHANGELOG.md` 참조, 2026-07-11, 동료심사 `docs/비판적_동료심사_v0.5.md` 항목 #2 "Phase 1 STD=0.0 데이터 무결성"에 대한 대응으로 추정)에서, zero-shot 평가는 greedy decoding으로 결정론적이므로 3-시드 분산 자체가 수학적으로 불가능하다는 점이 확인되었다. 즉 원 인수 조건(`num_seeds=3`, 비-제로 std)은 애초에 성립할 수 없는 전제(시드 간 복원 가능한 분산이 존재한다는 가정)에 기반한 것이었다. 실제 적용된 수정은 단일 시드(42) + bootstrap 95% CI를 통한 불확실성 정량화이며, `results/phase1_baseline/phase1_summary.csv`의 `num_seeds=1` + `closed_acc_ci_low`/`closed_acc_ci_high` 컬럼과 `src/baseline/run_all.py`의 집계 로직에서 직접 확인됨.
+
 ---
 
 ### REQ-006: [실험 파이프라인] .bat 스크립트를 Python CLI로 전환
@@ -167,6 +169,8 @@
 - [x] 콘솔(INFO 레벨) + 파일(DEBUG 레벨) 동시 출력
 - [x] 로그 파일명에 타임스탬프 포함 (예: `experiment_2026-04-28_143000.log`)
 - [x] 모든 모듈에서 직접 `logging.basicConfig()` 호출 제거, `setup_logging()` 사용
+
+**2026-07-14 재검증 주석**: 위 체크박스는 완료로 표시되어 있었으나, 재검증 시점에 6개 파일(`src/autoresearch/run_phase3.py`, `src/data/download.py`, `src/data/general_vqa.py`, `src/finetune/run_phase2.py`, `src/finetune/train_one.py`, `src/finetune/train_qlora.py`)이 여전히 `logging.basicConfig()`를 직접 호출하고 있는 것이 발견되었다. 이 격차는 커밋 `506d516`으로 이미 해소되었다 — 6개 파일 모두 `src/baseline/run_all.py` / `src/baseline/evaluate_zero_shot.py`의 기존 패턴과 동일하게 `setup_logging()`을 사용하도록 마이그레이션 완료. 현재 시점 REQ-008은 실질적으로 완전히 충족된 상태이다.
 
 ---
 
