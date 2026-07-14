@@ -1,7 +1,7 @@
 ---
 id: SPEC-EVAL-METRICS-001
 version: 0.1.1
-status: draft
+status: in-progress
 created_at: 2026-07-14
 updated: 2026-07-14
 author: manager-spec

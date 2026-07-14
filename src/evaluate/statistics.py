@@ -283,3 +283,45 @@ def run_kruskal_wallis(groups: dict[str, list[float]]) -> dict:
         "p_value": float(p_value),
         "significant": bool(p_value < 0.05),
     }
+
+
+def run_mann_whitney(x: list[float], y: list[float]) -> dict:
+    """Mann-Whitney U 검정 (2-독립표본, 양측) + rank-biserial 효과 크기.
+
+    Phase 3: run-level 비교 (예: Autoresearch vs Optuna, n=10 vs n=10)에 사용하는
+    비모수 2-독립표본 순위합 검정. REQ-EM-006, REQ-EM-007, REQ-EM-008, REQ-EM-009.
+
+    scipy의 정규근사(동점 보정)를 그대로 사용하므로 동순위(tied ranks)가 있어도
+    예외 없이 [0, 1] 범위의 유효한 p-value를 반환한다 (REQ-EM-009).
+
+    부호 규약 (REQ-EM-007): rank_biserial_r > 0 은 첫 표본(x)이 둘째 표본(y)보다
+    확률적으로 큰 경향임을 의미한다. scipy.stats.mannwhitneyu가 반환하는 U는
+    "x 기준" 통계량 — 즉 x_i > y_j 인 쌍의 수(동점은 0.5로 계산, 경험적으로 검증:
+    x=[5,6,7], y=[1,2,3] -> U=9=n1*n2)이므로, x가 y를 완전히 압도하면
+    U -> n1*n2 이 된다. 따라서 r = 2*U/(n1*n2) - 1 로 정의하면 이 경우 r -> +1이
+    되어 요구된 부호 규약을 만족한다. 인자 순서를 (y, x)로 반전하면 항상
+    U_y = n1*n2 - U_x (동점 여부와 무관하게 U_x + U_y = n1*n2)이므로 r의 부호도
+    반전한다.
+
+    Args:
+        x: 첫 번째 표본 (예: Autoresearch run-level accuracy, n=10).
+        y: 두 번째 표본 (예: Optuna run-level accuracy, n=10).
+
+    Returns:
+        dict with: u_stat, p_value, n1, n2, rank_biserial_r, significant (alpha=0.05).
+    """
+    n1 = len(x)
+    n2 = len(y)
+    result = stats.mannwhitneyu(x, y, alternative="two-sided")
+    u_stat = float(result.statistic)
+    p_value = float(result.pvalue)
+    rank_biserial_r = (2 * u_stat) / (n1 * n2) - 1
+
+    return {
+        "u_stat": u_stat,
+        "p_value": p_value,
+        "n1": n1,
+        "n2": n2,
+        "rank_biserial_r": float(rank_biserial_r),
+        "significant": bool(p_value < 0.05),
+    }
