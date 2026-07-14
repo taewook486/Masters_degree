@@ -1,9 +1,5 @@
 @echo off
-<<<<<<< Updated upstream
-cd /d "d:\project\Masters_degree"
-=======
 cd /d "D:\project\Masters_degree"
->>>>>>> Stashed changes
 set PYTHONUNBUFFERED=1
 echo Starting Phase 1 evaluation at %DATE% %TIME% >> results\phase1_baseline\run_all.log
 .venv\Scripts\python.exe -u -m src.baseline.run_all ^

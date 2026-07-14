@@ -1,9 +1,5 @@
 @echo off
-<<<<<<< Updated upstream
-cd /d "d:\project\Masters_degree"
-=======
 cd /d "D:\project\Masters_degree"
->>>>>>> Stashed changes
 set PYTHONUNBUFFERED=1
 set WANDB_PROJECT=medical-vqa-vlm
 

@@ -27,6 +27,8 @@ import yaml
 # trl.SFTTrainer를 전역 패치해 standard backend를 오염시키기 때문. 각 조건은
 # src.finetune.train_one을 별도 프로세스로 실행해 격리한다(_train_condition).
 
+from src.utils.logging_config import setup_logging
+
 logger = logging.getLogger(__name__)
 
 DATASETS = ["pathvqa", "slake", "vqa_rad"]
@@ -519,10 +521,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
+    setup_logging(log_dir=args.output_dir, experiment_name="run_phase2")
 
     skip = not args.no_skip_existing
     all_dfs = []

@@ -26,6 +26,8 @@ import sys
 
 import yaml
 
+from src.utils.logging_config import setup_logging
+
 # train_qlora._UNSLOTH_SUPPORTED_PATTERNS와 동일해야 한다. 여기서는 무거운 import
 # (transformers/unsloth) 없이 yaml만 읽어 backend를 판정하기 위해 패턴을 복제한다.
 # gemma4는 unsloth 미지원이라 제외 → standard backend(순수 trl)로 라우팅된다.
@@ -38,9 +40,6 @@ def _model_supports_unsloth(model_id: str) -> bool:
 
 
 def main() -> int:
-    import logging
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-
     parser = argparse.ArgumentParser(description="Single-condition QLoRA training (subprocess-isolated)")
     parser.add_argument("--model_config_path", required=True)
     parser.add_argument("--finetune_config_path", required=True)
@@ -55,6 +54,8 @@ def main() -> int:
     parser.add_argument("--measure_cf", action="store_true")
     parser.add_argument("--base_vqav2_json", default=None, help="Path to pre-computed base VQAv2 result JSON")
     args = parser.parse_args()
+
+    setup_logging(log_dir=args.output_dir, experiment_name="train_one")
 
     # 1) yaml만 읽어 backend 판정 (transformers/unsloth import 전에)
     with open(args.model_config_path, encoding="utf-8") as f:

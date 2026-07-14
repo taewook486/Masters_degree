@@ -6,6 +6,8 @@ from pathlib import Path
 
 from datasets import load_dataset
 
+from src.utils.logging_config import setup_logging
+
 logger = logging.getLogger(__name__)
 
 DATASET_REGISTRY = {
@@ -92,10 +94,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
+    setup_logging(log_dir="logs", experiment_name="download_datasets")
 
     if args.dataset:
         download_dataset(args.dataset, save_dir=args.save_dir, force=args.force)

@@ -25,6 +25,7 @@ import pandas as pd
 from src.autoresearch.loop import run_hpo_loop
 from src.autoresearch.strategies import get_strategy
 from src.autoresearch.tracker import ExperimentTracker
+from src.utils.logging_config import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -204,10 +205,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
+    setup_logging(log_dir=args.output_dir, experiment_name="run_phase3")
 
     run_phase3(
         model_config_path=args.model_config,

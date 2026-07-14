@@ -14,6 +14,8 @@ from pathlib import Path
 from datasets import load_dataset, load_from_disk
 from PIL import Image
 
+from src.utils.logging_config import setup_logging
+
 logger = logging.getLogger(__name__)
 
 VQAV2_HF_ID = "lmms-lab/VQAv2"
@@ -188,7 +190,7 @@ def main() -> None:
     parser.add_argument("--force", action="store_true")
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+    setup_logging(log_dir="logs", experiment_name="general_vqa")
 
     if args.download:
         download_vqav2_subset(

@@ -55,6 +55,7 @@ from trl import SFTConfig, SFTTrainer
 from src.baseline.evaluate_zero_shot import evaluate_with_loaded_model
 from src.baseline.model_loader import DTYPE_MAP, load_config
 from src.finetune.prepare_data import prepare_chat_dataset, prepare_qwen_chat_dataset
+from src.utils.logging_config import setup_logging
 from src.utils.seed import set_seed
 from src.utils.vram_monitor import get_vram_usage, reset_peak_stats
 
@@ -741,10 +742,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
+    setup_logging(log_dir=args.output_dir, experiment_name="train_qlora")
 
     train_qlora(
         model_config_path=args.model_config,
