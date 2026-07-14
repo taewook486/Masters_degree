@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>석사학위 논문 설계서</title>
+<style>
+
+@page {
+    size: A4;
+    margin: 25mm 22mm;
+    @bottom-center {
+        content: counter(page);
+        font-size: 9pt;
+        color: #888;
+        font-family: 'Malgun Gothic', sans-serif;
+    }
+}
+
+body {
+    font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    font-size: 10.5pt;
+    line-height: 1.6;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+/* 제목: 가운데 정렬, 큰 글자, 두꺼운 가로선으로 구분 */
+h1 {
+    font-size: 24pt;
+    font-weight: 700;
+    text-align: center;
+    margin: 0 0 12mm 0;
+    padding-bottom: 6mm;
+    border-bottom: 2px solid #1a1a1a;
+    letter-spacing: -0.5pt;
+}
+
+/* 절 제목: 좌측 정렬, 굵게, 하단 얇은 선 */
+h2 {
+    font-size: 15pt;
+    font-weight: 700;
+    margin: 9mm 0 4mm 0;
+    padding-bottom: 2mm;
+    border-bottom: 1px solid #d0d0d0;
+    color: #1a1a1a;
+}
+
+/* 소절 제목 */
+h3 {
+    font-size: 12pt;
+    font-weight: 700;
+    margin: 6mm 0 2.5mm 0;
+    color: #1a1a1a;
+}
+
+h4 {
+    font-size: 11pt;
+    font-weight: 600;
+    margin: 4mm 0 2mm 0;
+    color: #2a2a2a;
+}
+
+/* 본문 */
+p {
+    margin: 2mm 0;
+    text-align: justify;
+}
+
+/* 리스트 */
+ul, ol {
+    margin: 2mm 0;
+    padding-left: 6mm;
+}
+
+li {
+    margin-bottom: 1mm;
+    line-height: 1.55;
+}
+
+/* 표 — 교수 제출본 양식: 얇은 회색 테두리, 헤더 약한 음영 */
+table {
+    border-collapse: collapse;
+    margin: 3mm 0;
+    font-size: 9.5pt;
+    width: 100%;
+    page-break-inside: avoid;
+}
+
+th {
+    background-color: #ebebeb;
+    border: 1px solid #888;
+    padding: 1.8mm 2.5mm;
+    font-weight: 600;
+    text-align: left;
+    color: #1a1a1a;
+}
+
+td {
+    border: 1px solid #b0b0b0;
+    padding: 1.5mm 2.5mm;
+    line-height: 1.5;
+}
+
+/* 강조 */
+strong, b {
+    color: #1a1a1a;
+    font-weight: 700;
+}
+
+/* 인라인 코드 */
+code {
+    background-color: #f5f5f5;
+    padding: 0.5px 4px;
+    border-radius: 2px;
+    font-family: 'Consolas', 'D2Coding', monospace;
+    font-size: 9.5pt;
+    color: #c7254e;
+}
+
+/* 코드 블록 */
+pre {
+    background-color: #f7f7f7;
+    padding: 3mm 4mm;
+    border-radius: 3px;
+    border-left: 3px solid #888;
+    overflow-x: auto;
+    font-size: 9pt;
+    line-height: 1.5;
+    page-break-inside: avoid;
+    margin: 3mm 0;
+}
+
+pre code {
+    background-color: transparent;
+    padding: 0;
+    color: #1a1a1a;
+}
+
+/* 인용 (남은 것이 있다면 부드럽게) */
+blockquote {
+    margin: 3mm 0;
+    padding: 2mm 5mm;
+    color: #555;
+    border-left: 2px solid #b0b0b0;
+    background-color: #fafafa;
+    font-style: normal;
+}
+
+/* 가로선 */
+hr {
+    border: 0;
+    border-top: 1px solid #cccccc;
+    margin: 8mm 0;
+}
+
+/* 페이지 나누기 방지 */
+h1, h2, h3, h4 {
+    page-break-after: avoid;
+    page-break-inside: avoid;
+}
+
+table, pre {
+    page-break-inside: avoid;
+}
+
+</style>
+</head>
+<body>
+<h1>논문 설계서 주요 변경사항 보고</h1>
+<h2>보고 개요</h2>
+<p>본 문서는 2026년 4월 2일에 제출하였던 석사학위 논문 설계서 초안 이후 진행된 주요 변경사항을 정리한 보고 자료입니다. 1차 리뷰 피드백과 외부 동료 심사 의견, 그리고 후속 자체 점검 결과를 단계적으로 반영하여 현재의 설계서 본문(2026-05-16)에 이르렀습니다.</p>
+<p>본 보고서는 본문 설계서와 함께 제공되며, 변경의 배경과 범위를 한눈에 파악하실 수 있도록 항목별 비교표 형식으로 구성하였습니다.</p>
+<hr />
+<h2>1. 주요 변경사항 거시 요약</h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>초기 설계서 (2026-03-22)</th>
+<th>현재 설계서 (2026-05-16)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>대상 모델 수</td>
+<td>3개</td>
+<td>4개 (Gemma 4 E2B 추가)</td>
+</tr>
+<tr>
+<td>실험 환경</td>
+<td>RTX 5060 Ti 16GB 단일</td>
+<td>로컬 16GB 및 클라우드 RTX 4090 24GB 이원 구성</td>
+</tr>
+<tr>
+<td>RQ3 비교 대상</td>
+<td>Random Search</td>
+<td>Optuna(TPE)로 상향</td>
+</tr>
+<tr>
+<td>Phase 3 학습량 통제</td>
+<td>15분 고정 시간 예산</td>
+<td>max_steps 고정 (혼동 변수 통제)</td>
+</tr>
+<tr>
+<td>Phase 3 반복 횟수</td>
+<td>5회</td>
+<td>10회 (통계 검정력 확보)</td>
+</tr>
+<tr>
+<td>통계 분석 단위</td>
+<td>trial-level</td>
+<td>run-level (독립성 가정 충족)</td>
+</tr>
+<tr>
+<td>데이터 오염 통제</td>
+<td>미언급</td>
+<td>Min-K% Probability 능동 측정</td>
+</tr>
+<tr>
+<td>임상적 의미 분석</td>
+<td>미포함</td>
+<td>WCA, ECE 보조 지표 도입</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>2. 평가 지표 강화</h2>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Closed-ended</td>
+<td>Yes/No 정확도</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>Open-ended</td>
+<td>정답 토큰 매칭</td>
+<td>Exact Match 및 BERTScore F1 이중 보고 (roberta-large 및 BioBERT)</td>
+</tr>
+<tr>
+<td>응답 시간</td>
+<td>ms/question</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>VRAM</td>
+<td>peak MB</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>WCA (Weighted Clinical Accuracy)</td>
+<td>미포함</td>
+<td>PathVQA 7개 질문 유형 임상 중요도 가중 정확도</td>
+</tr>
+<tr>
+<td>ECE (Expected Calibration Error)</td>
+<td>미포함</td>
+<td>10 bins 기준, 모델 신뢰도와 실제 정확도의 일치도</td>
+</tr>
+<tr>
+<td>훈련 시간 및 학습 가능 파라미터 비율</td>
+<td>포함</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>Catastrophic Forgetting 측정</td>
+<td>범용 성능 감소율 단순 언급</td>
+<td>(A) VQAv2 2,000 샘플 및 (B) cross-dataset 24회 평가 이중 구조</td>
+</tr>
+</tbody>
+</table>
+<p>평가 지표를 종전의 단일 정확도 기반에서 임상 의미와 calibration까지 포괄하는 다층 구조로 확장하였습니다.</p>
+<hr />
+<h2>3. 통계 검증 방법 강화</h2>
+<table>
+<thead>
+<tr>
+<th>검증 항목</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1 모델 비교</td>
+<td>ANOVA 및 Tukey HSD (3개 모델)</td>
+<td>ANOVA 및 Tukey HSD (4개 모델)</td>
+</tr>
+<tr>
+<td>Phase 2 파인튜닝 전후 비교</td>
+<td>Paired t-test, Cohen's d, Wilcoxon signed-rank</td>
+<td>좌측 항목에 BCa Bootstrap 10,000회 재표집, Mixed-Effects Model, Wilcoxon r 효과 크기를 추가한 3중 검증 체계</td>
+</tr>
+<tr>
+<td>Phase 3 전략 비교</td>
+<td>Kruskal-Wallis (5회 반복, trial-level)</td>
+<td>Kruskal-Wallis (10회 반복, run-level), Mann-Whitney U (Autoresearch 대 Optuna 쌍별 비교)</td>
+</tr>
+<tr>
+<td>Bootstrap 신뢰구간</td>
+<td>언급에 한정</td>
+<td>BCa 방법으로 명시적 적용</td>
+</tr>
+<tr>
+<td>표본 크기 한계 인지</td>
+<td>미언급</td>
+<td>5.3 한계점에 명시</td>
+</tr>
+</tbody>
+</table>
+<p>작은 표본의 한계를 인지하고, 동일한 가설에 대하여 복수의 검증 방법을 병행 적용함으로써 결론의 robustness를 확보하였습니다.</p>
+<hr />
+<h2>4. 데이터 오염 통제 절차 신설</h2>
+<p>학습 데이터에 대상 평가 데이터셋이 포함되었을 가능성을 능동적으로 측정하기 위한 절차를 새롭게 도입하였습니다.</p>
+<table>
+<thead>
+<tr>
+<th>측면</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>데이터 오염 인식</td>
+<td>미언급</td>
+<td>§4.2.1 신규 절</td>
+</tr>
+<tr>
+<td>통제 방법</td>
+<td>해당 사항 없음</td>
+<td>Min-K% Probability Attack (Shi et al., NAACL 2024)</td>
+</tr>
+<tr>
+<td>측정 대상</td>
+<td>해당 사항 없음</td>
+<td>4개 모델 및 3개 데이터셋, 총 12개 조합 전체 테스트 샘플</td>
+</tr>
+<tr>
+<td>후속 분석</td>
+<td>해당 사항 없음</td>
+<td>의심 샘플 제거 후 결과 재계산 (sub-analysis)</td>
+</tr>
+<tr>
+<td>구현 산출물</td>
+<td>해당 사항 없음</td>
+<td><code>scripts/measure_contamination.py</code> 모듈</td>
+</tr>
+</tbody>
+</table>
+<p>이를 통하여 평가 결과의 신뢰성을 확보하고, 의심 샘플의 영향에 따른 결론 안정성도 함께 검증할 수 있도록 하였습니다.</p>
+<hr />
+<h2>5. 선행 연구와의 비교 보강</h2>
+<table>
+<thead>
+<tr>
+<th>비교 모델</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>의료 특화 VLM 직접 비교</td>
+<td>미포함</td>
+<td>본 연구 범위 외로 명시, 한계점에 반영</td>
+</tr>
+<tr>
+<td>의료 특화 VLM 간접 비교</td>
+<td>미포함</td>
+<td>Table 4.4 신규 추가</td>
+</tr>
+<tr>
+<td>비교 대상 모델</td>
+<td>해당 사항 없음</td>
+<td>LLaVA-Med-7B, Med-Flamingo, CheXagent, BioViL-T</td>
+</tr>
+<tr>
+<td>비교 지표</td>
+<td>해당 사항 없음</td>
+<td>PathVQA Open/Closed, SLAKE Open, VQA-RAD Open</td>
+</tr>
+</tbody>
+</table>
+<p>직접 실험 비교 시 환경 차이로 인한 불공정성이 발생할 수 있다는 점을 고려하여, 동일 데이터셋 및 동일 평가 프로토콜의 선행 연구 수치와 간접 비교하는 방식을 채택하였습니다.</p>
+<hr />
+<h2>6. Phase 3 자율 하이퍼파라미터 최적화 설계 개선</h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>학습량 단위</td>
+<td>epochs {1, 2, 3, 5}</td>
+<td>max_steps {100, 200, 400, 800}</td>
+</tr>
+<tr>
+<td>시간 통제 방식</td>
+<td>15분 고정 시간 예산</td>
+<td>max_steps 고정, data throughput 차이는 별도 보고</td>
+</tr>
+<tr>
+<td>추가 보고 항목</td>
+<td>해당 사항 없음</td>
+<td>effective_batch_size, total_samples_seen, wall_clock_time</td>
+</tr>
+<tr>
+<td>자율 탐색 근거 로그</td>
+<td>변경 근거 기록의 일반 언급</td>
+<td>rationale.md 자연어 근거 및 Git commit 추적</td>
+</tr>
+<tr>
+<td>LLM 비결정성 통제</td>
+<td>미포함</td>
+<td>temperature=0, top_p=1, 모델 ID 및 스냅샷 고정, API 응답 로깅</td>
+</tr>
+<tr>
+<td>RQ3 차별점 정의</td>
+<td>효율성 비교</td>
+<td>경쟁적 성능 확보 및 해석 가능한 탐색 근거 제공</td>
+</tr>
+<tr>
+<td>총 시도 횟수</td>
+<td>약 120회 (3 전략 × 40 trial)</td>
+<td>1,210회 (4 전략 × 10 반복 × 40 trial 및 Manual 10)</td>
+</tr>
+</tbody>
+</table>
+<p>자율 탐색 루프의 가치를 단순 성능 효율성에서 해석 가능성으로 재정의하였으며, Optuna(TPE)와의 경쟁적 성능 확보를 1차 목표로 설정하였습니다.</p>
+<hr />
+<h2>7. 논문 구조 변경</h2>
+<table>
+<thead>
+<tr>
+<th>절</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.3.3 기존 연구 성과</td>
+<td>일반 언급</td>
+<td>LLaVA-Med, Med-Flamingo, CheXagent 등 의료 특화 VLM 선행 연구 명시</td>
+</tr>
+<tr>
+<td>2.4.2 LLM 에이전트 기반 HPO</td>
+<td>일반 언급</td>
+<td>이론적 차별점 추가 (cross-domain transfer, 탐색 공간 구조 이해, Hyperband 인용)</td>
+</tr>
+<tr>
+<td>3.8 평가 지표</td>
+<td>단일 절</td>
+<td>3.8.1부터 3.8.5까지 다섯 개 하위 절로 분리 (BERTScore 이중, CF 이중, WCA 및 ECE, Robust 통계, Min-K%)</td>
+</tr>
+<tr>
+<td>4.4.5 임상적 의미 분석</td>
+<td>미포함</td>
+<td>신규 절</td>
+</tr>
+<tr>
+<td>4.3.5 Autoresearch 해석 가능성 분석</td>
+<td>미포함</td>
+<td>신규 절</td>
+</tr>
+<tr>
+<td>5.3 한계점</td>
+<td>일반 언급</td>
+<td>7개 항목으로 세분화 명시</td>
+</tr>
+<tr>
+<td>부록 D</td>
+<td>미포함</td>
+<td>Autoresearch 자연어 탐색 근거 로그</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>8. 재현성 보장 항목</h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>코드 관리</td>
+<td>GitHub 리포지토리</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>환경 재현</td>
+<td>pyproject.toml 및 CUDA 버전 명시</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>실험 추적</td>
+<td>Weights &amp; Biases 및 results.tsv</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>랜덤 시드 고정</td>
+<td>42, 123, 456</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>Git 커밋 추적</td>
+<td>각 실험 설정 추적</td>
+<td>동일</td>
+</tr>
+<tr>
+<td>LLM 비결정성 통제</td>
+<td>미포함</td>
+<td>temperature=0, top_p=1, 모델 ID 및 스냅샷 날짜 고정</td>
+</tr>
+<tr>
+<td>API 응답 로깅</td>
+<td>미포함</td>
+<td>실험별 JSON 저장</td>
+</tr>
+<tr>
+<td>변동성 흡수</td>
+<td>3회 반복</td>
+<td>Phase 3는 10회 반복으로 확장</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>9. 실험 규모 변화</h2>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>초기 설계서</th>
+<th>현재 설계서</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Phase 1 조건 수</td>
+<td>27 (3 모델 × 3 데이터셋 × 3 시드)</td>
+<td>36 (4 × 3 × 3)</td>
+</tr>
+<tr>
+<td>Phase 2 조건 수</td>
+<td>27</td>
+<td>36 및 cross-dataset CF 24회 추가</td>
+</tr>
+<tr>
+<td>Phase 3 trial 수</td>
+<td>약 120 (3 전략 × 40)</td>
+<td>1,210 (4 전략 × 10 반복 × 40 및 Manual)</td>
+</tr>
+<tr>
+<td>Phase 1.5 (신설)</td>
+<td>해당 사항 없음</td>
+<td>12 (4 모델 × 3 데이터셋 Min-K% 측정)</td>
+</tr>
+<tr>
+<td>총 GPU 시간 추정</td>
+<td>미산정</td>
+<td>약 250시간 (별첨 비용 산정 자료 참조)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>10. 변경 단계별 트리거</h2>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>시점</th>
+<th>변경 트리거</th>
+<th>주요 변경</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1차 개정</td>
+<td>2026-03-24</td>
+<td>1차 리뷰 피드백</td>
+<td>Florence-2 모델 탈락 (3개 모델로 축소), BERTScore 도입, max_steps 명시</td>
+</tr>
+<tr>
+<td>2차 개정</td>
+<td>2026-04-05</td>
+<td>Gemma 4 E2B 모델 출시</td>
+<td>4번째 평가 모델 추가, transformers 5.5.0 업그레이드</td>
+</tr>
+<tr>
+<td>3차 개정</td>
+<td>2026-05-15</td>
+<td>외부 동료 심사 (Major Revision)</td>
+<td>RQ3 귀무가설 상향, Phase 3 반복 횟수 증가, 하드웨어 이원화, BioBERT 병기, cross-dataset CF 추가, max_steps 전환</td>
+</tr>
+<tr>
+<td>4차 개정</td>
+<td>2026-05-16</td>
+<td>잔여 치명적 지적 4건 추가 처리</td>
+<td>Run-level 통계 도입, BCa Bootstrap, Min-K% 오염 통제, WCA 및 ECE 임상 의미 분석, 의료 특화 VLM 간접 비교</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>11. 결론</h2>
+<p>본 변경 과정은 단순한 설계 보완을 넘어, 1차 리뷰와 외부 동료 심사에서 제기된 방법론적 지적 사항을 체계적으로 검토하고 반영한 결과입니다. 그 결과 평가 지표의 다층화, 통계적 검정력의 강화, 데이터 오염 가능성에 대한 능동적 통제, 임상적 의미 해석의 추가 등 본 연구의 방법론적 엄밀성이 전반적으로 향상되었습니다.</p>
+<p>본 보고서는 향후 Phase 1부터 Phase 3까지의 실험이 완료되는 시점에 실험 결과를 포함한 최종 본 심사 자료로 다시 정리하여 보고드릴 예정입니다.</p>
+</body>
+</html>
