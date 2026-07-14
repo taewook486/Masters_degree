@@ -10,14 +10,37 @@ Supports both Qwen-style (with vision info) and standard chat template formats.
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import Any
 
-from datasets import Dataset
+from datasets import Dataset, load_from_disk
 
 from src.data.dataset import load_medical_vqa_dataset
 from src.utils.constants import MEDICAL_PROMPT
 
 logger = logging.getLogger(__name__)
+
+
+def _chat_cache_dir(
+    data_dir: str,
+    fmt: str,
+    dataset_name: str,
+    split: str,
+    max_samples: int | None,
+    subset_ratio: float | None,
+) -> Path:
+    """준비된(chat 포맷) 데이터셋의 디스크 캐시 경로.
+
+    조건마다 이미지 19k개를 디코딩→재인코딩(Dataset.from_list)하면 조건당 ~30분이라
+    36조건 Main이 비현실적이 된다. (dataset, split, format, samples, ratio)로 키를 만들어
+    한 번만 빌드하고 이후 load_from_disk(mmap)로 즉시 로드 + 학습 중 배치별 lazy 디코딩.
+    """
+    parts = [fmt, dataset_name, split]
+    if subset_ratio is not None:
+        parts.append(f"sub{subset_ratio}")
+    if max_samples is not None:
+        parts.append(f"max{max_samples}")
+    return Path(data_dir) / "_chat_cache" / "_".join(parts)
 
 
 def prepare_chat_dataset(
@@ -39,6 +62,11 @@ def prepare_chat_dataset(
     Returns:
         HuggingFace Dataset with columns: image, question, answer, question_type, messages.
     """
+    cache_dir = _chat_cache_dir(data_dir, "std", dataset_name, split, max_samples, subset_ratio)
+    if cache_dir.exists():
+        logger.info(f"[chat-cache] load {dataset_name}/{split} (std) from {cache_dir}")
+        return load_from_disk(str(cache_dir))
+
     samples = load_medical_vqa_dataset(dataset_name, split=split, data_dir=data_dir)
 
     if subset_ratio is not None:
@@ -83,6 +111,9 @@ def prepare_chat_dataset(
     logger.info(
         f"Prepared {dataset_name}/{split}: {len(ds)} samples for SFT training"
     )
+    cache_dir.parent.mkdir(parents=True, exist_ok=True)
+    ds.save_to_disk(str(cache_dir))
+    logger.info(f"[chat-cache] saved {dataset_name}/{split} (std) → {cache_dir}")
     return ds
 
 
@@ -101,6 +132,11 @@ def prepare_qwen_chat_dataset(
     Returns:
         HuggingFace Dataset with columns: image, messages (Qwen format).
     """
+    cache_dir = _chat_cache_dir(data_dir, "qwen", dataset_name, split, max_samples, subset_ratio)
+    if cache_dir.exists():
+        logger.info(f"[chat-cache] load {dataset_name}/{split} (qwen) from {cache_dir}")
+        return load_from_disk(str(cache_dir))
+
     samples = load_medical_vqa_dataset(dataset_name, split=split, data_dir=data_dir)
 
     if subset_ratio is not None:
@@ -139,4 +175,7 @@ def prepare_qwen_chat_dataset(
     logger.info(
         f"Prepared {dataset_name}/{split} (Qwen format): {len(ds)} samples"
     )
+    cache_dir.parent.mkdir(parents=True, exist_ok=True)
+    ds.save_to_disk(str(cache_dir))
+    logger.info(f"[chat-cache] saved {dataset_name}/{split} (qwen) → {cache_dir}")
     return ds
