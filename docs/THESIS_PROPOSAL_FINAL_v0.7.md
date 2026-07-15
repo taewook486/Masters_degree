@@ -145,8 +145,8 @@ PathVQA(2018), SLAKE(2021), VQA-RAD(2018)는 본 연구의 대상 모델(Qwen3-V
 | LoRA Dropout | 0.05 |
 | Target Modules | q_proj, v_proj |
 | Learning Rate | 2e-4 |
-| Batch Size | 1 (gradient accumulation 8) |
-| Epochs | 3 |
+| Batch Size | 1 (gradient accumulation 8, effective batch = 8) |
+| 학습 예산 | 목표 3 epochs, 단 RunPod RTX 4090 시간·비용 제약으로 `max_steps=500` **cap** 적용 (조건당 samples_seen = 500 × 8 = 4,000 고정). 데이터셋 크기와 무관하게 학습량이 고정되므로, 소형 VQA-RAD는 약 2 epoch 이상, 중형 SLAKE·대형 PathVQA는 1 epoch 미만만 학습된다. 조건별 실효 `samples_seen`·`num_train_epochs`(환산값)·`wall_clock`을 결과에 투명 보고. 상세 한계는 §5.3 참조 |
 | Optimizer | paged_adamw_8bit |
 
 **실험 조건**:
@@ -403,11 +403,13 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
   - **다중 비교 보정 부재**: 본 연구는 Phase 1(Cochran's Q + McNemar), Phase 2(paired t-test, Wilcoxon, Bootstrap, Mixed-Effects 병행), Phase 3(Kruskal-Wallis, Mann-Whitney 쌍별 비교)에 걸쳐 총 20회 이상의 통계 검정을 수행한다. 유의수준 0.05를 각 검정에 독립 적용할 경우 family-wise error rate가 누적되어 우연에 의한 유의 결과(제1종 오류)의 위험이 커진다. 본 연구는 Phase 1의 McNemar 사후검정에만 Bonferroni 보정을 적용했으며, Phase 2·3을 포함한 전체 파이프라인에 걸친 통합 다중비교 보정은 적용하지 않았다. 개별 p-value는 이 점을 감안하여 해석되어야 하며, 전체 파이프라인 수준의 FDR 보정 적용은 향후 분석 과제로 남긴다.
   - **Cross-dataset CF 개념 재정의**: PathVQA(병리 조직 영상)와 SLAKE/VQA-RAD(방사선 영상)는 이미지 도메인 자체가 상이하므로, (B) cross-dataset 성능 변화는 엄밀한 의미의 Catastrophic Forgetting(파인튜닝 이전에 가능했던 것을 파인튜닝 이후 수행하지 못하게 되는 현상)이라기보다, 도메인 특화에 따라 예측 가능한 도메인 일반화 격차(domain generalization gap)에 가깝다. 본 논문은 (B) 결과를 'cross-dataset 일반화 능력' 지표로 재명명하여 보고하며, CF의 엄밀한 판정은 (A) VQAv2 지표에 한정하여 해석한다.
   - **Gemma4-E2B MoE 공정성**: 평가 대상 모델 중 Gemma4-E2B는 Mixture-of-Experts(MoE) 구조로 추론 시 2.3B 파라미터만 활성화되나 전체 저장 파라미터는 5.1B에 달한다. 반면 Qwen3-VL-2B, SmolVLM-2.2B는 밀집(dense) 아키텍처로 활성/전체 파라미터가 동일하다. 본 연구의 '경량 VLM' 선정 기준은 활성 파라미터(추론 시 연산량 및 VRAM 사용량) 기준이며, 이는 소비자 GPU 환경에서의 실질적 구동 가능성이라는 연구 목적에 부합한다. 다만 Gemma4-E2B의 표현력이 저장 파라미터 5.1B에 기인할 가능성이 있어, 순수 파라미터 규모 기준 비교로 확대 해석해서는 안 된다는 한계를 명시한다.
+  - **학습 예산(max_steps cap)의 한계**: Phase 2 QLoRA 파인튜닝은 목표 3 epochs였으나 RunPod RTX 4090의 시간·비용 제약으로 `max_steps=500`(조건당 samples_seen = 4,000 고정) 상한을 적용했다. 이로 인해 데이터셋 크기에 따라 실효 학습량이 크게 달라진다 — 소형 VQA-RAD(train ~1.8K)는 약 2 epoch 이상 학습되나, 중형 SLAKE(~11K)와 대형 PathVQA(~26K)는 각각 1 epoch 미만(약 0.4·0.15 epoch 수준)만 학습된다. 따라서 대형 데이터셋의 파인튜닝 성능은 수렴 이전의 과소학습(under-training) 상태일 수 있으며, 데이터셋 간 성능 비교는 '동일 학습 step 예산 하의 학습 효율' 관점으로 해석해야 하고 '완전 수렴 성능'으로 확대 해석해서는 안 된다. 모든 조건의 실효 `samples_seen`·환산 epoch·`wall_clock`을 결과에 투명 보고하며, 데이터셋별 full-epoch 재학습(특히 PathVQA)은 후속 연구 과제로 남긴다.
 - 5.4 향후 연구 방향
 
 > **v0.4 변경**: 5.3 한계점에 데이터 오염, 의료 특화 모델 비교 부재, confounding, LLM 비결정성을 명시적으로 서술.
 > **v0.5 변경**: 5.3 한계점에 통계적 검정력의 한계와 WCA의 임시 가중치 한계를 추가 명시. 데이터 오염은 "Min-K%로 능동 통제하나 indicator 한계"로, 의료 특화 모델 비교는 "Table 4.4로 간접 비교"로 격상.
 > **v0.7 변경**: 동료 심사 v0.5 잔여 지적(WCA 근거 부족, 다중비교 보정 누락, cross-dataset CF 개념 오용, Gemma4 MoE 공정성) 4건을 5.3 한계점에 명시적으로 반영. WCA 항목은 "절대적 임상 중요도 척도로 해석 불가"로 표현을 강화하고, 다중비교 보정 부재·cross-dataset CF 재정의·Gemma4 MoE 공정성 3건을 신규 추가. 4.4에 SPEC-EVAL-METRICS-001(REQ-EM-004)의 primary 지표 규칙(roberta-large 단일 결정, BioBERT 비-게이팅)을 명시.
+> **v0.8 변경**: 4.4 QLoRA 표의 "Epochs 3"을 실제 구현(`max_steps=500` cap, samples_seen=4,000 고정)에 맞춰 "학습 예산" 행으로 수정하고, 5.3에 **학습 예산(max_steps cap)의 한계**를 신규 추가(대형 데이터셋 과소학습 가능성, 데이터셋 간 비교는 '동일 step 예산 하 학습 효율' 관점 해석). RUNPOD_GUIDE.md 실행 절차와의 정합성 확보(구현 ↔ 설계 일치).
 
 ### 참고문헌
 ### 부록

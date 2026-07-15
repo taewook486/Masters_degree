@@ -25,6 +25,7 @@
 | v0.5 | **v1.1** | 2026-05-16 | 잔여 치명적 4건 처리 |
 | v0.6 | (보고 예정) | 2026-07-11 | Phase 1 방법론 정정 (결정적 평가: 1시드 + 부트스트랩 CI, ANOVA→Cochran's Q/McNemar) |
 | v0.7 | (보고 예정) | 2026-07-14 | SPEC-EVAL-METRICS-001: BioBERT 이중 BERTScore primary 규칙 명시 + 동료심사 v0.5 잔여 4건(WCA/다중비교/CF개념/Gemma4) 한계점 반영 |
+| v0.8 | (보고 예정) | 2026-07-15 | 설계↔구현 정합성 확보: §4.4 "Epochs 3"→`max_steps=500` cap 정정 + §5.3 학습예산 한계 신규, RUNPOD_GUIDE 실행절차 정정, WCA/Phase2 통계 분석 실행기 추가 |
 | (예정) | **v2.0** | 2026-07 예상 | Phase 1/2 실험 결과 포함 본 심사용 |
 
 ### 시맨틱 버전 규칙 (External)
@@ -32,6 +33,28 @@
 - **MAJOR (v1, v2, ...)**: 연구 방향, RQ, 또는 큰 결과 추가 (예: Phase 1 실험 결과 포함)
 - **MINOR (v1.1, v1.2)**: 방법론 추가/개선 (예: 동료 심사 반영, 모델 추가)
 - **PATCH (v1.1.1)**: 오타, 표 형식 수정
+
+---
+
+## Internal v0.8 — 2026-07-15
+
+**설계서 ↔ 구현(RUNPOD_GUIDE) 정합성 확보** — RunPod 실행 절차와 설계서 기술 내용의 불일치 4건을 점검하고, 구현돼 있으나 실행 진입점이 없던 분석 로직 2건에 진입점을 추가. 코드·문서 개정(비-SPEC 문서/도구 태스크).
+
+### 반영 내용
+
+- **§4.4 학습 예산 정정 (구현 일치)**: QLoRA 표의 "Epochs 3"은 실제 구현(`configs/finetune/base_qlora.yaml`의 `max_steps=500` cap, HF Trainer가 `num_train_epochs` 무시)과 불일치했다. "학습 예산" 행으로 교체해 조건당 `samples_seen=4,000` 고정과 데이터셋별 실효 학습량 차이(VQA-RAD ~2 epoch, SLAKE/PathVQA 1 epoch 미만)를 명시.
+- **§5.3 학습 예산(max_steps cap)의 한계 신규**: 대형 데이터셋(PathVQA·SLAKE) 과소학습 가능성, 데이터셋 간 비교는 '동일 step 예산 하 학습 효율' 관점 해석, PathVQA full-epoch 재학습은 후속 과제로 명시.
+- **RUNPOD_GUIDE §3 정정**: Phase 1 헤더 "3개 시드"→"1개 시드(42)"(설계서 v0.6 결정성 정정 일치), "전체 재실행" 절차를 `runpod_phase1.sh`(3시드) → `run_all.py`(1시드) 기반으로 교체, 완료 체크 "36개/STD≠0.0"→"12개/STD=0.0(정상)".
+- **RUNPOD_GUIDE 통계·보조지표 실행 단계 추가**: 구현돼 있으나 가이드에 누락됐던 Phase 1 RQ1 분석(`analyze_phase1.py`), WCA 임상 분석(신규 `analyze_clinical.py`), Phase 2 RQ2 분석(신규 `analyze_phase2.py`) 실행 지침 추가.
+
+### 코드 산출물
+
+- `scripts/analyze_clinical.py` 신규 — WCA(질문 유형별 임상 가중 정확도) 실행기. `src/evaluate/clinical_significance.py`의 `classify_clinical_type`/`CLINICAL_WEIGHTS` 재사용, 저장된 per-sample `correct` 플래그로 집계(재채점 불필요). ECE는 confidence 미저장으로 N/A 표기.
+- `scripts/analyze_phase2.py` 신규 — RQ2 파인튜닝 효과 실행기. `src/evaluate/robust_statistics.py`의 `analyze_paired_robust`(t-test+BCa Bootstrap+Wilcoxon), `mixed_effects_analysis` 재사용. base(Phase 1 seed42) vs finetuned(Phase 2 eval_summary) 짝지은 검정.
+
+### 지도교수 확인 필요
+
+§4.4 학습 예산 기술 변경(Epochs 3 → max_steps=500 cap)은 실험 학습 깊이에 관한 것이므로 다음 보고 시 확인. 대형 데이터셋 full-epoch 재학습 여부는 시간·비용 제약과 함께 논의 필요.
 
 ---
 
@@ -227,4 +250,4 @@ Phase 1/2/3 실험 완료 후 본 심사용 버전(v2.0) 작성 예정:
 
 ---
 
-*최종 업데이트: 2026-05-16*
+*최종 업데이트: 2026-07-15*

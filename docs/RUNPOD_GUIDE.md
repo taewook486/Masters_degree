@@ -70,7 +70,7 @@ echo 'export ANTHROPIC_API_KEY=sk-ant-...' >> ~/.bashrc
 
 ## 3. Phase 1: Zero-shot 베이스라인
 
-**목표**: 4개 모델 × 3개 데이터셋 × 3개 시드 평가 (BERTScore 포함)
+**목표**: 4개 모델 × 3개 데이터셋 × **1개 시드(42)** 평가 (greedy 결정적 → 부트스트랩 95% CI로 불확실성 보고, BERTScore 포함)
 
 **평가 모델 (4개, 논문 대상)**: Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B
 
@@ -130,27 +130,30 @@ cat results/phase1_baseline/phase1_summary.csv
 
 ### Phase 1 전체 재실행 (BERTScore 포함 / 결과 덮어쓰기)
 
-기존 결과가 BERTScore 없이 집계됐거나 STD=0.0 버그가 의심될 경우 전체 재실행한다.
+기존 결과가 BERTScore 없이 집계됐을 경우 전체 재실행한다. **권장 경로는 `run_all.py`(1시드)** — 요약 CSV까지 한 번에 생성된다.
 
-`--no_skip_existing` 플래그는 `runpod_phase1.sh`와 `src/baseline/run_all.py` 모두에 구현되어 있으므로 아래 명령어를 그대로 사용하면 된다.
+> **[중요] 설계서 v0.6 정합성**: zero-shot은 greedy 결정적이라 시드를 바꿔도 결과가 동일하므로 **1시드(42)만 사용**한다(설계서 §4.3). 따라서 최종 산출물은 **12개 JSON(4모델 × 3데이터셋 × 1시드)** 이고 **seed-STD = 0.0 이 정상**이다(버그 아님). 3시드로 도는 `runpod_phase1.sh`(모델당 9조건)는 OOM 디버깅·모델 격리용 개별 실행에만 쓰고, 논문 산출물 집계는 아래 `run_all.py` 경로를 따른다.
+
+`--no_skip_existing` 플래그는 `src/baseline/run_all.py`에 구현되어 있으므로 아래 명령어를 그대로 사용하면 된다.
 
 ```bash
 # summary/intermediate 파일 초기화 (JSON 결과는 실행 중 덮어씌워짐)
 rm -f results/phase1_baseline/phase1_summary.csv
 rm -f results/phase1_baseline/phase1_intermediate.json
 
-# 4개 모델 순차 실행 (BERTScore 포함, 기존 결과 무시)
-bash scripts/runpod_phase1.sh --config configs/models/qwen3_vl_2b.yaml  --no_skip_existing
-bash scripts/runpod_phase1.sh --config configs/models/qwen25_vl_3b.yaml --no_skip_existing
-bash scripts/runpod_phase1.sh --config configs/models/smolvlm2_2b.yaml  --no_skip_existing
-bash scripts/runpod_phase1.sh --config configs/models/gemma4_e2b.yaml   --no_skip_existing
+# 4개 모델 × 3데이터셋 × 1시드(42) 일괄 재실행 (BERTScore 포함, 기존 결과 무시)
+python -m src.baseline.run_all \
+  --output_dir results/phase1_baseline \
+  --data_dir data \
+  --batch_size 8 \
+  --no_skip_existing
 ```
 
 완료 후 확인:
 
 ```bash
-ls results/phase1_baseline/*.json | wc -l   # 36개여야 함
-cat results/phase1_baseline/phase1_summary.csv  # STD != 0.0 확인
+ls results/phase1_baseline/*.json | wc -l   # 12개여야 함 (4모델 × 3데이터셋 × 1시드)
+cat results/phase1_baseline/phase1_summary.csv  # seed-STD = 0.0 이 정상 (greedy 결정적), 불확실성은 *_ci_low/high 열로 확인
 ```
 
 > **주의**: 기존 `results/phase1_baseline_pre_bertscore/` 폴더는 건드리지 않는다. 재실행 결과는 `results/phase1_baseline/`에 저장된다.
@@ -158,6 +161,37 @@ cat results/phase1_baseline/phase1_summary.csv  # STD != 0.0 확인
 ### Best Model 선택
 
 `phase1_summary.csv`의 `overall_acc_mean` 기준으로 최고 성능 모델 선택 후 메모.
+
+### Phase 1 통계 분석 (RQ1 — 모델 간 성능 차이 검정)
+
+Phase 1 결과 산출 후, 모델 간 zero-shot 성능 차이의 통계적 유의성을 검정한다(설계서 §4.3). zero-shot은 결정적 평가이므로 시드-분산 ANOVA 대신 **공유 테스트셋 짝지은 검정**(Cochran's Q + McNemar, Bonferroni 보정)을 사용한다.
+
+```bash
+python scripts/analyze_phase1.py \
+  --results_dir results/phase1_baseline \
+  --seed 42
+```
+
+**산출물**:
+- `results/phase1_baseline/phase1_rq1_analysis.md` — 사람이 읽는 리포트 (데이터셋별 + pooled Cochran's Q, McNemar 쌍별, 모델별 부트스트랩 95% CI)
+- `results/phase1_baseline/phase1_rq1_analysis.json` — 기계 판독용
+
+> 데이터 오염 강건성까지 확인하려면 아래 Phase 1.5 실행 후 `python scripts/robustness_phase1.py`로 의심 샘플 제거 재계산을 수행한다(설계서 §4.2.1).
+
+### 임상적 의미 분석 (WCA — 보조 지표, PathVQA)
+
+정확도 향상이 임상에서 어떤 의미인지 보완 설명하기 위한 보조 지표(설계서 §4.4.5). PathVQA 질문을 7개 임상 유형으로 분류해 중요도 가중 정확도(WCA)를 산출한다. 저장된 per-sample `correct` 플래그를 사용하므로 **모델 재실행·재채점이 필요 없다**.
+
+```bash
+python scripts/analyze_clinical.py \
+  --results_dir results/phase1_baseline \
+  --dataset pathvqa \
+  --seed 42
+```
+
+**산출물**: `results/phase1_baseline/clinical_analysis_pathvqa.{md,json}` (모델별 WCA + 질문 유형별 정확도)
+
+> **주의**: WCA 가중치는 외부 검증 없는 임시 척도이므로 참고용 보조 지표로만 사용한다(설계서 §5.3). ECE는 per-sample confidence 미저장으로 현재 산출 불가(리포트에 N/A 표기). Phase 2 PathVQA 결과에도 `--results_dir results/phase2_finetune/<조건 디렉터리>` 로 동일 적용 가능하다.
 
 ### Phase 1.5: 데이터 오염 측정 (v0.5 신설)
 
@@ -241,6 +275,26 @@ bash scripts/run_phase2_main.sh
 ```bash
 tail -f results/phase2_finetune/run_phase2.log
 ```
+
+### Phase 2 통계 분석 (RQ2 — 파인튜닝 효과 검정)
+
+36개 조건 학습 완료 후, zero-shot(base) 대비 파인튜닝 효과를 3중 검증한다(설계서 §4.4). base는 Phase 1 seed42 결과를, finetuned는 Phase 2 `eval_summary`를 사용한다.
+
+```bash
+# Mixed-Effects Model에는 statsmodels/pandas 필요 (미설치 시 해당 부분만 생략됨)
+uv pip install statsmodels pandas
+
+python scripts/analyze_phase2.py \
+  --phase1_dir results/phase1_baseline \
+  --phase2_dir results/phase2_finetune \
+  --base_seed 42
+```
+
+**산출물**:
+- `results/phase2_finetune/phase2_rq2_analysis.md` — 모델별 paired t-test + BCa Bootstrap 95% CI(Cohen's d) + Wilcoxon, 전체 Mixed-Effects Model
+- `results/phase2_finetune/phase2_rq2_analysis.json` — 기계 판독용
+
+> Catastrophic Forgetting은 각 조건의 `train_result.json` → `catastrophic_forgetting` 필드(VQAv2 기준 degradation)에 저장된다. WCA 임상 분석은 PathVQA 조건 디렉터리에 `scripts/analyze_clinical.py --results_dir results/phase2_finetune/<조건>` 로 적용한다.
 
 ---
 
