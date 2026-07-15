@@ -193,7 +193,7 @@ cat results/phase1_baseline/phase1_summary.csv
 | 평가 지표 | Closed/Open/Overall Accuracy, BERTScore F1 (roberta-large + BioBERT) |
 | 보조 지표 | WCA (Weighted Clinical Accuracy), ECE (Expected Calibration Error) |
 | 오염 통제 | Min-K% Probability Attack (Shi et al., NAACL 2024) |
-| 진행 상태 | BERTScore 재계산 준비 완료, RunPod에서 4개 모델 12개 조건 일괄 재실행 예정 |
+| 진행 상태 | **완료** — 3개 시드 × 4개 모델 × 3개 데이터셋 결과 확정 (`results/phase1_baseline/` frozen) |
 
 ### Phase 2: QLoRA 미세조정 분석
 
@@ -203,7 +203,7 @@ cat results/phase1_baseline/phase1_summary.csv
 - 학습률, 배치 크기, 에폭 수 영향 분석
 - 데이터셋별 도메인 적응 특성 비교
 
-**진행 상태**: 대기 중 (Phase 1 완료 후 착수)
+**진행 상태**: **진행 중** — RunPod RTX 4090에서 `run_phase2_main.sh` 실행 중 (max_steps=500, 36조건 × ~1.8h ≈ 65h 예상)
 
 ### Phase 3: 자율 하이퍼파라미터 최적화
 
