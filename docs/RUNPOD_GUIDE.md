@@ -227,53 +227,60 @@ done
 
 > `run_phase2_main.sh`는 `configs/models/*.yaml`을 전부 글롭하되 `enabled: false`는 건너뛴다. 논문 비대상인 `qwen25_vl_7b`와 `_template`은 `enabled: false`로 지정돼 자동 제외되므로, 위 4개 모델만 36개 조건으로 실행된다. (Florence-2는 v0.2에서 탈락 → `_excluded/` 유지)
 
-### 4.0 실행 준비 상태 (2026-07-12, 커밋 9531175 기준) — 필독
+### 4.0 실행 준비 상태 (2026-07-14, 커밋 ab3fa64 기준) — 필독
 
-Phase 2 학습 코드는 라이브러리 스택(transformers 5.5 / trl 0.24 / unsloth) 호환 이슈 3건을 해결했다. **원인은 모두 규명·수정 완료.** 새 pod에서는 반드시 `git pull` 후 `git log --oneline -1`로 **9531175 이상**인지 확인하고 시작한다.
+Phase 2 학습 코드는 라이브러리 스택 호환 이슈와 Main(full 데이터) 인프라 이슈를 모두 해결했다. **새 pod에서는 반드시 `git pull` 후 `git log --oneline -1`로 ab3fa64 이상인지 확인하고 시작한다.**
 
-**해결된 핵심 이슈:**
-- **unsloth 전역 SFTTrainer 패치** → `import unsloth`가 trl.SFTTrainer를 전역 몽키패치해, 한 프로세스에서 unsloth(qwen)와 standard(smolvlm2)를 함께 돌리면 standard가 오염됨. **해결: 조건마다 독립 프로세스 격리(`src/finetune/train_one.py`).** `run_phase2`가 각 조건을 서브프로세스로 실행 → standard 모델은 `MOAI_SKIP_UNSLOTH=1`로 unsloth 미로드(순수 trl native VLM), qwen은 unsloth 로드. **부수효과: 조건마다 GPU/RAM 완전 해제(OOM 방지).**
-- **standard backend**: trl 0.24 native VLM(`DataCollatorForVisionLanguageModeling`)로 재작성. `prepare_chat_dataset`에 `images`(복수 리스트) 컬럼 필요.
-- **SmolVLM2 bf16 이미지 병합 dtype 버그**(모델 자체 버그, inputs_merger): `get_image_features` 출력을 모델 dtype으로 캐스트하도록 래핑.
+**모델별 검증 상태 (2026-07-14 새 pod 스모크로 확정):**
+- ✅ **qwen3-vl-2b(best), qwen25-vl-3b**: 학습+평가 완주 확인.
+- ✅ **smolvlm2-2b**: 학습+평가 완주 확인 (collator → 병합 dtype → 평가 dtype 3개 벽 해결).
+- ✅ **gemma4-e2b**: 학습+평가 완주 확인 (standard backend + 텍스트 전용 LoRA 타깃).
+- **4모델 12조건(스모크) 전부 통과** — 라이브러리 스택 이슈는 완전히 해소됨.
 
-**모델별 검증 상태:**
-- ✅ **qwen3-vl-2b(best), qwen25-vl-3b**: 스모크 학습 완주 확인(train_loss + eval 정상).
-- 🔵 **smolvlm2-2b**: dtype 최종 수정 push 완료, **재검증 필요(다음 세션 첫 작업, 아래 절차 1)**.
-- 🔵 **gemma4-e2b**: 수정 완료(검증 대기). unsloth 라우팅 제거 → standard backend. PEFT가 vision/audio 타워의 Gemma4ClippableLinear를 거부하던 문제(peft#3129)는 LoRA 타깃을 실제 nn.Linear(텍스트 모델)로 한정해 해결(VLM QLoRA 표준: 인코더 freeze). **다음 스모크에서 smolvlm2와 함께 학습되는지 확인**(gemma4 자체 이미지 병합 dtype 이슈가 추가로 나올 수 있음 — 나오면 SmolVLM2와 동일 패턴으로 대응).
+**해결된 라이브러리 스택 이슈 (7-12 ~ 7-13):**
+- **unsloth 전역 SFTTrainer 패치** → `import unsloth`가 trl.SFTTrainer를 전역 몽키패치해 standard 모델(smolvlm2/gemma4)을 오염시킴. **해결: 조건마다 독립 프로세스 격리(`src/finetune/train_one.py`)** — standard 모델은 `MOAI_SKIP_UNSLOTH=1`로 unsloth 미로드, qwen은 로드. 부수효과: 조건마다 GPU/RAM 완전 해제.
+- **standard backend**: trl 0.24 native VLM(`DataCollatorForVisionLanguageModeling`)로 재작성.
+- **SmolVLM2 bf16 이미지 병합 dtype 버그**: `get_image_features` 출력(ModelOutput 또는 텐서)을 모델 dtype으로 캐스트.
+- **gemma4 ClippableLinear 거부(peft#3129)**: LoRA 타깃을 실제 `nn.Linear`(텍스트 모델)로 한정해 vision/audio 타워의 ClippableLinear 자동 제외.
+- **평가 dtype 충돌**: `merge_and_unload` 후 lm_head가 fp32로 남아 generation에서 bf16 hidden state와 충돌 → 평가·CF generation을 `torch.autocast(model dtype)`로 감쌈.
 
-**Main 실행 전 검증 절차 (순서대로):**
+**해결된 Main(full 데이터) 인프라 이슈 (7-14, 스모크에선 안 보이던 것들):**
+- **CF baseline OOM**: 메인 프로세스가 CF baseline 모델을 GPU에 올린 채 유지 → 학습 서브프로세스와 겹쳐 OOM. `unload_model` 호출자 쪽 참조까지 끊고 `gc + synchronize + empty_cache`로 확실히 해제.
+- **HF 모델 캐시 디스크 quota**: `HF_HOME` 미설정 시 `/workspace` 볼륨(quota 있음)에 모델 4개(~27GB)가 쌓여 `Disk quota exceeded`. → `run_phase2_main.sh`가 `HF_HOME=/hf_cache`(컨테이너)로 고정.
+- **데이터 로딩 30분/조건**: full pathvqa 19,654개 이미지를 조건마다 디코딩→재인코딩(`Dataset.from_list`, CPU 바운드)해 36조건이면 몇 주 소요. → `prepare_data.py`가 준비된 데이터셋을 `(dataset,split,format,samples,ratio)` 키로 디스크 캐시(최초 1회 빌드, 이후 `load_from_disk` mmap + 배치별 lazy 디코딩). 36회 재빌드 → 6회(3데이터셋×2포맷)로 축소.
+- **캐시 디스크 quota**: 이미지 캐시가 다시 `/workspace` volume을 채움 → `MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache`(컨테이너)로 재지정.
+- **학습 시간(full 3에폭 ≈ 2주)**: `base_qlora.yaml`에 **`max_steps=500`** cap 적용(QLoRA 표준, 조건당 samples_seen=4,000 고정, ~1.8h/조건). `train_qlora`가 max_steps>0이면 eval/save를 끝에서 1회만 수행. **논문 v0.8에 이 학습 예산 변경과 한계(데이터셋 크기별 실효 에폭 차이, PathVQA는 ~0.15epoch 과소학습 가능)를 이미 반영함** — §4.4 표 + §5.3 참조.
+
+**Main 실행 전 검증 절차 (선택, 새 pod 환경 확인용 — 이미 4모델 검증됐으므로 생략 가능):**
 ```bash
 export WANDB_MODE=offline
-# 1) smolvlm2 dtype 최종 검증 (~2분) — 로그에 "Patched get_image_features" + train_loss 확인
-python -m src.finetune.train_one \
-  --model_config_path configs/models/smolvlm2_2b.yaml \
-  --finetune_config_path configs/finetune/base_qlora.yaml \
-  --dataset_name pathvqa --output_dir results/_smoke_smolvlm2 \
-  --seed 42 --data_dir data \
-  --max_train_samples 20 --max_eval_samples 20 --max_test_samples 20
-ls results/_smoke_smolvlm2/train_result.json && echo "smolvlm2 OK"
-
-# 2) 전체 초고속 스모크 (--no_cf로 CF 생략, ~12분) — train_result 12개(4모델×3데이터셋) 기대
 python -m src.finetune.run_phase2 --config_dir configs/models \
   --finetune_config configs/finetune/base_qlora.yaml \
   --output_dir results/_phase2_smoke --seeds 42 --data_dir data \
   --max_train_samples 20 --max_eval_samples 20 --max_test_samples 20 --no_cf
-ls results/_phase2_smoke/*/train_result.json | wc -l   # 12 기대 (gemma4 포함 4모델 다 학습 시)
+ls results/_phase2_smoke/*/train_result.json | wc -l   # 12 기대 (4모델×3데이터셋)
 ```
-스모크에서 4모델 12조건이 다 학습되면 아래 Main을 tmux에서 실행한다(스모크 플래그 없이 → CF·full test 포함). gemma4에서 새 에러가 나면 그 조건만 FAILED로 남고(서브프로세스 격리) 나머지는 정상 진행되므로, 우선 3모델 결과를 확보한 뒤 gemma4를 개별 대응할 수 있다.
 
-**환경 주의:** RTX 3090 기준 **컨테이너 RAM 117GB 필요**(31GB는 OOM). `uv sync`로 transformers 5.5.0 / torch 2.10.0+cu128 / trl 0.24 / peft 0.18.1 고정. `WANDB_MODE=offline` 필수.
-
-> Phase 1 완료 및 best model 확인 후, 위 4.0 검증 절차 통과 후 실행
-
+**Main 실행 (tmux, 캐시·CF·max_steps·디스크 경로 전부 스크립트에 자동 반영됨):**
 ```bash
+tmux new -s p2
+cd /workspace/Masters_degree && source .venv/bin/activate
 bash scripts/run_phase2_main.sh
 ```
+첫 조건(알파벳순 gemma4/pathvqa)은 pathvqa std 포맷 캐시를 새로 빌드하므로 **~30분** 걸린다(1회성). 이후 같은 (dataset, format) 조합은 캐시를 즉시 로드해 바로 학습 시작. gemma4/pathvqa 첫 조건이 CF baseline → 학습(500스텝, ~1.8h) → 평가까지 `OutOfMemory`/`Disk quota` 없이 넘어가면 detach(`Ctrl+B, D`)하고 두면 된다.
+
+**환경 주의:**
+- RTX 3090 기준 **컨테이너 RAM ≥100GB 필요**(31GB는 OOM).
+- **`/workspace` 볼륨은 100GB 이상 권장** (50GB는 venv+data+wandb+결과로 꽉 참 → 7-14 pod에서 실제로 quota 이슈 발생). HF 모델 캐시·chat 캐시는 컨테이너 디스크(`/hf_cache`)로 자동 분리되므로 볼륨은 결과·데이터·checkpoint 용도.
+- `uv sync`로 transformers 5.5.0 / torch 2.10.0+cu128 / trl 0.24 / peft 0.18.1 고정. `WANDB_MODE=offline` 필수(스크립트에 내장됨).
+
+> Phase 1 완료 및 best model 확인 후 실행. 4모델 12조건 스모크는 이미 검증됐으므로 바로 Main 실행 가능.
 
 로그 확인:
 
 ```bash
 tail -f results/phase2_finetune/run_phase2.log
+grep -iE "OutOfMemory|Disk quota|FAILED|chat-cache|Summary:" results/phase2_finetune/run_phase2.log | tail
 ```
 
 ### Phase 2 통계 분석 (RQ2 — 파인튜닝 효과 검정)
