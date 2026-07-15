@@ -325,6 +325,17 @@ def _load_model_standard(
 
     model = model_cls.from_pretrained(model_id, **model_kwargs)
 
+    # device_map="auto"가 모델을 여러 GPU에 나눠 올렸을 때(model-parallel), HF Trainer는
+    # 기본적으로 model.model_parallel 플래그를 못 찾으면 "이미 병렬화됐다"는 걸 인식 못 하고
+    # torch.cuda.device_count()>1을 보고 별도로 nn.DataParallel로 한 번 더 감싸려 한다.
+    # 그러면 "module must have its parameters and buffers on device cuda:0 ... found on
+    # cuda:1" 충돌이 난다(모델이 이미 여러 GPU에 나뉘어 있는데 DataParallel은 원본이 단일
+    # 디바이스에 있길 요구). 표준 해결책(QLoRA 멀티GPU 튜토리얼에서 통용): 로드 직후 이 두
+    # 플래그를 세팅해 Trainer가 DataParallel로 재래핑하지 않도록 한다.
+    if torch.cuda.device_count() > 1:
+        model.is_parallelizable = True
+        model.model_parallel = True
+
     # prepare_model_for_kbit_training은 4bit(Params4bit)가 아닌 모든 fp16/bf16 파라미터를
     # 블랑켓으로 fp32 업캐스트한다(의도는 LayerNorm 안정화지만 실제로는 전체를 훑음).
     # bnb 4bit 양자화는 nn.Linear만 바꾸고 nn.Embedding은 안 건드려 bf16으로 남는데,
