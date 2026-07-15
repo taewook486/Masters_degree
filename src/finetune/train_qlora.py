@@ -324,22 +324,30 @@ def _load_model_standard(
         model_kwargs["attn_implementation"] = model_config.attn_implementation
 
     model = model_cls.from_pretrained(model_id, **model_kwargs)
-    model = prepare_model_for_kbit_training(
-        model,
-        use_gradient_checkpointing=ft_config.training.get("gradient_checkpointing", True),
-    )
 
     # prepare_model_for_kbit_training은 4bit(Params4bit)가 아닌 모든 fp16/bf16 파라미터를
     # 블랑켓으로 fp32 업캐스트한다(의도는 LayerNorm 안정화지만 실제로는 전체를 훑음).
     # bnb 4bit 양자화는 nn.Linear만 바꾸고 nn.Embedding은 안 건드려 bf16으로 남는데,
     # Gemma4는 거대한 vocab 임베딩을 2개(embed_tokens + embed_tokens_per_layer) 쓴다.
     # 이 임베딩들은 LoRA 타깃이 아니라 완전히 frozen이라 fp32로 올릴 이유가 없는데,
-    # 업캐스트 시 단일 텐서가 ~8.75GiB를 요구해 GPU당 16GB 카드에서 OOM(model-parallel
-    # 분산으로도 해결 안 됨 — in-place 캐스트라 파라미터가 있는 GPU에서 그대로 부족).
-    # 학습에 안 쓰이는 frozen 임베딩을 원래 dtype으로 되돌려 메모리를 회수한다.
-    for _module in model.modules():
-        if isinstance(_module, torch.nn.Embedding) and not _module.weight.requires_grad:
-            _module.weight.data = _module.weight.data.to(torch_dtype)
+    # 업캐스트 시 단일 텐서가 ~8.75GiB를 요구해 GPU당 16GB 카드에서 OOM
+    # (model-parallel 분산으로도 해결 안 됨 — in-place 캐스트라 파라미터가 있는
+    # GPU에서 그대로 부족). OOM은 peft 함수 "내부"의 캐스트 순간 발생하므로 함수
+    # 호출 후 되돌리는 방식은 늦다 — 호출 전에 해당 임베딩을 CPU로 옮겨 fp32
+    # 업캐스트가 CPU RAM(124GB, 여유 충분)에서 일어나게 하고, 끝난 뒤 원래
+    # device·dtype으로 되돌린다.
+    _frozen_embeds = [m for m in model.modules() if isinstance(m, torch.nn.Embedding)]
+    _embed_devices = {id(m): m.weight.device for m in _frozen_embeds}
+    for _emb in _frozen_embeds:
+        _emb.weight.data = _emb.weight.data.to("cpu")
+
+    model = prepare_model_for_kbit_training(
+        model,
+        use_gradient_checkpointing=ft_config.training.get("gradient_checkpointing", True),
+    )
+
+    for _emb in _frozen_embeds:
+        _emb.weight.data = _emb.weight.data.to(device=_embed_devices[id(_emb)], dtype=torch_dtype)
 
     # Resolve target modules
     target_modules = list(lora.target_modules)
