@@ -36,7 +36,12 @@
       "Bash(command -v jq)",
       "Bash(bash .claude/hooks/moai/handle-stop.sh)",
       "Bash(bash .claude/hooks/moai/sync-phase-quality-gate.sh)",
-      "Bash(bash .claude/hooks/moai/handle-stop-goal.sh)"
+      "Bash(bash .claude/hooks/moai/handle-stop-goal.sh)",
+      "Bash(git push *)",
+      "Bash(xargs -I{} python -c \"import json,sys; d=json.load\\(open\\('{}',encoding='utf-8'\\)\\); print\\('TOP:',list\\(d.keys\\(\\)\\)\\); print\\('META:',list\\(d.get\\('metadata',{}\\).keys\\(\\)\\)\\); ps=d.get\\('per_sample',[]\\); print\\('PER_SAMPLE_N:',len\\(ps\\)\\); print\\('PER_SAMPLE[0]:',list\\(ps[0].keys\\(\\)\\) if ps else 'none'\\)\")",
+      "Bash(grep -rn \"output_path\\\\|train_result\\\\|/ f\\\\\"\\\\|output_dir /\\\\|Path\\(output_dir\\)\\\\|{model_name}\\\\|{dataset\\\\|{seed\\\\|subset\" src/finetune/run_phase2.py)",
+      "Bash(grep -iA0 \"한계\\\\|5.3\\\\|max_steps\\\\|epoch\")",
+      "Bash(PYTHONPATH=. .venv/Scripts/python.exe scripts/analyze_clinical.py --help)"
     ],
     "defaultMode": "bypassPermissions"
   }
