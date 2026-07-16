@@ -397,7 +397,7 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
   - **데이터 오염 능동적 통제의 한계**: Min-K% Probability(Shi et al., NAACL 2024)로 contamination 정도를 정량화하나, 이는 간접 indicator이며 완전한 통제는 불가. Clean subset 결과를 보조 보고하여 결론의 robustness 검증.
   - **의료 특화 VLM 직접 비교 부재**: LLaVA-Med, Med-Flamingo 등과 동일 환경에서의 직접 실험 비교는 본 연구 범위 외. 동일 데이터셋·평가 프로토콜의 선행 연구 수치와 간접 비교 (Table 4.4).
   - **Phase 3 confounding**: max_steps 고정에도 effective_batch_size에 따른 total_samples_seen 차이 존재. 모든 trial의 effective_batch, samples_seen, wall_clock_time을 투명하게 보고.
-  - **LLM 비결정성**: Autoresearch의 API 비결정성으로 완전 재현 불가. temperature=0, top_p=1, 모델 ID + 스냅샷 날짜 고정, API 응답 로깅, 10회 반복으로 변동성 흡수.
+  - **LLM 비결정성**: Autoresearch의 API 비결정성으로 완전 재현 불가. 구현은 temperature=0 고정이 아니라 **temperature 스케줄링(trial 진행률에 따라 1.0→0.3, 초반 탐색/후반 활용 균형)**을 사용하며, top_p는 API 기본값을 사용한다(별도 고정 없음). 모델 ID(`claude-sonnet-4-6`)만 고정하고 스냅샷 날짜 접미사는 별도 지정하지 않는다. API 응답 로깅, 10회 반복으로 변동성 흡수.
   - **Ablation Study 일반화**: LoRA Rank/Target Module/데이터 크기 Ablation은 PathVQA + 최적 모델 1개 기준 수행. SLAKE rank=8,16,32 보조 검증으로 일관성만 확인. 전체 cross-dataset 확장은 향후 연구.
   - **통계적 검정력의 한계**: Phase 2 paired t-test n=9, Phase 3 run-level KW n=10. BCa Bootstrap + Mixed-Effects + Wilcoxon 등 3중 검증으로 robust한 결론 유도하나, n 자체의 한계로 효과 크기 추정 구간은 넓을 수 있음.
   - **WCA(Weighted Clinical Accuracy) 임시 가중치 한계**: 본 연구의 WCA 가중치(Diagnosis 1.0, Location 0.8, ...)는 임상 문헌이나 Delphi 기법 등 외부 검증 없이 연구자가 임의로 부여한 척도다. 이 가중치로 산출한 수치는 절대적 임상 중요도의 척도로 해석될 수 없으며, primary 지표(정확도, BERTScore)를 보완하는 참고용 보조 지표로만 제한적으로 사용한다. 임상의 설문 또는 Delphi 합의를 통한 가중치 검증은 후속 연구 과제로 남긴다.
@@ -412,6 +412,7 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
 > **v0.7 변경**: 동료 심사 v0.5 잔여 지적(WCA 근거 부족, 다중비교 보정 누락, cross-dataset CF 개념 오용, Gemma4 MoE 공정성) 4건을 5.3 한계점에 명시적으로 반영. WCA 항목은 "절대적 임상 중요도 척도로 해석 불가"로 표현을 강화하고, 다중비교 보정 부재·cross-dataset CF 재정의·Gemma4 MoE 공정성 3건을 신규 추가. 4.4에 SPEC-EVAL-METRICS-001(REQ-EM-004)의 primary 지표 규칙(roberta-large 단일 결정, BioBERT 비-게이팅)을 명시.
 > **v0.8 변경**: 4.4 QLoRA 표의 "Epochs 3"을 실제 구현(`max_steps=500` cap, samples_seen=4,000 고정)에 맞춰 "학습 예산" 행으로 수정하고, 5.3에 **학습 예산(max_steps cap)의 한계**를 신규 추가(대형 데이터셋 과소학습 가능성, 데이터셋 간 비교는 '동일 step 예산 하 학습 효율' 관점 해석). RUNPOD_GUIDE.md 실행 절차와의 정합성 확보(구현 ↔ 설계 일치).
 > **v0.9 변경**: 실험 환경에 16GB GPU 2장(4080 Super ×2) 멀티-GPU pod 대안 환경을 명시(24GB 단일 GPU 확보가 어려웠던 시점의 실사용 환경). `run_phase2.py`의 조건별 병렬 실행(`--max_parallel`, GPU 1장당 1조건 고정)으로 model-parallel/DataParallel 충돌 없이 검증됨을 반영 — 상세는 `docs/RUNPOD_GUIDE.md` §4.0.
+> **v0.10 변경**: Phase 3 LLM 비결정성 통제 서술(5.3, 6)을 실제 구현(`src/autoresearch/agent.py`)에 맞춰 정정 — "temperature=0, top_p=1 고정"이 아니라 **temperature 스케줄링(1.0→0.3)** 을 사용하며 top_p는 API 기본값임을 명시. 코드 검토 중 `anthropic` 패키지가 `pyproject.toml`/`uv.lock`에 누락되어 있던 것도 함께 발견·수정(Phase 3 `autoresearch` 전략이 새 pod `uv sync` 환경에서 즉시 실패할 수 있었던 문제).
 
 ### 참고문헌
 ### 부록
@@ -433,7 +434,7 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
 | 반복 실험 | Phase 1: 단일 결정적 평가 + 부트스트랩 95% CI / Phase 2·3: 3회 반복 -> 평균 +/- 표준편차 |
 | 데이터 버전 | 데이터셋 버전 및 다운로드 URL 명시 |
 | Git 커밋 | 각 실험 설정을 git commit으로 추적 |
-| LLM 비결정성 통제 | temperature=0, top_p=1, 모델 ID 및 스냅샷 날짜 고정 |
+| LLM 비결정성 통제 | temperature 스케줄링(1.0→0.3, 탐색/활용 균형), top_p는 API 기본값, 모델 ID(`claude-sonnet-4-6`) 고정 |
 | API 응답 로깅 | 전체 API 요청/응답 JSON을 실험별 로그 파일로 저장 |
 | 변동성 흡수 | Phase 3 각 전략 10회 반복으로 분포 보고 |
 

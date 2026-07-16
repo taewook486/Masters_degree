@@ -34,6 +34,7 @@ dependencies = [
     "wandb>=0.18.0",
     # HPO
     "optuna>=4.0.0",
+    "anthropic>=0.40.0",
     # Evaluation
     "scikit-learn>=1.5.0",
     "scipy>=1.14.0",

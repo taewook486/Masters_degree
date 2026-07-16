@@ -27,6 +27,7 @@
 | v0.7 | (보고 예정) | 2026-07-14 | SPEC-EVAL-METRICS-001: BioBERT 이중 BERTScore primary 규칙 명시 + 동료심사 v0.5 잔여 4건(WCA/다중비교/CF개념/Gemma4) 한계점 반영 |
 | v0.8 | (보고 예정) | 2026-07-15 | 설계↔구현 정합성 확보: §4.4 "Epochs 3"→`max_steps=500` cap 정정 + §5.3 학습예산 한계 신규, RUNPOD_GUIDE 실행절차 정정, WCA/Phase2 통계 분석 실행기 추가 |
 | v0.9 | (보고 안 함) | 2026-07-16 | 16GB×2 멀티-GPU pod 실험 환경 명시 + 조건별 병렬 실행(`--max_parallel`) 최적화 반영 |
+| v0.10 | (보고 안 함) | 2026-07-16 | Phase 3 LLM 비결정성 통제 서술 정정(temperature=0→실제 스케줄링 1.0→0.3) + `anthropic` 의존성 누락 수정 |
 | (예정) | **v2.0** | 2026-07 예상 | Phase 1/2 실험 결과 포함 본 심사용 |
 
 ### 시맨틱 버전 규칙 (External)
@@ -34,6 +35,26 @@
 - **MAJOR (v1, v2, ...)**: 연구 방향, RQ, 또는 큰 결과 추가 (예: Phase 1 실험 결과 포함)
 - **MINOR (v1.1, v1.2)**: 방법론 추가/개선 (예: 동료 심사 반영, 모델 추가)
 - **PATCH (v1.1.1)**: 오타, 표 형식 수정
+
+---
+
+## Internal v0.10 — 2026-07-16
+
+**Phase 3 설계서 ↔ 구현 정합성 확보 + 의존성 누락 수정** — Phase 3(자율 HPO) 코드를 처음으로 전수 검토하며 발견한 2건을 처리. 코드·문서 개정(비-SPEC 문서/도구 태스크).
+
+### 반영 내용
+
+- **`anthropic` 패키지 의존성 누락(진짜 버그)**: `src/autoresearch/agent.py`가 Claude API 호출에 `anthropic`을 쓰는데 `pyproject.toml`에 등록돼 있지 않았다. RUNPOD_GUIDE가 강조하는 `uv sync` 기반 새 pod 셋업에서는 `anthropic`이 설치되지 않아, Phase 3 `autoresearch` 전략 실행 시 `ModuleNotFoundError`로 즉시 실패했을 것. `pyproject.toml`에 `anthropic>=0.40.0` 추가 + `uv lock`으로 `uv.lock` 재생성(기존 고정 버전 — transformers 5.5.0/torch 2.10.0+cu128 등 — 변경 없음, 순수 추가 125줄만 확인).
+- **§5.3/§6 LLM 비결정성 통제 서술 정정**: "temperature=0, top_p=1, 모델 ID + 스냅샷 날짜 고정"이라 서술돼 있었으나, 실제 구현(`agent.py`)은 trial 진행률에 따라 temperature를 1.0(탐색)→0.3(활용)으로 스케줄링하고 top_p는 API 기본값을 사용한다. 코드의 스케줄링 방식이 탐색/활용 균형 측면에서 더 합리적이라 판단해 코드는 그대로 두고 설계서 서술을 실제 구현에 맞춰 정정.
+
+### 코드 산출물
+
+- `pyproject.toml` — `anthropic>=0.40.0` 추가.
+- `uv.lock` — 재생성(anthropic + 전이 의존성 distro/jiter/sniffio 추가, 기존 패키지 버전 무변경).
+
+### 지도교수 확인 필요
+
+없음 — 재현성 서술 정정 및 의존성 버그 수정으로, 실험 방법론(RQ/통계 검정) 자체의 변경은 아님.
 
 ---
 
