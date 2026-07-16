@@ -12,6 +12,7 @@
 - **실험 환경**:
   - **로컬**: RTX 5060 Ti (16GB VRAM), Ryzen 5 5600X, RAM 32GB — 16GB 재현성 검증용
   - **클라우드**: RunPod RTX 4090 (24GB VRAM) — 주 실험 환경
+  - **클라우드(대안)**: 24GB 단일 GPU 자원 확보가 어려운 시점에는 16GB GPU 2장(예: 4080 Super ×2) 멀티-GPU pod로 대체 진행. Phase 2는 조건(model×dataset×seed)을 GPU 개수만큼 동시 배정해 GPU 1장씩 독립 실행하는 방식(`--max_parallel`, `src/finetune/run_phase2.py`)으로 검증됨 — 상세는 `docs/RUNPOD_GUIDE.md` §4.0 참조
 
 ---
 
@@ -410,6 +411,7 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
 > **v0.5 변경**: 5.3 한계점에 통계적 검정력의 한계와 WCA의 임시 가중치 한계를 추가 명시. 데이터 오염은 "Min-K%로 능동 통제하나 indicator 한계"로, 의료 특화 모델 비교는 "Table 4.4로 간접 비교"로 격상.
 > **v0.7 변경**: 동료 심사 v0.5 잔여 지적(WCA 근거 부족, 다중비교 보정 누락, cross-dataset CF 개념 오용, Gemma4 MoE 공정성) 4건을 5.3 한계점에 명시적으로 반영. WCA 항목은 "절대적 임상 중요도 척도로 해석 불가"로 표현을 강화하고, 다중비교 보정 부재·cross-dataset CF 재정의·Gemma4 MoE 공정성 3건을 신규 추가. 4.4에 SPEC-EVAL-METRICS-001(REQ-EM-004)의 primary 지표 규칙(roberta-large 단일 결정, BioBERT 비-게이팅)을 명시.
 > **v0.8 변경**: 4.4 QLoRA 표의 "Epochs 3"을 실제 구현(`max_steps=500` cap, samples_seen=4,000 고정)에 맞춰 "학습 예산" 행으로 수정하고, 5.3에 **학습 예산(max_steps cap)의 한계**를 신규 추가(대형 데이터셋 과소학습 가능성, 데이터셋 간 비교는 '동일 step 예산 하 학습 효율' 관점 해석). RUNPOD_GUIDE.md 실행 절차와의 정합성 확보(구현 ↔ 설계 일치).
+> **v0.9 변경**: 실험 환경에 16GB GPU 2장(4080 Super ×2) 멀티-GPU pod 대안 환경을 명시(24GB 단일 GPU 확보가 어려웠던 시점의 실사용 환경). `run_phase2.py`의 조건별 병렬 실행(`--max_parallel`, GPU 1장당 1조건 고정)으로 model-parallel/DataParallel 충돌 없이 검증됨을 반영 — 상세는 `docs/RUNPOD_GUIDE.md` §4.0.
 
 ### 참고문헌
 ### 부록

@@ -32,6 +32,8 @@ Medical VQA VLM 석사 연구 — Phase 1/2/3 전체 파이프라인 실행 매�
 
 > Gemma4-E2B(~10.3GB) 또는 선택 모델 Qwen2.5-VL-7B 사용 시 RTX 4090(24GB) 권장. 2B/3B 모델만 사용 시 A5000(24GB)도 가능.
 
+> **대안: 16GB GPU 2장 멀티-GPU pod (예: 4080 Super ×2)** — 24GB 단일 GPU를 구하기 어려울 때의 대안 환경으로 실제 검증됨. Phase 2는 `src/finetune/run_phase2.py`가 조건(model×dataset×seed)을 GPU 개수만큼 동시 배정해(`--max_parallel`, 기본 자동 감지) 각 조건을 GPU 1장에 고정 실행하므로, model-parallel 분산 없이도 에러 없이 돌아가고 오히려 GPU 2장 몫의 처리량을 낸다. 상세는 §4.0 참조.
+
 ---
 
 ## 2. 환경 세팅 (최초 1회)
@@ -250,6 +252,11 @@ Phase 2 학습 코드는 라이브러리 스택 호환 이슈와 Main(full 데�
 - **데이터 로딩 30분/조건**: full pathvqa 19,654개 이미지를 조건마다 디코딩→재인코딩(`Dataset.from_list`, CPU 바운드)해 36조건이면 몇 주 소요. → `prepare_data.py`가 준비된 데이터셋을 `(dataset,split,format,samples,ratio)` 키로 디스크 캐시(최초 1회 빌드, 이후 `load_from_disk` mmap + 배치별 lazy 디코딩). 36회 재빌드 → 6회(3데이터셋×2포맷)로 축소.
 - **캐시 디스크 quota**: 이미지 캐시가 다시 `/workspace` volume을 채움 → `MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache`(컨테이너)로 재지정.
 - **학습 시간(full 3에폭 ≈ 2주)**: `base_qlora.yaml`에 **`max_steps=500`** cap 적용(QLoRA 표준, 조건당 samples_seen=4,000 고정, ~1.8h/조건). `train_qlora`가 max_steps>0이면 eval/save를 끝에서 1회만 수행. **논문 v0.8에 이 학습 예산 변경과 한계(데이터셋 크기별 실효 에폭 차이, PathVQA는 ~0.15epoch 과소학습 가능)를 이미 반영함** — §4.4 표 + §5.3 참조.
+
+**해결된 16GB×2 멀티-GPU pod 이슈 + 조건별 병렬 최적화 (7-15~16, 24GB 단일 GPU 대신 16GB 2장으로 진행한 환경에서 발견):**
+- **gemma4 kbit-training OOM (`Tried to allocate 8.75 GiB`)**: `peft.prepare_model_for_kbit_training`이 4bit 아닌 모든 파라미터를 fp32로 블랑켓 업캐스트하는데, Gemma4의 거대 vocab 임베딩(`embed_tokens`/`embed_tokens_per_layer`, frozen이라 LoRA 대상도 아님)까지 걸려 단일 텐서가 ~8.75GiB를 요구 → 16GB 카드에서 OOM(24GB 단일 GPU에서도 peak~16.17GB로 아슬아슬했던 문제). → 해당 함수 호출 **전**에 frozen 임베딩을 CPU로 옮겨 업캐스트가 CPU RAM에서 일어나게 하고, 끝나면 원래 device·dtype으로 복원.
+- **DataParallel 재래핑 충돌 (`module must have its parameters ... found on cuda:1`)**: `device_map="auto"`로 모델이 2-GPU에 분산(model-parallel)됐는데 HF Trainer가 이를 인식 못 해 `nn.DataParallel`로 재래핑 시도 → 모델 로드 직후 `model.is_parallelizable=True` + `model.model_parallel=True` 설정(QLoRA 멀티GPU 튜토리얼 표준 해결책)으로 Trainer가 재래핑을 건너뛰게 함.
+- **조건별 병렬 실행 최적화(신규)**: 위 두 수정으로 "에러 없이"는 해결됐으나 모델 1개를 2-GPU에 분산하는 구조는 조건을 여전히 순차 실행 — GPU 2장을 써도 속도 이득이 없었다(오히려 GPU간 통신 오버헤드로 손해 가능). `run_phase2.py`에 조건(model×dataset×seed)을 GPU 개수만큼 동시 배정하는 `--max_parallel` 플래그를 추가(기본: `torch.cuda.device_count()` 자동 감지). 각 조건은 `CUDA_VISIBLE_DEVICES`로 GPU 1장에 고정되어 완전히 독립적으로 학습되므로 model-parallel/DataParallel 충돌 자체가 생기지 않고, GPU 2장이면 실질적으로 처리량이 거의 2배가 된다. `--max_parallel 1`이면 기존과 완전히 동일한 순차 실행(회귀 없음). `run_phase2_main.sh`는 플래그를 안 주므로 자동 감지값이 적용된다.
 
 **Main 실행 전 검증 절차 (선택, 새 pod 환경 확인용 — 이미 4모델 검증됐으므로 생략 가능):**
 ```bash

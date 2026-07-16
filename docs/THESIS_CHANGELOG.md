@@ -26,6 +26,7 @@
 | v0.6 | (보고 예정) | 2026-07-11 | Phase 1 방법론 정정 (결정적 평가: 1시드 + 부트스트랩 CI, ANOVA→Cochran's Q/McNemar) |
 | v0.7 | (보고 예정) | 2026-07-14 | SPEC-EVAL-METRICS-001: BioBERT 이중 BERTScore primary 규칙 명시 + 동료심사 v0.5 잔여 4건(WCA/다중비교/CF개념/Gemma4) 한계점 반영 |
 | v0.8 | (보고 예정) | 2026-07-15 | 설계↔구현 정합성 확보: §4.4 "Epochs 3"→`max_steps=500` cap 정정 + §5.3 학습예산 한계 신규, RUNPOD_GUIDE 실행절차 정정, WCA/Phase2 통계 분석 실행기 추가 |
+| v0.9 | (보고 안 함) | 2026-07-16 | 16GB×2 멀티-GPU pod 실험 환경 명시 + 조건별 병렬 실행(`--max_parallel`) 최적화 반영 |
 | (예정) | **v2.0** | 2026-07 예상 | Phase 1/2 실험 결과 포함 본 심사용 |
 
 ### 시맨틱 버전 규칙 (External)
@@ -33,6 +34,29 @@
 - **MAJOR (v1, v2, ...)**: 연구 방향, RQ, 또는 큰 결과 추가 (예: Phase 1 실험 결과 포함)
 - **MINOR (v1.1, v1.2)**: 방법론 추가/개선 (예: 동료 심사 반영, 모델 추가)
 - **PATCH (v1.1.1)**: 오타, 표 형식 수정
+
+---
+
+## Internal v0.9 — 2026-07-16
+
+**16GB×2 멀티-GPU pod 실험 환경 반영 + 조건별 병렬 실행 최적화** — 24GB 단일 GPU 자원 확보가 어려워진 시점부터 16GB GPU 2장 pod로 Phase 2를 진행하며 발견된 이슈 2건을 해결하고, GPU 2장을 실질적으로 활용하도록 실행 구조를 최적화. 코드·문서 개정(비-SPEC 문서/도구 태스크).
+
+### 반영 내용
+
+- **실험 환경 명시**: 설계서 §논문 정보에 "클라우드(대안): 16GB GPU 2장(4080 Super ×2)" 환경을 신규 추가 — 기존에 문서화되지 않았던 실제 사용 환경(동료심사 v0.5 항목 VII/10 "하드웨어 명세 불일치" 지적과 같은 계열의 공백을 해소).
+- **gemma4 kbit-training OOM 해결**: `peft.prepare_model_for_kbit_training`의 frozen 임베딩 fp32 블랑켓 업캐스트(~8.75GiB)를 CPU 우회로 회피.
+- **DataParallel 재래핑 충돌 해결**: `device_map="auto"` 멀티-GPU 분산 모델에 `is_parallelizable`/`model_parallel` 플래그를 설정해 HF Trainer의 불필요한 DataParallel 재래핑을 방지.
+- **조건별 병렬 실행 최적화(신규)**: 위 두 수정은 "에러 없이"만 해결하고 속도 이득은 없었다(모델 1개를 2-GPU에 분산하는 구조는 조건을 여전히 순차 실행). `run_phase2.py`에 조건(model×dataset×seed)을 GPU 개수만큼 동시 배정하는 `--max_parallel`을 추가(기본: GPU 수 자동 감지) — 각 조건이 GPU 1장에 독립 고정되어 model-parallel/DataParallel 충돌 없이 GPU 2장 몫의 처리량을 낸다.
+
+### 코드 산출물
+
+- `src/finetune/train_qlora.py` — frozen 임베딩 CPU 우회(`_load_model_standard`), `is_parallelizable`/`model_parallel` 플래그 설정.
+- `src/finetune/run_phase2.py` — `_run_jobs()` 신규(GPU당 1조건 배치 실행 공유 헬퍼), `_train_condition(gpu_id=...)` 파라미터, `--max_parallel` CLI 플래그. `run_main_conditions`/`run_ablation_{a,b,c}` 4곳 모두 이 헬퍼로 통일.
+- `tests/test_run_phase2.py` 신규 — skip 로직, gpu_id 라운드로빈 배정, `max_parallel=1` 시 회귀 없음(gpu_id=None), 배치 내 개별 실패 격리, `CUDA_VISIBLE_DEVICES` 배선 검증(6개 테스트).
+
+### 지도교수 확인 필요
+
+없음 — 실험 방법론(RQ/통계 검정/평가 지표) 변경이 아닌 실행 인프라·재현성 문서화 개선.
 
 ---
 
