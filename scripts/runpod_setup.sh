@@ -36,6 +36,10 @@ fi
 export PATH="$HOME/.local/bin:$HOME/.cargo/bin:$PATH"
 
 echo "Syncing dependencies from uv.lock..."
+# 일부 RunPod 리전은 PyPI 대용량 wheel(torch/CUDA 계열, 수백MB) 다운로드가
+# 기본 30초 타임아웃보다 느려 'Failed to download distribution due to network
+# timeout' 로 실패한다. 넉넉히 늘려 재시도 없이 통과하도록 한다.
+export UV_HTTP_TIMEOUT="${UV_HTTP_TIMEOUT:-300}"
 uv sync --extra unsloth
 
 # 이후 명령과 이후 터미널이 프로젝트 venv를 쓰도록 activate + bashrc 등록
