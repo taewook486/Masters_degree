@@ -12,9 +12,11 @@ Ablations use a single "best" model + PathVQA, determined from Phase 1 results.
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import gc
 import json
 import logging
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -63,6 +65,7 @@ def _train_condition(
     subset_ratio: float | None = None,
     measure_cf: bool = False,
     base_vqav2: dict | None = None,
+    gpu_id: int | None = None,
 ) -> dict:
     """한 조건을 src.finetune.train_one 서브프로세스로 격리 실행한다.
 
@@ -70,6 +73,10 @@ def _train_condition(
     독립 프로세스를 띄운다. 학습 로그는 부모 stdout으로 스트리밍되고, 결과는
     result_out JSON으로 회수한다. 실패 시 CalledProcessError를 던져 호출부의
     try/except가 FAILED로 처리하게 한다.
+
+    gpu_id 지정 시 서브프로세스의 CUDA_VISIBLE_DEVICES를 해당 GPU 1장으로 제한한다
+    (조건별 병렬 실행 시 GPU당 1개 조건씩 배정 — model-parallel 분산/DataParallel
+    충돌 없이 물리 GPU 수만큼 동시 학습해 처리량을 높인다).
     """
     run_path = Path(run_dir)
     run_path.mkdir(parents=True, exist_ok=True)
@@ -99,12 +106,71 @@ def _train_condition(
             json.dump(base_vqav2, f, ensure_ascii=False)
         cmd += ["--base_vqav2_json", str(base_path)]
 
-    subprocess.run(cmd, check=True)  # 로그는 부모로 스트리밍; 비정상 종료 시 예외
+    env = None
+    if gpu_id is not None:
+        env = os.environ.copy()
+        env["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+
+    subprocess.run(cmd, check=True, env=env)  # 로그는 부모로 스트리밍; 비정상 종료 시 예외
 
     # train_qlora가 기록한 정본 결과를 읽는다.
     result_file = run_path / "train_result.json"
     with open(result_file, encoding="utf-8") as f:
         return json.load(f)
+
+
+def _run_jobs(
+    jobs: list[dict],
+    skip_existing: bool,
+    max_parallel: int,
+) -> list[dict | None]:
+    """조건(job) 목록을 GPU당 1개씩 배정해 max_parallel개씩 동시 실행한다.
+
+    각 job dict는 "run_dir"/"log_label" + _train_condition에 넘길 나머지 kwargs를
+    담는다. skip_existing 결과 재사용은 배치 실행 전에 순차 처리한다(파일 I/O만
+    이라 가볍고, 실제 학습이 필요한 job만 병렬 배치로 넘긴다).
+
+    max_parallel=1이면 기존과 동일하게 완전 순차 실행된다(회귀 없음).
+    """
+    results: list[dict | None] = [None] * len(jobs)
+    pending: list[int] = []
+
+    for i, job in enumerate(jobs):
+        if skip_existing:
+            existing = _load_existing_result(job["run_dir"])
+            if existing is not None:
+                logger.info(f"  -> SKIPPING ({job['log_label']}, result exists)")
+                results[i] = existing
+                continue
+        pending.append(i)
+
+    for batch_start in range(0, len(pending), max_parallel):
+        batch = pending[batch_start : batch_start + max_parallel]
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(batch)) as executor:
+            future_to_idx = {}
+            for slot, idx in enumerate(batch):
+                job = jobs[idx]
+                logger.info(f"\n=== {job['log_label']} (GPU {slot}) ===")
+                kwargs = {k: v for k, v in job.items() if k != "log_label"}
+                future = executor.submit(
+                    _train_condition,
+                    gpu_id=slot if max_parallel > 1 else None,
+                    **kwargs,
+                )
+                future_to_idx[future] = idx
+            for future in concurrent.futures.as_completed(future_to_idx):
+                idx = future_to_idx[future]
+                job = jobs[idx]
+                try:
+                    results[idx] = future.result()
+                except Exception as e:
+                    logger.error(f"FAILED: {job['log_label']}: {e}")
+
+        gc.collect()
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+
+    return results
 
 
 def _get_base_vqav2_result(
@@ -182,6 +248,7 @@ def run_main_conditions(
     max_eval_samples: int | None = None,
     max_test_samples: int | None = None,
     measure_cf: bool = True,
+    max_parallel: int = 1,
 ) -> list[dict]:
     """Run main Phase 2 conditions: all models x all datasets x all seeds.
 
@@ -194,6 +261,8 @@ def run_main_conditions(
         skip_existing: Skip if results already exist.
         max_train_samples: Limit training samples (debugging).
         measure_cf: If True, measure Catastrophic Forgetting on VQAv2.
+        max_parallel: Number of conditions to run concurrently, one GPU each
+            (via CUDA_VISIBLE_DEVICES). 1 = fully sequential (기존 동작과 동일).
     """
     config_files = sorted(Path(config_dir).glob("*.yaml"))
     results = []
@@ -218,43 +287,27 @@ def run_main_conditions(
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
 
+        jobs = []
         for dataset_name in DATASETS:
             for seed in seeds:
                 run_dir = Path(output_dir) / f"{model_name}_{dataset_name}_seed{seed}"
+                jobs.append({
+                    "run_dir": str(run_dir),
+                    "log_label": f"{model_name} / {dataset_name} / seed={seed}",
+                    "model_config_path": str(config_path),
+                    "finetune_config": finetune_config,
+                    "dataset_name": dataset_name,
+                    "seed": seed,
+                    "data_dir": data_dir,
+                    "max_train_samples": max_train_samples,
+                    "max_eval_samples": max_eval_samples,
+                    "max_test_samples": max_test_samples,
+                    "measure_cf": measure_cf,
+                    "base_vqav2": base_vqav2,
+                })
 
-                logger.info(f"\n=== {model_name} / {dataset_name} / seed={seed} ===")
-
-                if skip_existing and max_train_samples is None:
-                    existing = _load_existing_result(str(run_dir))
-                    if existing is not None:
-                        logger.info("  -> SKIPPING (result exists)")
-                        results.append(existing)
-                        continue
-
-                try:
-                    result = _train_condition(
-                        run_dir=str(run_dir),
-                        model_config_path=str(config_path),
-                        finetune_config=finetune_config,
-                        dataset_name=dataset_name,
-                        seed=seed,
-                        data_dir=data_dir,
-                        max_train_samples=max_train_samples,
-                        max_eval_samples=max_eval_samples,
-                        max_test_samples=max_test_samples,
-                        measure_cf=measure_cf,
-                        base_vqav2=base_vqav2,
-                    )
-                    results.append(result)
-                except torch.cuda.OutOfMemoryError:
-                    logger.error(f"OOM: {model_name}/{dataset_name}/seed={seed}")
-                    torch.cuda.empty_cache()
-                except Exception as e:
-                    logger.error(f"FAILED: {model_name}/{dataset_name}/seed={seed}: {e}")
-
-                gc.collect()
-                if torch.cuda.is_available():
-                    torch.cuda.empty_cache()
+        model_skip = skip_existing and max_train_samples is None
+        results.extend(r for r in _run_jobs(jobs, model_skip, max_parallel) if r is not None)
 
     return results
 
@@ -267,50 +320,35 @@ def run_ablation_a(
     data_dir: str = "data",
     skip_existing: bool = True,
     max_eval_samples: int | None = None,
+    max_parallel: int = 1,
 ) -> list[dict]:
     """Ablation A: Training data size impact (5%, 10%, 25%, 50%, 100%)."""
     ratios = [0.05, 0.10, 0.25, 0.50, 1.0]
-    results = []
 
     with open(model_config_path, encoding="utf-8") as f:
         raw = yaml.safe_load(f)
     model_name = raw.get("model_name", Path(model_config_path).stem)
 
+    jobs = []
     for ratio in ratios:
         for seed in seeds:
             run_dir = (
                 Path(output_dir)
                 / f"ablation_a_{model_name}_{ABLATION_DATASET}_ratio{ratio}_seed{seed}"
             )
-            logger.info(f"\n=== Ablation A: ratio={ratio}, seed={seed} ===")
+            jobs.append({
+                "run_dir": str(run_dir),
+                "log_label": f"Ablation A: ratio={ratio}, seed={seed}",
+                "model_config_path": model_config_path,
+                "finetune_config": finetune_config,
+                "dataset_name": ABLATION_DATASET,
+                "seed": seed,
+                "data_dir": data_dir,
+                "max_eval_samples": max_eval_samples,
+                "subset_ratio": ratio,
+            })
 
-            if skip_existing:
-                existing = _load_existing_result(str(run_dir))
-                if existing is not None:
-                    logger.info("  -> SKIPPING")
-                    results.append(existing)
-                    continue
-
-            try:
-                result = _train_condition(
-                    run_dir=str(run_dir),
-                    model_config_path=model_config_path,
-                    finetune_config=finetune_config,
-                    dataset_name=ABLATION_DATASET,
-                    seed=seed,
-                    data_dir=data_dir,
-                    max_eval_samples=max_eval_samples,
-                    subset_ratio=ratio,
-                )
-                results.append(result)
-            except Exception as e:
-                logger.error(f"FAILED: ablation_a ratio={ratio}/seed={seed}: {e}")
-
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-
-    return results
+    return [r for r in _run_jobs(jobs, skip_existing, max_parallel) if r is not None]
 
 
 def run_ablation_b(
@@ -321,15 +359,16 @@ def run_ablation_b(
     data_dir: str = "data",
     skip_existing: bool = True,
     max_eval_samples: int | None = None,
+    max_parallel: int = 1,
 ) -> list[dict]:
     """Ablation B: LoRA rank impact (4, 8, 16, 32, 64)."""
     ranks = [4, 8, 16, 32, 64]
-    results = []
 
     with open(model_config_path, encoding="utf-8") as f:
         raw = yaml.safe_load(f)
     model_name = raw.get("model_name", Path(model_config_path).stem)
 
+    jobs = []
     for rank in ranks:
         # Build per-rank config path
         ablation_config = Path(output_dir) / f"_config_rank{rank}.yaml"
@@ -340,34 +379,18 @@ def run_ablation_b(
                 Path(output_dir)
                 / f"ablation_b_{model_name}_{ABLATION_DATASET}_rank{rank}_seed{seed}"
             )
-            logger.info(f"\n=== Ablation B: rank={rank}, seed={seed} ===")
+            jobs.append({
+                "run_dir": str(run_dir),
+                "log_label": f"Ablation B: rank={rank}, seed={seed}",
+                "model_config_path": model_config_path,
+                "finetune_config": str(ablation_config),
+                "dataset_name": ABLATION_DATASET,
+                "seed": seed,
+                "data_dir": data_dir,
+                "max_eval_samples": max_eval_samples,
+            })
 
-            if skip_existing:
-                existing = _load_existing_result(str(run_dir))
-                if existing is not None:
-                    logger.info("  -> SKIPPING")
-                    results.append(existing)
-                    continue
-
-            try:
-                result = _train_condition(
-                    run_dir=str(run_dir),
-                    model_config_path=model_config_path,
-                    finetune_config=str(ablation_config),
-                    dataset_name=ABLATION_DATASET,
-                    seed=seed,
-                    data_dir=data_dir,
-                    max_eval_samples=max_eval_samples,
-                )
-                results.append(result)
-            except Exception as e:
-                logger.error(f"FAILED: ablation_b rank={rank}/seed={seed}: {e}")
-
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-
-    return results
+    return [r for r in _run_jobs(jobs, skip_existing, max_parallel) if r is not None]
 
 
 def run_ablation_c(
@@ -377,6 +400,7 @@ def run_ablation_c(
     data_dir: str = "data",
     skip_existing: bool = True,
     max_eval_samples: int | None = None,
+    max_parallel: int = 1,
 ) -> list[dict]:
     """Ablation C: Target modules impact (minimal, medium, full)."""
     configs_dir = Path("configs/finetune/ablation")
@@ -385,12 +409,12 @@ def run_ablation_c(
         "medium": str(configs_dir / "target_medium.yaml"),
         "full": str(configs_dir / "target_full.yaml"),
     }
-    results = []
 
     with open(model_config_path, encoding="utf-8") as f:
         raw = yaml.safe_load(f)
     model_name = raw.get("model_name", Path(model_config_path).stem)
 
+    jobs = []
     for label, config_path in module_configs.items():
         if not Path(config_path).exists():
             logger.warning(f"Ablation C config not found: {config_path}")
@@ -401,34 +425,18 @@ def run_ablation_c(
                 Path(output_dir)
                 / f"ablation_c_{model_name}_{ABLATION_DATASET}_{label}_seed{seed}"
             )
-            logger.info(f"\n=== Ablation C: targets={label}, seed={seed} ===")
+            jobs.append({
+                "run_dir": str(run_dir),
+                "log_label": f"Ablation C: targets={label}, seed={seed}",
+                "model_config_path": model_config_path,
+                "finetune_config": config_path,
+                "dataset_name": ABLATION_DATASET,
+                "seed": seed,
+                "data_dir": data_dir,
+                "max_eval_samples": max_eval_samples,
+            })
 
-            if skip_existing:
-                existing = _load_existing_result(str(run_dir))
-                if existing is not None:
-                    logger.info("  -> SKIPPING")
-                    results.append(existing)
-                    continue
-
-            try:
-                result = _train_condition(
-                    run_dir=str(run_dir),
-                    model_config_path=model_config_path,
-                    finetune_config=config_path,
-                    dataset_name=ABLATION_DATASET,
-                    seed=seed,
-                    data_dir=data_dir,
-                    max_eval_samples=max_eval_samples,
-                )
-                results.append(result)
-            except Exception as e:
-                logger.error(f"FAILED: ablation_c {label}/seed={seed}: {e}")
-
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
-
-    return results
+    return [r for r in _run_jobs(jobs, skip_existing, max_parallel) if r is not None]
 
 
 def _write_ablation_config(
@@ -519,12 +527,23 @@ def main() -> None:
         "--no_cf", action="store_true",
         help="Catastrophic Forgetting 베이스라인(VQAv2 평가) 생략 (스모크 가속용)",
     )
+    parser.add_argument(
+        "--max_parallel", type=int, default=None,
+        help="GPU당 1개 조건씩 동시 실행할 개수 (기본: 감지된 GPU 수, 최소 1). "
+             "각 조건은 CUDA_VISIBLE_DEVICES로 GPU 1장에 고정되어 model-parallel/"
+             "DataParallel 충돌 없이 실행된다. 1로 지정하면 기존과 동일한 완전 순차 실행.",
+    )
     args = parser.parse_args()
 
     setup_logging(log_dir=args.output_dir, experiment_name="run_phase2")
 
     skip = not args.no_skip_existing
     all_dfs = []
+
+    max_parallel = args.max_parallel
+    if max_parallel is None:
+        max_parallel = max(1, torch.cuda.device_count())
+    logger.info(f"max_parallel (조건별 동시 실행 GPU 수) = {max_parallel}")
 
     # Main conditions
     logger.info("=" * 60)
@@ -542,6 +561,7 @@ def main() -> None:
         max_eval_samples=args.max_eval_samples,
         max_test_samples=args.max_test_samples,
         measure_cf=not args.no_cf,
+        max_parallel=max_parallel,
     )
     if main_results:
         all_dfs.append(build_summary(main_results, "main"))
@@ -560,6 +580,7 @@ def main() -> None:
                 args.best_model_config, args.finetune_config,
                 args.output_dir, args.seeds, args.data_dir, skip,
                 max_eval_samples=args.max_eval_samples,
+                max_parallel=max_parallel,
             )
             if ab_a:
                 all_dfs.append(build_summary(ab_a, "ablation_a"))
@@ -572,6 +593,7 @@ def main() -> None:
                 args.best_model_config, args.finetune_config,
                 args.output_dir, args.seeds, args.data_dir, skip,
                 max_eval_samples=args.max_eval_samples,
+                max_parallel=max_parallel,
             )
             if ab_b:
                 all_dfs.append(build_summary(ab_b, "ablation_b"))
@@ -584,6 +606,7 @@ def main() -> None:
                 args.best_model_config, args.output_dir,
                 args.seeds, args.data_dir, skip,
                 max_eval_samples=args.max_eval_samples,
+                max_parallel=max_parallel,
             )
             if ab_c:
                 all_dfs.append(build_summary(ab_c, "ablation_c"))
