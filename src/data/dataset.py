@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -126,6 +127,102 @@ _LOADERS = {
     "slake": _load_slake,
     "vqa_rad": _load_vqa_rad,
 }
+
+
+def _iter_pathvqa(data_dir: str, split: str) -> Iterator[VQASample]:
+    """Stream PathVQA dataset one sample at a time (memory-safe for large train splits)."""
+    ds_path = Path(data_dir) / "pathvqa"
+    if not ds_path.exists():
+        raise FileNotFoundError(
+            f"PathVQA not found at {ds_path}. Run: python -m src.data.download --dataset pathvqa"
+        )
+    ds = load_from_disk(str(ds_path))
+    if split not in ds:
+        raise ValueError(f"PathVQA split '{split}' not found. Available: {list(ds.keys())}")
+    for row in ds[split]:
+        yield VQASample(
+            image=row["image"].convert("RGB"),
+            question=row["question"],
+            answer=row["answer"],
+            question_type=classify_question_type(row["answer"], "pathvqa"),
+        )
+
+
+def _iter_slake(data_dir: str, split: str) -> Iterator[VQASample]:
+    """Stream SLAKE dataset one sample at a time."""
+    ds_path = Path(data_dir) / "slake"
+    if not ds_path.exists():
+        raise FileNotFoundError(
+            f"SLAKE not found at {ds_path}. Run: python -m src.data.download --dataset slake"
+        )
+    ds = load_from_disk(str(ds_path))
+    if split not in ds:
+        raise ValueError(f"SLAKE split '{split}' not found. Available: {list(ds.keys())}")
+    for row in ds[split]:
+        yield VQASample(
+            image=row["image"].convert("RGB"),
+            question=row["question"],
+            answer=row["answer"],
+            question_type=classify_question_type(row["answer"], "slake"),
+        )
+
+
+def _iter_vqa_rad(data_dir: str, split: str) -> Iterator[VQASample]:
+    """Stream VQA-RAD dataset one sample at a time."""
+    ds_path = Path(data_dir) / "vqa_rad"
+    if not ds_path.exists():
+        raise FileNotFoundError(
+            f"VQA-RAD not found at {ds_path}. Run: python -m src.data.download --dataset vqa_rad"
+        )
+    ds = load_from_disk(str(ds_path))
+    if split == "validation":
+        raise ValueError("VQA-RAD has no validation split. Available: train, test")
+    if split not in ds:
+        raise ValueError(f"VQA-RAD split '{split}' not found. Available: {list(ds.keys())}")
+    for row in ds[split]:
+        yield VQASample(
+            image=row["image"].convert("RGB"),
+            question=row["question"],
+            answer=row["answer"],
+            question_type=classify_question_type(row["answer"], "vqa_rad"),
+        )
+
+
+_ITER_LOADERS = {
+    "pathvqa": _iter_pathvqa,
+    "slake": _iter_slake,
+    "vqa_rad": _iter_vqa_rad,
+}
+
+
+def iter_medical_vqa_dataset(
+    dataset_name: str,
+    split: str = "test",
+    data_dir: str = "data",
+) -> Iterator[VQASample]:
+    """Stream a medical VQA dataset one sample at a time (no full-list materialization).
+
+    Large train splits (e.g. PathVQA train = 19,654 images) decoded via
+    load_medical_vqa_dataset() hold every PIL image in one Python list at once,
+    which exceeded the container's cgroup memory limit during Phase 2 Main
+    (SIGKILL). Use this streaming variant for full-dataset chat-cache building;
+    load_medical_vqa_dataset() remains unchanged for existing callers (evaluation
+    on smaller/capped splits).
+    """
+    if dataset_name not in VALID_DATASETS:
+        raise ValueError(f"Unknown dataset: {dataset_name}. Available: {VALID_DATASETS}")
+    yield from _ITER_LOADERS[dataset_name](data_dir, split)
+
+
+def dataset_length(dataset_name: str, split: str, data_dir: str = "data") -> int:
+    """Row count for a dataset split without decoding any images (cheap Arrow metadata read)."""
+    if dataset_name not in VALID_DATASETS:
+        raise ValueError(f"Unknown dataset: {dataset_name}. Available: {VALID_DATASETS}")
+    ds_path = Path(data_dir) / dataset_name
+    ds = load_from_disk(str(ds_path))
+    if split not in ds:
+        raise ValueError(f"{dataset_name} split '{split}' not found. Available: {list(ds.keys())}")
+    return ds[split].num_rows
 
 
 def load_medical_vqa_dataset(

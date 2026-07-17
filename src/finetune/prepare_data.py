@@ -9,17 +9,42 @@ Supports both Qwen-style (with vision info) and standard chat template formats.
 
 from __future__ import annotations
 
+import itertools
 import logging
 import os
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 
 from datasets import Dataset, load_from_disk
 
-from src.data.dataset import load_medical_vqa_dataset
+from src.data.dataset import VQASample, dataset_length, iter_medical_vqa_dataset
 from src.utils.constants import MEDICAL_PROMPT
 
 logger = logging.getLogger(__name__)
+
+
+def _bounded_samples(
+    dataset_name: str,
+    split: str,
+    data_dir: str,
+    max_samples: int | None,
+    subset_ratio: float | None,
+) -> Iterator[VQASample]:
+    """subset_ratio/max_samples를 반영한 샘플 스트림.
+
+    dataset_length()는 이미지를 디코딩하지 않는 가벼운 Arrow 메타데이터 조회라,
+    subset_ratio 계산에 전체 리스트 materialize가 필요 없다.
+    """
+    n = None
+    if subset_ratio is not None:
+        total = dataset_length(dataset_name, split, data_dir=data_dir)
+        n = max(1, int(total * subset_ratio))
+        logger.info(f"Subset ratio {subset_ratio}: using {n}/{total} samples")
+    if max_samples is not None:
+        n = max_samples if n is None else min(n, max_samples)
+
+    it = iter_medical_vqa_dataset(dataset_name, split=split, data_dir=data_dir)
+    return itertools.islice(it, n) if n is not None else it
 
 
 def _chat_cache_dir(
@@ -72,47 +97,41 @@ def prepare_chat_dataset(
         logger.info(f"[chat-cache] load {dataset_name}/{split} (std) from {cache_dir}")
         return load_from_disk(str(cache_dir))
 
-    samples = load_medical_vqa_dataset(dataset_name, split=split, data_dir=data_dir)
+    # load_medical_vqa_dataset()는 전체 split을 파이썬 리스트로 한번에 materialize한다.
+    # PathVQA train(19,654 이미지)처럼 큰 split은 이게 컨테이너 cgroup 메모리 상한을
+    # 넘겨 SIGKILL로 죽는다(Phase 2 Main 2026-07-17 실제 재현). Dataset.from_generator로
+    # 배치 단위 스트리밍 빌드해 이미지 전체를 메모리에 동시에 들고 있지 않게 한다.
+    def _records() -> Iterator[dict]:
+        for s in _bounded_samples(dataset_name, split, data_dir, max_samples, subset_ratio):
+            prompt_text = MEDICAL_PROMPT.format(question=s.question)
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image"},
+                        {"type": "text", "text": prompt_text},
+                    ],
+                },
+                {
+                    "role": "assistant",
+                    "content": [
+                        {"type": "text", "text": s.answer},
+                    ],
+                },
+            ]
+            yield {
+                # trl 0.24 native VLM collator(DataCollatorForVisionLanguageModeling)는
+                # "images"(복수 리스트) 컬럼을 읽는다. messages content는 이미 리스트라
+                # prepare_multimodal_messages가 no-op → 이미지 토큰 이중 삽입 없음.
+                # 단수 "image"는 collator가 안 읽으므로 제거(대용량 train셋 이미지 중복 저장/RAM 방지).
+                "images": [s.image],
+                "question": s.question,
+                "answer": s.answer,
+                "question_type": s.question_type,
+                "messages": messages,
+            }
 
-    if subset_ratio is not None:
-        n = max(1, int(len(samples) * subset_ratio))
-        samples = samples[:n]
-        logger.info(f"Subset ratio {subset_ratio}: using {n}/{len(samples)} samples")
-
-    if max_samples is not None:
-        samples = samples[:max_samples]
-
-    records: list[dict[str, Any]] = []
-    for s in samples:
-        prompt_text = MEDICAL_PROMPT.format(question=s.question)
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image"},
-                    {"type": "text", "text": prompt_text},
-                ],
-            },
-            {
-                "role": "assistant",
-                "content": [
-                    {"type": "text", "text": s.answer},
-                ],
-            },
-        ]
-        records.append({
-            # trl 0.24 native VLM collator(DataCollatorForVisionLanguageModeling)는
-            # "images"(복수 리스트) 컬럼을 읽는다. messages content는 이미 리스트라
-            # prepare_multimodal_messages가 no-op → 이미지 토큰 이중 삽입 없음.
-            # 단수 "image"는 collator가 안 읽으므로 제거(대용량 train셋 이미지 중복 저장/RAM 방지).
-            "images": [s.image],
-            "question": s.question,
-            "answer": s.answer,
-            "question_type": s.question_type,
-            "messages": messages,
-        })
-
-    ds = Dataset.from_list(records)
+    ds = Dataset.from_generator(_records)
     logger.info(
         f"Prepared {dataset_name}/{split}: {len(ds)} samples for SFT training"
     )
@@ -142,41 +161,32 @@ def prepare_qwen_chat_dataset(
         logger.info(f"[chat-cache] load {dataset_name}/{split} (qwen) from {cache_dir}")
         return load_from_disk(str(cache_dir))
 
-    samples = load_medical_vqa_dataset(dataset_name, split=split, data_dir=data_dir)
+    # prepare_chat_dataset과 동일한 이유로 스트리밍 빌드(전체 리스트 materialize 회피).
+    def _records() -> Iterator[dict]:
+        for s in _bounded_samples(dataset_name, split, data_dir, max_samples, subset_ratio):
+            prompt_text = MEDICAL_PROMPT.format(question=s.question)
+            # Qwen expects {"type": "image", "image": <PIL.Image>} in content
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "image", "image": s.image},
+                        {"type": "text", "text": prompt_text},
+                    ],
+                },
+                {
+                    "role": "assistant",
+                    "content": [
+                        {"type": "text", "text": s.answer},
+                    ],
+                },
+            ]
+            yield {
+                "image": s.image,
+                "messages": messages,
+            }
 
-    if subset_ratio is not None:
-        n = max(1, int(len(samples) * subset_ratio))
-        samples = samples[:n]
-        logger.info(f"Subset ratio {subset_ratio}: using {n}/{len(samples)} samples")
-
-    if max_samples is not None:
-        samples = samples[:max_samples]
-
-    records: list[dict[str, Any]] = []
-    for s in samples:
-        prompt_text = MEDICAL_PROMPT.format(question=s.question)
-        # Qwen expects {"type": "image", "image": <PIL.Image>} in content
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {"type": "image", "image": s.image},
-                    {"type": "text", "text": prompt_text},
-                ],
-            },
-            {
-                "role": "assistant",
-                "content": [
-                    {"type": "text", "text": s.answer},
-                ],
-            },
-        ]
-        records.append({
-            "image": s.image,
-            "messages": messages,
-        })
-
-    ds = Dataset.from_list(records)
+    ds = Dataset.from_generator(_records)
     logger.info(
         f"Prepared {dataset_name}/{split} (Qwen format): {len(ds)} samples"
     )
