@@ -12,6 +12,7 @@ from __future__ import annotations
 import itertools
 import logging
 import os
+import shutil
 from collections.abc import Iterator
 from pathlib import Path
 
@@ -21,6 +22,24 @@ from src.data.dataset import VQASample, dataset_length, iter_medical_vqa_dataset
 from src.utils.constants import MEDICAL_PROMPT
 
 logger = logging.getLogger(__name__)
+
+
+def _atomic_save_to_disk(ds: Dataset, final_dir: Path) -> None:
+    """save_to_disk를 임시 경로에 쓴 뒤 성공 시에만 원자적으로 최종 경로로 rename한다.
+
+    디스크 풀(ENOSPC) 등으로 save_to_disk가 중간에 끊기면, final_dir에 "폴더는
+    있지만 내용은 불완전한" 캐시가 남는다. 이후 실행은 cache_dir.exists()만 보고
+    load_from_disk를 시도해 FileNotFoundError로 영구 반복 실패한다(Phase 2 Main
+    2026-07-18 실제 재현: 원본 컨테이너 디스크가 꽉 찬 순간 빌드 중이던
+    qwen_pathvqa_train 캐시가 이렇게 깨진 채 남았다). 임시 경로 rename은 같은
+    파일시스템 내에서 원자적이므로, 중간에 죽어도 final_dir은 "아예 없음" 상태를
+    유지해 다음 실행이 정상적으로 재빌드를 시도한다.
+    """
+    tmp_dir = final_dir.parent / f".tmp-{final_dir.name}-{os.getpid()}"
+    if tmp_dir.exists():
+        shutil.rmtree(tmp_dir)
+    ds.save_to_disk(str(tmp_dir))
+    os.replace(tmp_dir, final_dir)
 
 
 def _bounded_samples(
@@ -136,7 +155,7 @@ def prepare_chat_dataset(
         f"Prepared {dataset_name}/{split}: {len(ds)} samples for SFT training"
     )
     cache_dir.parent.mkdir(parents=True, exist_ok=True)
-    ds.save_to_disk(str(cache_dir))
+    _atomic_save_to_disk(ds, cache_dir)
     logger.info(f"[chat-cache] saved {dataset_name}/{split} (std) → {cache_dir}")
     return ds
 
@@ -191,6 +210,6 @@ def prepare_qwen_chat_dataset(
         f"Prepared {dataset_name}/{split} (Qwen format): {len(ds)} samples"
     )
     cache_dir.parent.mkdir(parents=True, exist_ok=True)
-    ds.save_to_disk(str(cache_dir))
+    _atomic_save_to_disk(ds, cache_dir)
     logger.info(f"[chat-cache] saved {dataset_name}/{split} (qwen) → {cache_dir}")
     return ds
