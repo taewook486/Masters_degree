@@ -52,6 +52,8 @@ from omegaconf import DictConfig, OmegaConf
 from transformers import BitsAndBytesConfig, TrainerCallback
 from trl import SFTConfig, SFTTrainer
 
+from datasets.exceptions import DatasetGenerationError
+
 from src.baseline.evaluate_zero_shot import evaluate_with_loaded_model
 from src.baseline.model_loader import DTYPE_MAP, load_config
 from src.finetune.prepare_data import prepare_chat_dataset, prepare_qwen_chat_dataset
@@ -603,7 +605,16 @@ def train_qlora(
             dataset_name, split="validation", data_dir=data_dir,
             max_samples=max_eval_samples,
         )
-    except (ValueError, KeyError):
+    except (ValueError, KeyError, DatasetGenerationError) as e:
+        # Dataset.from_generator()로 스트리밍 빌드(997238f)한 이후, split 없음 같은
+        # ValueError가 제너레이터 내부에서 나면 datasets가 DatasetGenerationError로
+        # 감싸서 던진다 — 원래 잡던 ValueError/KeyError가 더는 안 잡혀 조용히 죽는
+        # 회귀였다(Phase 2 Main 2026-07-19 vqa_rad 실제 재현). __cause__를 까서
+        # 진짜 "split 없음"(ValueError/KeyError)일 때만 대체하고, 그 외(디스크 풀 등
+        # 진짜 에러)는 숨기지 않고 그대로 재발생시킨다.
+        cause = e.__cause__ if isinstance(e, DatasetGenerationError) else e
+        if not isinstance(cause, (ValueError, KeyError)):
+            raise
         logger.info(f"{dataset_name} has no validation split; using last 10% of train")
         n_eval = max(50, len(train_ds) // 10)
         if max_eval_samples is not None:
