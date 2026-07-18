@@ -13,11 +13,15 @@ export PYTHONUNBUFFERED=1
 export WANDB_PROJECT=medical-vqa-vlm
 export WANDB_MODE=offline  # 온라인 동기화 시도로 멈추지 않도록 (다일 실행 안정성)
 export PYTORCH_ALLOC_CONF=expandable_segments:True  # GPU 메모리 파편화 완화 (다조건 반복)
-# HF 모델 캐시를 컨테이너 디스크(/hf_cache, 60GB)로. 미설정 시 /workspace 볼륨(50GB)이
-# 모델 4개(~27GB)로 꽉 차 'Disk quota exceeded' 발생.
-export HF_HOME=/hf_cache
-# 준비된 chat 데이터셋 캐시도 컨테이너 디스크로(이미지 재저장이라 용량 큼 → /workspace quota 회피).
-export MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache
+# [2026-07-14] 당시엔 /workspace 볼륨이 50GB뿐이라 컨테이너 디스크(/hf_cache)로 뒀었으나,
+# [2026-07-18] 실제 36조건 Main 완주 시 HF 모델(23G)+chat 캐시(21G)=44G가 컨테이너 디스크
+# (보통 80GB)를 가득 채워 'No space left on device'로 30/36조건이 연쇄 실패했다(디스크
+# 여유 있게 잡아도 컨테이너 쪽은 OS/베이스 이미지 자체가 이미 상당량을 차지해 여유가 작음).
+# /workspace 볼륨은 보통 100GB+로 주문하고 실사용은 venv+data+results 합쳐 ~20GB뿐이라
+# 훨씬 여유롭다 — 캐시를 여기로 옮긴다. 볼륨을 정말 작게(50GB 미만) 잡은 경우에만
+# HF_HOME=/hf_cache로 되돌려야 한다.
+export HF_HOME=/workspace/hf_cache
+export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
 
 mkdir -p results/phase2_finetune
 
