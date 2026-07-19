@@ -263,7 +263,7 @@
     "MOAI_CONFIG_SOURCE": "sections",
     "CLAUDE_CODE_NO_FLICKER": "1",
     "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
-    "PATH": "/c/Users/taewo/.local/bin:/c/Users/taewo/go/bin:/c/Program Files/nodejs:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+    "PATH": "C:\\Users\\taewo\\.local\\bin;C:\\Users\\taewo\\go\\bin;/usr/local/bin;/usr/local/sbin;/usr/bin;/bin;/usr/sbin;/sbin"
   },
   "permissions": {
     "defaultMode": "acceptEdits",

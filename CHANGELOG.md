@@ -9,6 +9,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 Phase 2 QLoRA 미세조정 실험 진행 중 (RunPod RTX 4090, 36조건 × max_steps=500)
 
+### Fixed — Phase 2 캐시/디스크 인프라 (2026-07-18~19)
+
+- **SIGKILL(cgroup 메모리 초과)**: `src/data/dataset.py`에 `iter_medical_vqa_dataset()`(제너레이터)/`dataset_length()` 추가, `prepare_data.py`가 `Dataset.from_generator()`로 스트리밍 빌드하도록 변경 — PathVQA train(19,654장) 전체를 리스트로 한번에 들고 있다가 죽던 문제 해결
+- **컨테이너 디스크 풀(30/36조건 연쇄 실패)**: 모델 캐시(hub)·데이터셋 캐시(chat_cache)를 `/workspace` 볼륨으로 이관
+- **불완전 캐시 영구 재실패**: `prepare_data.py`에 `_atomic_save_to_disk()` 추가 — 임시 경로에 저장 후 성공 시에만 원자적 rename, 디스크 풀 등으로 빌드가 중간에 끊겨도 불완전한 캐시 폴더가 남지 않도록 수정
+- **볼륨 쿼터 초과(Disk quota exceeded)**: 모델 캐시(hub, 상대적으로 고정 용량)는 컨테이너 디스크로, 데이터셋 캐시(chat_cache, 누적 용량이 큼)는 볼륨으로 분리 배치
+- **VQA-RAD eval split 회귀**: `train_qlora.py`의 "validation split 없으면 train 마지막 10%로 대체" 폴백이, 스트리밍 빌드 전환 후 `ValueError`가 `datasets`에 의해 `DatasetGenerationError`로 감싸지면서 더는 잡히지 않던 문제 수정 — `__cause__`를 확인해 진짜 "split 없음"일 때만 대체하고 그 외(디스크 풀 등 실제 에러)는 그대로 재발생
+
 ---
 
 ## [0.3.0] — 2026-07-14
