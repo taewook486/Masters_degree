@@ -16,9 +16,12 @@
 git pull   # 오늘 푸시한 커밋들 받기
 
 # 1) Cross-dataset CF 최초 실행 (미검증 신규 기능 — 에러 나면 바로 diagnose)
+# --max_samples 500: full test set이면 PathVQA(6,719개)가 24회 반복되어 ~16시간
+# 소요 추정(보조 지표라 과함) → 500으로 제한해 ~2-3시간으로 단축(사용자 확정, 2026-07-19)
 python scripts/measure_cross_dataset_cf.py \
   --config_dir configs/models --phase2_dir results/phase2_finetune \
-  --phase1_summary results/phase1_baseline/phase1_summary.csv --seeds 42 123 456
+  --phase1_summary results/phase1_baseline/phase1_summary.csv --seeds 42 123 456 \
+  --max_samples 500
 
 # 2) Phase 1 재실행 (RQ1 McNemar/Cochran's Q, WCA 임상분석용 sample 단위 데이터 복구)
 rm -f results/phase1_baseline/phase1_summary.csv results/phase1_baseline/phase1_intermediate.json
