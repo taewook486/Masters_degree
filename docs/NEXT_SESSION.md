@@ -1,4 +1,4 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-19)
+# 다음 세션 시작점 (마지막 갱신: 2026-07-22)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
@@ -6,6 +6,8 @@
 ## 현재 상태
 
 - **Phase 2 Main: 36/36 전 조건 완료** ✅
+- **Phase 2 Ablation 실행 중** (2026-07-22 시작, pod에서 `bash scripts/run_phase2_ablation.sh` 직접 실행) — best model은 스크립트 기본값 `qwen3-vl-2b` 그대로 사용. Ablation A(데이터비율 5종)+B(rank 5종)+C(타겟모듈 3종) × 3 seed = **39개 조건**, PathVQA 하나로만, full test set 평가. **예상 소요 ~55-85시간(RTX 3090 기준, 스크립트 자체 주석은 RTX 4090 기준 40-60h)**, 비용 ~$25-40 추가 예상. 진행 확인: `ls results/phase2_finetune/ablation_*/train_result.json | wc -l` (39개 중 몇 개).
+  - Ablation A는 데이터 비율마다 캐시를 새로 만들어야 해서(5%=17분, 100%는 2시간+) 첫 조건들이 느릴 수 있음 — 정상. B/C는 Phase 2 Main이 이미 만든 전체 데이터 캐시를 그대로 재사용해서 빠름.
 - 오늘(07-18~19) 세션에서 disk quota/캐시 손상 버그 4건 + eval-split 회귀 1건 수정 (커밋 981bd6d~52b318a)
 - Table 4.2b(B) cross-dataset CF 신규 구현·푸시 완료 (커밋 335c808) — **아직 pod에서 실행 안 함, 미검증**
 - SSH 개인키(`runpod.ppk`) gitignore 보호 완료 (커밋 c570c64)
@@ -35,8 +37,8 @@ python scripts/analyze_phase2.py --phase1_dir results/phase1_baseline --phase2_d
 그 다음 순서:
 - Phase 1 재실행 완료 후: `python scripts/analyze_phase1.py --results_dir results/phase1_baseline --seed 42` (RQ1)
 - `python scripts/analyze_clinical.py --results_dir results/phase1_baseline --dataset pathvqa --seed 42` (WCA 임상분석)
-- Phase 2 Ablation: `scripts/run_phase2_ablation.sh` (best model 지정 필요, `analyze_phase2.py` 결과로 결정)
-- Phase 3 HPO: 아직 미착수. ~$78, ~200 GPU시간 규모 — 예산/시간 재확인 후 착수.
+- Phase 2 Ablation은 위에 적힌 대로 이미 실행 중 — 39/39 완료될 때까지 기다렸다가 결과 확인
+- Phase 3 HPO: 아직 미착수. ~$78, ~200 GPU시간 규모 — Ablation까지 끝난 뒤 예산/시간 재확인 후 착수.
 
 ## 알아둘 것
 
