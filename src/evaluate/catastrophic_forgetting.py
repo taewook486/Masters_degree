@@ -217,3 +217,107 @@ def run_cf_measurement(
     )
 
     return result
+
+
+def run_cross_dataset_cf_measurement(
+    model,
+    processor,
+    config,
+    train_dataset: str,
+    eval_dataset: str,
+    base_accuracy: float,
+    output_dir: str,
+    model_name: str,
+    seed: int,
+    data_dir: str = "data",
+    max_samples: int | None = None,
+    batch_size: int = 4,
+) -> dict:
+    """Measure medical-domain cross-dataset generalization (THESIS §4.4 Table 4.2b-B).
+
+    Evaluates a model fine-tuned on `train_dataset` against a *different*
+    medical VQA dataset's test split (`eval_dataset`), and compares the
+    result against the zero-shot baseline accuracy on that same eval_dataset
+    (sourced from Phase 1 results by the caller).
+
+    Reuses evaluate_with_loaded_model (same inference pipeline as Phase 1/2
+    evaluation) so the returned accuracy is directly comparable to the
+    Phase 1 baseline.
+
+    Args:
+        model: Fine-tuned model (already loaded, LoRA adapter merged).
+        processor: Model processor.
+        config: Model config for eval_dataset (may differ from training config
+            only in dataset-specific fields; model identity is unchanged).
+        train_dataset: Dataset the model was fine-tuned on.
+        eval_dataset: A *different* medical dataset to cross-evaluate on.
+        base_accuracy: Phase 1 zero-shot overall_accuracy for
+            (model_name, eval_dataset) — the pre-finetune reference point.
+        output_dir: Directory to save the cross-dataset CF result.
+        model_name: Model name for logging/output.
+        seed: Random seed (matches the fine-tuning seed).
+        data_dir: Dataset directory.
+        max_samples: Limit eval samples for debugging.
+        batch_size: Inference batch size.
+
+    Returns:
+        Dict with metadata + base/finetuned/change-rate summary.
+    """
+    from src.baseline.evaluate_zero_shot import evaluate_with_loaded_model
+
+    if train_dataset == eval_dataset:
+        raise ValueError(
+            f"train_dataset and eval_dataset must differ for cross-dataset CF "
+            f"(got both = {train_dataset!r})"
+        )
+
+    logger.info(
+        f"[Cross-CF] Evaluating {model_name} (trained on {train_dataset}) "
+        f"on {eval_dataset}..."
+    )
+    ft_eval = evaluate_with_loaded_model(
+        model=model,
+        processor=processor,
+        config=config,
+        dataset_name=eval_dataset,
+        output_dir=str(Path(output_dir) / "cross_eval_raw"),
+        seed=seed,
+        data_dir=data_dir,
+        max_samples=max_samples,
+        batch_size=batch_size,
+    )
+    ft_accuracy = ft_eval["overall_accuracy"]
+
+    change_pct = (
+        (ft_accuracy - base_accuracy) / base_accuracy * 100 if base_accuracy > 0 else 0.0
+    )
+
+    result = {
+        "metadata": {
+            "model_name": model_name,
+            "train_dataset": train_dataset,
+            "eval_dataset": eval_dataset,
+            "seed": seed,
+            "measurement_type": "cross_dataset_generalization",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        },
+        "summary": {
+            "base_accuracy": round(base_accuracy, 4),
+            "finetuned_accuracy": round(ft_accuracy, 4),
+            "change_pct": round(change_pct, 2),
+        },
+        "finetuned_eval": ft_eval,
+    }
+
+    output_path = Path(output_dir)
+    output_path.mkdir(parents=True, exist_ok=True)
+    result_file = output_path / f"cross_cf_{train_dataset}_to_{eval_dataset}.json"
+    with open(result_file, "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2, ensure_ascii=False)
+
+    logger.info(
+        f"[Cross-CF] {model_name}/{train_dataset}->{eval_dataset}/seed={seed}: "
+        f"base={base_accuracy:.4f} -> ft={ft_accuracy:.4f} (change={change_pct:+.1f}%)"
+    )
+
+    return result
