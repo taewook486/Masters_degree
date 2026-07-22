@@ -22,6 +22,7 @@ import contextlib
 import gc
 import json
 import logging
+import shutil
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -247,6 +248,9 @@ def _build_trainer_unsloth(
         # epoch 전략일 땐 무시됨.
         save_steps=max_steps_val if max_steps_val > 0 else 500,
         eval_steps=max_steps_val if max_steps_val > 0 else 500,
+        # epoch 전략(Ablation C 등, 3에폭)에서 체크포인트가 누적돼 디스크 quota를 채우는 것을 방지.
+        # 최종 가중치는 학습 후 별도로 adapter/에 저장되므로 checkpoints/는 최신 1개만 있으면 충분.
+        save_total_limit=1,
         seed=seed,
         report_to="wandb",
         run_name=f"{model_name}_{dataset_name}_seed{seed}_unsloth",
@@ -502,6 +506,9 @@ def _build_trainer_standard(
         # epoch 전략일 땐 무시됨.
         save_steps=max_steps_val if max_steps_val > 0 else 500,
         eval_steps=max_steps_val if max_steps_val > 0 else 500,
+        # epoch 전략(Ablation C 등, 3에폭)에서 체크포인트가 누적돼 디스크 quota를 채우는 것을 방지.
+        # 최종 가중치는 학습 후 별도로 adapter/에 저장되므로 checkpoints/는 최신 1개만 있으면 충분.
+        save_total_limit=1,
         seed=seed,
         report_to="wandb",
         run_name=f"{model_name}_{dataset_name}_seed{seed}_peft",
@@ -655,6 +662,13 @@ def train_qlora(
     model.save_pretrained(str(adapter_path))
     processor.save_pretrained(str(adapter_path))
     logger.info(f"Adapter saved to {adapter_path}")
+
+    # 학습용 raw 체크포인트(옵티마이저 상태 포함, adapter/보다 훨씬 큼)는
+    # 최종 가중치가 adapter/에 이미 저장됐으므로 더 이상 필요 없음 → 디스크 quota 방지를 위해 삭제.
+    checkpoints_path = output_path / "checkpoints"
+    if checkpoints_path.exists():
+        shutil.rmtree(checkpoints_path, ignore_errors=True)
+        logger.info(f"Removed redundant checkpoints dir: {checkpoints_path}")
 
     # Collect training metrics
     vram = get_vram_usage()
