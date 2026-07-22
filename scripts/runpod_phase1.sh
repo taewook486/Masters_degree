@@ -27,6 +27,13 @@
 
 set -e
 
+# run_phase2_main.sh 등과 동일하게 캐시를 분산 배치 (누락 시 이 컨테이너는
+# $HOME=/workspace라 HF_HOME 기본값이 /workspace/.cache로 새어 볼륨 quota를
+# 채우고 Disk quota exceeded로 죽는다 — Ablation에서 실제로 겪은 버그, 2026-07-22
+# 커밋 2db2361, 여기도 동일 적용)
+export HF_HOME=/hf_cache
+export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
+
 # --- 인자 파싱 ---
 CONFIG=""
 BATCH_SIZE=8

@@ -22,7 +22,14 @@
 ## 다음 세션 최우선 작업 (pod에서 실행)
 
 ```bash
-git pull   # 2db2361 이상 확인 (ablation 캐시 경로 수정 포함)
+git pull   # 2db2361 이상 확인 (ablation 캐시 경로 수정 포함) + fac3xxx 이상 확인 (아래 스크립트 캐시경로 수정)
+
+# [중요] 이 세션 전체에 캐시 경로 지정 — run_phase2_ablation.sh가 겪은 것과 같은
+# Disk quota exceeded를 막기 위해, .sh 래퍼 없이 bare python으로 실행하는
+# 아래 1)/2) 단계 전에 반드시 먼저 실행할 것 (run_phase3.sh/runpod_phase1.sh는
+# 스크립트 자체에 내장했지만, 아래 python 직접 호출은 셸에서 직접 잡아줘야 함)
+export HF_HOME=/hf_cache
+export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
 
 # 0) Phase 2 Ablation 재개 — 최우선. skip_existing으로 자동 이어서 진행됨.
 tmux new -s ablation
@@ -55,7 +62,7 @@ python scripts/analyze_phase2.py --phase1_dir results/phase1_baseline --phase2_d
 
 ## 알아둘 것
 
-- **캐시 디스크 분산 배치는 스크립트마다 개별 설정해야 함**: `HF_HOME=/hf_cache`, `MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache`는 공용 함수가 아니라 각 실행 스크립트(`run_phase2_main.sh`, `run_phase2_ablation.sh`, 향후 `run_phase3.sh` 등)에 개별적으로 export돼 있음. 새 실행 스크립트를 추가하거나 복사해서 만들 때 이 export 누락 여부를 반드시 확인할 것 — 누락되면 `$HOME=/workspace`인 이 컨테이너에서는 조용히 `/workspace/.cache`로 캐시가 새며, 몇 시간 뒤 quota 초과로 전체 파이프라인이 죽는 형태로만 드러남(초기 증상은 무관해 보이는 `AttributeError` 등으로 나타날 수 있어 진단이 어려움).
+- **캐시 디스크 분산 배치는 스크립트마다 개별 설정해야 함**: `HF_HOME=/hf_cache`, `MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache`는 공용 함수가 아니라 각 실행 스크립트에 개별적으로 export돼 있음. 2026-07-22 전수 점검 결과 `run_phase2_main.sh`/`run_phase2_ablation.sh`는 있었지만 `run_phase3.sh`/`runpod_phase1.sh`엔 빠져있어서 추가함(커밋 확인은 위 git pull 안내 참고). `runpod_phase1_gemma4.sh`(deprecated, 미수정)와 `.sh` 래퍼 없이 직접 실행하는 `measure_cross_dataset_cf.py`/`run_all.py` 같은 bare python 명령은 **셸에서 직접 export해야 함**(위 최우선 작업 블록에 이미 추가함). 새 실행 스크립트를 추가하거나 복사해서 만들 때 이 export 누락 여부를 반드시 확인할 것 — 누락되면 `$HOME=/workspace`인 이 컨테이너에서는 조용히 `/workspace/.cache`로 캐시가 새며, 몇 시간 뒤 quota 초과로 전체 파이프라인이 죽는 형태로만 드러남(초기 증상은 무관해 보이는 `AttributeError` 등으로 나타날 수 있어 진단이 어려움).
 - **`df -h /workspace`는 신뢰 불가**: `/workspace`는 `mfs#eu-cz-1.runpod.net` 네트워크 볼륨이라 `df -h`가 리전 전체 풀 용량(851T)을 보여줌. 실제 이 pod의 quota 확인은 `du -h --max-depth=1 /workspace`로 해야 함(`-s`와 `--max-depth`는 동시 사용 불가, `du: warning`만 뜨고 결과 없음).
 - **unsloth 어댑터 호환성 미검증**: `measure_cross_dataset_cf.py`가 `PeftModel.from_pretrained`로 어댑터를 불러오는데, unsloth로 학습한 qwen3-vl-2b/qwen25-vl-3b 어댑터가 문제없이 로드되는지 실증 안 됨. 에러 나면 즉시 보고.
 - **비용 민감**: 이미 $40+ 사용. RunPod 대시보드에서 지출 한도(spending limit) 설정 권장.
