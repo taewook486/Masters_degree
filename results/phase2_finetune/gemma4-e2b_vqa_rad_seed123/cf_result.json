@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "model_name": "gemma4-e2b",
+    "train_dataset": "vqa_rad",
+    "seed": 123,
+    "measurement_type": "catastrophic_forgetting",
+    "timestamp": "2026-07-18T19:36:37.783107+00:00"
+  },
+  "summary": {
+    "base_closed_accuracy": 0.645,
+    "finetuned_closed_accuracy": 0.507,
+    "degradation_closed_accuracy_pct": 21.4,
+    "base_open_accuracy": 0.47,
+    "finetuned_open_accuracy": 0.123,
+    "degradation_open_accuracy_pct": 73.83,
+    "base_overall_accuracy": 0.5575,
+    "finetuned_overall_accuracy": 0.315,
+    "degradation_overall_accuracy_pct": 43.5
+  },
+  "base_vqav2": {
+    "closed_accuracy": 0.645,
+    "open_accuracy": 0.47,
+    "overall_accuracy": 0.5575,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 1434.9
+  },
+  "finetuned_vqav2": {
+    "closed_accuracy": 0.507,
+    "open_accuracy": 0.123,
+    "overall_accuracy": 0.315,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 1499.7
+  }
+}

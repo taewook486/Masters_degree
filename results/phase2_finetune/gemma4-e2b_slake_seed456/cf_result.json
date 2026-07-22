@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "model_name": "gemma4-e2b",
+    "train_dataset": "slake",
+    "seed": 456,
+    "measurement_type": "catastrophic_forgetting",
+    "timestamp": "2026-07-18T02:03:09.773037+00:00"
+  },
+  "summary": {
+    "base_closed_accuracy": 0.645,
+    "finetuned_closed_accuracy": 0.427,
+    "degradation_closed_accuracy_pct": 33.8,
+    "base_open_accuracy": 0.47,
+    "finetuned_open_accuracy": 0.066,
+    "degradation_open_accuracy_pct": 85.96,
+    "base_overall_accuracy": 0.5575,
+    "finetuned_overall_accuracy": 0.2465,
+    "degradation_overall_accuracy_pct": 55.78
+  },
+  "base_vqav2": {
+    "closed_accuracy": 0.645,
+    "open_accuracy": 0.47,
+    "overall_accuracy": 0.5575,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 1434.9
+  },
+  "finetuned_vqav2": {
+    "closed_accuracy": 0.427,
+    "open_accuracy": 0.066,
+    "overall_accuracy": 0.2465,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 3111.1
+  }
+}

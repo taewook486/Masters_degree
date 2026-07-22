@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "model_name": "qwen25-vl-3b",
+    "train_dataset": "pathvqa",
+    "seed": 456,
+    "measurement_type": "catastrophic_forgetting",
+    "timestamp": "2026-07-19T07:42:23.295407+00:00"
+  },
+  "summary": {
+    "base_closed_accuracy": 0.85,
+    "finetuned_closed_accuracy": 0.786,
+    "degradation_closed_accuracy_pct": 7.53,
+    "base_open_accuracy": 0.607,
+    "finetuned_open_accuracy": 0.55,
+    "degradation_open_accuracy_pct": 9.39,
+    "base_overall_accuracy": 0.7285,
+    "finetuned_overall_accuracy": 0.668,
+    "degradation_overall_accuracy_pct": 8.3
+  },
+  "base_vqav2": {
+    "closed_accuracy": 0.85,
+    "open_accuracy": 0.607,
+    "overall_accuracy": 0.7285,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 485.6
+  },
+  "finetuned_vqav2": {
+    "closed_accuracy": 0.786,
+    "open_accuracy": 0.55,
+    "overall_accuracy": 0.668,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 741.4
+  }
+}

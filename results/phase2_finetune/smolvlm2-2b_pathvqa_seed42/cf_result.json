@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "model_name": "smolvlm2-2b",
+    "train_dataset": "pathvqa",
+    "seed": 42,
+    "measurement_type": "catastrophic_forgetting",
+    "timestamp": "2026-07-20T18:39:23.927387+00:00"
+  },
+  "summary": {
+    "base_closed_accuracy": 0.832,
+    "finetuned_closed_accuracy": 0.816,
+    "degradation_closed_accuracy_pct": 1.92,
+    "base_open_accuracy": 0.517,
+    "finetuned_open_accuracy": 0.52,
+    "degradation_open_accuracy_pct": -0.58,
+    "base_overall_accuracy": 0.6745,
+    "finetuned_overall_accuracy": 0.668,
+    "degradation_overall_accuracy_pct": 0.96
+  },
+  "base_vqav2": {
+    "closed_accuracy": 0.832,
+    "open_accuracy": 0.517,
+    "overall_accuracy": 0.6745,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 915.6
+  },
+  "finetuned_vqav2": {
+    "closed_accuracy": 0.816,
+    "open_accuracy": 0.52,
+    "overall_accuracy": 0.668,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 1048.9
+  }
+}

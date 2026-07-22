@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "model_name": "smolvlm2-2b",
+    "train_dataset": "slake",
+    "seed": 42,
+    "measurement_type": "catastrophic_forgetting",
+    "timestamp": "2026-07-21T03:09:20.610096+00:00"
+  },
+  "summary": {
+    "base_closed_accuracy": 0.832,
+    "finetuned_closed_accuracy": 0.819,
+    "degradation_closed_accuracy_pct": 1.56,
+    "base_open_accuracy": 0.517,
+    "finetuned_open_accuracy": 0.521,
+    "degradation_open_accuracy_pct": -0.77,
+    "base_overall_accuracy": 0.6745,
+    "finetuned_overall_accuracy": 0.67,
+    "degradation_overall_accuracy_pct": 0.67
+  },
+  "base_vqav2": {
+    "closed_accuracy": 0.832,
+    "open_accuracy": 0.517,
+    "overall_accuracy": 0.6745,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 915.6
+  },
+  "finetuned_vqav2": {
+    "closed_accuracy": 0.819,
+    "open_accuracy": 0.521,
+    "overall_accuracy": 0.67,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 1125.8
+  }
+}

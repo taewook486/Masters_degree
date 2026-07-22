@@ -1,0 +1,38 @@
+{
+  "metadata": {
+    "model_name": "qwen25-vl-3b",
+    "train_dataset": "slake",
+    "seed": 42,
+    "measurement_type": "catastrophic_forgetting",
+    "timestamp": "2026-07-20T13:21:31.496165+00:00"
+  },
+  "summary": {
+    "base_closed_accuracy": 0.85,
+    "finetuned_closed_accuracy": 0.824,
+    "degradation_closed_accuracy_pct": 3.06,
+    "base_open_accuracy": 0.607,
+    "finetuned_open_accuracy": 0.554,
+    "degradation_open_accuracy_pct": 8.73,
+    "base_overall_accuracy": 0.7285,
+    "finetuned_overall_accuracy": 0.689,
+    "degradation_overall_accuracy_pct": 5.42
+  },
+  "base_vqav2": {
+    "closed_accuracy": 0.85,
+    "open_accuracy": 0.607,
+    "overall_accuracy": 0.7285,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 485.6
+  },
+  "finetuned_vqav2": {
+    "closed_accuracy": 0.824,
+    "open_accuracy": 0.554,
+    "overall_accuracy": 0.689,
+    "closed_count": 1000,
+    "open_count": 1000,
+    "total_count": 2000,
+    "eval_time_sec": 737.7
+  }
+}
