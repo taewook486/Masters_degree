@@ -59,6 +59,7 @@ python scripts/analyze_phase2.py --phase1_dir results/phase1_baseline --phase2_d
 - Phase 1 재실행 완료 후: `python scripts/analyze_phase1.py --results_dir results/phase1_baseline --seed 42` (RQ1)
 - `python scripts/analyze_clinical.py --results_dir results/phase1_baseline --dataset pathvqa --seed 42` (WCA 임상분석)
 - Phase 3 HPO: 아직 미착수. ~$78, ~200 GPU시간 규모 — Ablation까지 끝난 뒤 예산/시간 재확인 후 착수.
+- **비용 대안 검토는 Ablation 완료 후로 보류(사용자 확정, 2026-07-22)**: 누적 지출 $120 초과로 비용 절감 방향을 논의함. 건국대 자체 중앙 HPC는 확인 안 됨(랩 단위 GPU서버만 존재). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터)가 유력 후보 — 연구비 확보 어려운 과제 대상 무상지원 트랙 있음, `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요(제 쪽에서 인증서 오류로 실시간 검증은 못 함). 참고 문서: `docs/ENVIRONMENT_SETUP.md`(새 컴퓨터 환경 요구사항), `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`(대여처 문의 체크리스트). Ablation 39/39 끝나면 이어서 검토.
 
 ## 알아둘 것
 
