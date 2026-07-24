@@ -20,6 +20,10 @@ training:
   per_device_train_batch_size: 1
   gradient_accumulation_steps: 8
   num_train_epochs: 3
+  # base_qlora.yaml과 동일한 스텝 캡(QLoRA 표준, full 3에폭은 비현실적). 이 파일이
+  # 이 캡 없이 num_train_epochs만 있어 full 3에폭(pathvqa 7371스텝≈7.25h/조건)으로
+  # 도는 버그를 2026-07-24 발견·수정(Ablation C 실행 중 실측).
+  max_steps: 500
   max_seq_length: 2048
   warmup_ratio: 0.03
   weight_decay: 0.01
