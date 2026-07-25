@@ -1,16 +1,27 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-22 오전)
+# 다음 세션 시작점 (마지막 갱신: 2026-07-25 자정)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
-- **[긴급] Ablation-C `target_medium_seed123` 재실행 필요** — 2026-07-25 발견: 커밋 `64a3fe9`로 Ablation C(`target_minimal/medium/full.yaml`)에 `max_steps=500` 캡을 뒤늦게 추가했는데, `target_medium/seed123` 조건은 이미 캡 없는 옛 설정(`num_train_epochs=3`만 적용, 7371스텝≈7h15m)으로 학습을 마친 상태다. 나머지 38개 조건은 500스텝 캡으로 통일되므로 이 조건만 학습 예산이 달라 Ablation C(타겟모듈 영향) 비교를 오염시킨다. **git pull 후 아래로 재실행**:
+- **RunPod pod 중지 예정 (2026-07-25 자정)** — 사용자가 오늘 세션을 마무리하며 pod를 중지(stop)함. 재시작 후 아래 "다음 세션 최우선 작업"부터 진행.
+- **[주의] GitHub PAT 토큰 노출됨, 무효화 여부 미확인** — 이 세션 중 `git remote -v` 실행 결과가 그대로 대화에 노출되어 토큰이 평문으로 남았음. 다음 세션 시작 시 GitHub → Settings → Developer settings → Personal access tokens에서 해당 토큰이 아직 살아있는지 확인하고, 살아있다면 즉시 revoke 후 재발급할 것.
+- **Phase 2 Main+Ablation 전체(75조건) 완료, git 백업+push 완료** ✅ — Main 36 + Ablation A(비율 5종×3시드=15) + B(rank 5종×3시드=15) + C(target 3종×3시드=9) = 75조건. 결과(JSON/CSV/MD만, 어댑터 가중치 제외) 커밋 `8230e64`로 push 완료.
+  - **확정**: ablation_a → **ratio=1.0**이 최적(단조 증가, 아직 한계치 안 보임). ablation_b → **rank=64**가 최적(단조 증가, 시간·VRAM 비용 거의 안 늘어남). 재실행 불필요.
+- **[긴급] Ablation-C 6개 조건(minimal 3시드 + medium 3시드) 재실행 필요** — 2026-07-25 밤 재검증으로 발견: 이전에 "target_medium/seed123 조건 하나만" 문제라고 진단했었으나(아래 옛 기록), 각 조건 `train_result.json`의 `metadata.timestamp`를 직접 대조한 결과 **minimal 3시드 전부(평균 390분) + medium 3시드 전부(평균 300분), 총 6개 조건**이 `max_steps=500` 캡(커밋 `64a3fe9`) 적용 전에 이미 실행 완료되어 있었던 것으로 확인됨(캡 적용 후 정상 실행된 full은 평균 36.8분). `skip_existing=True` 기본값 때문에 캡 반영 후 재실행해도 이 6개는 스킵되어 옛 결과가 그대로 남아있음. 상세 경위는 로컬 auto-memory `phase2-ablation-c-confound` 참고. **git pull 후 아래로 재실행**:
   ```bash
+  rm -rf results/phase2_finetune/ablation_c_qwen3-vl-2b_pathvqa_minimal_seed42
+  rm -rf results/phase2_finetune/ablation_c_qwen3-vl-2b_pathvqa_minimal_seed123
+  rm -rf results/phase2_finetune/ablation_c_qwen3-vl-2b_pathvqa_minimal_seed456
+  rm -rf results/phase2_finetune/ablation_c_qwen3-vl-2b_pathvqa_medium_seed42
   rm -rf results/phase2_finetune/ablation_c_qwen3-vl-2b_pathvqa_medium_seed123
-  bash scripts/run_phase2_ablation.sh   # skip_existing=True라 나머지 조건은 자동 스킵, 삭제한 조건만 재학습
+  rm -rf results/phase2_finetune/ablation_c_qwen3-vl-2b_pathvqa_medium_seed456
+  bash scripts/run_phase2_ablation.sh   # skip_existing=True라 나머지 조건은 자동 스킵, 삭제한 6개만 재학습(~37분/조건, 총 3~4시간 예상)
   ```
+  재실행 후 `wc -l results/phase2_finetune/phase2_summary.csv`로 중복 행 없이 76줄(헤더+75) 유지되는지 확인할 것 — 검증 안 된 부분.
   (BEST_MODEL_CONFIG가 `qwen3_vl_2b.yaml`이 아니면 디렉터리명의 `qwen3-vl-2b` 부분을 실제 `model_name`으로 바꿀 것.)
+  - *(옛 기록, 참고용 — 위 재검증으로 대체됨)*: 2026-07-25 최초 발견 시엔 `target_medium/seed123` 조건 하나만 문제라고 판단해 그 조건만 삭제 후 재실행을 계획했었으나, 표본 하나만 우연히 걸려 나온 불완전한 진단이었음.
 - **Phase 2 Main: 36/36 전 조건 완료** ✅ (결과 git 백업 완료, 커밋 d6c6cd5)
 - **Phase 2 Ablation: 원인 수정 후 재시작, 07-22 01:33 UTC부터 재실행 중 (오후에 진행 상황 재확인 예정)**
   - **수정 검증됨**: 재시작 후 이전 실패 지점(`unsloth_compile_transformers`의 `Conv1d` AttributeError)을 정상 통과, 모델 로딩·LoRA 패칭 완료, train split 생성까지 에러 없이 진행 확인(01:35 UTC 기준). 캐시 경로 수정이 root cause를 잡은 것으로 사실상 확정.
@@ -28,7 +39,7 @@
 ## 다음 세션 최우선 작업 (pod에서 실행)
 
 ```bash
-git pull   # 2db2361 이상 확인 (ablation 캐시 경로 수정 포함) + fac3xxx 이상 확인 (아래 스크립트 캐시경로 수정)
+git pull   # 8230e64 이상 확인 (Phase 2 Main+Ablation 75조건 결과 백업 포함)
 
 # [중요] 이 세션 전체에 캐시 경로 지정 — run_phase2_ablation.sh가 겪은 것과 같은
 # Disk quota exceeded를 막기 위해, .sh 래퍼 없이 bare python으로 실행하는
@@ -37,11 +48,11 @@ git pull   # 2db2361 이상 확인 (ablation 캐시 경로 수정 포함) + fac3
 export HF_HOME=/hf_cache
 export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
 
-# 0) Phase 2 Ablation 재개 — 최우선. skip_existing으로 자동 이어서 진행됨.
+# 0) Ablation-C 오염된 6개 조건 재실행 — 최우선. 명령어는 위 "[긴급]" 항목 참고.
 tmux new -s ablation
 cd /workspace/Masters_degree && source .venv/bin/activate
-bash scripts/run_phase2_ablation.sh
-# Ctrl+B, D로 detach 후 방치. 진행 확인: ls results/phase2_finetune/ablation_*/train_result.json | wc -l
+# (위 [긴급] 항목의 rm -rf 6줄 + bash scripts/run_phase2_ablation.sh 실행)
+# Ctrl+B, D로 detach 후 방치. 진행 확인: ls results/phase2_finetune/ablation_c_*/train_result.json | wc -l
 
 # 1) Cross-dataset CF 최초 실행 (미검증 신규 기능 — 에러 나면 바로 diagnose)
 # --max_samples 500: full test set이면 PathVQA(6,719개)가 24회 반복되어 ~16시간
@@ -61,6 +72,9 @@ python scripts/analyze_phase2.py --phase1_dir results/phase1_baseline --phase2_d
 ```
 
 그 다음 순서:
+- Ablation-C 6개 조건 재실행 완료 후 target modules 최적 조합 재계산(이전 "minimal 1등"은 컨파운드로 신뢰 불가)
+- ratio=1.0, rank=64, target=(재계산 예정) 조합을 `configs/finetune/base_qlora.yaml`에 반영할지 결정 — Phase 3는 기본적으로 이 파일을 그대로 재사용함
+- Phase 3(`scripts/run_phase3.sh`) 실행 전 `ANTHROPIC_API_KEY` 환경변수 필수(없으면 스크립트가 preflight에서 즉시 중단)
 - Ablation 39/39 완료될 때까지 기다렸다가 결과 확인
 - Phase 1 재실행 완료 후: `python scripts/analyze_phase1.py --results_dir results/phase1_baseline --seed 42` (RQ1)
 - `python scripts/analyze_clinical.py --results_dir results/phase1_baseline --dataset pathvqa --seed 42` (WCA 임상분석)
