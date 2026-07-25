@@ -310,6 +310,24 @@ python scripts/analyze_phase2.py \
 
 > Catastrophic Forgetting은 각 조건의 `train_result.json` → `catastrophic_forgetting` 필드(VQAv2 기준 degradation)에 저장된다. WCA 임상 분석은 PathVQA 조건 디렉터리에 `scripts/analyze_clinical.py --results_dir results/phase2_finetune/<조건>` 로 적용한다.
 
+### Phase 2 Cross-dataset CF (Table 4.2b-B, v0.4 신설)
+
+설계서 §4.4 (B) "의료 도메인 내 cross-dataset 일반화" — 훈련 데이터셋 ≠ 평가 데이터셋 조합(예: PathVQA로 학습 → SLAKE·VQA-RAD로 평가)으로 12개 조건 × 2개 cross-dataset = 24회 추가 평가를 수행한다. Phase 2 Main(36/36) 완료 후 실행한다.
+
+```bash
+python scripts/measure_cross_dataset_cf.py \
+  --config_dir configs/models --phase2_dir results/phase2_finetune \
+  --phase1_summary results/phase1_baseline/phase1_summary.csv --seeds 42 123 456 \
+  --max_samples 500
+```
+
+> **[중요] `--max_samples 500`**: full test set으로 돌리면 PathVQA(6,719개)가 24회 반복 평가되어 ~16시간(보조 지표 치고 과함) 소요 추정 → 500 샘플로 제한해 ~2-3시간으로 단축(사용자 확정, 2026-07-19). 이 스크립트는 새로 구현된 뒤 pod에서 아직 실행·검증된 적이 없으므로, 처음 실행 시 에러가 나면 바로 진단할 것 — 특히 `PeftModel.from_pretrained`로 unsloth 학습 어댑터(qwen3-vl-2b/qwen25-vl-3b)를 불러오는 부분의 호환성이 실증되지 않았다.
+
+**산출물**:
+- `results/phase2_finetune/<조건>/cross_cf_<train>_to_<eval>.json` (72개)
+- `results/phase2_finetune/cross_dataset_cf_summary.csv` (집계)
+- `results/phase2_finetune/cross_dataset_cf_summary.md` (사람이 읽는 리포트, Table 4.2b-B 원본)
+
 ---
 
 ## 5. Phase 2 Ablation
@@ -335,7 +353,7 @@ bash scripts/run_phase2_ablation.sh
 
 **목표**: 4개 전략(Manual/RS/Optuna/Autoresearch) × 10회 반복 × 40 trial = HPO 비교 실험
 
-**예상 규모**: ~1,210 trials, ~200 GPU-hours (RTX 4090 기준 약 8-9일), 비용 ~$78-107 (Community Cloud)
+**예상 규모**: ~1,210 trials. **GPU-hours/비용 추정치(~200h, ~$78-107)는 재검증 필요** — max_steps는 이제 전 trial 공통 200스텝으로 고정되고(v0.11, 이전엔 탐색 공간과 고정 조건이 서로 모순돼 실제로는 {100,200,400,800} 중 표본을 뽑고 있었음), 안전장치용 시간 상한(`time_budget_min`)도 15분→90분으로 상향했다. Phase 2 main 실측 처리량(스텝당 약 13초, effective_batch=8 기준)을 적용하면 trial당 최소 ~35-45분이 걸려 기존 "~10분/trial" 추정보다 클 가능성이 높다. **아래 스모크 먼저 실행해 실측 후 총 시간·비용을 재산출할 것.**
 
 > Phase 2 완료 및 ANTHROPIC_API_KEY 설정 후 실행
 
@@ -344,6 +362,20 @@ bash scripts/run_phase2_ablation.sh
 ```bash
 nano scripts/run_phase3.sh
 # MODEL_CONFIG를 Phase 2 best model로 수정
+```
+
+### 실행 전: 스모크로 trial당 실제 소요 시간 확인 (권장)
+
+전체 1,210 trial을 돌리기 전에, 전략당 1-2 trial만 먼저 실행해 실제 wall-clock을 측정하고 총 GPU-시간·비용 추정치를 갱신한다.
+
+```bash
+python -u -m src.autoresearch.run_phase3 \
+  --model_config configs/models/qwen3_vl_2b.yaml \
+  --finetune_config configs/finetune/base_qlora.yaml \
+  --output_dir results/_phase3_smoke \
+  --strategies manual random optuna autoresearch \
+  --repeats 1 --trials_per_repeat 2 --time_budget_min 90
+# results/_phase3_smoke/results.tsv의 train_time_min 열로 실측 확인
 ```
 
 ```bash
@@ -358,6 +390,20 @@ Phase 3는 체크포인트를 자동 저장합니다. 동일 명령어 재실행
 # 체크포인트 상태 확인
 cat results/phase3_autoresearch/checkpoints/hpo_checkpoint.json
 ```
+
+### Phase 3 통계 분석 (RQ3 — HPO 전략 비교, run-level)
+
+4개 전략 × 10회 반복 완료 후, run-level(반복별 최고 accuracy 10개)에서 Kruskal-Wallis(4그룹 비교) + Mann-Whitney U(Autoresearch vs Optuna 쌍별) + Bootstrap 95% CI를 산출한다(설계서 §4.5).
+
+```bash
+python scripts/analyze_phase3.py --results_dir results/phase3_autoresearch
+```
+
+**산출물**:
+- `results/phase3_autoresearch/phase3_rq3_analysis.md` — 사람이 읽는 리포트
+- `results/phase3_autoresearch/phase3_rq3_analysis.json` — 기계 판독용
+
+> trial-level 데이터(탐색 궤적, anytime performance curve)는 이 스크립트의 범위 밖이며, 필요 시 `results/phase3_autoresearch/results.tsv`를 직접 시각화한다.
 
 ---
 

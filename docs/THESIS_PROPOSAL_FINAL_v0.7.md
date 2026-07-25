@@ -264,7 +264,6 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
 | warmup_ratio | [0.0, 0.1] | 연속 |
 | weight_decay | [0.0, 0.1] | 연속 |
 | lora_targets | {minimal, medium, full} | 범주형 |
-| max_steps | {100, 200, 400, 800} | 이산 |
 
 **비교 대상 (4가지 HPO 전략)**:
 
@@ -287,13 +286,13 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
 **고정 조건**:
 - 동일 모델 (Phase 2에서 최적 모델 1개)
 - 동일 데이터셋 (PathVQA)
-- 고정 학습량: max_steps 고정 (200 steps) — trial 간 동일 학습 step 수 보장
+- 고정 학습량: max_steps 고정 (200 steps, 전 trial 공통) — trial 간 동일 학습 step 수 보장. 구현 상 학습 콜백에 안전장치용 wall-clock 상한(`time_budget_min`)도 함께 걸려 있으나, 이는 비정상적으로 느린 조합에 대한 안전장치일 뿐 실험 통제 변수가 아니며, max_steps=200이 모든 하이퍼파라미터 조합에서 안전장치보다 먼저 도달하도록 충분히 넉넉하게(90분) 설정한다.
 - 동일 검증 세트
 
 **예상 실험 규모**:
 - 총 trial 수: Manual 10회 + RS 400회(40x10) + Optuna 400회(40x10) + Autoresearch 400회(40x10) = 1,210회
-- trial당 소요: ~10분 (max_steps=200 학습 + 검증 평가, RTX 4090 기준)
-- 예상 총 GPU 시간: ~200 GPU-hours (RunPod RTX 4090 기준 약 8-9일, 24h 가동)
+- trial당 소요: ~10분(초기 추정치, max_steps=200 학습 + 검증 평가, RTX 4090 기준) — **재검증 필요**. Phase 2 main 실측 처리량(기본 설정 batch=1·grad_accum=8, 500스텝≈1.8h → 스텝당 약 13초)을 그대로 적용하면 200스텝은 effective_batch=8 기준 약 35-45분이 걸리고, 탐색 공간의 effective_batch 최대치(64)에서는 이보다 더 길어질 수 있어 ~10분 추정치보다 훨씬 클 가능성이 있다. Phase 3 착수 전 1-2개 trial로 실측 후 총 GPU 시간·비용을 재산출한다.
+- 예상 총 GPU 시간: ~200 GPU-hours (RunPod RTX 4090 기준 약 8-9일, 24h 가동) — 위와 동일한 사유로 재검증 필요한 초기 추정치
 
 > **v0.4 변경**: "15분 고정 시간 예산"에서 "max_steps 고정"으로 변경. batch_size × grad_accum 조합에 따라 동일 시간 내 처리 데이터량이 달라지는 confounding을 해소. effective_batch_size(= batch × grad_accum)와 total_samples_seen(= steps × effective_batch), wall_clock_time을 별도 보고하여 데이터 처리량 차이를 투명하게 공개한다.
 
@@ -398,12 +397,13 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
   - **의료 특화 VLM 직접 비교 부재**: LLaVA-Med, Med-Flamingo 등과 동일 환경에서의 직접 실험 비교는 본 연구 범위 외. 동일 데이터셋·평가 프로토콜의 선행 연구 수치와 간접 비교 (Table 4.4).
   - **Phase 3 confounding**: max_steps 고정에도 effective_batch_size에 따른 total_samples_seen 차이 존재. 모든 trial의 effective_batch, samples_seen, wall_clock_time을 투명하게 보고.
   - **LLM 비결정성**: Autoresearch의 API 비결정성으로 완전 재현 불가. 구현은 temperature=0 고정이 아니라 **temperature 스케줄링(trial 진행률에 따라 1.0→0.3, 초반 탐색/후반 활용 균형)**을 사용하며, top_p는 API 기본값을 사용한다(별도 고정 없음). 모델 ID(`claude-sonnet-4-6`)만 고정하고 스냅샷 날짜 접미사는 별도 지정하지 않는다. API 응답 로깅, 10회 반복으로 변동성 흡수.
-  - **Ablation Study 일반화**: LoRA Rank/Target Module/데이터 크기 Ablation은 PathVQA + 최적 모델 1개 기준 수행. SLAKE rank=8,16,32 보조 검증으로 일관성만 확인. 전체 cross-dataset 확장은 향후 연구.
+  - **Ablation Study 일반화**: LoRA Rank/Target Module/데이터 크기 Ablation은 PathVQA + 최적 모델 1개 기준 수행. **(v0.11 정정)** "SLAKE rank=8,16,32 보조 검증으로 일관성만 확인"은 2026-07-25 기준 git 이력·결과 파일·auto-memory 어디에도 실행 근거가 없어 아직 수행되지 않은 계획이었음을 확인했다 — `src/finetune/run_phase2.py`의 Ablation B(`run_ablation_b`)도 현재 `ABLATION_DATASET="pathvqa"`로 고정돼 있어 SLAKE를 바로 지정할 수 없다(코드 수정 필요). 이 보조 검증은 실행 여부를 확정하지 않은 채 완료된 것처럼 서술되어 있었으므로, 실제로 수행하거나(코드에 dataset 파라미터화 추가 후 실행) 또는 계획을 철회하고 "전체 cross-dataset 확장은 향후 연구"로만 남기는 결정이 필요하다. 전체 cross-dataset 확장은 향후 연구.
   - **통계적 검정력의 한계**: Phase 2 paired t-test n=9, Phase 3 run-level KW n=10. BCa Bootstrap + Mixed-Effects + Wilcoxon 등 3중 검증으로 robust한 결론 유도하나, n 자체의 한계로 효과 크기 추정 구간은 넓을 수 있음.
   - **WCA(Weighted Clinical Accuracy) 임시 가중치 한계**: 본 연구의 WCA 가중치(Diagnosis 1.0, Location 0.8, ...)는 임상 문헌이나 Delphi 기법 등 외부 검증 없이 연구자가 임의로 부여한 척도다. 이 가중치로 산출한 수치는 절대적 임상 중요도의 척도로 해석될 수 없으며, primary 지표(정확도, BERTScore)를 보완하는 참고용 보조 지표로만 제한적으로 사용한다. 임상의 설문 또는 Delphi 합의를 통한 가중치 검증은 후속 연구 과제로 남긴다.
   - **다중 비교 보정 부재**: 본 연구는 Phase 1(Cochran's Q + McNemar), Phase 2(paired t-test, Wilcoxon, Bootstrap, Mixed-Effects 병행), Phase 3(Kruskal-Wallis, Mann-Whitney 쌍별 비교)에 걸쳐 총 20회 이상의 통계 검정을 수행한다. 유의수준 0.05를 각 검정에 독립 적용할 경우 family-wise error rate가 누적되어 우연에 의한 유의 결과(제1종 오류)의 위험이 커진다. 본 연구는 Phase 1의 McNemar 사후검정에만 Bonferroni 보정을 적용했으며, Phase 2·3을 포함한 전체 파이프라인에 걸친 통합 다중비교 보정은 적용하지 않았다. 개별 p-value는 이 점을 감안하여 해석되어야 하며, 전체 파이프라인 수준의 FDR 보정 적용은 향후 분석 과제로 남긴다.
   - **Cross-dataset CF 개념 재정의**: PathVQA(병리 조직 영상)와 SLAKE/VQA-RAD(방사선 영상)는 이미지 도메인 자체가 상이하므로, (B) cross-dataset 성능 변화는 엄밀한 의미의 Catastrophic Forgetting(파인튜닝 이전에 가능했던 것을 파인튜닝 이후 수행하지 못하게 되는 현상)이라기보다, 도메인 특화에 따라 예측 가능한 도메인 일반화 격차(domain generalization gap)에 가깝다. 본 논문은 (B) 결과를 'cross-dataset 일반화 능력' 지표로 재명명하여 보고하며, CF의 엄밀한 판정은 (A) VQAv2 지표에 한정하여 해석한다.
   - **Gemma4-E2B MoE 공정성**: 평가 대상 모델 중 Gemma4-E2B는 Mixture-of-Experts(MoE) 구조로 추론 시 2.3B 파라미터만 활성화되나 전체 저장 파라미터는 5.1B에 달한다. 반면 Qwen3-VL-2B, SmolVLM-2.2B는 밀집(dense) 아키텍처로 활성/전체 파라미터가 동일하다. 본 연구의 '경량 VLM' 선정 기준은 활성 파라미터(추론 시 연산량 및 VRAM 사용량) 기준이며, 이는 소비자 GPU 환경에서의 실질적 구동 가능성이라는 연구 목적에 부합한다. 다만 Gemma4-E2B의 표현력이 저장 파라미터 5.1B에 기인할 가능성이 있어, 순수 파라미터 규모 기준 비교로 확대 해석해서는 안 된다는 한계를 명시한다.
+  - **ECE(Expected Calibration Error) 산출 불가 (v0.11 신설)**: §4.4.5는 ECE를 WCA와 함께 임상적 의미 분석의 보조 지표로 제시하나, 현재 평가 파이프라인은 per-sample confidence(모델 예측 확률)를 저장하지 않는다. `scripts/analyze_clinical.py`/`src/evaluate/clinical_significance.py`에는 ECE 계산 로직 자체는 구현돼 있지만 입력값이 없어 항상 "N/A(미저장)"으로 보고된다. ECE를 실제로 산출하려면 평가 스크립트가 정답 여부뿐 아니라 예측 confidence까지 저장하도록 확장해야 하며, 이는 Phase 1/2 재실행을 요구하는 후속 작업이므로 본 연구에서는 ECE를 결과에 포함하지 못하고 WCA만 보조 지표로 보고한다.
   - **학습 예산(max_steps cap)의 한계**: Phase 2 QLoRA 파인튜닝은 목표 3 epochs였으나 RunPod RTX 4090의 시간·비용 제약으로 `max_steps=500`(조건당 samples_seen = 4,000 고정) 상한을 적용했다. 이로 인해 데이터셋 크기에 따라 실효 학습량이 크게 달라진다 — 소형 VQA-RAD(train ~1.8K)는 약 2 epoch 이상 학습되나, 중형 SLAKE(~11K)와 대형 PathVQA(~26K)는 각각 1 epoch 미만(약 0.4·0.15 epoch 수준)만 학습된다. 따라서 대형 데이터셋의 파인튜닝 성능은 수렴 이전의 과소학습(under-training) 상태일 수 있으며, 데이터셋 간 성능 비교는 '동일 학습 step 예산 하의 학습 효율' 관점으로 해석해야 하고 '완전 수렴 성능'으로 확대 해석해서는 안 된다. 모든 조건의 실효 `samples_seen`·환산 epoch·`wall_clock`을 결과에 투명 보고하며, 데이터셋별 full-epoch 재학습(특히 PathVQA)은 후속 연구 과제로 남긴다.
 - 5.4 향후 연구 방향
 
@@ -413,6 +413,7 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
 > **v0.8 변경**: 4.4 QLoRA 표의 "Epochs 3"을 실제 구현(`max_steps=500` cap, samples_seen=4,000 고정)에 맞춰 "학습 예산" 행으로 수정하고, 5.3에 **학습 예산(max_steps cap)의 한계**를 신규 추가(대형 데이터셋 과소학습 가능성, 데이터셋 간 비교는 '동일 step 예산 하 학습 효율' 관점 해석). RUNPOD_GUIDE.md 실행 절차와의 정합성 확보(구현 ↔ 설계 일치).
 > **v0.9 변경**: 실험 환경에 16GB GPU 2장(4080 Super ×2) 멀티-GPU pod 대안 환경을 명시(24GB 단일 GPU 확보가 어려웠던 시점의 실사용 환경). `run_phase2.py`의 조건별 병렬 실행(`--max_parallel`, GPU 1장당 1조건 고정)으로 model-parallel/DataParallel 충돌 없이 검증됨을 반영 — 상세는 `docs/RUNPOD_GUIDE.md` §4.0.
 > **v0.10 변경**: Phase 3 LLM 비결정성 통제 서술(5.3, 6)을 실제 구현(`src/autoresearch/agent.py`)에 맞춰 정정 — "temperature=0, top_p=1 고정"이 아니라 **temperature 스케줄링(1.0→0.3)** 을 사용하며 top_p는 API 기본값임을 명시. 코드 검토 중 `anthropic` 패키지가 `pyproject.toml`/`uv.lock`에 누락되어 있던 것도 함께 발견·수정(Phase 3 `autoresearch` 전략이 새 pod `uv sync` 환경에서 즉시 실패할 수 있었던 문제).
+> **v0.11 변경**: §4.5 탐색 공간 표와 고정 조건 문단이 max_steps를 두고 서로 모순됐던 것(표=탐색 가능 {100,200,400,800} vs 고정 조건=200 고정)을 발견·해소. `src/autoresearch/strategies.py`가 실제로는 탐색 가능한 버전으로 구현돼 있어 RandomSearch/Optuna가 trial마다 다른 max_steps를 뽑고 있었음을 확인, 코드를 고정 조건에 맞춰 수정(`PHASE3_FIXED_MAX_STEPS=200`, `agent.py`의 LLM 제안값 강제 덮어쓰기 포함). 탐색 공간 표에서 max_steps 행 제거(9→8개 파라미터). 추가로 학습 콜백에 걸린 wall-clock 안전장치(`time_budget_min`, 기존 15분)가 max_steps보다 먼저 trial을 끊어 사실상의 숨은 시간 예산으로 작동하고 있었음을 발견 — Phase 2 main 실측 처리량(스텝당 약 13초) 기준 200스텝 완주에는 최소 35-45분이 필요해 기존 15분 설정으로는 거의 모든 trial이 조기 절단됐을 가능성이 높음. 90분으로 상향해 안전장치가 실험 통제 변수를 침범하지 않도록 정정. 이에 따라 "예상 실험 규모"의 trial당 소요·총 GPU 시간 추정치도 재검증 필요로 표시(§4.5 본문 참조). 추가로 5.3에 두 항목을 반영: (1) ECE가 per-sample confidence 미저장으로 항상 N/A 산출됨을 명시(신규 한계점), (2) "SLAKE rank=8,16,32 보조 검증으로 일관성만 확인" 문장이 실제로는 실행 근거 없이 완료된 것처럼 서술돼 있었음을 발견·정정(Ablation Study 일반화 항목).
 
 ### 참고문헌
 ### 부록

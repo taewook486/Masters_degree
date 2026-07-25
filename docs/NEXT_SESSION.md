@@ -5,6 +5,12 @@
 
 ## 현재 상태
 
+- **[긴급] Ablation-C `target_medium_seed123` 재실행 필요** — 2026-07-25 발견: 커밋 `64a3fe9`로 Ablation C(`target_minimal/medium/full.yaml`)에 `max_steps=500` 캡을 뒤늦게 추가했는데, `target_medium/seed123` 조건은 이미 캡 없는 옛 설정(`num_train_epochs=3`만 적용, 7371스텝≈7h15m)으로 학습을 마친 상태다. 나머지 38개 조건은 500스텝 캡으로 통일되므로 이 조건만 학습 예산이 달라 Ablation C(타겟모듈 영향) 비교를 오염시킨다. **git pull 후 아래로 재실행**:
+  ```bash
+  rm -rf results/phase2_finetune/ablation_c_qwen3-vl-2b_pathvqa_medium_seed123
+  bash scripts/run_phase2_ablation.sh   # skip_existing=True라 나머지 조건은 자동 스킵, 삭제한 조건만 재학습
+  ```
+  (BEST_MODEL_CONFIG가 `qwen3_vl_2b.yaml`이 아니면 디렉터리명의 `qwen3-vl-2b` 부분을 실제 `model_name`으로 바꿀 것.)
 - **Phase 2 Main: 36/36 전 조건 완료** ✅ (결과 git 백업 완료, 커밋 d6c6cd5)
 - **Phase 2 Ablation: 원인 수정 후 재시작, 07-22 01:33 UTC부터 재실행 중 (오후에 진행 상황 재확인 예정)**
   - **수정 검증됨**: 재시작 후 이전 실패 지점(`unsloth_compile_transformers`의 `Conv1d` AttributeError)을 정상 통과, 모델 로딩·LoRA 패칭 완료, train split 생성까지 에러 없이 진행 확인(01:35 UTC 기준). 캐시 경로 수정이 root cause를 잡은 것으로 사실상 확정.
