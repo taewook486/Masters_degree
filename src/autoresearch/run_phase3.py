@@ -41,7 +41,7 @@ def run_phase3(
     trials_per_repeat: int = 40,
     seed: int = 42,
     data_dir: str = "data",
-    time_budget_min: float = 15.0,
+    time_budget_min: float = 90.0,
 ) -> pd.DataFrame:
     """Run all Phase 3 HPO experiments.
 
@@ -54,7 +54,8 @@ def run_phase3(
         trials_per_repeat: Max trials per repeat.
         seed: Base random seed.
         data_dir: Dataset directory.
-        time_budget_min: Training time budget per trial.
+        time_budget_min: Wall-clock safety cutoff per trial in minutes (not the
+            controlled variable — see PHASE3_FIXED_MAX_STEPS in strategies.py).
 
     Returns:
         Summary DataFrame.
@@ -200,8 +201,15 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--data_dir", default="data")
     parser.add_argument(
-        "--time_budget_min", type=float, default=15.0,
-        help="Training time budget per trial in minutes (default: 15)",
+        "--time_budget_min", type=float, default=90.0,
+        help=(
+            "Wall-clock safety cutoff per trial in minutes (default: 90). "
+            "This is NOT the controlled variable — max_steps is fixed at "
+            "PHASE3_FIXED_MAX_STEPS(=200) for every trial. 90min gives enough "
+            "headroom for the slowest hyperparameter combo (effective_batch up "
+            "to 64) to reach 200 steps based on Phase 2 main's measured "
+            "throughput (~13s/step at effective_batch=8)."
+        ),
     )
     args = parser.parse_args()
 

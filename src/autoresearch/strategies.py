@@ -35,8 +35,13 @@ SEARCH_SPACE = {
     "warmup_ratio": (0.0, 0.1),  # continuous
     "weight_decay": (0.0, 0.1),  # continuous
     "lora_targets": ["minimal", "medium", "full"],
-    "max_steps": [100, 200, 400, 800],  # v0.2: replaces epochs for Phase 3
 }
+
+# v0.11: max_steps는 탐색 대상이 아니라 전 trial 공통 고정값이다(설계서 §4.5 "고정
+# 조건" — trial 간 동일 학습 step 수 보장). v0.2~v0.10 구간에서는 SEARCH_SPACE에
+# 남아 있어 탐색 공간 표(탐색 가능)와 고정 조건 문단(200 고정)이 서로 모순됐고,
+# RandomSearch/Optuna가 실제로 {100,200,400,800} 중에서 표본을 뽑고 있었다.
+PHASE3_FIXED_MAX_STEPS = 200
 
 
 def config_to_dict(trial: TrialResult) -> dict:
@@ -96,7 +101,7 @@ class ManualStrategy(HPOStrategy):
             "warmup_ratio": 0.03,
             "weight_decay": 0.01,
             "lora_targets": "minimal",
-            "max_steps": 400,
+            "max_steps": PHASE3_FIXED_MAX_STEPS,
         }
 
 
@@ -128,7 +133,7 @@ class RandomSearchStrategy(HPOStrategy):
             "warmup_ratio": round(random.uniform(wu_lo, wu_hi), 4),
             "weight_decay": round(random.uniform(wd_lo, wd_hi), 4),
             "lora_targets": random.choice(SEARCH_SPACE["lora_targets"]),
-            "max_steps": random.choice(SEARCH_SPACE["max_steps"]),
+            "max_steps": PHASE3_FIXED_MAX_STEPS,
         }
 
 
@@ -173,7 +178,6 @@ class OptunaTPEStrategy(HPOStrategy):
                 "warmup_ratio": t.warmup_ratio,
                 "weight_decay": t.weight_decay,
                 "lora_targets": t.lora_targets,
-                "max_steps": t.max_steps,
             }
             study.add_trial(
                 optuna.trial.create_trial(
@@ -203,7 +207,6 @@ class OptunaTPEStrategy(HPOStrategy):
             "warmup_ratio": optuna.distributions.FloatDistribution(wu_lo, wu_hi),
             "weight_decay": optuna.distributions.FloatDistribution(wd_lo, wd_hi),
             "lora_targets": optuna.distributions.CategoricalDistribution(SEARCH_SPACE["lora_targets"]),
-            "max_steps": optuna.distributions.CategoricalDistribution(SEARCH_SPACE["max_steps"]),
         }
 
     def suggest(self, history: list[TrialResult]) -> dict:
@@ -223,7 +226,7 @@ class OptunaTPEStrategy(HPOStrategy):
             "warmup_ratio": round(trial.params["warmup_ratio"], 4),
             "weight_decay": round(trial.params["weight_decay"], 4),
             "lora_targets": trial.params["lora_targets"],
-            "max_steps": trial.params["max_steps"],
+            "max_steps": PHASE3_FIXED_MAX_STEPS,
         }
 
 
@@ -398,7 +401,10 @@ Search space:
 - warmup_ratio: [0.0, 0.1]
 - weight_decay: [0.0, 0.1]
 - lora_targets: {"minimal", "medium", "full"}
-- max_steps: {100, 200, 400, 800}
+
+Note: max_steps is fixed at 200 for every trial (not tunable) so that all
+trials are trained on the same step budget for a fair comparison. Do not
+suggest a value for it.
 
 Strategy guidelines:
 1. Early trials (0-5): Explore diverse configurations

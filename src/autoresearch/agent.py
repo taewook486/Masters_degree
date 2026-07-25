@@ -14,6 +14,8 @@ import os
 import re
 import time
 
+from src.autoresearch.strategies import PHASE3_FIXED_MAX_STEPS
+
 logger = logging.getLogger(__name__)
 
 # Retry settings for API resilience
@@ -25,7 +27,6 @@ _VALID_RANKS = {4, 8, 16, 32, 64}
 _VALID_BATCH_SIZES = {1, 2, 4}
 _VALID_GRAD_ACCUM = {4, 8, 16}
 _VALID_TARGETS = {"minimal", "medium", "full"}
-_VALID_EPOCHS = {1, 2, 3, 5}
 
 
 def ask_agent_for_config(
@@ -182,9 +183,9 @@ def _parse_config(raw_text: str) -> dict:
     raise RuntimeError(f"Could not parse JSON from agent response: {raw_text[:200]}")
 
 
-_VALID_MAX_STEPS = {100, 200, 400, 800}
-
 # REQ-RI-005: 필수 키 정의 및 기본값
+# v0.11: max_steps는 여기서 관리하지 않는다 — 모든 trial 공통 고정값
+# (PHASE3_FIXED_MAX_STEPS)이며, LLM이 무엇을 제안하든 아래에서 강제로 덮어쓴다.
 _REQUIRED_KEYS_DEFAULTS = {
     "lora_rank": 16,
     "lora_alpha": 32,
@@ -194,14 +195,16 @@ _REQUIRED_KEYS_DEFAULTS = {
     "warmup_ratio": 0.03,
     "weight_decay": 0.01,
     "lora_targets": "minimal",
-    "max_steps": 400,
 }
 
 
 def _validate_config(config: dict) -> dict:
     """Validate and clamp hyperparameters to search space bounds.
 
-    REQ-RI-005: 필수 키 누락 시 기본값 적용, epochs->max_steps 마이그레이션.
+    REQ-RI-005: 필수 키 누락 시 기본값 적용.
+    v0.11: max_steps는 탐색 대상이 아니므로 LLM 제안값을 무시하고 항상
+    PHASE3_FIXED_MAX_STEPS로 고정한다(epochs->max_steps 마이그레이션 로직도
+    함께 제거 — 더 이상 가변값이 아니므로 마이그레이션할 대상이 없다).
     """
     # REQ-RI-005: 필수 키 존재 여부 확인, 누락 시 기본값 적용
     for key, default_val in _REQUIRED_KEYS_DEFAULTS.items():
@@ -209,17 +212,13 @@ def _validate_config(config: dict) -> dict:
             logger.warning(f"필수 키 '{key}' 누락, 기본값 {default_val} 적용")
             config[key] = default_val
 
-    # REQ-RI-005: epochs -> max_steps 하위 호환성 마이그레이션
-    if "epochs" in config and "max_steps" not in config:
-        epochs_val = config.pop("epochs")
-        # epochs를 max_steps로 변환 (대략적 매핑)
-        epoch_to_steps = {1: 100, 2: 200, 3: 400, 5: 800}
-        max_steps = epoch_to_steps.get(epochs_val, 400)
-        config["max_steps"] = max_steps
-        logger.warning(f"epochs={epochs_val} -> max_steps={max_steps} 마이그레이션 완료")
-    elif "epochs" in config:
-        # max_steps가 이미 있으면 epochs 키 제거
-        config.pop("epochs", None)
+    # max_steps/epochs는 LLM이 무엇을 제안하든 무시하고 고정값을 강제한다.
+    config.pop("epochs", None)
+    if config.get("max_steps") != PHASE3_FIXED_MAX_STEPS:
+        logger.info(
+            f"max_steps는 고정값이므로 LLM 제안({config.get('max_steps')})을 "
+            f"무시하고 {PHASE3_FIXED_MAX_STEPS}으로 강제합니다"
+        )
 
     rank = config.get("lora_rank", 16)
     if rank not in _VALID_RANKS:
@@ -254,11 +253,6 @@ def _validate_config(config: dict) -> dict:
         targets = "minimal"
         logger.warning("Invalid lora_targets, defaulting to 'minimal'")
 
-    max_steps = config.get("max_steps", 400)
-    if max_steps not in _VALID_MAX_STEPS:
-        max_steps = min(_VALID_MAX_STEPS, key=lambda x: abs(x - max_steps))
-        logger.warning(f"Clamped max_steps to {max_steps}")
-
     return {
         "lora_rank": rank,
         "lora_alpha": alpha,
@@ -268,5 +262,5 @@ def _validate_config(config: dict) -> dict:
         "warmup_ratio": round(wu, 4),
         "weight_decay": round(wd, 4),
         "lora_targets": targets,
-        "max_steps": max_steps,
+        "max_steps": PHASE3_FIXED_MAX_STEPS,
     }

@@ -81,7 +81,7 @@ def run_single_trial(
     output_dir: str,
     seed: int = 42,
     data_dir: str = "data",
-    time_budget_min: float = 15.0,
+    time_budget_min: float = 90.0,
 ) -> TrialResult:
     """Run a single HPO trial with the given hyperparameters.
 
@@ -96,7 +96,9 @@ def run_single_trial(
         output_dir: Base output directory for this trial.
         seed: Random seed.
         data_dir: Dataset directory.
-        time_budget_min: Max training time in minutes.
+        time_budget_min: Wall-clock safety cutoff in minutes (not the
+            controlled variable — max_steps is fixed, see strategies.py
+            PHASE3_FIXED_MAX_STEPS).
 
     Returns:
         Completed TrialResult.
@@ -198,7 +200,7 @@ def run_hpo_loop(
     max_trials: int = 40,
     seed: int = 42,
     data_dir: str = "data",
-    time_budget_min: float = 15.0,
+    time_budget_min: float = 90.0,
 ) -> list[TrialResult]:
     """Run the full HPO loop for one strategy + one repeat.
 
@@ -213,7 +215,9 @@ def run_hpo_loop(
         max_trials: Maximum number of trials.
         seed: Base random seed (offset by trial_id).
         data_dir: Dataset directory.
-        time_budget_min: Max training time per trial in minutes.
+        time_budget_min: Wall-clock safety cutoff per trial in minutes (not
+            the controlled variable — max_steps is fixed, see strategies.py
+            PHASE3_FIXED_MAX_STEPS).
 
     Returns:
         List of TrialResult for this run.

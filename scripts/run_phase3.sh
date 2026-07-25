@@ -3,7 +3,19 @@
 # Phase 3: HPO Strategy Comparison (4 strategies x 10 repeats)
 # THESIS v0.5 Section 4.5: 10 independent repeats per strategy
 # (statistical power ~0.6-0.7, Mann-Whitney U test)
-# Estimated: ~100-160 hours on RTX 4090
+#
+# v0.11: max_steps is now a fixed 200 for every trial (was previously drawn
+# from {100,200,400,800} — see src/autoresearch/strategies.py
+# PHASE3_FIXED_MAX_STEPS). --time_budget_min is now 90 (was 15) purely as a
+# wall-clock safety cutoff, not the controlled variable. The old "~100-160h"
+# estimate assumed the (buggy) 15-min-per-trial ceiling; using Phase 2 main's
+# measured throughput (~13s/step at effective_batch=8, results/phase2_finetune
+# run logs) as a rough baseline, a 200-step trial now needs ~35-45min at
+# effective_batch=8 and proportionally more at higher effective_batch (up to
+# 64 in the search space) -- so the real total is unverified and likely
+# substantially higher than the old estimate. Run a short smoke trial first
+# (1-2 trials per strategy) and re-derive the total from measured wall-clock
+# before committing to the full 1,210-trial run.
 #
 # IMPORTANT: Set ANTHROPIC_API_KEY for autoresearch strategy.
 #            Update --model_config with the best model from Phase 2.
@@ -62,7 +74,7 @@ python -u -m src.autoresearch.run_phase3 \
   --trials_per_repeat 40 \
   --seed 42 \
   --data_dir data \
-  --time_budget_min 15 \
+  --time_budget_min 90 \
   2>&1 | tee results/phase3_autoresearch/run_phase3.log
 
 echo ""
