@@ -1,10 +1,15 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-25 자정)
+# 다음 세션 시작점 (마지막 갱신: 2026-07-26)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
+- **2026-07-26 세션 완료 — 우선순위 ①②③(Cross-dataset CF → Phase 1 재실행 → Phase 2 재분석) 전부 끝남** ✅
+  - Ablation-C 컨파운드 6조건 재실행 완료 + target modules 최적 조합 확정: **rank=64, alpha=128, target=full(all-linear)** → `configs/finetune/base_qlora.yaml`에 반영, push 완료(커밋 `f52080b`). ratio=1.0/rank=64/target=full은 각각 축 하나씩만 바꿔가며 독립 검증한 것으로, 세 값을 동시에 적용한 조합 자체는 미검증(한계점으로 기록해둘 것).
+  - Cross-dataset CF 72/72 조건 측정 완료(커밋 `20be0eb`). 도중 `transformers==5.5.0`의 `TokenizersBackend` 리팩터링으로 `bert-score`가 쓰는 `build_inputs_with_special_tokens`가 빠진 버그 발견·수정(커밋 `121af8e`, `src/evaluate/metrics.py`) — roberta-large/biobert 둘 다 실측 검증됨.
+  - Phase 1 재실행을 "36개 전부"가 아니라 **백업 복원(27개, `_pre_bertscore/`) + gemma4-e2b 9→3개만 신규 실행**으로 대체해 GPU 시간 절감(커밋 `25f9f9f`). `scripts/rescore_phase1.py`가 원본에 bertscore 없는 조건에서 빈 값을 남기던 버그도 수정(커밋 `71bb476`). RQ1(McNemar/Cochran's Q), 임상분석(WCA, pathvqa), RQ2(Mixed-Effects Model) 전부 완료·백업(커밋 `8ec9fed`~`ad850b3`).
+  - **RQ2 해석 주의**: 아래 참고.
 - **RQ2 Mixed-Effects Model 해석 주의 (2026-07-26, 논문 작성 시 반드시 반영)** — `results/phase2_finetune/phase2_rq2_analysis.md`의 MEM(`accuracy ~ condition + dataset`, group=seed) 고정효과는 **p=0.3629로 유의하지 않고 ICC(seed)=0.0**으로 나오는데, 이건 계산 오류가 아니라 **MEM이 4개 모델을 구분 없이 합쳐서 추정**하기 때문임. 실제로는 모델별 3중 검증(paired t-test + BCa Bootstrap Cohen's d + Wilcoxon)에서 효과가 **모델마다 정반대**로 나타남 — qwen25-vl-3b(d=+2.65, 유의) / qwen3-vl-2b(d=+1.62, 유의)는 파인튜닝이 확실히 도움됐고, smolvlm2-2b(d=-2.28, 유의)는 오히려 나빠졌고, gemma4-e2b(d=-0.65, 비유의)도 부정 방향임. 이질적(heterogeneous) 효과가 pooled 평균에서 상쇄되며 MEM이 "효과 없음"으로 보이는 것 — **RQ2 결론은 모델별 3중 검증 결과를 1차 근거로 쓰고, MEM pooled 결과는 "모델 구분 없는 전체 효과는 유의하지 않음(모델간 이질성 때문)"이라는 보조 설명으로만 인용할 것.** 코드는 수정하지 않기로 결정함(2026-07-26 확정) — MEM 수식에 model 고정효과/상호작용을 추가하는 개선은 보류.
 - **RunPod pod 중지 예정 (2026-07-25 자정)** — 사용자가 오늘 세션을 마무리하며 pod를 중지(stop)함. 재시작 후 아래 "다음 세션 최우선 작업"부터 진행.
 - **[주의] GitHub PAT 토큰 노출됨, 무효화 여부 미확인** — 이 세션 중 `git remote -v` 실행 결과가 그대로 대화에 노출되어 토큰이 평문으로 남았음. 다음 세션 시작 시 GitHub → Settings → Developer settings → Personal access tokens에서 해당 토큰이 아직 살아있는지 확인하고, 살아있다면 즉시 revoke 후 재발급할 것.
@@ -39,54 +44,28 @@
 
 ## 다음 세션 최우선 작업 (pod에서 실행)
 
-```bash
-git pull   # 8230e64 이상 확인 (Phase 2 Main+Ablation 75조건 결과 백업 포함)
+Cross-dataset CF, Phase 1 재실행(+RQ1/WCA), Phase 2 재분석(RQ2)까지 전부 끝났음(위 "2026-07-26 세션 완료" 참고). 이제 진짜 남은 건 이 3가지:
 
-# [중요] 이 세션 전체에 캐시 경로 지정 — run_phase2_ablation.sh가 겪은 것과 같은
-# Disk quota exceeded를 막기 위해, .sh 래퍼 없이 bare python으로 실행하는
-# 아래 1)/2) 단계 전에 반드시 먼저 실행할 것 (run_phase3.sh/runpod_phase1.sh는
-# 스크립트 자체에 내장했지만, 아래 python 직접 호출은 셸에서 직접 잡아줘야 함)
+```bash
+git pull   # 7a37e42 이상 확인
+
 export HF_HOME=/hf_cache
 export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
-
-# 0) Ablation-C 오염된 6개 조건 재실행 — 최우선. 명령어는 위 "[긴급]" 항목 참고.
-tmux new -s ablation
-cd /workspace/Masters_degree && source .venv/bin/activate
-# (위 [긴급] 항목의 rm -rf 6줄 + bash scripts/run_phase2_ablation.sh 실행)
-# Ctrl+B, D로 detach 후 방치. 진행 확인: ls results/phase2_finetune/ablation_c_*/train_result.json | wc -l
-
-# 1) Cross-dataset CF 최초 실행 (미검증 신규 기능 — 에러 나면 바로 diagnose)
-# --max_samples 500: full test set이면 PathVQA(6,719개)가 24회 반복되어 ~16시간
-# 소요 추정(보조 지표라 과함) → 500으로 제한해 ~2-3시간으로 단축(사용자 확정, 2026-07-19)
-python scripts/measure_cross_dataset_cf.py \
-  --config_dir configs/models --phase2_dir results/phase2_finetune \
-  --phase1_summary results/phase1_baseline/phase1_summary.csv --seeds 42 123 456 \
-  --max_samples 500
-
-# 2) Phase 1 재실행 (RQ1 McNemar/Cochran's Q, WCA 임상분석용 sample 단위 데이터 복구)
-rm -f results/phase1_baseline/phase1_summary.csv results/phase1_baseline/phase1_intermediate.json
-python -m src.baseline.run_all --output_dir results/phase1_baseline --data_dir data --batch_size 8
-
-# 3) Mixed-Effects Model 포함 Phase 2 재분석
-uv pip install statsmodels pandas
-python scripts/analyze_phase2.py --phase1_dir results/phase1_baseline --phase2_dir results/phase2_finetune --base_seed 42
 ```
 
-그 다음 순서:
-- Ablation-C 6개 조건 재실행 완료 후 target modules 최적 조합 재계산(이전 "minimal 1등"은 컨파운드로 신뢰 불가)
-- ratio=1.0, rank=64, target=(재계산 예정) 조합을 `configs/finetune/base_qlora.yaml`에 반영할지 결정 — Phase 3는 기본적으로 이 파일을 그대로 재사용함
-- Phase 3(`scripts/run_phase3.sh`) 실행 전 `ANTHROPIC_API_KEY` 환경변수 필수(없으면 스크립트가 preflight에서 즉시 중단)
-- Ablation 39/39 완료될 때까지 기다렸다가 결과 확인
-- Phase 1 재실행 완료 후: `python scripts/analyze_phase1.py --results_dir results/phase1_baseline --seed 42` (RQ1)
-- `python scripts/analyze_clinical.py --results_dir results/phase1_baseline --dataset pathvqa --seed 42` (WCA 임상분석)
-- Phase 3 HPO: 아직 미착수. ~$78, ~200 GPU시간 규모 — Ablation까지 끝난 뒤 예산/시간 재확인 후 착수.
-- **비용 대안 검토는 Ablation 완료 후로 보류(사용자 확정, 2026-07-22)**: 누적 지출 $120 초과로 비용 절감 방향을 논의함. 건국대 자체 중앙 HPC는 확인 안 됨(랩 단위 GPU서버만 존재). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터)가 유력 후보 — 연구비 확보 어려운 과제 대상 무상지원 트랙 있음, `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요(제 쪽에서 인증서 오류로 실시간 검증은 못 함). 참고 문서: `docs/ENVIRONMENT_SETUP.md`(새 컴퓨터 환경 요구사항), `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`(대여처 문의 체크리스트). Ablation 39/39 끝나면 이어서 검토.
+1. **[주의, 아직 미확인] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
+2. **Phase 3 HPO 착수** — 아직 미착수. `scripts/run_phase3.sh` 실행 전 `ANTHROPIC_API_KEY` 환경변수 필수(없으면 preflight에서 즉시 중단). ~$78, ~200 GPU시간 규모로 사전 추정해뒀음 — 예산 재확인 후 착수. base_qlora.yaml이 이미 최적 조합(rank=64/target=full)으로 갱신돼 있으니 Phase 3는 이 설정을 그대로 재사용하면 됨.
+3. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, Ablation 끝나면 이어서 검토하기로 보류해뒀던 것. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요(인증서 오류로 원격 실시간 검증은 못 함). 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
 
 ## 알아둘 것
 
 - **캐시 디스크 분산 배치는 스크립트마다 개별 설정해야 함**: `HF_HOME=/hf_cache`, `MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache`는 공용 함수가 아니라 각 실행 스크립트에 개별적으로 export돼 있음. 2026-07-22 전수 점검 결과 `run_phase2_main.sh`/`run_phase2_ablation.sh`는 있었지만 `run_phase3.sh`/`runpod_phase1.sh`엔 빠져있어서 추가함(커밋 확인은 위 git pull 안내 참고). `runpod_phase1_gemma4.sh`(deprecated, 미수정)와 `.sh` 래퍼 없이 직접 실행하는 `measure_cross_dataset_cf.py`/`run_all.py` 같은 bare python 명령은 **셸에서 직접 export해야 함**(위 최우선 작업 블록에 이미 추가함). 새 실행 스크립트를 추가하거나 복사해서 만들 때 이 export 누락 여부를 반드시 확인할 것 — 누락되면 `$HOME=/workspace`인 이 컨테이너에서는 조용히 `/workspace/.cache`로 캐시가 새며, 몇 시간 뒤 quota 초과로 전체 파이프라인이 죽는 형태로만 드러남(초기 증상은 무관해 보이는 `AttributeError` 등으로 나타날 수 있어 진단이 어려움).
 - **`df -h /workspace`는 신뢰 불가**: `/workspace`는 `mfs#eu-cz-1.runpod.net` 네트워크 볼륨이라 `df -h`가 리전 전체 풀 용량(851T)을 보여줌. 실제 이 pod의 quota 확인은 `du -h --max-depth=1 /workspace`로 해야 함(`-s`와 `--max-depth`는 동시 사용 불가, `du: warning`만 뜨고 결과 없음).
-- **unsloth 어댑터 호환성 미검증**: `measure_cross_dataset_cf.py`가 `PeftModel.from_pretrained`로 어댑터를 불러오는데, unsloth로 학습한 qwen3-vl-2b/qwen25-vl-3b 어댑터가 문제없이 로드되는지 실증 안 됨. 에러 나면 즉시 보고.
+- **unsloth 어댑터 호환성 — 검증 완료(2026-07-26)**: `measure_cross_dataset_cf.py`의 `PeftModel.from_pretrained` 어댑터 로드, 72/72 조건 전부 정상 동작 확인됨. 더 이상 미검증 아님.
 - **비용 민감**: 이미 $40+ 사용. RunPod 대시보드에서 지출 한도(spending limit) 설정 권장.
 - **로컬↔pod 작업 방식**: Claude Code(로컬)는 이 노트북/PC에만 직접 접근 가능. RunPod pod는 SSH 직접 접속 없이 사용자가 웹 터미널에서 명령 실행 후 결과를 복사해서 붙여넣는 방식.
+- **`python3`가 venv를 안 가리킬 수 있음(2026-07-26 실증)**: 세션 중간에 venv activate가 풀리면 `python3`가 `/usr/bin/python3`(시스템, 패키지 없음)로 잡히면서 멀쩡한 패키지가 `ModuleNotFoundError`로 보이는 헛다리짚기가 발생함. `which python3`로 `.venv` 경로인지 먼저 확인하거나, 아예 **`uv run python ...`으로 통일**하면 셸 상태와 무관하게 항상 올바른 프로젝트 환경을 씀 — 앞으로는 이걸 기본으로 쓸 것.
+- **`uv sync`의 하드링크가 이 네트워크 볼륨(`/workspace`)에서 가끔 깨짐(2026-07-26 실증)**: `nvidia-cusparselt-cu12`, `nvidia-nvshmem-cu12`, `scipy`가 각각 "설치됨"으로 기록돼 있는데 실제 파일은 로드 안 되는 증상이 반복됨(패키지 하나씩 `uv sync --reinstall-package <pkg>`로 개별 복구 가능하지만 계속 재발할 수 있음). 근본적으로는 `UV_LINK_MODE=copy uv sync --reinstall`로 하드링크 대신 실제 복사를 강제하는 게 더 안정적임 — 다음에 또 이런 `ModuleNotFoundError`/`ImportError: lib*.so`류가 나오면 이걸 먼저 시도할 것.
+- **bert-score + `transformers==5.5.0` 호환성 버그(2026-07-26 수정)**: `transformers` 5.5.0에서 토크나이저가 새 `TokenizersBackend`로 리팩터링되며 `build_inputs_with_special_tokens`가 빠짐 — `bert_score` 0.3.13이 이 메서드를 직접 호출해 `AttributeError`로 죽음. `src/evaluate/metrics.py`의 `_patch_tokenizers_backend_special_tokens`(커밋 `121af8e`)로 공유 베이스 클래스에 호환 shim을 패치해뒀음. 만약 다른 bert-score 계열 스크립트에서 비슷한 에러가 또 나면, 이미 고쳐져 있는지부터(`git log -- src/evaluate/metrics.py`) 확인.
+- **`git` index.lock이 이 저장소(`/mnt/d/...` WSL 마운트)에서 종종 stale하게 남음**: 느린 DrvFs 때문에 `git status`류가 오래 걸리다 index.lock을 남기고, 다음 git 명령이 "Another git process seems to be running"로 막히는 경우가 반복됨. `ps aux | grep git`+`lsof <lockfile>`로 실제 홀더가 없는 걸 확인한 뒤에만 `rm -f .git/index.lock`으로 지울 것(무작정 지우지 말 것).
 - 상세 이력은 `docs/RUNPOD_GUIDE.md`와 (로컬 `.claude` 메모리가 있는 컴퓨터에서는) auto-memory `runpod-experiment-status.md` 참고.
