@@ -64,12 +64,22 @@ def _rescore_condition(src_file: Path, dst_file: Path) -> dict:
     qtypes = [r["question_type"] for r in per_sample]
 
     # per-sample 정오 재계산 (개선 매처 반영)
-    correctness = [1 if _is_correct(p, g, qt) else 0 for p, g, qt in zip(preds, golds, qtypes)]
+    correctness = [
+        1 if _is_correct(p, g, qt) else 0 for p, g, qt in zip(preds, golds, qtypes)
+    ]
     for r, c in zip(per_sample, correctness):
         r["correct"] = bool(c)
 
-    # 정확도 재계산 (BERTScore는 매처와 무관하므로 원본 요약 값 유지)
-    metrics = compute_overall_accuracy(preds, golds, qtypes, compute_bertscore=False)
+    orig = data.get("summary", {})
+    meta = data.get("metadata", {})
+
+    # BERTScore는 매처와 무관하므로 원본에 이미 있으면 재계산을 생략한다.
+    # 단, bertscore 도입 이전 백업에서 복원된 조건처럼 원본에 아예 없는
+    # 경우엔 생략하면 빈 값으로 남으므로 그때만 새로 계산한다.
+    needs_bertscore = orig.get("open_bertscore_f1") is None
+    metrics = compute_overall_accuracy(
+        preds, golds, qtypes, compute_bertscore=needs_bertscore
+    )
 
     closed_flags = [c for c, qt in zip(correctness, qtypes) if qt == "closed"]
     open_flags = [c for c, qt in zip(correctness, qtypes) if qt != "closed"]
@@ -77,8 +87,10 @@ def _rescore_condition(src_file: Path, dst_file: Path) -> dict:
     closed_ci = bootstrap_accuracy_ci(closed_flags)
     open_ci = bootstrap_accuracy_ci(open_flags)
 
-    orig = data.get("summary", {})
-    meta = data.get("metadata", {})
+    bertscore_f1 = metrics.get("open_bertscore_f1", orig.get("open_bertscore_f1"))
+    bertscore_acc = metrics.get(
+        "open_bertscore_accuracy", orig.get("open_bertscore_accuracy")
+    )
 
     new_summary = {
         **metrics,
@@ -88,9 +100,8 @@ def _rescore_condition(src_file: Path, dst_file: Path) -> dict:
         "closed_acc_ci_high": closed_ci[1],
         "open_acc_ci_low": open_ci[0],
         "open_acc_ci_high": open_ci[1],
-        # 매처와 무관한 지표는 원본 유지
-        "open_bertscore_f1": orig.get("open_bertscore_f1"),
-        "open_bertscore_accuracy": orig.get("open_bertscore_accuracy"),
+        "open_bertscore_f1": bertscore_f1,
+        "open_bertscore_accuracy": bertscore_acc,
         "avg_time_ms": orig.get("avg_time_ms"),
         "peak_vram_mb": orig.get("peak_vram_mb"),
         "rescored": True,
@@ -117,9 +128,9 @@ def _rescore_condition(src_file: Path, dst_file: Path) -> dict:
         "overall_acc_std": 0.0,
         "overall_acc_ci_low": overall_ci[0],
         "overall_acc_ci_high": overall_ci[1],
-        "open_bertscore_f1_mean": orig.get("open_bertscore_f1"),
+        "open_bertscore_f1_mean": bertscore_f1,
         "open_bertscore_f1_std": 0.0,
-        "open_bertscore_accuracy_mean": orig.get("open_bertscore_accuracy"),
+        "open_bertscore_accuracy_mean": bertscore_acc,
         "open_bertscore_accuracy_std": 0.0,
         "avg_time_ms_mean": orig.get("avg_time_ms"),
         "avg_time_ms_std": 0.0,
@@ -128,7 +139,9 @@ def _rescore_condition(src_file: Path, dst_file: Path) -> dict:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Phase 1 재채점 (개선 매처, GPU 불필요)")
+    parser = argparse.ArgumentParser(
+        description="Phase 1 재채점 (개선 매처, GPU 불필요)"
+    )
     parser.add_argument("--results_dir", default="results/phase1_baseline")
     parser.add_argument("--output_dir", default="results/phase1_baseline_rescored")
     parser.add_argument("--seed", type=int, default=42)
@@ -165,7 +178,10 @@ def main() -> None:
             writer.writerow(r)
 
     print(f"\n재채점 완료. 요약: {csv_path}")
-    print(f"다음: python scripts/analyze_phase1.py --results_dir {dst_dir} --seed {args.seed}")
+    print(
+        f"다음: python scripts/analyze_phase1.py "
+        f"--results_dir {dst_dir} --seed {args.seed}"
+    )
 
 
 if __name__ == "__main__":
