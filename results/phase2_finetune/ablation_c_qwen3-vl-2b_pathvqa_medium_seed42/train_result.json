@@ -6,7 +6,7 @@
     "seed": 42,
     "subset_ratio": null,
     "backend": "Unsloth",
-    "timestamp": "2026-07-24T15:14:07.827649+00:00"
+    "timestamp": "2026-07-26T04:34:46.476629+00:00"
   },
   "lora_config": {
     "rank": 16,
@@ -22,34 +22,34 @@
   "training": {
     "train_samples": 19654,
     "eval_samples": 500,
-    "train_loss": 0.35812592266849935,
-    "train_runtime_sec": 25965.4604,
-    "train_time_min": 433.2,
+    "train_loss": 0.6863097906112671,
+    "train_runtime_sec": 1859.0085,
+    "train_time_min": 31.4,
     "trainable_params": 6422528,
     "total_params": 1511100416,
     "trainable_pct": 0.43,
-    "peak_vram_mb": 3898.0
+    "peak_vram_mb": 3902.9
   },
   "eval_summary": {
-    "closed_accuracy": 0.9045,
-    "open_accuracy": 0.2794,
-    "overall_accuracy": 0.5922,
+    "closed_accuracy": 0.8441,
+    "open_accuracy": 0.1871,
+    "overall_accuracy": 0.5159,
     "closed_count": 3362,
     "open_count": 3357,
     "total_count": 6719,
-    "open_bertscore_f1": 0.8911,
+    "open_bertscore_f1": 0.8772,
     "open_bertscore_accuracy": 1.0,
-    "open_bertscore_f1_biobert": 0.7499,
-    "open_bertscore_accuracy_biobert": 0.4465,
-    "open_bertscore_spearman": 0.8244,
-    "open_bertscore_pearson": 0.9206,
-    "overall_acc_ci_low": 0.5804,
-    "overall_acc_ci_high": 0.6041,
-    "closed_acc_ci_low": 0.8947,
-    "closed_acc_ci_high": 0.9143,
-    "open_acc_ci_low": 0.2645,
-    "open_acc_ci_high": 0.2943,
-    "avg_time_ms": 214.1,
+    "open_bertscore_f1_biobert": 0.7155,
+    "open_bertscore_accuracy_biobert": 0.3846,
+    "open_bertscore_spearman": 0.7274,
+    "open_bertscore_pearson": 0.8709,
+    "overall_acc_ci_low": 0.5039,
+    "overall_acc_ci_high": 0.5276,
+    "closed_acc_ci_low": 0.8319,
+    "closed_acc_ci_high": 0.856,
+    "open_acc_ci_low": 0.1743,
+    "open_acc_ci_high": 0.2005,
+    "avg_time_ms": 185.5,
     "peak_vram_mb": 3251.2
   }
 }
