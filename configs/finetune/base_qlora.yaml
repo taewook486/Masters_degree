@@ -8,12 +8,13 @@ quantization:
   bnb_4bit_use_double_quant: true
 
 lora:
-  rank: 16
-  alpha: 32
+  # Ablation A/B/C(39조건, 3시드) 결과로 확정된 최적 조합: ratio=1.0(기본 full data,
+  # 별도 설정 불필요), rank=64, target=full(all-linear). 단조 증가 패턴 확인, 비용 증가는 미미.
+  rank: 64
+  alpha: 128
   dropout: 0.05
   target_modules:
-    - q_proj
-    - v_proj
+    - full
   bias: none
   task_type: CAUSAL_LM
 
