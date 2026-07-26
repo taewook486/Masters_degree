@@ -54,7 +54,39 @@ export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
 ```
 
 1. **[주의, 아직 미확인] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
-2. **Phase 3 HPO 착수** — 아직 미착수. `scripts/run_phase3.sh` 실행 전 `ANTHROPIC_API_KEY` 환경변수 필수(없으면 preflight에서 즉시 중단). ~$78, ~200 GPU시간 규모로 사전 추정해뒀음 — 예산 재확인 후 착수. base_qlora.yaml이 이미 최적 조합(rank=64/target=full)으로 갱신돼 있으니 Phase 3는 이 설정을 그대로 재사용하면 됨.
+2. **Phase 3 HPO — 전체 실행 전에 스모크 테스트부터 (2026-07-26 확정)** — `run_phase3.sh` 주석엔 "스모크 트라이얼 명령을 이미 추가해뒀다"고 돼 있지만 **실제 파일엔 없음**(확인 완료, 2026-07-26). 기존 ~$78/~200 GPU시간 추정치는 예전(버그 있던) 15분 컷오프 기준이라 스크립트 자체 주석도 "실제로는 훨씬 클 가능성 높음"이라 경고 중 — 전체(1,210trial, 4전략×10반복×40trial)를 바로 돌리지 말고 아래 스모크(전략당 1반복×2trial=8trial)부터 실행해서 실측 `train_time_min`으로 총 비용을 재계산할 것. base_qlora.yaml은 이미 최적 조합(rank=64/target=full)으로 갱신돼 있어 그대로 재사용됨.
+   ```bash
+   cd /workspace/Masters_degree
+   export HF_HOME=/hf_cache
+   export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
+   export WANDB_PROJECT=medical-vqa-vlm
+   export PYTHONUNBUFFERED=1
+
+   # ANTHROPIC_API_KEY 없으면 autoresearch 전략 preflight에서 즉시 중단됨
+   export ANTHROPIC_API_KEY=sk-ant-...   # 발급된 키로 채울 것
+
+   python -c "
+   import anthropic
+   c = anthropic.Anthropic()
+   c.messages.create(model='claude-sonnet-4-6', max_tokens=8, messages=[{'role': 'user', 'content': 'ping'}])
+   print('[preflight] Anthropic API OK')
+   "
+
+   mkdir -p results/phase3_autoresearch_smoke
+
+   python -u -m src.autoresearch.run_phase3 \
+     --model_config configs/models/qwen3_vl_2b.yaml \
+     --finetune_config configs/finetune/base_qlora.yaml \
+     --output_dir results/phase3_autoresearch_smoke \
+     --strategies manual random optuna autoresearch \
+     --repeats 1 \
+     --trials_per_repeat 2 \
+     --seed 42 \
+     --data_dir data \
+     --time_budget_min 90 \
+     2>&1 | tee results/phase3_autoresearch_smoke/run_phase3_smoke.log
+   ```
+   스모크 결과 나오면 trial당 실측 시간으로 전체 비용 재계산 → 그 다음에 전체 실행(`scripts/run_phase3.sh`, `--repeats 10 --trials_per_repeat 40`) 여부 결정. 스모크 결과물은 `results/phase3_autoresearch_smoke/`에 따로 쌓이므로 나중에 진짜 실험 결과(`results/phase3_autoresearch/`)와 안 섞임.
 3. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, Ablation 끝나면 이어서 검토하기로 보류해뒀던 것. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요(인증서 오류로 원격 실시간 검증은 못 함). 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
 
 ## 알아둘 것
