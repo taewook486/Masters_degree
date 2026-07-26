@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "model_name": "qwen3-vl-2b",
+    "train_dataset": "vqa_rad",
+    "eval_dataset": "slake",
+    "seed": 456,
+    "measurement_type": "cross_dataset_generalization",
+    "timestamp": "2026-07-26T10:26:05.894959+00:00"
+  },
+  "summary": {
+    "base_accuracy": 0.5693,
+    "finetuned_accuracy": 0.606,
+    "change_pct": 6.45
+  },
+  "finetuned_eval": {
+    "closed_accuracy": 0.8397,
+    "open_accuracy": 0.5,
+    "overall_accuracy": 0.606,
+    "closed_count": 156,
+    "open_count": 344,
+    "total_count": 500,
+    "open_bertscore_f1": 0.9133,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.562,
+    "overall_acc_ci_high": 0.65,
+    "closed_acc_ci_low": 0.7821,
+    "closed_acc_ci_high": 0.8974,
+    "open_acc_ci_low": 0.4477,
+    "open_acc_ci_high": 0.5523,
+    "avg_time_ms": 125.6,
+    "peak_vram_mb": 4421.7
+  }
+}

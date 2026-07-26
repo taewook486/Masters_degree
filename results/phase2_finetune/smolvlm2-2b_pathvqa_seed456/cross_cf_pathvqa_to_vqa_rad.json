@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "model_name": "smolvlm2-2b",
+    "train_dataset": "pathvqa",
+    "eval_dataset": "vqa_rad",
+    "seed": 456,
+    "measurement_type": "cross_dataset_generalization",
+    "timestamp": "2026-07-26T10:51:16.018690+00:00"
+  },
+  "summary": {
+    "base_accuracy": 0.5122,
+    "finetuned_accuracy": 0.3814,
+    "change_pct": -25.54
+  },
+  "finetuned_eval": {
+    "closed_accuracy": 0.5976,
+    "open_accuracy": 0.11,
+    "overall_accuracy": 0.3814,
+    "closed_count": 251,
+    "open_count": 200,
+    "total_count": 451,
+    "open_bertscore_f1": 0.8749,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.337,
+    "overall_acc_ci_high": 0.4257,
+    "closed_acc_ci_low": 0.5378,
+    "closed_acc_ci_high": 0.6574,
+    "open_acc_ci_low": 0.07,
+    "open_acc_ci_high": 0.155,
+    "avg_time_ms": 516.3,
+    "peak_vram_mb": 6013.9
+  }
+}

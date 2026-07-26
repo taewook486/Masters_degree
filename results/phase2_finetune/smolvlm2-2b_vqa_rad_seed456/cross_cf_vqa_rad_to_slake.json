@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "model_name": "smolvlm2-2b",
+    "train_dataset": "vqa_rad",
+    "eval_dataset": "slake",
+    "seed": 456,
+    "measurement_type": "cross_dataset_generalization",
+    "timestamp": "2026-07-26T11:42:31.592980+00:00"
+  },
+  "summary": {
+    "base_accuracy": 0.4618,
+    "finetuned_accuracy": 0.224,
+    "change_pct": -51.49
+  },
+  "finetuned_eval": {
+    "closed_accuracy": 0.5,
+    "open_accuracy": 0.0988,
+    "overall_accuracy": 0.224,
+    "closed_count": 156,
+    "open_count": 344,
+    "total_count": 500,
+    "open_bertscore_f1": 0.8824,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.188,
+    "overall_acc_ci_high": 0.262,
+    "closed_acc_ci_low": 0.4231,
+    "closed_acc_ci_high": 0.5769,
+    "open_acc_ci_low": 0.0698,
+    "open_acc_ci_high": 0.1308,
+    "avg_time_ms": 511.4,
+    "peak_vram_mb": 6005.8
+  }
+}

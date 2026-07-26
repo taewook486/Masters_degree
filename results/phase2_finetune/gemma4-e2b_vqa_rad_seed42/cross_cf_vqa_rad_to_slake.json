@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "model_name": "gemma4-e2b",
+    "train_dataset": "vqa_rad",
+    "eval_dataset": "slake",
+    "seed": 42,
+    "measurement_type": "cross_dataset_generalization",
+    "timestamp": "2026-07-26T09:12:29.573895+00:00"
+  },
+  "summary": {
+    "base_accuracy": 0.4873,
+    "finetuned_accuracy": 0.496,
+    "change_pct": 1.79
+  },
+  "finetuned_eval": {
+    "closed_accuracy": 0.6667,
+    "open_accuracy": 0.4186,
+    "overall_accuracy": 0.496,
+    "closed_count": 156,
+    "open_count": 344,
+    "total_count": 500,
+    "open_bertscore_f1": 0.9194,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.452,
+    "overall_acc_ci_high": 0.54,
+    "closed_acc_ci_low": 0.5897,
+    "closed_acc_ci_high": 0.7372,
+    "open_acc_ci_low": 0.3663,
+    "open_acc_ci_high": 0.4709,
+    "avg_time_ms": 196.7,
+    "peak_vram_mb": 11867.0
+  }
+}

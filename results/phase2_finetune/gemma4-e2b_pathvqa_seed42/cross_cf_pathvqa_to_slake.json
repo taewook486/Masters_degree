@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "model_name": "gemma4-e2b",
+    "train_dataset": "pathvqa",
+    "eval_dataset": "slake",
+    "seed": 42,
+    "measurement_type": "cross_dataset_generalization",
+    "timestamp": "2026-07-26T07:25:12.634193+00:00"
+  },
+  "summary": {
+    "base_accuracy": 0.4873,
+    "finetuned_accuracy": 0.448,
+    "change_pct": -8.06
+  },
+  "finetuned_eval": {
+    "closed_accuracy": 0.4936,
+    "open_accuracy": 0.4273,
+    "overall_accuracy": 0.448,
+    "closed_count": 156,
+    "open_count": 344,
+    "total_count": 500,
+    "open_bertscore_f1": 0.9109,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.406,
+    "overall_acc_ci_high": 0.49,
+    "closed_acc_ci_low": 0.4167,
+    "closed_acc_ci_high": 0.5705,
+    "open_acc_ci_low": 0.375,
+    "open_acc_ci_high": 0.4797,
+    "avg_time_ms": 659.4,
+    "peak_vram_mb": 11866.0
+  }
+}

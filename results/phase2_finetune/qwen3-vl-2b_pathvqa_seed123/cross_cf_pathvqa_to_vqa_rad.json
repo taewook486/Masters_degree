@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "model_name": "qwen3-vl-2b",
+    "train_dataset": "pathvqa",
+    "eval_dataset": "vqa_rad",
+    "seed": 123,
+    "measurement_type": "cross_dataset_generalization",
+    "timestamp": "2026-07-26T10:05:00.889321+00:00"
+  },
+  "summary": {
+    "base_accuracy": 0.5011,
+    "finetuned_accuracy": 0.4523,
+    "change_pct": -9.74
+  },
+  "finetuned_eval": {
+    "closed_accuracy": 0.6574,
+    "open_accuracy": 0.195,
+    "overall_accuracy": 0.4523,
+    "closed_count": 251,
+    "open_count": 200,
+    "total_count": 451,
+    "open_bertscore_f1": 0.8867,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.4058,
+    "overall_acc_ci_high": 0.4989,
+    "closed_acc_ci_low": 0.5976,
+    "closed_acc_ci_high": 0.7131,
+    "open_acc_ci_low": 0.14,
+    "open_acc_ci_high": 0.25,
+    "avg_time_ms": 131.0,
+    "peak_vram_mb": 4437.6
+  }
+}

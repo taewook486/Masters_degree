@@ -1,0 +1,33 @@
+{
+  "metadata": {
+    "model_name": "qwen3-vl-2b",
+    "train_dataset": "slake",
+    "eval_dataset": "pathvqa",
+    "seed": 123,
+    "measurement_type": "cross_dataset_generalization",
+    "timestamp": "2026-07-26T10:12:16.146601+00:00"
+  },
+  "summary": {
+    "base_accuracy": 0.348,
+    "finetuned_accuracy": 0.332,
+    "change_pct": -4.6
+  },
+  "finetuned_eval": {
+    "closed_accuracy": 0.6066,
+    "open_accuracy": 0.0703,
+    "overall_accuracy": 0.332,
+    "closed_count": 244,
+    "open_count": 256,
+    "total_count": 500,
+    "open_bertscore_f1": 0.853,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.29,
+    "overall_acc_ci_high": 0.374,
+    "closed_acc_ci_low": 0.5451,
+    "closed_acc_ci_high": 0.668,
+    "open_acc_ci_low": 0.0391,
+    "open_acc_ci_high": 0.1055,
+    "avg_time_ms": 129.6,
+    "peak_vram_mb": 4450.5
+  }
+}
