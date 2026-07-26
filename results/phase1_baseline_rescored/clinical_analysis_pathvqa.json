@@ -1,0 +1,117 @@
+{
+  "dataset": "pathvqa",
+  "seed": 42,
+  "models": [
+    "gemma4-e2b",
+    "qwen25-vl-3b",
+    "qwen3-vl-2b",
+    "smolvlm2-2b"
+  ],
+  "weights": {
+    "diagnosis": 1.0,
+    "location": 0.8,
+    "measurement": 0.7,
+    "description": 0.6,
+    "temporal": 0.5,
+    "yes_no": 0.5,
+    "unknown": 0.5
+  },
+  "per_model": {
+    "gemma4-e2b": {
+      "wca": 0.0743,
+      "overall_accuracy": 0.1055,
+      "per_type_accuracy": {
+        "diagnosis": 0.0,
+        "location": 0.0647,
+        "measurement": 0.2121,
+        "description": 0.0425,
+        "temporal": 0.0,
+        "yes_no": 0.1633,
+        "unknown": 0.0692
+      },
+      "per_type_count": {
+        "diagnosis": 23,
+        "location": 433,
+        "measurement": 33,
+        "description": 2729,
+        "temporal": 9,
+        "yes_no": 3362,
+        "unknown": 130
+      },
+      "n": 6719,
+      "ece": null
+    },
+    "qwen25-vl-3b": {
+      "wca": 0.1094,
+      "overall_accuracy": 0.3245,
+      "per_type_accuracy": {
+        "diagnosis": 0.0,
+        "location": 0.1062,
+        "measurement": 0.0909,
+        "description": 0.0224,
+        "temporal": 0.0,
+        "yes_no": 0.613,
+        "unknown": 0.0692
+      },
+      "per_type_count": {
+        "diagnosis": 23,
+        "location": 433,
+        "measurement": 33,
+        "description": 2729,
+        "temporal": 9,
+        "yes_no": 3362,
+        "unknown": 130
+      },
+      "n": 6719,
+      "ece": null
+    },
+    "qwen3-vl-2b": {
+      "wca": 0.1335,
+      "overall_accuracy": 0.3472,
+      "per_type_accuracy": {
+        "diagnosis": 0.0,
+        "location": 0.1478,
+        "measurement": 0.1515,
+        "description": 0.0447,
+        "temporal": 0.0,
+        "yes_no": 0.6336,
+        "unknown": 0.0923
+      },
+      "per_type_count": {
+        "diagnosis": 23,
+        "location": 433,
+        "measurement": 33,
+        "description": 2729,
+        "temporal": 9,
+        "yes_no": 3362,
+        "unknown": 130
+      },
+      "n": 6719,
+      "ece": null
+    },
+    "smolvlm2-2b": {
+      "wca": 0.0954,
+      "overall_accuracy": 0.3085,
+      "per_type_accuracy": {
+        "diagnosis": 0.0,
+        "location": 0.0762,
+        "measurement": 0.0909,
+        "description": 0.0198,
+        "temporal": 0.0,
+        "yes_no": 0.5892,
+        "unknown": 0.0154
+      },
+      "per_type_count": {
+        "diagnosis": 23,
+        "location": 433,
+        "measurement": 33,
+        "description": 2729,
+        "temporal": 9,
+        "yes_no": 3362,
+        "unknown": 130
+      },
+      "n": 6719,
+      "ece": null
+    }
+  }
+}
