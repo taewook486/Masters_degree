@@ -5,6 +5,7 @@
 
 ## 현재 상태
 
+- **RQ2 Mixed-Effects Model 해석 주의 (2026-07-26, 논문 작성 시 반드시 반영)** — `results/phase2_finetune/phase2_rq2_analysis.md`의 MEM(`accuracy ~ condition + dataset`, group=seed) 고정효과는 **p=0.3629로 유의하지 않고 ICC(seed)=0.0**으로 나오는데, 이건 계산 오류가 아니라 **MEM이 4개 모델을 구분 없이 합쳐서 추정**하기 때문임. 실제로는 모델별 3중 검증(paired t-test + BCa Bootstrap Cohen's d + Wilcoxon)에서 효과가 **모델마다 정반대**로 나타남 — qwen25-vl-3b(d=+2.65, 유의) / qwen3-vl-2b(d=+1.62, 유의)는 파인튜닝이 확실히 도움됐고, smolvlm2-2b(d=-2.28, 유의)는 오히려 나빠졌고, gemma4-e2b(d=-0.65, 비유의)도 부정 방향임. 이질적(heterogeneous) 효과가 pooled 평균에서 상쇄되며 MEM이 "효과 없음"으로 보이는 것 — **RQ2 결론은 모델별 3중 검증 결과를 1차 근거로 쓰고, MEM pooled 결과는 "모델 구분 없는 전체 효과는 유의하지 않음(모델간 이질성 때문)"이라는 보조 설명으로만 인용할 것.** 코드는 수정하지 않기로 결정함(2026-07-26 확정) — MEM 수식에 model 고정효과/상호작용을 추가하는 개선은 보류.
 - **RunPod pod 중지 예정 (2026-07-25 자정)** — 사용자가 오늘 세션을 마무리하며 pod를 중지(stop)함. 재시작 후 아래 "다음 세션 최우선 작업"부터 진행.
 - **[주의] GitHub PAT 토큰 노출됨, 무효화 여부 미확인** — 이 세션 중 `git remote -v` 실행 결과가 그대로 대화에 노출되어 토큰이 평문으로 남았음. 다음 세션 시작 시 GitHub → Settings → Developer settings → Personal access tokens에서 해당 토큰이 아직 살아있는지 확인하고, 살아있다면 즉시 revoke 후 재발급할 것.
 - **Phase 2 Main+Ablation 전체(75조건) 완료, git 백업+push 완료** ✅ — Main 36 + Ablation A(비율 5종×3시드=15) + B(rank 5종×3시드=15) + C(target 3종×3시드=9) = 75조건. 결과(JSON/CSV/MD만, 어댑터 가중치 제외) 커밋 `8230e64`로 push 완료.
