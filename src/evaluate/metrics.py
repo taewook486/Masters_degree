@@ -24,6 +24,41 @@ _BIOBERT_MODEL_ID = "dmis-lab/biobert-v1.1"
 _BIOBERT_NUM_LAYERS = 9
 
 
+def _patch_tokenizers_backend_special_tokens(tokenizer: object) -> None:
+    """transformers==5.5.0의 TokenizersBackend 리팩터링에 대한 호환 패치.
+
+    5.5.0에서 RobertaTokenizer/BertTokenizer 등이 새 TokenizersBackend
+    베이스로 옮겨지면서, bert-score 0.3.13이 직접 호출하는
+    build_inputs_with_special_tokens 메서드가 통째로 빠졌다
+    (RunPod에서 AttributeError로 실증, 2026-07-26). 일반 encode
+    경로는 특수 토큰을 여전히 정확히 붙여준다는 걸 확인했으므로
+    (예: RobertaTokenizer "hello world" -> "<s>hello world</s>"),
+    토크나이저 자체 특수 토큰 id로 그 동작을 재현한다. 공유 베이스
+    클래스(TokenizersBackend)에 한 번만 패치하면 roberta-large,
+    biobert(dmis-lab/biobert-v1.1) 등 이 베이스를 쓰는 모든
+    토크나이저에 동시 적용된다.
+    """
+    for cls in type(tokenizer).__mro__:
+        if cls.__name__ != "TokenizersBackend":
+            continue
+        if hasattr(cls, "build_inputs_with_special_tokens"):
+            return
+
+        def build_inputs_with_special_tokens(self, token_ids_0, token_ids_1=None):
+            bos, cls_ = self.bos_token_id, self.cls_token_id
+            eos, sep = self.eos_token_id, self.sep_token_id
+            start_id = bos if bos is not None else cls_
+            end_id = eos if eos is not None else sep
+            if token_ids_1 is None:
+                return [start_id] + token_ids_0 + [end_id]
+            return (
+                [start_id] + token_ids_0 + [end_id] + [end_id] + token_ids_1 + [end_id]
+            )
+
+        cls.build_inputs_with_special_tokens = build_inputs_with_special_tokens
+        return
+
+
 def preprocess_answer(answer: str) -> str:
     """Normalize an answer string for comparison.
 
@@ -172,13 +207,25 @@ def compute_open_bertscore(
         Dict with mean F1, accuracy at threshold, and per-sample F1 scores.
     """
     if not predictions:
-        return {"bertscore_f1_mean": 0.0, "bertscore_accuracy": 0.0, "bertscore_f1_scores": []}
+        return {
+            "bertscore_f1_mean": 0.0,
+            "bertscore_accuracy": 0.0,
+            "bertscore_f1_scores": [],
+        }
 
     try:
         from bert_score import score as bert_score_fn
     except ImportError:
         logger.warning("bert-score not installed. Run: pip install bert-score")
-        return {"bertscore_f1_mean": 0.0, "bertscore_accuracy": 0.0, "bertscore_f1_scores": []}
+        return {
+            "bertscore_f1_mean": 0.0,
+            "bertscore_accuracy": 0.0,
+            "bertscore_f1_scores": [],
+        }
+
+    from transformers import AutoTokenizer
+
+    _patch_tokenizers_backend_special_tokens(AutoTokenizer.from_pretrained(model_type))
 
     score_kwargs: dict[str, str | int | bool] = {
         "model_type": model_type,
