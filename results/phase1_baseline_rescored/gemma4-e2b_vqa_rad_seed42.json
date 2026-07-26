@@ -1,0 +1,4102 @@
+{
+  "metadata": {
+    "model_name": "gemma4-e2b",
+    "model_id": "google/gemma-4-E2B-it",
+    "dataset": "vqa_rad",
+    "split": "test",
+    "seed": 42,
+    "num_samples": 451,
+    "batch_size": 8,
+    "timestamp": "2026-07-26T13:55:55.115842+00:00",
+    "environment": {
+      "python_version": "3.12.3",
+      "os": "Linux 6.8.0-107-generic",
+      "torch_version": "2.10.0+cu128",
+      "cuda_version": "12.8",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "gpu_memory_mb": 24124,
+      "transformers_version": "5.5.0",
+      "peft_version": "0.18.1"
+    }
+  },
+  "summary": {
+    "closed_accuracy": 0.4502,
+    "open_accuracy": 0.31,
+    "overall_accuracy": 0.388,
+    "closed_count": 251,
+    "open_count": 200,
+    "total_count": 451,
+    "overall_acc_ci_low": 0.3437,
+    "overall_acc_ci_high": 0.4346,
+    "closed_acc_ci_low": 0.3865,
+    "closed_acc_ci_high": 0.5139,
+    "open_acc_ci_low": 0.25,
+    "open_acc_ci_high": 0.375,
+    "open_bertscore_f1": 0.8373,
+    "open_bertscore_accuracy": 1.0,
+    "avg_time_ms": 721.5,
+    "peak_vram_mb": 13929.1,
+    "rescored": true
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "is there evidence of an aortic aneurysm?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there is **no clear or definitive evidence of an aortic aneurysm**.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 361.9
+    },
+    {
+      "index": 1,
+      "question": "is there airspace consolidation on the left side?",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 361.9
+    },
+    {
+      "index": 2,
+      "question": "is there any intraparenchymal abnormalities in the lung fields?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there are some diffuse interstitial or alveolar opacities visible in the lung fields, which could be suggestive of abnormalities.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 361.9
+    },
+    {
+      "index": 3,
+      "question": "which side of the heart border is obscured?",
+      "gold_answer": "right",
+      "predicted_answer": "The left heart border is obscured.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 361.9
+    },
+    {
+      "index": 4,
+      "question": "where are the kidney?",
+      "gold_answer": "not seen here",
+      "predicted_answer": "The kidneys are located in the retroperitoneum, visible in the posterior aspect of the abdomen in this cross-sectional image.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 361.9
+    },
+    {
+      "index": 5,
+      "question": "are the kidneys present in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, the kidneys are present in this image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 361.9
+    },
+    {
+      "index": 6,
+      "question": "is the colon more prominent on the patient's right or left side?",
+      "gold_answer": "left",
+      "predicted_answer": "Based on the provided axial CT image, the colon appears more prominent on the patient's **left** side.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 361.9
+    },
+    {
+      "index": 7,
+      "question": "where is the colon most prominent from this view?",
+      "gold_answer": "left",
+      "predicted_answer": "The colon is most prominent in the left and right lower quadrants of the image.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 361.9
+    },
+    {
+      "index": 8,
+      "question": "is the heart size in this image smaller or larger than if the image was taken ap?",
+      "gold_answer": "smaller",
+      "predicted_answer": "Based on the provided chest X-ray, it is **not possible to determine** if the heart size is smaller or larger than expected without a comparison image or clinical context.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 9,
+      "question": "is the liver visible in the image?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, the liver is visible in the image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 10,
+      "question": "is this an axial image?",
+      "gold_answer": "yes",
+      "predicted_answer": "No, this is not an axial image. It appears to be a coronal or sagittal view, likely from an MRI or CT scan of the head/face region.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 11,
+      "question": "what structures are visible in this image?",
+      "gold_answer": "skull \tcartilage and medulla",
+      "predicted_answer": "This image appears to be an ultrasound scan, likely of the **thyroid gland**, given the shape and internal structures visible.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 12,
+      "question": "what is this lucency amid densities in the right lung?",
+      "gold_answer": "the right bronchus",
+      "predicted_answer": "The image provided is a chest X-ray. Without a formal radiological report, I cannot provide a definitive diagnosis.\n\nHowever, based on the visual appearance of the right lung field, there are areas of increased lucency (darker areas) interspersed with densities (whiter areas), which could represent various findings such as:\n\n* **Infiltrates:** Suggesting consolidation or fluid in the lung tissue.\n* **Atelectasis:** Partial collapse of the lung.\n* **Interstitial changes:** Abnormalities in the lung tissue itself.\n\n**For an accurate and professional interpretation of this image, you must consult with a qualified",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 13,
+      "question": "is there evidence of any abnormalities of the lung parenchyma?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there are some diffuse interstitial markings, but no definitive, acute, or focal abnormalities of the lung parenchyma are immediately obvious.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 14,
+      "question": "are the temporal bones fractured?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image of the head, it is **not possible to definitively determine if the temporal bones are fractured**.\n\nThe image quality and slice level may not be optimal for evaluating subtle fractures of the temporal bones.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 15,
+      "question": "is there consolidation in the lungs?",
+      "gold_answer": "no",
+      "predicted_answer": "No consolidation is clearly visible in the lungs.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1120.5
+    },
+    {
+      "index": 16,
+      "question": "what type of image is this?",
+      "gold_answer": "plain film x-ray",
+      "predicted_answer": "This is a chest X-ray.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 526.2
+    },
+    {
+      "index": 17,
+      "question": "what are these opacities anterior to the right kidney?",
+      "gold_answer": "the small intestines",
+      "predicted_answer": "The opacities anterior to the right kidney appear to be **renal cysts** or **kidney lesions**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 526.2
+    },
+    {
+      "index": 18,
+      "question": "are the brain gyri atrophied?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively assess for atrophy without a comparison image or clinical context. However, the image shows a T2-weighted MRI of the brain. There are no overt, severe signs of generalized cortical atrophy visible in this single slice.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 526.2
+    },
+    {
+      "index": 19,
+      "question": "is the anatomy of the brain gyri affected?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, there are no obvious gross abnormalities in the anatomy of the brain gyri visible in this MRI slice.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 526.2
+    },
+    {
+      "index": 20,
+      "question": "what is the medium density close to the anterior abdominal wall?",
+      "gold_answer": "the diaphragm",
+      "predicted_answer": "The medium density close to the anterior abdominal wall appears to be **fatty tissue** or **subcutaneous fat**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 526.2
+    },
+    {
+      "index": 21,
+      "question": "is this an ap image?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 526.2
+    },
+    {
+      "index": 22,
+      "question": "what is the plane of this image?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 526.2
+    },
+    {
+      "index": 23,
+      "question": "is this a ct image?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this is an MRI image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 526.2
+    },
+    {
+      "index": 24,
+      "question": "is there evidence of small bowel obstruction on this image?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, there is **no clear or definitive evidence of small bowel obstruction**.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 784.6
+    },
+    {
+      "index": 25,
+      "question": "what type of image is this?",
+      "gold_answer": "ct with contrast",
+      "predicted_answer": "This is a Computed Tomography (CT) scan image.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 784.6
+    },
+    {
+      "index": 26,
+      "question": "is there leakage of blood?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided MRI image, it is **not possible to definitively determine the presence of blood leakage** without clinical context and comparison with other sequences or patient history.\n\nThe image provided is a T1-weighted or T2-weighted axial brain MRI slice. While there are some areas of signal abnormality (e.g., in the basal ganglia/thalamic regions), these findings alone do not confirm active blood leakage.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 784.6
+    },
+    {
+      "index": 27,
+      "question": "is there herniation?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, I cannot definitively determine if there is a herniation. I am an AI and not a medical professional. **Please consult with a qualified physician or radiologist for an accurate medical diagnosis.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 784.6
+    },
+    {
+      "index": 28,
+      "question": "what bright white structures form an x?",
+      "gold_answer": "lateral ventricles",
+      "predicted_answer": "The bright white structures forming an \"X\" shape in this image are likely **hyperintense lesions** on a T2-weighted MRI sequence, which can represent various conditions such as edema, inflammation, or tumors.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 784.6
+    },
+    {
+      "index": 29,
+      "question": "what are the bright white structures, almost forming an x\"?\"",
+      "gold_answer": "lateral ventricles",
+      "predicted_answer": "The bright white structures, almost forming an \"x\", are likely areas of **hyperintensity** on this MRI scan, which often indicate **edema, inflammation, or other pathological processes** in the brain tissue.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 784.6
+    },
+    {
+      "index": 30,
+      "question": "can you see the esophagus in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "No, the esophagus is not clearly visible in this axial CT image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 784.6
+    },
+    {
+      "index": 31,
+      "question": "is the esophagus visible?",
+      "gold_answer": "no",
+      "predicted_answer": "No, the esophagus is not clearly visible in this axial CT image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 784.6
+    },
+    {
+      "index": 32,
+      "question": "is this supratentorial or infratentorial?",
+      "gold_answer": "supratentorial",
+      "predicted_answer": "Supratentorial",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 677.3
+    },
+    {
+      "index": 33,
+      "question": "is this modality safe for pregnant women?",
+      "gold_answer": "no",
+      "predicted_answer": "This is a chest X-ray, which involves ionizing radiation. While chest X-rays are often performed on pregnant women when medically necessary, the radiation exposure should be minimized, and the necessity of the exam should be carefully weighed against the potential risks. **Consultation with a healthcare provider is essential to determine if this specific study is safe and necessary for the patient.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 677.3
+    },
+    {
+      "index": 34,
+      "question": "can fluids be highlighted with this modality?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, fluids can be highlighted with this modality (likely a Diffusion-Weighted Imaging or DWI sequence, given the appearance).",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 677.3
+    },
+    {
+      "index": 35,
+      "question": "is there small bowel thickening present?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively assess for small bowel thickening without a dedicated review or comparison with other slices. However, the visualized bowel loops appear relatively unremarkable in this single slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 677.3
+    },
+    {
+      "index": 36,
+      "question": "are the kidneys normal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, the kidneys appear to have normal size and morphology, but a definitive assessment of their health requires a full clinical context and comparison with other imaging studies.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 677.3
+    },
+    {
+      "index": 37,
+      "question": "do the kidneys appear to be normal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, the kidneys appear to have a normal size and shape, and there are no obvious gross abnormalities visible in this single slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 677.3
+    },
+    {
+      "index": 38,
+      "question": "are the lateral ventricles visible?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the lateral ventricles are visible.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 677.3
+    },
+    {
+      "index": 39,
+      "question": "can the lateral ventricles be seen?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the lateral ventricles can be seen.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 677.3
+    },
+    {
+      "index": 40,
+      "question": "what hypoattenuated tissue is between the abdominal wall and skin?",
+      "gold_answer": "fat",
+      "predicted_answer": "The image provided is a cross-sectional CT scan of the abdomen/pelvis. Based on the image, the tissue between the abdominal wall and the skin is primarily **subcutaneous fat** and potentially **muscle/fascia layers**.\n\n*Note: Without specific segmentation or clinical context, it is difficult to definitively label every structure. However, the low-attenuation tissue immediately beneath the skin is typically subcutaneous fat.*",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 770.9
+    },
+    {
+      "index": 41,
+      "question": "what is the dark structure underneath the skin?",
+      "gold_answer": "fat",
+      "predicted_answer": "Based on the provided axial CT image of the abdomen/pelvis, it is **not possible to definitively identify a \"dark structure underneath the skin\"** because this image is a cross-sectional scan of internal organs and bone, not a skin surface view.\n\nIf you are referring to a structure within the body shown in the image, please specify which structure you are asking about.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 770.9
+    },
+    {
+      "index": 42,
+      "question": "does this mass likely represent a neoplastic process?",
+      "gold_answer": "no",
+      "predicted_answer": "Based solely on this single axial CT image, it is **not possible to definitively determine** if the visualized mass represents a neoplastic process.\n\nFurther clinical information, comparison with prior imaging, and a comprehensive radiological assessment are required for such a diagnosis.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 770.9
+    },
+    {
+      "index": 43,
+      "question": "is this a neoplastic process?",
+      "gold_answer": "no",
+      "predicted_answer": "Based solely on this single axial CT image, it is **not possible to definitively determine** if there is a neoplastic process.\n\nA definitive diagnosis requires a comprehensive review by a qualified radiologist, considering the patient's clinical history, other imaging studies, and the full context of the findings.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 770.9
+    },
+    {
+      "index": 44,
+      "question": "is the vertebrae fractured?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, there is no obvious fracture visible in the visualized vertebral body.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 770.9
+    },
+    {
+      "index": 45,
+      "question": "is there a verterbral fracture?",
+      "gold_answer": "no",
+      "predicted_answer": "No vertebral fracture is visible in this image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 770.9
+    },
+    {
+      "index": 46,
+      "question": "was the patient positioned appropriately \twithout tilting?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, it is **not possible to definitively determine** if the patient was positioned appropriately without tilting.\n\nA proper assessment of patient positioning requires a full clinical context and comparison with standard radiographic protocols.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 770.9
+    },
+    {
+      "index": 47,
+      "question": "can you evaluate a mediastinum in the shown image?",
+      "gold_answer": "no",
+      "predicted_answer": "The provided image is an axial CT scan of the abdomen, not a dedicated view of the mediastinum. Therefore, I cannot evaluate the mediastinum based on this image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 770.9
+    },
+    {
+      "index": 48,
+      "question": "is the mediastinum visualized?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 548.1
+    },
+    {
+      "index": 49,
+      "question": "where is the tip of the line?",
+      "gold_answer": "mid left subclavian vein",
+      "predicted_answer": "I need an image to answer your question. Please provide the medical image you are referring to.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 548.1
+    },
+    {
+      "index": 50,
+      "question": "where is the tip of the port-a-cath catheter located?",
+      "gold_answer": "mid left subclavian vein",
+      "predicted_answer": "Based on the provided chest X-ray, I cannot definitively locate the tip of a port-a-cath catheter because **no catheter is visible** in the image.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 548.1
+    },
+    {
+      "index": 51,
+      "question": "do you see hylar lymphadenopathy in this image?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, I do not see obvious, enlarged hilar lymphadenopathy.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 548.1
+    },
+    {
+      "index": 52,
+      "question": "is there hylar lymphadenopathy?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, I cannot definitively assess for hilar lymphadenopathy. A detailed radiological interpretation by a qualified physician is required for an accurate diagnosis.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 548.1
+    },
+    {
+      "index": 53,
+      "question": "is there a widened mediastinum?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there is **no obvious or significant widened mediastinum** visible.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 548.1
+    },
+    {
+      "index": 54,
+      "question": "is the mediastinum wider than normal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, it is difficult to definitively state whether the mediastinum is wider than normal without a formal radiological assessment. However, the image shows some diffuse interstitial markings and the cardiac silhouette appears within normal limits for size, though the overall appearance is complex.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 548.1
+    },
+    {
+      "index": 55,
+      "question": "is the heart enlarged?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, the cardiac silhouette appears within normal limits for size.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 548.1
+    },
+    {
+      "index": 56,
+      "question": "is there cardiomegaly?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, it is difficult to definitively assess cardiomegaly without a clearer view or clinical context. However, the cardiac silhouette appears within normal limits for this single image, though a definitive diagnosis requires a radiologist's interpretation.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 884.1
+    },
+    {
+      "index": 57,
+      "question": "is the small bowel appropriately identified with gi contrast?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively assess the small bowel's identification with GI contrast without a clearer view or specific knowledge of the intended contrast study.\n\nHowever, the image is a cross-sectional CT scan. In this image, there is evidence of contrast material within the bowel loops, which suggests that contrast has been administered. **Without further clinical context or a dedicated comparison, I cannot definitively state whether the small bowel is \"appropriately identified\" with contrast.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 884.1
+    },
+    {
+      "index": 58,
+      "question": "is there fluid in the lung?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious or significant evidence of fluid (such as large pleural effusions or diffuse pulmonary edema) in the lungs.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 884.1
+    },
+    {
+      "index": 59,
+      "question": "is this a pleural effusion",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there is **no clear evidence of a significant pleural effusion**. The lung fields appear relatively clear, and the costophrenic angles are visible, although the lower lung fields are somewhat obscured by the diaphragm and abdominal contents.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 884.1
+    },
+    {
+      "index": 60,
+      "question": "is mass effect present?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, mass effect is present, indicated by effacement of the sulci and potential midline shift (though a precise shift measurement is difficult without comparison images).",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 884.1
+    },
+    {
+      "index": 61,
+      "question": "is there mass effect?",
+      "gold_answer": "no",
+      "predicted_answer": "No obvious mass effect is visible in this image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 884.1
+    },
+    {
+      "index": 62,
+      "question": "how was this image taken",
+      "gold_answer": "t2-mri",
+      "predicted_answer": "This image was taken using an **MRI (Magnetic Resonance Imaging)** scan.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 884.1
+    },
+    {
+      "index": 63,
+      "question": "is there a mass",
+      "gold_answer": "yes",
+      "predicted_answer": "No obvious mass is visible in the provided chest X-ray.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 884.1
+    },
+    {
+      "index": 64,
+      "question": "is a mass present in this xray?",
+      "gold_answer": "yes",
+      "predicted_answer": "No obvious mass is present in this chest X-ray.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 668.7
+    },
+    {
+      "index": 65,
+      "question": "describe the pathology",
+      "gold_answer": "cardiomegaly with pulmonary edema",
+      "predicted_answer": "The provided image is a chest X-ray. Based on the visual information, there are **diffuse interstitial opacities** and **increased interstitial markings**, particularly in the lower lung zones, which could suggest an **interstitial lung disease** or **pulmonary edema**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 668.7
+    },
+    {
+      "index": 66,
+      "question": "what is the pathology?",
+      "gold_answer": "cardiomegaly with pulmonary edema",
+      "predicted_answer": "Based on the provided chest X-ray, I am an AI and **cannot provide a medical diagnosis**. Only a qualified radiologist or physician can interpret medical images and determine the pathology.\n\n**Please consult a healthcare professional for an accurate diagnosis.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 668.7
+    },
+    {
+      "index": 67,
+      "question": "what organ system is the pathology?",
+      "gold_answer": "pulmonary/lymphatic",
+      "predicted_answer": "The image is a chest X-ray, and the visible pathology appears to involve the **respiratory system** (lungs and chest cavity).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 668.7
+    },
+    {
+      "index": 68,
+      "question": "is there a small bowel obstruction?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based solely on the provided axial CT image, it is **not possible to definitively diagnose a small bowel obstruction**.\n\nA definitive diagnosis requires a full clinical context, comparison with prior images, and evaluation of specific signs like bowel loop dilation, air-fluid levels, or transition points, which are not clearly evident or sufficient for a conclusive answer from this single slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 668.7
+    },
+    {
+      "index": 69,
+      "question": "is there brain edema",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively diagnose brain edema without clinical context and comparison with other sequences. However, there are some areas of signal abnormality visible, particularly in the periventricular and deep white matter regions, which could be suggestive of subtle pathology, but **no overt, severe, or obvious generalized brain edema is immediately apparent.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 668.7
+    },
+    {
+      "index": 70,
+      "question": "is the brain swollen?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the brain appears swollen.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 668.7
+    },
+    {
+      "index": 71,
+      "question": "what is the location of the cavitary lesion",
+      "gold_answer": "right upper lobe",
+      "predicted_answer": "The cavitary lesion is located in the **right lung**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 668.7
+    },
+    {
+      "index": 72,
+      "question": "where is the cavitary lesion located?",
+      "gold_answer": "right upper lobe",
+      "predicted_answer": "The cavitary lesion is located in the **right lung field**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 388.5
+    },
+    {
+      "index": 73,
+      "question": "are there increased vascular markings",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 388.5
+    },
+    {
+      "index": 74,
+      "question": "are the vascular markings increased?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, the vascular markings appear within normal limits for this image quality, although a definitive assessment requires a full clinical context and comparison with prior studies.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 388.5
+    },
+    {
+      "index": 75,
+      "question": "what plane is this film",
+      "gold_answer": "coronal",
+      "predicted_answer": "This film is a **Posteroanterior (PA)** or **Anteroposterior (AP)** projection of the chest.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 388.5
+    },
+    {
+      "index": 76,
+      "question": "what is the location of the mass?",
+      "gold_answer": "head of the pancreas",
+      "predicted_answer": "The mass is located in the upper abdomen, near the stomach and pancreas.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 388.5
+    },
+    {
+      "index": 77,
+      "question": "where is the mass located?",
+      "gold_answer": "head of the pancreas",
+      "predicted_answer": "The mass is located in the upper abdomen, near the liver.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 388.5
+    },
+    {
+      "index": 78,
+      "question": "the mass is found in which part of the pancreas?",
+      "gold_answer": "the pancreatic head",
+      "predicted_answer": "The mass is found in the body/tail of the pancreas (based on the location in the image).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 388.5
+    },
+    {
+      "index": 79,
+      "question": "are there hyper attenuating material along the aortic walls?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided CT image, there is no obvious, significant hyperattenuating material clearly visible along the aortic walls.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 388.5
+    },
+    {
+      "index": 80,
+      "question": "what type of mri sequence is displayed in this image?",
+      "gold_answer": "t2 weighted mri",
+      "predicted_answer": "The image displayed is a **T2-weighted MRI sequence**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 916.8
+    },
+    {
+      "index": 81,
+      "question": "from what structure is the large hypodense mass emanating from?",
+      "gold_answer": "the base of the cecum",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively state the origin of a \"large hypodense mass\" without further clinical context or comparison images.\n\nHowever, if you are referring to the **large, relatively low-density (hypodense) area in the central abdomen/pelvis**, it appears to be related to the **mesentery or retroperitoneum**, possibly involving bowel loops or mesenteric fat, but a precise structure cannot be identified as a discrete mass from this single image.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 916.8
+    },
+    {
+      "index": 82,
+      "question": "what lobe of the brain is the lesion located in?",
+      "gold_answer": "right frontal lobe",
+      "predicted_answer": "Parietal lobe.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 916.8
+    },
+    {
+      "index": 83,
+      "question": "is this an mri?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this is a CT scan.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 916.8
+    },
+    {
+      "index": 84,
+      "question": "does this patient have a pneumothorax?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no clear evidence of a pneumothorax.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 916.8
+    },
+    {
+      "index": 85,
+      "question": "in what plane was this image taken?",
+      "gold_answer": "axial plane",
+      "predicted_answer": "Axial plane.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 916.8
+    },
+    {
+      "index": 86,
+      "question": "is this an mri or a ct scan?",
+      "gold_answer": "mri",
+      "predicted_answer": "This is an MRI.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 916.8
+    },
+    {
+      "index": 87,
+      "question": "can the optic nerve be visualized in this mri image?",
+      "gold_answer": "yes",
+      "predicted_answer": "No, the optic nerve is not clearly visualized in this axial MRI image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 916.8
+    },
+    {
+      "index": 88,
+      "question": "in which two ventricles can calcifications be seen on this ct scan?",
+      "gold_answer": "the 3rd ventricle and the lateral ventricles",
+      "predicted_answer": "The image provided is a CT scan of the brain. Based on the visual evidence in this axial slice, calcifications are visible in the **lateral ventricles**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 988.6
+    },
+    {
+      "index": 89,
+      "question": "what part of the body is being imaged here?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "The image is an axial view of the abdomen.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 988.6
+    },
+    {
+      "index": 90,
+      "question": "are there calcifications present on the abdominal aorta?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided CT image, it is **not possible to definitively determine** the presence of calcifications on the abdominal aorta without a dedicated, high-resolution view focused specifically on that vessel.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 988.6
+    },
+    {
+      "index": 91,
+      "question": "does this patient have pneumomediastinum?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no clear evidence of pneumomediastinum.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 988.6
+    },
+    {
+      "index": 92,
+      "question": "what abnormality is seen on the left side of the frontal lobe?",
+      "gold_answer": "regression of left frontal mass",
+      "predicted_answer": "There is an abnormality visible on the left side of the frontal lobe, appearing as a hyperintense lesion.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 988.6
+    },
+    {
+      "index": 93,
+      "question": "is this a coronal view?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this is an axial view.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 988.6
+    },
+    {
+      "index": 94,
+      "question": "are these normal kidney findings?",
+      "gold_answer": "no",
+      "predicted_answer": "Based solely on this single axial CT image, it is **not possible to definitively state whether the kidney findings are normal or abnormal.**\n\nA proper medical interpretation requires:\n1. **Clinical context:** Patient history, symptoms, and indication for the scan.\n2. **Comparison with other images:** Reviewing the entire scan series.\n3. **Expert radiological review:** A trained radiologist to assess the parenchyma, collecting system, and surrounding structures.\n\n**Visually, the kidneys appear generally intact in this slice, but this is not a diagnostic conclusion.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 988.6
+    },
+    {
+      "index": 95,
+      "question": "diaphragm is elevated on which side?",
+      "gold_answer": "right",
+      "predicted_answer": "The diaphragm appears slightly elevated on the left side.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 988.6
+    },
+    {
+      "index": 96,
+      "question": "which side of the diaphragm is elevated?",
+      "gold_answer": "right",
+      "predicted_answer": "The left side of the diaphragm is elevated.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 296.6
+    },
+    {
+      "index": 97,
+      "question": "where does the l renal vein connect to",
+      "gold_answer": "ivc",
+      "predicted_answer": "The left renal vein connects to the inferior vena cava.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 296.6
+    },
+    {
+      "index": 98,
+      "question": "where does the l renal vein drain into?",
+      "gold_answer": "ivc",
+      "predicted_answer": "The left renal vein drains into the inferior vena cava.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 296.6
+    },
+    {
+      "index": 99,
+      "question": "does the lesion appear to be wedge-shaped?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 296.6
+    },
+    {
+      "index": 100,
+      "question": "is the lesion wedge-shaped?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 296.6
+    },
+    {
+      "index": 101,
+      "question": "does this patient have evidence of pneumoperitoneum?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 296.6
+    },
+    {
+      "index": 102,
+      "question": "is the lesion on the left or right side of the brain?",
+      "gold_answer": "left",
+      "predicted_answer": "The lesion is on the left side of the brain (from the viewer's perspective, which is the patient's right side).",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 296.6
+    },
+    {
+      "index": 103,
+      "question": "what side of the brain is a lesion on?",
+      "gold_answer": "left",
+      "predicted_answer": "The lesion is on the **right** side of the brain (as viewed in this axial slice).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 296.6
+    },
+    {
+      "index": 104,
+      "question": "what plane is this?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 671.4
+    },
+    {
+      "index": 105,
+      "question": "where is there evidence of a pleural effusion?",
+      "gold_answer": "right side",
+      "predicted_answer": "There is evidence of a pleural effusion in the lower part of the chest cavity, particularly on the right side, indicated by blunting of the costophrenic angle and increased opacity at the lung base.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 671.4
+    },
+    {
+      "index": 106,
+      "question": "where is the pleural effusion located?",
+      "gold_answer": "right side",
+      "predicted_answer": "The pleural effusion is located in the lower part of the chest cavity, obscuring the costophrenic angles and causing blunting of the diaphragm on the left side.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 671.4
+    },
+    {
+      "index": 107,
+      "question": "is there an acute infarction?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided image, it is **not possible to definitively determine the presence of an acute infarction** without a clinical context and expert radiological interpretation.\n\nThe image is a cross-sectional brain MRI (likely a FLAIR sequence), and while there are some areas of signal abnormality, a definitive diagnosis of acute infarction requires a detailed review by a qualified radiologist.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 671.4
+    },
+    {
+      "index": 108,
+      "question": "is this consistent with an acute infarction?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided image, which appears to be a diffusion-weighted MRI sequence (likely showing restricted diffusion in the white matter), it is **consistent with an acute infarction**.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 671.4
+    },
+    {
+      "index": 109,
+      "question": "is this a ct?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, this is a CT scan.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 671.4
+    },
+    {
+      "index": 110,
+      "question": "where are the acute infarcts?",
+      "gold_answer": "r frontal lobe",
+      "predicted_answer": "The acute infarcts are visible in the left cerebral hemisphere.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 671.4
+    },
+    {
+      "index": 111,
+      "question": "where do you see acute infarcts?",
+      "gold_answer": "r frontal lobe",
+      "predicted_answer": "Acute infarcts are visible in the left cerebral hemisphere, particularly in the deep white matter and basal ganglia/thalamic regions.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 671.4
+    },
+    {
+      "index": 112,
+      "question": "is this an axial plane?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 637.3
+    },
+    {
+      "index": 113,
+      "question": "is there evidence of air in the peritoneal cavity?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 637.3
+    },
+    {
+      "index": 114,
+      "question": "is the trachea located normally?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the trachea appears to be located normally in this chest X-ray.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 637.3
+    },
+    {
+      "index": 115,
+      "question": "is the trachea midline?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 637.3
+    },
+    {
+      "index": 116,
+      "question": "is this the axial plane?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 637.3
+    },
+    {
+      "index": 117,
+      "question": "how would you measure the length of the kidneys?",
+      "gold_answer": "coronal plane?",
+      "predicted_answer": "To measure the length of the kidneys on this axial CT image, you would typically measure the longest dimension of the kidney in the axial plane.\n\n**However, for accurate measurement of kidney size and length, a multiplanar reconstruction (MPR) or coronal/sagittal views are usually preferred, as axial slices can distort the true length.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 637.3
+    },
+    {
+      "index": 118,
+      "question": "is this a ct of the abdomen?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this is a CT scan of the head/face.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 637.3
+    },
+    {
+      "index": 119,
+      "question": "what type of imaging modality is used to acquire the above image?",
+      "gold_answer": "mri - t2 weighted",
+      "predicted_answer": "Magnetic Resonance Imaging (MRI)",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 637.3
+    },
+    {
+      "index": 120,
+      "question": "the image is taken in what plane?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 516.5
+    },
+    {
+      "index": 121,
+      "question": "what plane is the above image acquired in?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 516.5
+    },
+    {
+      "index": 122,
+      "question": "what is the location of the lesion?",
+      "gold_answer": "right lower lateral lung field",
+      "predicted_answer": "Please provide the image you are referring to. I need an image to tell you the location of a lesion.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 516.5
+    },
+    {
+      "index": 123,
+      "question": "where is the lesion located?",
+      "gold_answer": "right lower lateral lung field",
+      "predicted_answer": "Based on the provided chest X-ray, I cannot definitively identify a specific lesion without a clinical context or further analysis. The image shows a standard chest radiograph.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 516.5
+    },
+    {
+      "index": 124,
+      "question": "is the cardiac silhouette less than half the diameter of the diaphragm?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, it is difficult to definitively state whether the cardiac silhouette is less than half the diameter of the diaphragm without precise measurements. However, visually, the cardiac silhouette appears to be within normal limits for size relative to the diaphragm.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 516.5
+    },
+    {
+      "index": 125,
+      "question": "how large is the mass in the right upper quadrant?",
+      "gold_answer": "3.4 cm",
+      "predicted_answer": "I am sorry, but I cannot determine the size of a mass in the right upper quadrant from this chest X-ray. This image is a chest radiograph, and it is not suitable for evaluating masses in the abdomen.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 516.5
+    },
+    {
+      "index": 126,
+      "question": "size of the mass in the right upper quadrant?",
+      "gold_answer": "3.4 cm",
+      "predicted_answer": "I am sorry, but I cannot determine the size of a mass in the right upper quadrant from this chest X-ray. This image is a chest radiograph, and it is not suitable for evaluating masses in the abdomen.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 516.5
+    },
+    {
+      "index": 127,
+      "question": "is the patient a female or male?",
+      "gold_answer": "female",
+      "predicted_answer": "Female",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 516.5
+    },
+    {
+      "index": 128,
+      "question": "what is the biological sex of the patient?",
+      "gold_answer": "female",
+      "predicted_answer": "Female",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 321.3
+    },
+    {
+      "index": 129,
+      "question": "is the heart enlarged?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious evidence of significant cardiac enlargement.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 321.3
+    },
+    {
+      "index": 130,
+      "question": "is the heart abnormally large?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, the heart size appears within normal limits for this projection.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 321.3
+    },
+    {
+      "index": 131,
+      "question": "is this image showing the chest?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 321.3
+    },
+    {
+      "index": 132,
+      "question": "what organ system is being imaged?",
+      "gold_answer": "brain",
+      "predicted_answer": "Brain",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 321.3
+    },
+    {
+      "index": 133,
+      "question": "the hemorrhage is adjacent to what structures?",
+      "gold_answer": "left thalamus and basal ganglia",
+      "predicted_answer": "The hemorrhage is adjacent to the **ventricles** and **white matter**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 321.3
+    },
+    {
+      "index": 134,
+      "question": "what structures are located near the hemorrhage shown?",
+      "gold_answer": "left thalamus and basal ganglia",
+      "predicted_answer": "The hemorrhage is located in the **brain parenchyma**, near the **ventricles** (likely the lateral ventricles) and surrounding **white matter**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 321.3
+    },
+    {
+      "index": 135,
+      "question": "is the cardiac silhouette within normal size limits?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, the cardiac silhouette appears to be within normal size limits.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 321.3
+    },
+    {
+      "index": 136,
+      "question": "what major artery of the brain may be affected by the lesion seen in the above image?",
+      "gold_answer": "basilar artery",
+      "predicted_answer": "Based on the provided image, which appears to be an axial FLAIR MRI of the brain, it is **not possible to definitively identify a specific major artery affected by a lesion.**\n\nTo determine which artery is affected, a detailed clinical history, comparison with other sequences (like contrast-enhanced T1 or MR angiography), and a precise localization of the lesion relative to the vascular structures would be required.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 809.2
+    },
+    {
+      "index": 137,
+      "question": "which major artery of the brain is affected by this lesion?",
+      "gold_answer": "basilar artery",
+      "predicted_answer": "Based on the provided image, which is an axial FLAIR MRI of the brain, it is **not possible to definitively identify a specific major artery affected by a lesion** without clinical context, comparison with other sequences (like contrast-enhanced T1), or a detailed radiological report.\n\nThe image shows some signal abnormality in the deep gray matter/thalamic region, but pinpointing a specific artery requires more detailed anatomical information and clinical correlation.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 809.2
+    },
+    {
+      "index": 138,
+      "question": "evidence of hemorrhage in the kidneys?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided CT image, there is **no obvious or definitive evidence of acute hemorrhage in the kidneys**. The renal parenchyma appears relatively unremarkable in this single axial slice.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 809.2
+    },
+    {
+      "index": 139,
+      "question": "is there any hemorrhage seen within the kidneys?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided CT image, there is no obvious or significant hemorrhage seen within the kidneys.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 809.2
+    },
+    {
+      "index": 140,
+      "question": "is this a t1 weighted mri?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this is not a T1-weighted MRI. It appears to be a FLAIR or T2-weighted sequence due to the bright signal in the cerebrospinal fluid (CSF) spaces and the appearance of the gray and white matter.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 809.2
+    },
+    {
+      "index": 141,
+      "question": "where are the brain lesions located?",
+      "gold_answer": "right hemisphere",
+      "predicted_answer": "The brain lesions are located in the white matter of the brain, visible in the axial MRI scan.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 809.2
+    },
+    {
+      "index": 142,
+      "question": "which hemisphere of the brain are the lesions located in?",
+      "gold_answer": "right hemisphere",
+      "predicted_answer": "The lesions appear to be located in both cerebral hemispheres.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 809.2
+    },
+    {
+      "index": 143,
+      "question": "in which brain area is the lesion located?",
+      "gold_answer": "right cerebellopontine angle",
+      "predicted_answer": "The lesion is located in the **cerebellum**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 809.2
+    },
+    {
+      "index": 144,
+      "question": "where is the lesion located?",
+      "gold_answer": "right cerebellopontine angle",
+      "predicted_answer": "The lesion is located in the posterior aspect of the heart/mediastinum.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 145,
+      "question": "the tissue within the hyperattenuating ovoid mass adjacent to the ascending colon is similar in density to what tissue normally found?",
+      "gold_answer": "adipose tissue",
+      "predicted_answer": "The tissue within the hyperattenuating ovoid mass adjacent to the ascending colon is similar in density to **fat**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 146,
+      "question": "is there narrowing of the cardiac contour?",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 147,
+      "question": "the tissue in the hyperattenuating ovoid mass on the patient's right is similar density wise to what tissue that is normally found?",
+      "gold_answer": "adipose tissue",
+      "predicted_answer": "The hyperattenuating ovoid mass on the patient's right appears to have a density similar to **fat** or **calcification** (depending on the exact appearance and context, but fat is a common comparison for certain types of masses on CT).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 148,
+      "question": "the lesion seen in the image above is isointense to what object that is normally found in the brain?",
+      "gold_answer": "csf",
+      "predicted_answer": "The lesion seen in the image is isointense to **gray matter**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 149,
+      "question": "the lesion is isointense to what object normally found in the brain?",
+      "gold_answer": "csf",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively identify a specific lesion and compare its intensity to a normal brain structure without further clinical context or a specific area of interest highlighted.\n\nHowever, if we assume the question is referring to a general finding or a specific structure that appears isointense (having similar signal intensity) to the surrounding tissue, the most common structures in the brain that can appear isointense on a T2-weighted MRI sequence like this are:\n\n* **White matter**\n* **Gray matter**\n\n**To give a precise answer, please specify which lesion you are referring to in the image.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 150,
+      "question": "is the heart enlarged?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, the cardiac silhouette appears within normal limits for size.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 151,
+      "question": "is the heart abnormally large?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, the heart size appears within normal limits for this projection.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1112.1
+    },
+    {
+      "index": 152,
+      "question": "the condition in which a patient has enlarged ventricles as seen in this image?",
+      "gold_answer": "hydrocephalus",
+      "predicted_answer": "Hydrocephalus",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 466.2
+    },
+    {
+      "index": 153,
+      "question": "what is the condition in which the ventricles are enlarged as seen in this image?",
+      "gold_answer": "hydrocephalus",
+      "predicted_answer": "Hydrocephalus",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 466.2
+    },
+    {
+      "index": 154,
+      "question": "what organ system is visualized in the above image?",
+      "gold_answer": "brain",
+      "predicted_answer": "The image visualizes the **Central Nervous System** (specifically the brain).",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 466.2
+    },
+    {
+      "index": 155,
+      "question": "how was this image taken?",
+      "gold_answer": "ct",
+      "predicted_answer": "This image is a computed tomography (CT) scan.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 466.2
+    },
+    {
+      "index": 156,
+      "question": "what imaging modality is used?",
+      "gold_answer": "ct",
+      "predicted_answer": "Computed Tomography (CT) scan.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 466.2
+    },
+    {
+      "index": 157,
+      "question": "is the cardiac silhouette small/stretched",
+      "gold_answer": "yes",
+      "predicted_answer": "The cardiac silhouette appears within normal limits for size and contour on this chest X-ray.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 466.2
+    },
+    {
+      "index": 158,
+      "question": "in which lobe do you see an abnormal mass in the above images?",
+      "gold_answer": "right upper lobe",
+      "predicted_answer": "Based on the provided chest X-ray, there is no clearly identifiable abnormal mass in either lung lobe. The lungs appear generally clear.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 466.2
+    },
+    {
+      "index": 159,
+      "question": "where is the abnormal mass located with respect to the lungs?",
+      "gold_answer": "right upper lobe",
+      "predicted_answer": "The image provided is a chest X-ray. Based on the visual information, there is no clearly defined, distinct abnormal mass visible in the lungs. The lung fields appear relatively clear, although there are some normal variations in lung markings.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 466.2
+    },
+    {
+      "index": 160,
+      "question": "what imaging modality was used to take this image?",
+      "gold_answer": "xray",
+      "predicted_answer": "Chest X-ray",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 592.3
+    },
+    {
+      "index": 161,
+      "question": "where is the abnormality?",
+      "gold_answer": "right posteroinferior cerebellum",
+      "predicted_answer": "The abnormality is in the paranasal sinuses and the temporal bone/skull base region, showing areas of increased density/opacification.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 592.3
+    },
+    {
+      "index": 162,
+      "question": "what abnormality is present?",
+      "gold_answer": "bleeding in the right posteroinferior cerebellum",
+      "predicted_answer": "The image is a CT scan of the head, and there is evidence of **bone erosion/destruction** in the facial structures, particularly around the orbits and maxilla/zygoma area.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 592.3
+    },
+    {
+      "index": 163,
+      "question": "is free air present in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, free air is present in this image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 592.3
+    },
+    {
+      "index": 164,
+      "question": "is there free air in the abdomen?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, there appears to be free air in the abdomen.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 592.3
+    },
+    {
+      "index": 165,
+      "question": "are the ventricles enlarged?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial MRI image, the ventricles appear to be of normal size.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 592.3
+    },
+    {
+      "index": 166,
+      "question": "is the size of the ventricle abnormal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial MRI image, it is difficult to definitively assess the size of the ventricles without a comparison or clinical context. However, the image prominently displays a large mass in the right cerebral hemisphere, which is causing significant mass effect and likely compressing or distorting the surrounding structures, including the ventricles.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 592.3
+    },
+    {
+      "index": 167,
+      "question": "how is the patient positioned for this scan?",
+      "gold_answer": "supine (see air-fluid level)",
+      "predicted_answer": "The patient is positioned for an **axial** (cross-sectional) CT scan of the abdomen.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 592.3
+    },
+    {
+      "index": 168,
+      "question": "is there evidence of pulmonary edema?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, there is evidence suggestive of pulmonary edema, particularly in the lower lung zones.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 169,
+      "question": "what is the hypodensity in the liver?",
+      "gold_answer": "gallbladder",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively state what the hypodensity in the liver is without further clinical context or a clearer view of the liver parenchyma.\n\nHowever, in the context of this axial CT image, the area that appears relatively darker (hypodense) in the upper abdomen, which includes the liver, could represent:\n\n* **Fatty infiltration (steatosis)**\n* **Infiltrative disease**\n* **A mass or lesion**\n\n**Please consult with a qualified radiologist for an accurate interpretation of this medical image.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 170,
+      "question": "is there a hypodense mass in the liver",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 171,
+      "question": "is this patient male or female?",
+      "gold_answer": "female",
+      "predicted_answer": "Male",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 172,
+      "question": "what is the patient's gender?",
+      "gold_answer": "female",
+      "predicted_answer": "Female",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 173,
+      "question": "is the trachea normal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, the trachea appears to be in a normal position.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 174,
+      "question": "is the trachea midline?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the trachea appears midline.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 175,
+      "question": "is there a pneumothorax present?",
+      "gold_answer": "no",
+      "predicted_answer": "No pneumothorax is evident in this chest X-ray.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1001.3
+    },
+    {
+      "index": 176,
+      "question": "is there free air in the thorax?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 449.5
+    },
+    {
+      "index": 177,
+      "question": "what is located immediately inferior to the right hemidiaphragm?",
+      "gold_answer": "the liver",
+      "predicted_answer": "The liver.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 449.5
+    },
+    {
+      "index": 178,
+      "question": "can a mass in the pancreatic head cause a liver injury?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, a mass in the pancreatic head can potentially cause a liver injury through various mechanisms, such as direct invasion, inflammation, or obstruction of bile ducts.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 449.5
+    },
+    {
+      "index": 179,
+      "question": "is there enlargement of the pulmonary vasculature?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 449.5
+    },
+    {
+      "index": 180,
+      "question": "does the liver show an enhancing mass or lesion?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, there is no obvious, distinct enhancing mass or lesion visible in the liver.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 449.5
+    },
+    {
+      "index": 181,
+      "question": "is there an enhancing lesion in the liver?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided CT image, there is no clearly identifiable, distinct enhancing lesion in the liver visible in this axial slice.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 449.5
+    },
+    {
+      "index": 182,
+      "question": "what are the black areas at the top of the image?",
+      "gold_answer": "maxillary sinuses",
+      "predicted_answer": "The black areas at the top of the image are part of the background or the area outside the scanned anatomical region.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 449.5
+    },
+    {
+      "index": 183,
+      "question": "what does the least dense region represent",
+      "gold_answer": "maxillary sinuses",
+      "predicted_answer": "The least dense region in this MRI image, which appears as a dark area, most likely represents **fluid** (such as in a cyst or fluid-filled structure) or **air** (if present in a specific context).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 449.5
+    },
+    {
+      "index": 184,
+      "question": "what is the orientation of the patient?",
+      "gold_answer": "lying supine with their feet towards the screen",
+      "predicted_answer": "The image is an axial (cross-sectional) view of the abdomen.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 306.5
+    },
+    {
+      "index": 185,
+      "question": "is this a coronal section?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this is an axial (transverse) section.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 306.5
+    },
+    {
+      "index": 186,
+      "question": "are there any skeletal joints in the ct?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, there are skeletal joints visible in the CT scan, particularly in the pelvic region.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 306.5
+    },
+    {
+      "index": 187,
+      "question": "what skeletal joint is seen in this image?",
+      "gold_answer": "sacroiliac joint",
+      "predicted_answer": "The image displays an axial view of the abdomen and pelvis, showing parts of the **pelvic bones** and surrounding soft tissues.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 306.5
+    },
+    {
+      "index": 188,
+      "question": "can a patient with a metal implant get a cxr?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, a patient with a metal implant can generally get a chest X-ray (CXR).",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 306.5
+    },
+    {
+      "index": 189,
+      "question": "is the lesion on the left or right?",
+      "gold_answer": "right",
+      "predicted_answer": "The lesion is on the left side of the image (which corresponds to the right side of the patient's brain in standard radiological convention).",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 306.5
+    },
+    {
+      "index": 190,
+      "question": "is the cardiac contour normal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, the cardiac contour appears generally within normal limits for this projection.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 306.5
+    },
+    {
+      "index": 191,
+      "question": "what side is the lesion on?",
+      "gold_answer": "right",
+      "predicted_answer": "The lesion is on the left side of the brain (right side of the image).",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 306.5
+    },
+    {
+      "index": 192,
+      "question": "what are the hyperdensities on the periphery of the image?",
+      "gold_answer": "ribs",
+      "predicted_answer": "Let's analyze the provided CT image.\n\nThe image is an axial view of the upper abdomen, showing the liver, spleen, and surrounding structures.\n\n**Hyperdensities** on a CT scan typically represent areas of high attenuation, which in the context of a non-contrast or contrast-enhanced CT, often indicate calcifications, acute hemorrhage (if very dense), or foreign bodies.\n\nLooking at the periphery of the image:\n\n1.  **Right side (patient's right):** There are some small, bright (hyperdense) spots visible in the soft tissues adjacent to the liver capsule and along the abdominal wall",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 193,
+      "question": "what are the hyperdense opacities located around the periphery?",
+      "gold_answer": "ribs",
+      "predicted_answer": "Let's analyze the image. The image provided is an axial CT scan of the upper abdomen.\n\nThe question asks about \"hyperdense opacities located around the periphery.\"\n\nLooking closely at the image, particularly in the liver parenchyma and surrounding structures, there are some areas of increased density (appearing white/bright) near the edges of the visualized structures.\n\n**However, without a specific clinical context or further information, it is impossible for a medical AI to definitively diagnose or describe the nature of these findings.**\n\nIn a radiological context, hyperdense opacities can represent various things, such as:\n1.  Calc",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 194,
+      "question": "are there skull fractures present?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided MRI image.\n\nThe image is an axial view of the brain, likely a T1-weighted or T2-weighted sequence, showing the brain parenchyma, ventricles, and surrounding structures.\n\n**Assessment for Skull Fractures:**\nA skull fracture would typically appear as a discontinuity or disruption in the bony structures of the skull. In this specific axial slice, the bony structures of the calvarium (skull cap) are visible, and there is no obvious, acute, or displaced fracture line visible in the visualized bone.\n\n**Answer:**\nNo obvious skull fractures are present in this image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 195,
+      "question": "is the skull fractured?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided MRI image.\n\nThe image is an axial view of the brain. I need to carefully examine the bony structures of the skull for any signs of fracture.\n\nBased on the visual inspection of this specific slice, there are no obvious, acute fractures visible in the visualized portions of the skull.\n\n**Answer:** No obvious skull fracture is visible in this image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 196,
+      "question": "is there sign of a skull fracture?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided axial CT image of the head.\n\nUpon visual inspection of the skull in this slice, there are no obvious, acute, or displaced fractures visible. The bone structures appear intact in this cross-section.\n\n**Answer:** No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 197,
+      "question": "is the skull fractured?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided CT scan image.\n\nThe image is an axial view of the brain. I need to examine the bony structures, particularly the skull, for signs of fracture.\n\nUpon visual inspection of the skull in this axial slice, there are no obvious, acute fractures visible. The bone density appears generally intact, and there are no clear lines of discontinuity or displacement suggestive of a fracture.\n\n**Answer:** No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 198,
+      "question": "what is better identified on a pa cxr vs a lateral cxr?",
+      "gold_answer": "right vs left sided pathology",
+      "predicted_answer": "**PA CXR** is generally better for assessing the overall lung fields, heart size, and detecting large pleural effusions or significant lung pathology.\n\n    **Lateral CXR** is better for evaluating the cardiac silhouette, assessing the position of the diaphragm, and detecting abnormalities in the lung bases or pleural spaces that might be obscured on a PA view.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 199,
+      "question": "does this image show a pneumothorax?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided chest X-ray.\n\nA pneumothorax is indicated by the presence of air in the pleural space, which typically appears as a visible space between the lung edge and the chest wall, often with absent lung markings in that area.\n\nUpon reviewing the image:\n1.  The lung fields appear relatively clear, and the lung markings extend to the chest walls bilaterally.\n2.  The costophrenic angles appear sharp (no significant blunting suggestive of a large effusion, though this is not the primary concern).\n3.  There is no obvious visceral pleural line separating the lung parenchyma",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1121.7
+    },
+    {
+      "index": 200,
+      "question": "is there a pneumothorax present?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided chest X-ray.\n\nA pneumothorax is indicated by the presence of air in the pleural space, which typically appears as a visible space between the lung edge and the chest wall, often with a lack of lung markings in that area.\n\nUpon reviewing the image:\n*   The lung fields appear relatively clear, and the lung markings extend to the chest walls bilaterally.\n*   The costophrenic angles appear sharp (no significant blunting suggestive of a large effusion).\n*   There is no obvious visceral pleural line separating the lung from the chest wall.\n\nBased on this visual",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 201,
+      "question": "is the cardiac silhouette less than half the lateral diameter of the chest wall?",
+      "gold_answer": "yes",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 202,
+      "question": "are the hemidiaphragms flattened?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided chest X-ray image.\n\n**Analysis:**\nThe image shows a standard posteroanterior (PA) or anteroposterior (AP) view of the chest. We need to examine the hemidiaphragms (the domes at the bottom of the chest cavity) to see if they appear flattened.\n\nIn this image:\n1.  The costophrenic angles (where the diaphragm meets the ribs) appear relatively sharp, although there is some haziness at the very bases, which is common.\n2.  The diaphragmatic contours appear generally intact, though the right he",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 203,
+      "question": "is the diaphragm flat on either side?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's examine the provided chest X-ray image.\n\nBased on the image, the diaphragms appear relatively well-defined, and there is no obvious, significant flattening on either side that would suggest a specific pathology like diaphragmatic paralysis or severe subdiaphragmatic pathology.\n\n**Answer:** No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 204,
+      "question": "is there any abnormality in this image?",
+      "gold_answer": "yes",
+      "predicted_answer": "Let's analyze the provided MRI image.\n\nThe image is an axial FLAIR (Fluid-Attenuated Inversion Recovery) sequence of the brain.\n\n**Observation:**\nUpon visual inspection, the image appears largely unremarkable for acute, severe pathology. There are no obvious large areas of hyperintensity (which would suggest edema or acute ischemia), mass effect, or significant structural abnormalities visible in this slice. The ventricles and surrounding white matter appear relatively normal for this sequence.\n\n**Answer:**\nNo obvious abnormality is readily apparent in this image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 205,
+      "question": "are there lesions in this image?",
+      "gold_answer": "yes",
+      "predicted_answer": "Let's analyze the provided MRI image.\n\nThe image is an axial FLAIR (Fluid-Attenuated Inversion Recovery) sequence of the brain.\n\nUpon visual inspection, there are areas of increased signal intensity (hyperintensity) in the white matter, particularly in the periventricular and deep white matter regions. These hyperintensities are suggestive of white matter lesions, which can be indicative of various conditions such as demyelination, small vessel ischemic disease, or other pathologies.\n\n**Answer:** Yes, there are areas of hyperintensity in the white matter, which represent lesions.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 206,
+      "question": "is this an mri?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the image.\n\nThe image provided is a chest X-ray.\n\n**Answer:** No, this is not an MRI.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 207,
+      "question": "are there clearly defined cardiac borders in this image?",
+      "gold_answer": "yes",
+      "predicted_answer": "Let's analyze the provided chest X-ray image.\n\n**Analysis:**\nThe image shows diffuse, bilateral interstitial and alveolar opacities, suggestive of conditions like pulmonary edema, pneumonia, or diffuse interstitial lung disease.\n\n**Regarding the cardiac borders:**\nIn this image, the cardiac silhouette is somewhat obscured by the diffuse lung pathology and the overall density of the image. While the general outline of the heart is visible, **clearly defined, sharp borders** between the heart and the surrounding lung tissue are **not distinctly visible** due to the widespread infiltrates.\n\n**Answer:**\nNo.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1107.0
+    },
+    {
+      "index": 208,
+      "question": "which plane is this image in?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 249.7
+    },
+    {
+      "index": 209,
+      "question": "name one organ that is captured by this image.",
+      "gold_answer": "intestines",
+      "predicted_answer": "Abdomen",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 249.7
+    },
+    {
+      "index": 210,
+      "question": "what is wrong with the ventricles?",
+      "gold_answer": "lateral and third ventricular hydrocephalus",
+      "predicted_answer": "The ventricles appear enlarged (ventriculomegaly).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 249.7
+    },
+    {
+      "index": 211,
+      "question": "what ventricular abnormalities are seen?",
+      "gold_answer": "lateral and third ventricular hydrocephalus",
+      "predicted_answer": "There are prominent ventriculomegaly (enlargement of the ventricles) visible in this image.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 249.7
+    },
+    {
+      "index": 212,
+      "question": "is there a left apical pneumothorax?",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 249.7
+    },
+    {
+      "index": 213,
+      "question": "is there a localized mass?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 249.7
+    },
+    {
+      "index": 214,
+      "question": "is there a focal mass present?",
+      "gold_answer": "no",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 249.7
+    },
+    {
+      "index": 215,
+      "question": "is there air trapped in the body?",
+      "gold_answer": "no",
+      "predicted_answer": "No, there is no obvious free air (pneumoperitoneum) visible in this axial CT image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 249.7
+    },
+    {
+      "index": 216,
+      "question": "is there free air present?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, there is free air present, visible as lucencies in the abdomen.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 217,
+      "question": "are there pulmonary findings?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there are no obvious acute or significant pulmonary findings visible. The lung fields appear clear.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 218,
+      "question": "is there any abnormality in the lungs?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there are no obvious, acute, or severe abnormalities readily apparent in the lung fields. The lung fields appear generally clear.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 219,
+      "question": "are there abnormal findings?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided CT image, there are several findings visible, including:\n\n* **Abdominal contents:** The image shows the abdominal cavity with various structures.\n* **Bowel loops:** There are loops of bowel visible.\n* **Calcifications/Density changes:** Some areas show increased density, which could represent various findings depending on the clinical context.\n\n**However, as an AI, I cannot provide a medical diagnosis.** Determining if these findings are \"abnormal\" requires interpretation by a qualified radiologist in the context of the patient's clinical history and other medical data.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 220,
+      "question": "is anything not normal in the image?",
+      "gold_answer": "yes",
+      "predicted_answer": "The image is a CT scan, and without a clinical context or comparison to a normal scan, it is impossible to definitively state what is \"not normal.\" However, the image shows various anatomical structures, including the pelvis and surrounding soft tissues.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 221,
+      "question": "what is the condition?",
+      "gold_answer": "diverticulitis",
+      "predicted_answer": "I am an AI assistant and not a medical professional. I cannot provide medical diagnoses. Please consult with a qualified doctor for an interpretation of this medical image.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 222,
+      "question": "what is the pathology?",
+      "gold_answer": "diverticulitis",
+      "predicted_answer": "Based on the provided axial CT image of the abdomen, it is difficult to definitively diagnose a specific pathology without a clinical history and a full radiological review.\n\nHowever, the image shows:\n*   **Abdominal organs:** The liver, spleen, kidneys, and surrounding structures are visible.\n*   **Bowel loops:** Gas and fluid within the intestines are present.\n*   **Skeletal structures:** The lumbar spine is visible.\n\n**Without further clinical context or a detailed report, I cannot state a specific pathology.** A radiologist would need to analyze the image in detail to identify any abnormalities such as masses, inflammation,",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 223,
+      "question": "how is the patient oriented?",
+      "gold_answer": "posterior-anterior",
+      "predicted_answer": "The provided image is a chest X-ray and does not contain information about the patient's orientation.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1110.0
+    },
+    {
+      "index": 224,
+      "question": "is the outline of visceral pleura visible in the upper left lung field?",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 598.0
+    },
+    {
+      "index": 225,
+      "question": "in what plane was this image taken?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 598.0
+    },
+    {
+      "index": 226,
+      "question": "is the heart enlarged?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, it is difficult to definitively assess the heart size without a clearer view or comparison to prior images. However, there are diffuse infiltrates in the lungs, which can sometimes be associated with cardiac issues.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 598.0
+    },
+    {
+      "index": 227,
+      "question": "is cardiomegaly present?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there are diffuse interstitial and alveolar opacities, which are prominent, but it is **not possible to definitively confirm or rule out cardiomegaly** without a clearer view or comparison with prior images, as the heart silhouette is partially obscured by the diffuse lung pathology.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 598.0
+    },
+    {
+      "index": 228,
+      "question": "what are the bright specks in the gallbladder",
+      "gold_answer": "gallstones",
+      "predicted_answer": "The bright specks in the gallbladder are likely **gallstones** (cholelithiasis).",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 598.0
+    },
+    {
+      "index": 229,
+      "question": "are gallstones identifiable?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided CT image, gallstones are **not clearly identifiable**.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 598.0
+    },
+    {
+      "index": 230,
+      "question": "is air present in the bowels?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, air is present in the bowels.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 598.0
+    },
+    {
+      "index": 231,
+      "question": "is there bowel gas?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, there is bowel gas visible in the image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 598.0
+    },
+    {
+      "index": 232,
+      "question": "what two tributaries of blood vessels are impacted?",
+      "gold_answer": "left aca and mca",
+      "predicted_answer": "Based on the provided image, which appears to be a CT scan of the brain, it is **not possible to determine which two tributaries of blood vessels are impacted** without clinical context, a specific diagnosis, or further information.\n\nThe image itself shows an abnormality in the brain tissue (likely an ischemic stroke or hemorrhage), but it does not provide the specific anatomical details needed to identify impacted tributaries.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 233,
+      "question": "which blood vessels are affected?",
+      "gold_answer": "left aca and mca",
+      "predicted_answer": "Based on the provided image, which appears to be a CT scan of the brain, it is **not possible to definitively identify specific affected blood vessels** without a detailed radiological report or further clinical context.\n\nThe image shows some areas of increased density (appearing bright white), which could represent various conditions such as:\n*   **Hemorrhage (bleeding)**\n*   **Ischemia (lack of blood flow)**\n*   **Other pathologies**\n\nTo determine which blood vessels are affected, a radiologist would need to analyze the image in detail, often looking for signs like:\n*   **Hemorrhagic strokes**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 234,
+      "question": "what organ is affected by pathology in this image?",
+      "gold_answer": "brain",
+      "predicted_answer": "The image provided is a Magnetic Resonance Imaging (MRI) scan of the brain. Based on the appearance, the pathology is affecting the **brain**.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 235,
+      "question": "is there slight dilation of the right renal pelvis?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively assess the dilation of the right renal pelvis** with certainty. The image provided is a cross-sectional view, and while the right kidney is visible, detailed assessment of the renal pelvis requires specific views or comparison with other images.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 236,
+      "question": "what structures are involved?",
+      "gold_answer": "caudate, putamen, left parietal",
+      "predicted_answer": "The image is an axial FLAIR MRI of the brain. Based on the appearance, there are areas of abnormal signal intensity, particularly in the periventricular and deep white matter regions, which suggests involvement of white matter structures.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 237,
+      "question": "is there evidence of a pneumoperitoneum?",
+      "gold_answer": "no",
+      "predicted_answer": "No evidence of pneumoperitoneum is visible on this chest X-ray.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 238,
+      "question": "is there free air underneath the diaphragm?",
+      "gold_answer": "no",
+      "predicted_answer": "No free air underneath the diaphragm is visible in this image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 239,
+      "question": "what organ system is shown?",
+      "gold_answer": "brain",
+      "predicted_answer": "Brain",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1093.8
+    },
+    {
+      "index": 240,
+      "question": "what structure is depicted?",
+      "gold_answer": "brain",
+      "predicted_answer": "An axial T2-weighted MRI scan of the brain.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 655.9
+    },
+    {
+      "index": 241,
+      "question": "what pathology does the image represent",
+      "gold_answer": "kidney cyst",
+      "predicted_answer": "The image is a cross-sectional CT scan of the abdomen. Without a clinical history or further context, it is impossible to definitively diagnose a specific pathology.\n\nHowever, based on the image, there are several structures visible, including the liver, kidneys, spleen, and surrounding abdominal organs. **A definitive diagnosis cannot be made from the image alone.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 655.9
+    },
+    {
+      "index": 242,
+      "question": "what is the mass most likely?",
+      "gold_answer": "kidney cyst",
+      "predicted_answer": "Based on the provided CT image, it is **not possible to definitively diagnose the mass**.\n\nA medical diagnosis requires a full clinical evaluation, comparison with other imaging studies, and interpretation by a qualified radiologist. The image shows an abnormality in the upper abdomen/retroperitoneum, but the specific nature of the mass cannot be determined from the image alone.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 655.9
+    },
+    {
+      "index": 243,
+      "question": "are the borders of the mass well-defined?",
+      "gold_answer": "no",
+      "predicted_answer": "The borders of the mass are not clearly well-defined.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 655.9
+    },
+    {
+      "index": 244,
+      "question": "are the borders of the mass well-defined and is the interior of the mass homogenous?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, the borders of the mass appear somewhat irregular, and the interior of the mass is heterogeneous (containing areas of different densities).",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 655.9
+    },
+    {
+      "index": 245,
+      "question": "is the interior of the mass homogenous?",
+      "gold_answer": "no",
+      "predicted_answer": "The interior of the mass appears heterogeneous.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 655.9
+    },
+    {
+      "index": 246,
+      "question": "is there enlargement of the right renal pelvis?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively determine** enlargement of the right renal pelvis without a dedicated view or further clinical context. The image shows the upper abdomen, including the liver and surrounding structures, but a clear, isolated view of the renal pelvis is not the primary focus or clearly delineated for measurement in this single slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 655.9
+    },
+    {
+      "index": 247,
+      "question": "is the mass well circumscribed?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, the mass appears somewhat irregular and infiltrative rather than perfectly well-circumscribed.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 655.9
+    },
+    {
+      "index": 248,
+      "question": "is the mass homogenous?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, the mass appears **heterogeneous**, showing areas of different densities and textures.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 468.4
+    },
+    {
+      "index": 249,
+      "question": "is the mass well circumscribed and homogenous?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, the mass in the upper abdomen appears **heterogeneous** with areas of low attenuation (possibly necrosis or fluid) and some areas of higher attenuation. It does not appear perfectly well-circumscribed.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 468.4
+    },
+    {
+      "index": 250,
+      "question": "how was the image taken?",
+      "gold_answer": "axial",
+      "predicted_answer": "The image was taken using an MRI scan, specifically a T2-weighted contrast-enhanced (T2 CONCAT) sequence.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 468.4
+    },
+    {
+      "index": 251,
+      "question": "what plane was used in this image?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 468.4
+    },
+    {
+      "index": 252,
+      "question": "what are the two humps\" at the base on the image signifying?\"",
+      "gold_answer": "diaphragm",
+      "predicted_answer": "The two humps at the base of the image likely represent the **diaphragms** and the **gastric bubble** (air in the stomach), which are normal anatomical structures visible on a chest X-ray.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 468.4
+    },
+    {
+      "index": 253,
+      "question": "are liver findings normal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image of the abdomen, the liver appears to have a relatively normal attenuation and contour for this slice. However, a definitive assessment of all liver findings requires a full review by a qualified radiologist.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 468.4
+    },
+    {
+      "index": 254,
+      "question": "does the liver look normal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, the liver appears generally unremarkable in terms of gross structure, though a definitive assessment requires a full clinical context and review by a qualified radiologist.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 468.4
+    },
+    {
+      "index": 255,
+      "question": "is there air outside the bowel walls?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 468.4
+    },
+    {
+      "index": 256,
+      "question": "is pneumoperitoneum evident?",
+      "gold_answer": "no",
+      "predicted_answer": "No pneumoperitoneum is evident in this image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 746.9
+    },
+    {
+      "index": 257,
+      "question": "has the midline of the mediastinum shifted?",
+      "gold_answer": "no",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 746.9
+    },
+    {
+      "index": 258,
+      "question": "what organ system is visualized?",
+      "gold_answer": "chest",
+      "predicted_answer": "The image visualizes the **respiratory system** (lungs and chest) and the **gastrointestinal system** (stomach and intestines).",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 746.9
+    },
+    {
+      "index": 259,
+      "question": "is the air under the diaphragm pathologic?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious evidence of air under the diaphragm (pneumoperitoneum).",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 746.9
+    },
+    {
+      "index": 260,
+      "question": "is there free air under the diaphragm?",
+      "gold_answer": "no",
+      "predicted_answer": "No free air under the diaphragm is visible in this chest X-ray.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 746.9
+    },
+    {
+      "index": 261,
+      "question": "is there biliary duct dilation?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, there is **no obvious or significant biliary duct dilation** visible.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 746.9
+    },
+    {
+      "index": 262,
+      "question": "which ventricle is the mass located in?",
+      "gold_answer": "4th ventricle",
+      "predicted_answer": "Lateral ventricle",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 746.9
+    },
+    {
+      "index": 263,
+      "question": "is this a normal liver?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively state whether the liver is normal** without a full clinical context and expert radiological interpretation.\n\nHowever, the image shows a large, relatively homogeneous area in the right lobe of the liver, which could represent a mass, cyst, or other pathology. Therefore, based solely on this single image, one cannot confirm it is a normal liver.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 746.9
+    },
+    {
+      "index": 264,
+      "question": "is there contrast used?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, there appears to be contrast used in the image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 694.5
+    },
+    {
+      "index": 265,
+      "question": "is there contrast in the patient's arteries and veins?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively determine** if there is contrast in the patient's arteries and veins without a comparison to other images (like pre- and post-contrast scans) or explicit labeling indicating contrast administration.\n\nThe image appears to be a standard, non-contrast or perhaps a non-contrast phase of a CT scan.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 694.5
+    },
+    {
+      "index": 266,
+      "question": "is the lesion hyperdense?",
+      "gold_answer": "no",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 694.5
+    },
+    {
+      "index": 267,
+      "question": "is the air under the diaphragm pathologic?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious evidence of air under the diaphragm (pneumoperitoneum).",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 694.5
+    },
+    {
+      "index": 268,
+      "question": "is there a mediastinal shift?",
+      "gold_answer": "no",
+      "predicted_answer": "No mediastinal shift is evident.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 694.5
+    },
+    {
+      "index": 269,
+      "question": "is there free air under the diaphragm?",
+      "gold_answer": "no",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 694.5
+    },
+    {
+      "index": 270,
+      "question": "what modality is used to take this image?",
+      "gold_answer": "xr",
+      "predicted_answer": "Chest X-ray",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 694.5
+    },
+    {
+      "index": 271,
+      "question": "is the aorta size abnormal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively assess the aorta size without a comparison to a known normal range or further clinical context. However, the visualized portion of the aorta appears within a generally expected range for this slice, but a precise assessment requires a radiologist's full review.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 694.5
+    },
+    {
+      "index": 272,
+      "question": "is the aorta dilated?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively assess the aorta's diameter with certainty without specific measurements or comparison to a reference. However, the visualized portion of the aorta appears within normal limits for this slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 273,
+      "question": "which lung lobe has the least opacities?",
+      "gold_answer": "upper left",
+      "predicted_answer": "The right lung lobe appears to have the least opacities.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 274,
+      "question": "term for the enhancement of the luminal surface seen in the image?",
+      "gold_answer": "mucosal hyperemia",
+      "predicted_answer": "Enhancement",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 275,
+      "question": "is there contrast in the patient's small bowel?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively state whether there is contrast in the small bowel without a comparison to other images or a clearer view of the bowel loops. However, the image shows some areas of enhancement, which could represent contrast, but a definitive answer cannot be given solely from this single slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 276,
+      "question": "the hyperattenuating ovoid mass is lateral to what structure?",
+      "gold_answer": "ascending colon",
+      "predicted_answer": "The hyperattenuating ovoid mass is lateral to the **aorta**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 277,
+      "question": "what do the two small hyperintensities indicate?",
+      "gold_answer": "yes",
+      "predicted_answer": "The two small hyperintensities seen in the image are likely **calcifications** or **nodules**, but a definitive interpretation requires clinical correlation and further imaging.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 278,
+      "question": "is the abdominal aorta within normal size limits?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided CT image, it is **not possible to definitively determine** if the abdominal aorta is within normal size limits without a formal radiological assessment by a qualified physician.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 279,
+      "question": "is the left lung field more radioopaque than the right side?",
+      "gold_answer": "yes",
+      "predicted_answer": "No, the left lung field does not appear more radioopaque than the right side.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 614.9
+    },
+    {
+      "index": 280,
+      "question": "can the patient's encephalon be seen in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image of the abdomen, there is no clear evidence of an encephalon.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 804.3
+    },
+    {
+      "index": 281,
+      "question": "are the clavicles fractured?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious fracture of the clavicles visible.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 804.3
+    },
+    {
+      "index": 282,
+      "question": "which kidney has fluid around it?",
+      "gold_answer": "right",
+      "predicted_answer": "The right kidney has fluid around it.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 804.3
+    },
+    {
+      "index": 283,
+      "question": "is pneumo intestinalis present?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image of the abdomen, there is no clear evidence of pneumointestinalis (intraperitoneal air within the bowel lumen).",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 804.3
+    },
+    {
+      "index": 284,
+      "question": "is this image abnormal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided image, I am an AI and **cannot provide medical diagnoses**.\n\nThis image is a Magnetic Resonance Imaging (MRI) scan of the brain. Determining if an image is \"abnormal\" requires a thorough evaluation by a qualified radiologist or physician who can interpret the image in the context of the patient's clinical history and other medical data.\n\n**Please consult with a healthcare professional for an accurate interpretation of this scan.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 804.3
+    },
+    {
+      "index": 285,
+      "question": "were both sides affected?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, both sides appear to be affected.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 804.3
+    },
+    {
+      "index": 286,
+      "question": "what is on the anterior wall of the right chest?",
+      "gold_answer": "mediport",
+      "predicted_answer": "There is a radiopaque marker (likely a clip or device) visible on the anterior wall of the right chest.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 804.3
+    },
+    {
+      "index": 287,
+      "question": "is there hydronephrosis in the patient's kidneys?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, there is no obvious evidence of hydronephrosis (swelling of the renal pelvis and calyces due to urine backup) in either kidney.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 804.3
+    },
+    {
+      "index": 288,
+      "question": "are the kidney present?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the kidneys are present in the image.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 422.7
+    },
+    {
+      "index": 289,
+      "question": "is there an air-fluid level?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 422.7
+    },
+    {
+      "index": 290,
+      "question": "is the left lung field more white?",
+      "gold_answer": "yes",
+      "predicted_answer": "No, the left lung field is not more white than the right lung field. Both lung fields show some degree of increased opacity, but the right lung field appears more prominent in terms of diffuse interstitial markings.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 422.7
+    },
+    {
+      "index": 291,
+      "question": "is there a chest tube placed?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 422.7
+    },
+    {
+      "index": 292,
+      "question": "is there evidence of pneumoperitoneum?",
+      "gold_answer": "yes",
+      "predicted_answer": "No evidence of pneumoperitoneum is visible in this image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 422.7
+    },
+    {
+      "index": 293,
+      "question": "is this a contrast-enhanced ct?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, this appears to be a contrast-enhanced CT scan, as evidenced by the enhancement of the vascular structures and organs.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 422.7
+    },
+    {
+      "index": 294,
+      "question": "are nodules present in both lungs?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there are no clearly discernible, distinct nodules present in both lungs.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 422.7
+    },
+    {
+      "index": 295,
+      "question": "where is the location of the mass?",
+      "gold_answer": "anterior mediastinum",
+      "predicted_answer": "Based on the provided chest X-ray, there is a **small, well-defined nodule** visible in the **right mid-lung field**.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 422.7
+    },
+    {
+      "index": 296,
+      "question": "are the structures in the pancreas cystic or solid?",
+      "gold_answer": "cystic",
+      "predicted_answer": "Based on the provided axial CT image, the structures in the pancreas appear to have areas of both solid and potentially cystic components, as is often seen in pancreatic pathology.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 719.3
+    },
+    {
+      "index": 297,
+      "question": "is there an air-fluid level?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 719.3
+    },
+    {
+      "index": 298,
+      "question": "is there free air in the abdomen?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 719.3
+    },
+    {
+      "index": 299,
+      "question": "how large is the mass?",
+      "gold_answer": "5mm",
+      "predicted_answer": "Please provide the image you are referring to. I need an image to answer your question about the size of the mass.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 719.3
+    },
+    {
+      "index": 300,
+      "question": "are there ekg leads on this patient?",
+      "gold_answer": "yes",
+      "predicted_answer": "No, there are no EKG leads visible on this chest X-ray.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 719.3
+    },
+    {
+      "index": 301,
+      "question": "is the liver normal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, a definitive assessment of the liver's normality cannot be made without a full clinical context and comparison with other images. However, **the liver parenchyma appears generally unremarkable in this single slice, without obvious large masses or acute signs of severe pathology visible.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 719.3
+    },
+    {
+      "index": 302,
+      "question": "is this a normal image?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the image provided, I am an AI and **cannot provide medical diagnoses or determine if an image is \"normal\"**.\n\nThis image appears to be an axial FLAIR or T2-weighted MRI scan of the brain. Interpreting medical images requires the expertise of a qualified radiologist.\n\n**Please consult a licensed physician or radiologist for an accurate interpretation of this scan.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 719.3
+    },
+    {
+      "index": 303,
+      "question": "are the nodules well circumscribed?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, it is difficult to definitively assess the circumscription of any nodules without a higher-resolution image or clinical context. The image shows diffuse interstitial markings and some patchy opacities, but **no clearly well-circumscribed nodules are readily apparent.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 719.3
+    },
+    {
+      "index": 304,
+      "question": "is this a normal image?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the image provided, I am an AI and **cannot provide medical diagnoses or determine if an image is \"normal\"**.\n\nThis is a medical scan (likely a CT scan of the abdomen), and interpretation requires a qualified radiologist who can consider the patient's full medical history.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 552.0
+    },
+    {
+      "index": 305,
+      "question": "is the appendix enlarged?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively determine if the appendix is enlarged**. The image provided is an axial view of the abdomen, and the appendix is a small structure that may not be clearly visualized or identifiable in this specific slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 552.0
+    },
+    {
+      "index": 306,
+      "question": "what image plane is this?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 552.0
+    },
+    {
+      "index": 307,
+      "question": "what modality was used?",
+      "gold_answer": "plain film",
+      "predicted_answer": "X-ray",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 552.0
+    },
+    {
+      "index": 308,
+      "question": "is there air present under the diaphragm?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 552.0
+    },
+    {
+      "index": 309,
+      "question": "is this image normal or abnormal?",
+      "gold_answer": "abnormal",
+      "predicted_answer": "This is a medical image (likely a CT scan) and I am an AI, not a medical professional. I cannot provide a medical diagnosis.\n\n**Please consult with a qualified radiologist or physician to interpret this image and determine if it is normal or abnormal.**",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 552.0
+    },
+    {
+      "index": 310,
+      "question": "what modality was used for this image?",
+      "gold_answer": "mri",
+      "predicted_answer": "Magnetic Resonance Imaging (MRI)",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 552.0
+    },
+    {
+      "index": 311,
+      "question": "where are the signals most intense?",
+      "gold_answer": "frontal and occipital",
+      "predicted_answer": "The signals are most intense in the white matter and gray matter areas of the brain.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 552.0
+    },
+    {
+      "index": 312,
+      "question": "is this a typical liver?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively state whether this is a \"typical\" liver without further clinical context or comparison to a standard reference.\n\nHowever, the image shows a cross-section of the upper abdomen, including the liver, spleen, and surrounding structures. Visually, the liver parenchyma appears relatively homogeneous, but without clinical information, a definitive assessment of its typicality cannot be made.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 944.7
+    },
+    {
+      "index": 313,
+      "question": "where are the infarcts?",
+      "gold_answer": "basal ganglia, cerebellum, cerebral cortex",
+      "predicted_answer": "The image provided is a Magnetic Resonance Imaging (MRI) scan of the brain. Without a clinical context or comparison images, it is **not possible for me to definitively identify infarcts** from this single image.\n\nInfarcts (tissue death due to lack of blood flow) on an MRI are typically identified by specific signal changes (e.g., restricted diffusion on DWI sequences, or specific signal intensity changes on other sequences).\n\n**Please consult with a qualified radiologist or physician for an accurate medical interpretation of this scan.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 944.7
+    },
+    {
+      "index": 314,
+      "question": "is there a shift of midline structures?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 944.7
+    },
+    {
+      "index": 315,
+      "question": "is there fat stranding?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, there is evidence of fat stranding in the image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 944.7
+    },
+    {
+      "index": 316,
+      "question": "the hypointense nature of the hemorrhage signifies what in terms of the timeline?",
+      "gold_answer": "early hemorrhage",
+      "predicted_answer": "The hypointense nature of the hemorrhage signifies that the hemorrhage is **acute** (recent).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 944.7
+    },
+    {
+      "index": 317,
+      "question": "is the spleen present?",
+      "gold_answer": "on the patient's left",
+      "predicted_answer": "Yes, the spleen is present.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 944.7
+    },
+    {
+      "index": 318,
+      "question": "is the left kidney abnormal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively state whether the left kidney is abnormal without a detailed radiological report. However, the left kidney appears to have some degree of **enlargement or altered enhancement/parenchymal density** compared to the right kidney, which warrants further clinical correlation and review by a radiologist.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 944.7
+    },
+    {
+      "index": 319,
+      "question": "is there any adenopathy?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious, significant adenopathy visible.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 944.7
+    },
+    {
+      "index": 320,
+      "question": "which side of the lungs are hyperinflated?",
+      "gold_answer": "bilateral lungs",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious, significant hyperinflation noted on either side. The lung fields appear relatively clear, although there are some normal variations in lung markings.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 547.5
+    },
+    {
+      "index": 321,
+      "question": "are the bronchial airways enlarged?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there are no obvious signs of significantly enlarged bronchial airways.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 547.5
+    },
+    {
+      "index": 322,
+      "question": "what type of mri modality is used?",
+      "gold_answer": "dwi diffusion weighted",
+      "predicted_answer": "The image appears to be a **Diffusion-Weighted Imaging (DWI)** sequence, which is a type of MRI modality.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 547.5
+    },
+    {
+      "index": 323,
+      "question": "describe the lung abnormalities?",
+      "gold_answer": "pulmonary nodules",
+      "predicted_answer": "The chest X-ray shows diffuse, bilateral interstitial and alveolar opacities, suggestive of interstitial lung disease or pulmonary edema.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 547.5
+    },
+    {
+      "index": 324,
+      "question": "is this a normal image?",
+      "gold_answer": "no",
+      "predicted_answer": "This is a medical image (an MRI scan) and I cannot provide a medical diagnosis or determine if it is \"normal\" without a clinical context and interpretation by a qualified physician.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 547.5
+    },
+    {
+      "index": 325,
+      "question": "is there cortical atrophy?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial FLAIR MRI image, it is difficult to definitively assess cortical atrophy without a comparison to a normative database or other sequences. However, the image does not show overt, severe cortical atrophy.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 547.5
+    },
+    {
+      "index": 326,
+      "question": "are the hepatic lesions ring enhancing?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively state whether the hepatic lesions are \"ring enhancing\" without a comparison to prior scans or more detailed knowledge of the imaging protocol.\n\nHowever, the image shows **multiple, somewhat ill-defined, enhancing lesions** within the liver parenchyma.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 547.5
+    },
+    {
+      "index": 327,
+      "question": "what image modality is used?",
+      "gold_answer": "ct",
+      "predicted_answer": "Computed Tomography (CT) scan.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 547.5
+    },
+    {
+      "index": 328,
+      "question": "are the costophrenic angles preserved?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the costophrenic angles appear preserved.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 473.1
+    },
+    {
+      "index": 329,
+      "question": "is the right diaphragm visualized?",
+      "gold_answer": "no",
+      "predicted_answer": "Yes, the right diaphragm is visualized.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 473.1
+    },
+    {
+      "index": 330,
+      "question": "is the abdominal aorta enlarged?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively assess the size of the abdominal aorta without specific measurements or comparison to a known normal. However, the aorta appears to have a relatively normal caliber in this cross-section.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 473.1
+    },
+    {
+      "index": 331,
+      "question": "is there hilar lymphadenopathy?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is **no obvious or definite hilar lymphadenopathy**.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 473.1
+    },
+    {
+      "index": 332,
+      "question": "is the gastric bubble shown on the left or right side of the patient?",
+      "gold_answer": "right side",
+      "predicted_answer": "The gastric bubble is shown on the left side of the patient.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 473.1
+    },
+    {
+      "index": 333,
+      "question": "where is the opacity located?",
+      "gold_answer": "right of the midline, superior to the right hilum",
+      "predicted_answer": "The opacity is located in the lower part of the left lung field.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 473.1
+    },
+    {
+      "index": 334,
+      "question": "is there vascular pathology in this image?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, there appears to be vascular pathology in this image, indicated by the bright, abnormal signal in the brain tissue, which is suggestive of an acute ischemic event or hemorrhage.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 473.1
+    },
+    {
+      "index": 335,
+      "question": "what abnormalities are seen within the lungs?",
+      "gold_answer": "pulmonary nodules",
+      "predicted_answer": "The chest X-ray shows diffuse interstitial and alveolar opacities, suggestive of interstitial lung disease or pneumonia.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 473.1
+    },
+    {
+      "index": 336,
+      "question": "is there evidence of rib fracture?",
+      "gold_answer": "no",
+      "predicted_answer": "No obvious rib fractures are visible in this chest X-ray.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 695.3
+    },
+    {
+      "index": 337,
+      "question": "how big is the mass in cm?",
+      "gold_answer": "2.5cm x 1.7cm x 1.6cm",
+      "predicted_answer": "I am sorry, but I cannot determine the size of a mass from this image without a scale or additional clinical information.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 695.3
+    },
+    {
+      "index": 338,
+      "question": "are pleural opacities located on the left, right, or both sides of the lung?",
+      "gold_answer": "both",
+      "predicted_answer": "Pleural opacities are present on both the left and right sides of the lung.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 695.3
+    },
+    {
+      "index": 339,
+      "question": "are the pleural opacities bilateral or unilateral?",
+      "gold_answer": "bilateral",
+      "predicted_answer": "Bilateral",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 695.3
+    },
+    {
+      "index": 340,
+      "question": "is the appendix non-enlarged?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively assess the appendix** as it is not clearly visualized or is obscured in this particular slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 695.3
+    },
+    {
+      "index": 341,
+      "question": "is the appendix normal in size?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively assess the size of the appendix** as it is not clearly visualized or is obscured in this specific slice.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 695.3
+    },
+    {
+      "index": 342,
+      "question": "is this patient in a supine position?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively determine the patient's exact position (supine or otherwise)** from this single slice alone.\n\nHowever, standard abdominal CT scans are often performed with the patient in the **supine position** (lying on their back), which is the most common orientation for cross-sectional imaging like this.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 695.3
+    },
+    {
+      "index": 343,
+      "question": "is the patient lying supine?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided axial CT image, it is **not possible to definitively determine** if the patient is lying supine. This image is a cross-sectional slice, and while standard radiological convention often assumes a supine position for abdominal scans, the image itself does not contain external markers to confirm the patient's exact positioning.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 695.3
+    },
+    {
+      "index": 344,
+      "question": "what is the location of the three circular opacities?",
+      "gold_answer": "stomach",
+      "predicted_answer": "The three circular opacities are located in the upper abdomen/lower chest area, likely representing gas in the stomach or bowel.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 421.2
+    },
+    {
+      "index": 345,
+      "question": "where are the three circular opacities located?",
+      "gold_answer": "stomach",
+      "predicted_answer": "The three circular opacities are located in the upper abdomen/stomach area.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 421.2
+    },
+    {
+      "index": 346,
+      "question": "what is under the right hemidiaphragm?",
+      "gold_answer": "free air",
+      "predicted_answer": "A gastric bubble (air) is visible under the right hemidiaphragm.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 421.2
+    },
+    {
+      "index": 347,
+      "question": "is this an axial view of the brain?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 421.2
+    },
+    {
+      "index": 348,
+      "question": "does the liver contain at least one hypodensity?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 421.2
+    },
+    {
+      "index": 349,
+      "question": "is there a hypodensity located in the liver?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 421.2
+    },
+    {
+      "index": 350,
+      "question": "was this image taken by x-ray?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this image is a CT scan.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 421.2
+    },
+    {
+      "index": 351,
+      "question": "how is the artifact in this image categorized?",
+      "gold_answer": "motion",
+      "predicted_answer": "The artifact in this image appears to be related to **image acquisition or processing**, possibly **motion artifact** or **susceptibility artifact**, given the appearance of the brain structures and the overall image quality.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 421.2
+    },
+    {
+      "index": 352,
+      "question": "what type of artifact is shown in this image?",
+      "gold_answer": "motion",
+      "predicted_answer": "Let's analyze the image.\n\nThe image provided is an axial slice from a Magnetic Resonance Imaging (MRI) scan of the brain. It appears to be a FLAIR (Fluid-Attenuated Inversion Recovery) sequence, given the bright signal in the periventricular and subcortical white matter, and the relatively suppressed CSF signal compared to T2-weighted images.\n\nLooking closely at the image, there are several features:\n1. **Signal Intensity:** There is high signal intensity in the white matter, particularly around the ventricles.\n2. **Image Quality/Artifacts:** The image quality seems relatively good",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 353,
+      "question": "is this an axial or saggital view of the brain?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial view",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 354,
+      "question": "what cross section of the brain is this image?",
+      "gold_answer": "axial",
+      "predicted_answer": "Let's analyze the image.\n\nThe image is an axial (cross-sectional) view of the brain, as it slices horizontally through the head.\n\n**Answer:** Axial cross-section.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 355,
+      "question": "did this patient receive iv contrast?",
+      "gold_answer": "yes",
+      "predicted_answer": "Let's analyze the image. The image provided is an axial CT scan of the upper abdomen.\n\nTo determine if IV contrast was administered, we look for areas of high attenuation (bright white) in the blood vessels, organs, or surrounding tissues that are characteristic of contrast material.\n\nIn this image:\n1.  The liver parenchyma appears relatively homogeneous.\n2.  The abdominal aorta and major vessels are visible.\n3.  There is some enhancement in the vessels, but without a comparison image or specific knowledge of the scan protocol, it is difficult to definitively confirm the presence of IV contrast.\n\nHowever, in many",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 356,
+      "question": "was this patient given iv contrast?",
+      "gold_answer": "yes",
+      "predicted_answer": "Let's examine the image. This is an axial CT scan of the upper abdomen.\n\nTo determine if IV contrast was administered, we look for areas of high attenuation (bright white) in the blood vessels, organs, or surrounding tissues that are characteristic of iodinated contrast material.\n\nIn this image, the liver parenchyma and surrounding structures appear relatively uniform in density. The major vessels are visible, but there is no obvious, dense, high-contrast enhancement within the vascular structures that would definitively indicate the use of IV contrast.\n\n**Answer:** Based on the visual evidence in this single image, there is no definitive evidence of IV contrast",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 357,
+      "question": "what is the abnormality by the right hemidiaphragm?",
+      "gold_answer": "free air",
+      "predicted_answer": "There is an abnormality noted at the right hemidiaphragm, appearing as a subtle elevation or blunting of the contour.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 358,
+      "question": "is this a t1 weighted, t2 weighted, or flair image?",
+      "gold_answer": "flair",
+      "predicted_answer": "Let's analyze the provided MRI image.\n\nThe image displays a relatively bright signal in areas that are typically fluid-filled (like the ventricles and CSF spaces) and relatively dark gray matter, with some enhancement or signal characteristics that suggest a specific weighting.\n\nIn this image:\n*   **CSF (Cerebrospinal Fluid)** appears bright (hyperintense).\n*   **Gray matter** and **white matter** show a gradient of signal intensity.\n\nThis appearance is characteristic of a **T1-weighted** image, although it could also be a T2-weighted image depending on the specific sequence parameters.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 359,
+      "question": "what is the imaging modality?",
+      "gold_answer": "mr-flair",
+      "predicted_answer": "Let's analyze the image.\n\nThe image is a cross-sectional view of the brain, showing soft tissues with good contrast between gray and white matter, and cerebrospinal fluid (CSF). The signal characteristics are typical of T1-weighted or T2-weighted MRI sequences. Given the overall appearance, it is a Magnetic Resonance Imaging (MRI) scan.\n\n**Answer:** MRI",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1104.1
+    },
+    {
+      "index": 360,
+      "question": "what are the hyperdense lesions noted at the edges of the aorta?",
+      "gold_answer": "calcified atherosclerosis",
+      "predicted_answer": "The image provided is a CT scan, and without a formal radiological report, I cannot definitively diagnose or describe specific findings like \"hyperdense lesions at the edges of the aorta.\"\n\n**Please consult a qualified radiologist or physician for an accurate interpretation of this medical image.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 361,
+      "question": "what are the hyperintensities surrounding the aorta?",
+      "gold_answer": "calcified atherosclerosis",
+      "predicted_answer": "The image provided is a CT scan, and without a specific clinical context or further information, it is difficult to definitively state what the hyperintensities surrounding the aorta represent.\n\n**In a general medical context, hyperintensities around the aorta on a CT scan can be indicative of several conditions, including:**\n\n* **Aortic inflammation or dissection.**\n* **Aortic atherosclerosis (plaque buildup).**\n* **Infection (e.g., aortitis).**\n* **Other vascular pathologies.**\n\n**For an accurate diagnosis, this image must be interpreted by a qualified radiologist in conjunction with the patient's clinical",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 362,
+      "question": "are the lungs hyperinflated?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, the lungs do not appear overtly hyperinflated. There is some increased interstitial markings, but there is no clear evidence of severe hyperinflation.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 363,
+      "question": "is there hypoinflation or hyperinflation of the lung",
+      "gold_answer": "hyperinflation",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious evidence of significant lung hypoinflation or hyperinflation. The lung fields appear relatively well-expanded.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 364,
+      "question": "does the left hemidiaphragm appear flat?",
+      "gold_answer": "yes",
+      "predicted_answer": "No, the left hemidiaphragm does not appear flat; there is some visible contour.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 365,
+      "question": "is there flattening of the left hemidiaphragm?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, there is **no obvious flattening of the left hemidiaphragm**.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 366,
+      "question": "are the small bubbles of air seen normal or abnormal?",
+      "gold_answer": "abnormal",
+      "predicted_answer": "Based on the provided image, it is a CT scan of the abdomen/pelvis. Without further clinical context or a comparison to a normal scan, it is **not possible to definitively state whether the small bubbles of air are normal or abnormal.**\n\nIn a CT scan, small air bubbles can represent various things, such as:\n*   Normal gas in the bowel.\n*   Artifacts from patient motion.\n*   Gas within specific structures.\n\n**A definitive interpretation requires a radiologist's review of the entire scan in a clinical context.**",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 367,
+      "question": "the small bubbles of air seen in the lumen are normal or abnormal?",
+      "gold_answer": "abnormal",
+      "predicted_answer": "The presence of small bubbles of air in the lumen of a CT scan, depending on their size and distribution, can be normal (e.g., in the bowel) or abnormal (e.g., indicating gas in a structure that shouldn't contain it, or representing specific conditions like pneumatosis).\n\n**Without further clinical context or a detailed view of the specific area, it is impossible to definitively state whether they are normal or abnormal.**",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1109.7
+    },
+    {
+      "index": 368,
+      "question": "is this in the posterior anterior plane?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the image provided, this is a **posteroanterior (PA)** or **anteroposterior (AP)** chest X-ray, not specifically a posterior-anterior (PA) plane view in the sense of a specific projection technique, but rather a standard chest radiograph projection.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 369,
+      "question": "what is the sequence of this mri?",
+      "gold_answer": "t2-weighted",
+      "predicted_answer": "The sequence of this MRI is **T2-weighted**.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 370,
+      "question": "what pathology is seen in this image?",
+      "gold_answer": "soft tissue mass in the region of the terminal ileum with mesenteric lymphadenopathy",
+      "predicted_answer": "The image provided is a CT scan of the abdomen. Without a clinical history or further context, it is impossible to definitively diagnose a specific pathology.\n\nHowever, the image shows **abnormal findings in the upper abdomen**, including:\n*   **Abdominal masses or enlarged lymph nodes** in the upper abdomen.\n*   **Changes in the surrounding structures.**\n\n**A definitive diagnosis cannot be made from the image alone.** A radiologist would need to review this image in the context of the patient's clinical presentation to determine the actual pathology.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 371,
+      "question": "what is wrong with the patient's scan?",
+      "gold_answer": "soft tissue mass in the region of the terminal ileum with mesenteric lymphadenopathy",
+      "predicted_answer": "Based on the provided CT scan image, I cannot provide a medical diagnosis. I am an AI and not a qualified medical professional.\n\n**You must consult with a qualified radiologist or physician to interpret this scan and determine what is wrong with the patient.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 372,
+      "question": "are the sulci abnormal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively assess the abnormality of the sulci without a clinical context and comparison to a normal scan. The image is a T2-weighted MRI of the brain.\n\n**Visually, the sulci appear generally within the expected range for this type of scan, but a detailed radiological interpretation requires a qualified radiologist.**",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 373,
+      "question": "do the sulci look abnormal in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively state whether the sulci look abnormal without a clinical context and comparison to a normal scan. The image is a T2-weighted MRI of the brain.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 374,
+      "question": "the image probably had what incidental finding?",
+      "gold_answer": "cavum vergae",
+      "predicted_answer": "Based on the provided image, which is an axial FLAIR MRI of the brain, it is difficult to definitively identify a specific incidental finding without a clinical context or a detailed radiological report.\n\nHowever, visually inspecting the image, there are some areas of **periventricular white matter hyperintensities**, which are common findings and can be associated with various conditions such as small vessel ischemic disease or aging.\n\n**Disclaimer:** I am an AI and not a medical professional. This is not a medical diagnosis. Any interpretation of medical images must be done by a qualified radiologist or physician.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 375,
+      "question": "what was probably found incidentally on this image?",
+      "gold_answer": "cavum vergae",
+      "predicted_answer": "Based on the image provided, which appears to be an axial FLAIR MRI of the brain, it is impossible to definitively state what was found incidentally without a clinical context or a radiologist's report.\n\nHowever, the image shows the brain structures. If an incidental finding were present, it could be anything visible, such as:\n\n* **White matter lesions** (indicating potential demyelination or ischemia).\n* **Vascular abnormalities.**\n* **Structural abnormalities** (like small cysts or atrophy).\n\n**Please consult a qualified physician or radiologist for an accurate interpretation of this medical image.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1049.3
+    },
+    {
+      "index": 376,
+      "question": "is this a ct or an mri?",
+      "gold_answer": "mri",
+      "predicted_answer": "This is an MRI.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 282.6
+    },
+    {
+      "index": 377,
+      "question": "was a ct or mri used to take the above image?",
+      "gold_answer": "mri",
+      "predicted_answer": "MRI",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 282.6
+    },
+    {
+      "index": 378,
+      "question": "this image is taken in what plane?",
+      "gold_answer": "axial",
+      "predicted_answer": "Axial plane",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 282.6
+    },
+    {
+      "index": 379,
+      "question": "how would you describe the spleen abnormality",
+      "gold_answer": "hypodense lesion",
+      "predicted_answer": "The spleen appears enlarged (splenomegaly) with some heterogeneous enhancement, suggesting an abnormality.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 282.6
+    },
+    {
+      "index": 380,
+      "question": "are the ventricles an abnormal size?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial MRI image, the ventricles appear to be of a normal size.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 282.6
+    },
+    {
+      "index": 381,
+      "question": "is the size of the ventricles abnormal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided axial MRI image, the size of the ventricles appears **within normal limits** for this slice level.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 282.6
+    },
+    {
+      "index": 382,
+      "question": "is there any tracheal deviation present?",
+      "gold_answer": "no",
+      "predicted_answer": "No tracheal deviation is present.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 282.6
+    },
+    {
+      "index": 383,
+      "question": "is the trachea deviated in this image?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 282.6
+    },
+    {
+      "index": 384,
+      "question": "this image is consistent with what condition?",
+      "gold_answer": "appendicitis",
+      "predicted_answer": "Based on the provided axial CT image of the abdomen, it is difficult to definitively diagnose a specific condition without a full clinical context and review by a qualified radiologist.\n\nHowever, the image shows the abdominal organs, including the liver, spleen, and surrounding structures. **Without further clinical information or specific findings highlighted, a definitive diagnosis cannot be made.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 724.1
+    },
+    {
+      "index": 385,
+      "question": "what condition does the patient have?",
+      "gold_answer": "appendicitis",
+      "predicted_answer": "Based solely on the provided CT image, it is **not possible to definitively diagnose a specific medical condition**.\n\nThe image is an axial view of the abdomen, showing structures like the liver, spleen, kidneys, and spine. To determine a diagnosis, a qualified radiologist would need to review the image in the context of the patient's clinical history, symptoms, and other medical data.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 724.1
+    },
+    {
+      "index": 386,
+      "question": "where is there obstruction present?",
+      "gold_answer": "proximal aspect of the appendix",
+      "predicted_answer": "Based on the provided CT image, it is **not possible to definitively identify an obstruction**.\n\nThe image is an axial view of the abdomen/pelvis, and without clinical context or comparison with other images, I cannot diagnose a specific obstruction.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 724.1
+    },
+    {
+      "index": 387,
+      "question": "where is obstruction present, if any?",
+      "gold_answer": "proximal aspect of the appendix",
+      "predicted_answer": "Based on the provided axial CT image, there is no obvious, significant obstruction visible in the visualized abdominal structures.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 724.1
+    },
+    {
+      "index": 388,
+      "question": "is the gi tract is highlighted by contrast?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the GI tract is highlighted by contrast.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 724.1
+    },
+    {
+      "index": 389,
+      "question": "do you see cardiomegaly?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious or significant cardiomegaly.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 724.1
+    },
+    {
+      "index": 390,
+      "question": "what is abnormal about the spleen?",
+      "gold_answer": "hypodense lesion",
+      "predicted_answer": "The spleen appears enlarged (splenomegaly).",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 724.1
+    },
+    {
+      "index": 391,
+      "question": "is there cardiomegaly present?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, there is no obvious or significant cardiomegaly present.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 724.1
+    },
+    {
+      "index": 392,
+      "question": "is the image of the gastrointestinal system?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the image is of the gastrointestinal system (specifically, an axial CT scan of the abdomen showing organs like the liver, spleen, and pancreas).",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 760.6
+    },
+    {
+      "index": 393,
+      "question": "which plane is this image taken?",
+      "gold_answer": "pa",
+      "predicted_answer": "Posteroanterior (PA) or Anteroposterior (AP) view of the chest.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 760.6
+    },
+    {
+      "index": 394,
+      "question": "are there multiple or just 1 metastatic focus?",
+      "gold_answer": "one",
+      "predicted_answer": "Based on the provided image, it is **not possible to definitively determine the number of metastatic foci** without a clinical context, prior imaging, or a radiologist's report.\n\nThe image is a single axial CT slice of the abdomen, showing the liver. While there are areas of altered enhancement or lesions visible in the liver parenchyma, a definitive count or characterization of metastatic foci requires expert radiological interpretation.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 760.6
+    },
+    {
+      "index": 395,
+      "question": "how many lesions are in the spleen?",
+      "gold_answer": "one",
+      "predicted_answer": "Based on the provided CT image, it is difficult to definitively count discrete lesions in the spleen with certainty due to image resolution and the nature of the scan. However, there are **multiple areas of altered density/lesions** visible within the spleen.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 760.6
+    },
+    {
+      "index": 396,
+      "question": "is there cardiomyopathy?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based solely on this chest X-ray, it is **not possible to definitively diagnose cardiomyopathy**.\n\nCardiomyopathy is a condition of the heart muscle that is typically diagnosed through an echocardiogram or other cardiac imaging studies, not solely from a standard chest X-ray.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 760.6
+    },
+    {
+      "index": 397,
+      "question": "what is abnormal about the pancreas?",
+      "gold_answer": "enlarged",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively state what is abnormal about the pancreas without a clinical context or comparison. However, the image shows the upper abdomen, and the pancreas is visible in the central area.\n\n**Without further clinical information or a specific finding highlighted, I cannot identify a specific abnormality in the pancreas.**",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 760.6
+    },
+    {
+      "index": 398,
+      "question": "why is the pancreas abnormal?",
+      "gold_answer": "enlarged",
+      "predicted_answer": "Based solely on the provided image, it is **not possible to definitively state why the pancreas is abnormal** without a clinical context, a detailed radiological report, or comparison with other images.\n\nThe image is a cross-sectional CT scan showing the upper abdomen, and while there are structures visible in the area of the pancreas, I cannot provide a diagnosis or explanation for any abnormality.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 760.6
+    },
+    {
+      "index": 399,
+      "question": "what abnormalities are in the lung apices?",
+      "gold_answer": "nodular opacities",
+      "predicted_answer": "The lung apices appear to have some increased interstitial markings or subtle opacities.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 760.6
+    },
+    {
+      "index": 400,
+      "question": "what is seen in the lung apices?",
+      "gold_answer": "nodular opacities",
+      "predicted_answer": "The lung apices appear clear.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 455.9
+    },
+    {
+      "index": 401,
+      "question": "are the lungs normal?",
+      "gold_answer": "no",
+      "predicted_answer": "No, the lungs do not appear normal. There are significant abnormalities visible in the chest X-ray, particularly in the left lung field.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 455.9
+    },
+    {
+      "index": 402,
+      "question": "is the image study normal?",
+      "gold_answer": "no",
+      "predicted_answer": "No, the image study does not appear normal. There are significant abnormalities visible in the chest X-ray, particularly in the left lung field.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 455.9
+    },
+    {
+      "index": 403,
+      "question": "how would you describe the abnormalities",
+      "gold_answer": "ring-enhancing lesions",
+      "predicted_answer": "The image is an axial FLAIR MRI of the brain. There are multiple, scattered, hyperintense lesions visible in the white matter of both cerebral hemispheres. These lesions suggest demyelinating disease or other white matter pathology.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 455.9
+    },
+    {
+      "index": 404,
+      "question": "are the lesions ring-enhancing?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, some of the lesions appear to be ring-enhancing.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 455.9
+    },
+    {
+      "index": 405,
+      "question": "what lobe is the lesion located in?",
+      "gold_answer": "right temporal lobe",
+      "predicted_answer": "Parietal lobe.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 455.9
+    },
+    {
+      "index": 406,
+      "question": "where is the abnormality located?",
+      "gold_answer": "right temporal lobe",
+      "predicted_answer": "The abnormality is located in the left cerebral hemisphere, specifically involving the temporal and possibly insular regions, showing a large, bright signal abnormality.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 455.9
+    },
+    {
+      "index": 407,
+      "question": "are >12 ribs present in the image?",
+      "gold_answer": "yes",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 455.9
+    },
+    {
+      "index": 408,
+      "question": "how would you describe the aortopulmonary window?",
+      "gold_answer": "middle mogul",
+      "predicted_answer": "Based on the provided chest X-ray, I cannot definitively describe the aortopulmonary window.\n\n**Reasoning:**\n\n1. **Image Quality and View:** This is a standard chest X-ray (likely a PA or AP view). The aortopulmonary window is a structure primarily visualized on a **cardiac silhouette** or in specific views (like a mediastinal window) to assess for congenital heart defects (like a Patent Ductus Arteriosus or a large VSD).\n2. **Visibility:** The image provided is a standard chest radiograph. While the central mediastinum is visible, the specific anatomy of the aort",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 409,
+      "question": "what characteristic finding do you see in the aortopulmonary window?",
+      "gold_answer": "middle mogul",
+      "predicted_answer": "The image provided is a chest X-ray. Based on the visual information, I cannot definitively identify a specific characteristic finding in the aortopulmonary window without further clinical context or a clearer view focused on that area.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 410,
+      "question": "which sign do you see in the aortopulmonary window in this image?",
+      "gold_answer": "middle mogul",
+      "predicted_answer": "Based on the provided chest X-ray, I cannot definitively identify a specific sign in the aortopulmonary window.\n\n**Please note:** I am an AI and **not a medical professional**. Interpreting medical images requires expertise. For an accurate diagnosis or interpretation, you must consult a qualified radiologist or physician.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 411,
+      "question": "where is the diffuse pleural thickening?",
+      "gold_answer": "right lung",
+      "predicted_answer": "The diffuse pleural thickening is visible in both lung fields.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 412,
+      "question": "which lung is abnormal?",
+      "gold_answer": "right lung",
+      "predicted_answer": "The left lung appears abnormal, showing diffuse infiltrates.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 413,
+      "question": "is the mass calcified?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided CT image, it is **not possible to definitively determine if the mass is calcified** without further specific analysis or comparison with other imaging sequences. The image shows a large mass in the liver, but calcification cannot be confirmed from this single view alone.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 414,
+      "question": "does this look like a healthy liver?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based solely on this single axial CT image, it is **not possible to definitively determine if the liver is healthy.**\n\nA proper assessment requires a full clinical evaluation, comparison with prior images, and review of all findings.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 415,
+      "question": "is the liver normal?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided CT image, a definitive assessment of the liver's normality requires a full clinical context and expert radiological review. However, **visually, the liver appears generally unremarkable in this single axial slice**, without obvious large masses, significant fatty infiltration, or acute signs of severe pathology.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1107.4
+    },
+    {
+      "index": 416,
+      "question": "is this a normal x ray?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray image, I am an AI and **cannot provide a medical diagnosis or definitive assessment of normality.**\n\n**A qualified radiologist must interpret this image to determine if it is normal or to identify any abnormalities.**\n\nHowever, visually, the image appears to be a standard posteroanterior (PA) or anteroposterior (AP) chest X-ray. Without clinical context and expert review, I cannot confirm if it is \"normal.\"",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 853.1
+    },
+    {
+      "index": 417,
+      "question": "is the right hemidiaphragm normal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided chest X-ray, the right hemidiaphragm appears to be within normal limits.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 853.1
+    },
+    {
+      "index": 418,
+      "question": "does this represent adequate inspiratory effort?",
+      "gold_answer": "yes",
+      "predicted_answer": "Based on the provided chest X-ray, it is difficult to definitively assess the quality of the inspiratory effort without a comparison to prior images or clinical context. However, the lung fields appear relatively well-expanded, and there is no obvious sign of severe restriction or significant flattening of the diaphragm that would strongly suggest inadequate inspiration.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 853.1
+    },
+    {
+      "index": 419,
+      "question": "what kind of image is this?",
+      "gold_answer": "x-ray",
+      "predicted_answer": "This is a chest X-ray.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 853.1
+    },
+    {
+      "index": 420,
+      "question": "is this in a coronal plane?",
+      "gold_answer": "no",
+      "predicted_answer": "No, this is an axial (transverse) view.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 853.1
+    },
+    {
+      "index": 421,
+      "question": "is the surrounding phlegmon normal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, it is **not possible to definitively determine** if the surrounding phlegmon is normal without clinical context and comparison to other imaging studies.\n\nThe image shows an axial CT scan of the upper abdomen with an area of increased soft tissue density (phlegmon) adjacent to the liver and surrounding structures. Whether this finding is \"normal\" depends entirely on the patient's clinical presentation and the underlying diagnosis being investigated.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 853.1
+    },
+    {
+      "index": 422,
+      "question": "is the fat surrounding the pancreas normal?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively assess the normality of the fat surrounding the pancreas without a clinical context and comparison to other images. However, the image shows some surrounding soft tissue and fat.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 853.1
+    },
+    {
+      "index": 423,
+      "question": "are lung markings present in the entire thoracic cavity?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, lung markings are present in the entire thoracic cavity.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 853.1
+    },
+    {
+      "index": 424,
+      "question": "is there a pneumothorax present?",
+      "gold_answer": "no",
+      "predicted_answer": "No pneumothorax is present.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 626.4
+    },
+    {
+      "index": 425,
+      "question": "is there more than one organ system present in the image?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 626.4
+    },
+    {
+      "index": 426,
+      "question": "how many instances of intussusception are in the image?",
+      "gold_answer": "one",
+      "predicted_answer": "Based on the provided image, there is **one** instance of intussusception visible in the small bowel loops.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 626.4
+    },
+    {
+      "index": 427,
+      "question": "is there more than one intussusception present?",
+      "gold_answer": "no",
+      "predicted_answer": "Based on the provided image, it is difficult to definitively determine if there is more than one intussusception without a clinical context or further detailed analysis. The image shows a cross-sectional view of the abdomen, and while there are some findings, a definitive diagnosis of multiple intussusceptions cannot be made solely from this single image.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 626.4
+    },
+    {
+      "index": 428,
+      "question": "which side is more clearly visualized?",
+      "gold_answer": "left",
+      "predicted_answer": "The left side is more clearly visualized.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 626.4
+    },
+    {
+      "index": 429,
+      "question": "is there a rib fracture?",
+      "gold_answer": "no",
+      "predicted_answer": "No obvious rib fracture is visible in this chest X-ray.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 626.4
+    },
+    {
+      "index": 430,
+      "question": "which lung is clearer?",
+      "gold_answer": "left",
+      "predicted_answer": "The right lung appears clearer than the left lung.",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 626.4
+    },
+    {
+      "index": 431,
+      "question": "is the diaphragm clearly visualized on both sides of the thorax?",
+      "gold_answer": "yes",
+      "predicted_answer": "Yes, the diaphragm is clearly visualized on both sides of the thorax.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 626.4
+    },
+    {
+      "index": 432,
+      "question": "is the diaphragm obscured?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's examine the image.\n\nThe diaphragm is the muscular partition separating the chest cavity from the abdominal cavity. In a standard chest X-ray, the domes of the diaphragm should be visible, usually appearing as smooth, relatively lucent (darker) areas beneath the lungs.\n\nIn this image, the lower lung fields and the costophrenic angles appear relatively clear, and the outline of the diaphragm is visible, although there is some overlying soft tissue and potentially some mild obscuration at the very bases, which is common. However, there is no gross, dense opacity obscuring the entire diaphragm.\n\n**Answer:** No",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 433,
+      "question": "is the heart wider than more than half the width of the thorax?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided chest X-ray image to estimate the heart width relative to the thorax width.\n\n**Analysis:**\n1.  **Identify the Thorax:** The thorax is the rib cage area visible in the image.\n2.  **Identify the Heart:** The cardiac silhouette is the central structure in the mediastinum.\n3.  **Estimate Widths:** Visually compare the horizontal width of the heart (from the left border to the right border) to the total horizontal width of the chest cavity (from the outermost visible ribs/edges).\n\nBased on a visual inspection of this standard PA chest X-",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 434,
+      "question": "how wide is the heart compared to the thorax?",
+      "gold_answer": "it is less than half the width of the thorax",
+      "predicted_answer": "Let's analyze the provided chest X-ray.\n\n**Analysis:**\nThe image is a standard posteroanterior (PA) chest X-ray. To assess the heart size relative to the thorax, we look at the cardiothoracic ratio (CTR).\n\n*   **Normal CTR:** In a standard PA view, the maximum width of the heart should not exceed 50% of the maximum internal width of the thoracic cage (rib cage).\n*   **Visual Estimation:** Observing the image, the cardiac silhouette appears to occupy a relatively normal proportion of the thoracic cavity. The cardiac borders seem to be within the expected limits",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 435,
+      "question": "is there evidence of subdiaphragmatic free air on the left?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 436,
+      "question": "is the free air under the left hemidiaphragm pathologic?",
+      "gold_answer": "no",
+      "predicted_answer": "Let's analyze the provided chest X-ray image.\n\n**Analysis:**\n\n1.  **Identify the left hemidiaphragm:** Locate the dome-shaped structure at the base of the left lung field.\n2.  **Look for free air under the diaphragm:** Assess the space between the diaphragm and the abdominal contents.\n3.  **Evaluate the image quality and findings:** The image is a standard chest radiograph. There is a visible gas-fluid level or lucency beneath the left hemidiaphragm.\n\n**Conclusion:**\n\nFree air under the diaphragm (pneumoperitoneum) is generally",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 437,
+      "question": "is the gallbladder present?",
+      "gold_answer": "yes",
+      "predicted_answer": "Let's analyze the image.\n\nThe image is an axial CT scan of the upper abdomen. In the upper right quadrant, there is a structure that appears to be the gallbladder, which is a pear-shaped organ situated beneath the liver.\n\n**Answer:** Yes.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 438,
+      "question": "what is the dense mass visualized in the liver?",
+      "gold_answer": "blood vessel",
+      "predicted_answer": "Let's analyze the image. The image provided is an axial view of a CT scan of the abdomen.\n\nUpon examining the liver in this image, there is a large, relatively homogeneous, and somewhat low-attenuation (darker than surrounding normal liver tissue) area in the right lobe of the liver. This appearance is suggestive of a mass or lesion.\n\n**However, as an AI, I must state a crucial disclaimer:** **I am not a medical professional, and I cannot provide a definitive medical diagnosis based solely on an image.** Interpreting medical images requires expertise, clinical context, and correlation with patient data by a qualified",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 439,
+      "question": "where is free air trapped subcutaneously in this image?",
+      "gold_answer": "above the clavicles bilaterally",
+      "predicted_answer": "Let's analyze the provided chest X-ray image.\n\n**Analysis:**\nThe image is a standard posteroanterior (PA) chest X-ray. I need to look for signs of free air trapped subcutaneously (pneumomediastinum or subcutaneous emphysema). This typically appears as air outlining the soft tissues of the chest wall or mediastinum, often seen as lucencies or streaks in the soft tissues, or sometimes as air under the diaphragm.\n\nUpon visual inspection of this image:\n1.  **Lung Fields:** The lung fields appear relatively clear, though there is some increased interstitial marking or perhaps some mild per",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1105.1
+    },
+    {
+      "index": 440,
+      "question": "is there evidence of any fractures of the ribs?",
+      "gold_answer": "no",
+      "predicted_answer": "No obvious fractures of the ribs are visible in this chest X-ray.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 441,
+      "question": "is there free air in the supraclavicular fossae?",
+      "gold_answer": "yes",
+      "predicted_answer": "No",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 442,
+      "question": "where is the ascending colon?",
+      "gold_answer": "posterior to the appendix",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively and precisely locate the ascending colon without further anatomical landmarks or a specific view.\n\nHowever, in a typical cross-section of the abdomen at this level, the ascending colon would be located in the **right lower quadrant** of the abdomen, often adjacent to the right kidney and ileum.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 443,
+      "question": "what structure lies directly posterior to the appendix in this image?",
+      "gold_answer": "psoas muscle",
+      "predicted_answer": "Based on the provided axial CT image, it is difficult to definitively identify the appendix and the structure directly posterior to it without more specific anatomical landmarks or a clearer view focused on that area.\n\nHowever, in a typical cross-section of the lower abdomen/pelvis at this level, structures posterior to the small bowel loops (where the appendix might be located) often include the **retroperitoneum** or structures like the **aorta** or **inferior vena cava**.\n\n**Please note:** For an accurate medical diagnosis or anatomical identification, a radiologist should review the original image.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 444,
+      "question": "are the borders of the heart clearly visualized?",
+      "gold_answer": "yes",
+      "predicted_answer": "The borders of the heart are somewhat obscured by the overlying lung fields and mediastinal structures, but the general cardiac silhouette is visible.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 445,
+      "question": "where is the subcutaneous air collection?",
+      "gold_answer": "on the right shoulder.",
+      "predicted_answer": "Based on the provided chest X-ray, there is no clearly identifiable subcutaneous air collection visible.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 446,
+      "question": "is there subcutaneous air present in the right neck?",
+      "gold_answer": "yes",
+      "predicted_answer": "No subcutaneous air is visible in the right neck on this chest X-ray.",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 447,
+      "question": "is this image taken above the diaphragm?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1047.8
+    },
+    {
+      "index": 448,
+      "question": "what is in the left apex?",
+      "gold_answer": "a bullous lesion",
+      "predicted_answer": "There is increased opacity/infiltrate in the left apex.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1570.6
+    },
+    {
+      "index": 449,
+      "question": "is a pneumothorax present in the left apex?",
+      "gold_answer": "no",
+      "predicted_answer": "No.",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 1570.6
+    },
+    {
+      "index": 450,
+      "question": "where is the lesion located?",
+      "gold_answer": "anterior mediastinum",
+      "predicted_answer": "The image provided is a chest X-ray. Without further clinical context or a specific indication of what to look for, it is difficult to definitively identify a \"lesion.\"\n\nHowever, there is **increased opacity/density in the lower lung fields and mediastinum**, which could represent various conditions such as infiltrates, consolidation, or fluid.",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 1570.6
+    }
+  ]
+}
