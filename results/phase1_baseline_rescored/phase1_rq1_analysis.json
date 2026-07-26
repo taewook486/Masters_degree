@@ -10,32 +10,32 @@
     "pathvqa": {
       "accuracy_ci": {
         "gemma4-e2b": {
-          "accuracy": 0.1075,
-          "ci_low": 0.1,
-          "ci_high": 0.1149,
+          "accuracy": 0.1055,
+          "ci_low": 0.0982,
+          "ci_high": 0.1128,
           "n": 6719
         },
         "qwen25-vl-3b": {
-          "accuracy": 0.3242,
-          "ci_low": 0.3131,
-          "ci_high": 0.3353,
+          "accuracy": 0.3245,
+          "ci_low": 0.3134,
+          "ci_high": 0.3356,
           "n": 6719
         },
         "qwen3-vl-2b": {
-          "accuracy": 0.348,
-          "ci_low": 0.3368,
-          "ci_high": 0.3591,
+          "accuracy": 0.3472,
+          "ci_low": 0.3361,
+          "ci_high": 0.3584,
           "n": 6719
         },
         "smolvlm2-2b": {
-          "accuracy": 0.3079,
-          "ci_low": 0.2971,
-          "ci_high": 0.3188,
+          "accuracy": 0.3085,
+          "ci_low": 0.2977,
+          "ci_high": 0.3195,
           "n": 6719
         }
       },
       "cochran_q": {
-        "q_stat": 2034.742586365026,
+        "q_stat": 2067.0788428236733,
         "p_value": 0.0,
         "df": 3,
         "k": 4,
@@ -45,9 +45,9 @@
         {
           "model_a": "gemma4-e2b",
           "model_b": "qwen25-vl-3b",
-          "b01_a_only": 186,
-          "b10_b_only": 1642,
-          "n_discordant": 1828,
+          "b01_a_only": 177,
+          "b10_b_only": 1648,
+          "n_discordant": 1825,
           "p_value": 0.0,
           "p_bonferroni": 0.0,
           "significant": true
@@ -55,9 +55,9 @@
         {
           "model_a": "gemma4-e2b",
           "model_b": "qwen3-vl-2b",
-          "b01_a_only": 163,
-          "b10_b_only": 1779,
-          "n_discordant": 1942,
+          "b01_a_only": 157,
+          "b10_b_only": 1781,
+          "n_discordant": 1938,
           "p_value": 0.0,
           "p_bonferroni": 0.0,
           "significant": true
@@ -65,9 +65,9 @@
         {
           "model_a": "gemma4-e2b",
           "model_b": "smolvlm2-2b",
-          "b01_a_only": 260,
-          "b10_b_only": 1607,
-          "n_discordant": 1867,
+          "b01_a_only": 253,
+          "b10_b_only": 1617,
+          "n_discordant": 1870,
           "p_value": 0.0,
           "p_bonferroni": 0.0,
           "significant": true
@@ -75,29 +75,29 @@
         {
           "model_a": "qwen25-vl-3b",
           "model_b": "qwen3-vl-2b",
-          "b01_a_only": 562,
-          "b10_b_only": 722,
-          "n_discordant": 1284,
-          "p_value": 9e-06,
-          "p_bonferroni": 5.3e-05,
+          "b01_a_only": 567,
+          "b10_b_only": 720,
+          "n_discordant": 1287,
+          "p_value": 2.2e-05,
+          "p_bonferroni": 0.000133,
           "significant": true
         },
         {
           "model_a": "qwen25-vl-3b",
           "model_b": "smolvlm2-2b",
-          "b01_a_only": 843,
-          "b10_b_only": 734,
-          "n_discordant": 1577,
-          "p_value": 0.006518,
-          "p_bonferroni": 0.039105,
+          "b01_a_only": 844,
+          "b10_b_only": 737,
+          "n_discordant": 1581,
+          "p_value": 0.007659,
+          "p_bonferroni": 0.045955,
           "significant": true
         },
         {
           "model_a": "qwen3-vl-2b",
           "model_b": "smolvlm2-2b",
-          "b01_a_only": 792,
-          "b10_b_only": 523,
-          "n_discordant": 1315,
+          "b01_a_only": 788,
+          "b10_b_only": 528,
+          "n_discordant": 1316,
           "p_value": 0.0,
           "p_bonferroni": 0.0,
           "significant": true
@@ -113,9 +113,9 @@
           "n": 1061
         },
         "qwen25-vl-3b": {
-          "accuracy": 0.5598,
-          "ci_low": 0.5287,
-          "ci_high": 0.5891,
+          "accuracy": 0.558,
+          "ci_low": 0.5269,
+          "ci_high": 0.5872,
           "n": 1061
         },
         "qwen3-vl-2b": {
@@ -132,8 +132,8 @@
         }
       },
       "cochran_q": {
-        "q_stat": 72.43250327653998,
-        "p_value": 1.3322676295501878e-15,
+        "q_stat": 71.3377135348226,
+        "p_value": 2.220446049250313e-15,
         "df": 3,
         "k": 4,
         "significant": true
@@ -142,19 +142,19 @@
         {
           "model_a": "gemma4-e2b",
           "model_b": "qwen25-vl-3b",
-          "b01_a_only": 111,
-          "b10_b_only": 183,
-          "n_discordant": 294,
-          "p_value": 3.2e-05,
-          "p_bonferroni": 0.000191,
+          "b01_a_only": 108,
+          "b10_b_only": 178,
+          "n_discordant": 286,
+          "p_value": 4.1e-05,
+          "p_bonferroni": 0.000249,
           "significant": true
         },
         {
           "model_a": "gemma4-e2b",
           "model_b": "qwen3-vl-2b",
-          "b01_a_only": 78,
-          "b10_b_only": 160,
-          "n_discordant": 238,
+          "b01_a_only": 79,
+          "b10_b_only": 161,
+          "n_discordant": 240,
           "p_value": 0.0,
           "p_bonferroni": 1e-06,
           "significant": true
@@ -162,20 +162,20 @@
         {
           "model_a": "gemma4-e2b",
           "model_b": "smolvlm2-2b",
-          "b01_a_only": 148,
-          "b10_b_only": 116,
-          "n_discordant": 264,
-          "p_value": 0.056196,
-          "p_bonferroni": 0.337175,
+          "b01_a_only": 146,
+          "b10_b_only": 114,
+          "n_discordant": 260,
+          "p_value": 0.054329,
+          "p_bonferroni": 0.325973,
           "significant": false
         },
         {
           "model_a": "qwen25-vl-3b",
           "model_b": "qwen3-vl-2b",
           "b01_a_only": 113,
-          "b10_b_only": 123,
-          "n_discordant": 236,
-          "p_value": 0.558068,
+          "b10_b_only": 125,
+          "n_discordant": 238,
+          "p_value": 0.475908,
           "p_bonferroni": 1.0,
           "significant": false
         },
@@ -183,8 +183,8 @@
           "model_a": "qwen25-vl-3b",
           "model_b": "smolvlm2-2b",
           "b01_a_only": 171,
-          "b10_b_only": 67,
-          "n_discordant": 238,
+          "b10_b_only": 69,
+          "n_discordant": 240,
           "p_value": 0.0,
           "p_bonferroni": 0.0,
           "significant": true
@@ -192,9 +192,9 @@
         {
           "model_a": "qwen3-vl-2b",
           "model_b": "smolvlm2-2b",
-          "b01_a_only": 185,
-          "b10_b_only": 71,
-          "n_discordant": 256,
+          "b01_a_only": 186,
+          "b10_b_only": 72,
+          "n_discordant": 258,
           "p_value": 0.0,
           "p_bonferroni": 0.0,
           "significant": true
@@ -204,15 +204,15 @@
     "vqa_rad": {
       "accuracy_ci": {
         "gemma4-e2b": {
-          "accuracy": 0.3814,
-          "ci_low": 0.337,
-          "ci_high": 0.4257,
+          "accuracy": 0.388,
+          "ci_low": 0.3437,
+          "ci_high": 0.4346,
           "n": 451
         },
         "qwen25-vl-3b": {
           "accuracy": 0.4922,
           "ci_low": 0.4457,
-          "ci_high": 0.5388,
+          "ci_high": 0.5366,
           "n": 451
         },
         "qwen3-vl-2b": {
@@ -222,15 +222,15 @@
           "n": 451
         },
         "smolvlm2-2b": {
-          "accuracy": 0.5122,
-          "ci_low": 0.4656,
-          "ci_high": 0.5588,
+          "accuracy": 0.5055,
+          "ci_low": 0.459,
+          "ci_high": 0.5543,
           "n": 451
         }
       },
       "cochran_q": {
-        "q_stat": 31.57176196032672,
-        "p_value": 6.442038099629954e-07,
+        "q_stat": 27.18417945690673,
+        "p_value": 5.386466135126611e-06,
         "df": 3,
         "k": 4,
         "significant": true
@@ -240,30 +240,30 @@
           "model_a": "gemma4-e2b",
           "model_b": "qwen25-vl-3b",
           "b01_a_only": 70,
-          "b10_b_only": 120,
-          "n_discordant": 190,
-          "p_value": 0.000352,
-          "p_bonferroni": 0.002114,
+          "b10_b_only": 117,
+          "n_discordant": 187,
+          "p_value": 0.000726,
+          "p_bonferroni": 0.004354,
           "significant": true
         },
         {
           "model_a": "gemma4-e2b",
           "model_b": "qwen3-vl-2b",
           "b01_a_only": 45,
-          "b10_b_only": 99,
-          "n_discordant": 144,
-          "p_value": 8e-06,
-          "p_bonferroni": 4.8e-05,
+          "b10_b_only": 96,
+          "n_discordant": 141,
+          "p_value": 2.1e-05,
+          "p_bonferroni": 0.000126,
           "significant": true
         },
         {
           "model_a": "gemma4-e2b",
           "model_b": "smolvlm2-2b",
           "b01_a_only": 39,
-          "b10_b_only": 98,
-          "n_discordant": 137,
-          "p_value": 0.0,
-          "p_bonferroni": 3e-06,
+          "b10_b_only": 92,
+          "n_discordant": 131,
+          "p_value": 4e-06,
+          "p_bonferroni": 2.5e-05,
           "significant": true
         },
         {
@@ -279,20 +279,20 @@
         {
           "model_a": "qwen25-vl-3b",
           "model_b": "smolvlm2-2b",
-          "b01_a_only": 76,
-          "b10_b_only": 85,
-          "n_discordant": 161,
-          "p_value": 0.528506,
+          "b01_a_only": 77,
+          "b10_b_only": 83,
+          "n_discordant": 160,
+          "p_value": 0.692762,
           "p_bonferroni": 1.0,
           "significant": false
         },
         {
           "model_a": "qwen3-vl-2b",
           "model_b": "smolvlm2-2b",
-          "b01_a_only": 54,
+          "b01_a_only": 57,
           "b10_b_only": 59,
-          "n_discordant": 113,
-          "p_value": 0.706882,
+          "n_discordant": 116,
+          "p_value": 0.926078,
           "p_bonferroni": 1.0,
           "significant": false
         }
@@ -302,9 +302,9 @@
   "pooled": {
     "accuracy_ci": {
       "gemma4-e2b": {
-        "accuracy": 0.172,
-        "ci_low": 0.164,
-        "ci_high": 0.1803,
+        "accuracy": 0.1708,
+        "ci_low": 0.1627,
+        "ci_high": 0.179,
         "n": 8231
       },
       "qwen25-vl-3b": {
@@ -314,20 +314,20 @@
         "n": 8231
       },
       "qwen3-vl-2b": {
-        "accuracy": 0.3849,
-        "ci_low": 0.3744,
-        "ci_high": 0.3953,
+        "accuracy": 0.3843,
+        "ci_low": 0.374,
+        "ci_high": 0.3947,
         "n": 8231
       },
       "smolvlm2-2b": {
-        "accuracy": 0.339,
-        "ci_low": 0.3288,
-        "ci_high": 0.3492,
+        "accuracy": 0.3391,
+        "ci_low": 0.3289,
+        "ci_high": 0.3495,
         "n": 8231
       }
     },
     "cochran_q": {
-      "q_stat": 1884.7753361757952,
+      "q_stat": 1904.2767109798128,
       "p_value": 0.0,
       "df": 3,
       "k": 4,
@@ -337,9 +337,9 @@
       {
         "model_a": "gemma4-e2b",
         "model_b": "qwen25-vl-3b",
-        "b01_a_only": 367,
-        "b10_b_only": 1945,
-        "n_discordant": 2312,
+        "b01_a_only": 355,
+        "b10_b_only": 1943,
+        "n_discordant": 2298,
         "p_value": 0.0,
         "p_bonferroni": 0.0,
         "significant": true
@@ -347,9 +347,9 @@
       {
         "model_a": "gemma4-e2b",
         "model_b": "qwen3-vl-2b",
-        "b01_a_only": 286,
+        "b01_a_only": 281,
         "b10_b_only": 2038,
-        "n_discordant": 2324,
+        "n_discordant": 2319,
         "p_value": 0.0,
         "p_bonferroni": 0.0,
         "significant": true
@@ -357,9 +357,9 @@
       {
         "model_a": "gemma4-e2b",
         "model_b": "smolvlm2-2b",
-        "b01_a_only": 447,
-        "b10_b_only": 1821,
-        "n_discordant": 2268,
+        "b01_a_only": 438,
+        "b10_b_only": 1823,
+        "n_discordant": 2261,
         "p_value": 0.0,
         "p_bonferroni": 0.0,
         "significant": true
@@ -367,29 +367,29 @@
       {
         "model_a": "qwen25-vl-3b",
         "model_b": "qwen3-vl-2b",
-        "b01_a_only": 729,
+        "b01_a_only": 734,
         "b10_b_only": 903,
-        "n_discordant": 1632,
-        "p_value": 1.8e-05,
-        "p_bonferroni": 0.000109,
+        "n_discordant": 1637,
+        "p_value": 3.2e-05,
+        "p_bonferroni": 0.000195,
         "significant": true
       },
       {
         "model_a": "qwen25-vl-3b",
         "model_b": "smolvlm2-2b",
-        "b01_a_only": 1090,
-        "b10_b_only": 886,
-        "n_discordant": 1976,
-        "p_value": 5e-06,
-        "p_bonferroni": 2.9e-05,
+        "b01_a_only": 1092,
+        "b10_b_only": 889,
+        "n_discordant": 1981,
+        "p_value": 6e-06,
+        "p_bonferroni": 3.3e-05,
         "significant": true
       },
       {
         "model_a": "qwen3-vl-2b",
         "model_b": "smolvlm2-2b",
         "b01_a_only": 1031,
-        "b10_b_only": 653,
-        "n_discordant": 1684,
+        "b10_b_only": 659,
+        "n_discordant": 1690,
         "p_value": 0.0,
         "p_bonferroni": 0.0,
         "significant": true
