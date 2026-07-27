@@ -5,6 +5,7 @@
 
 ## 현재 상태
 
+- **2026-07-27 Phase 1 결과 폴더 이름 오류 수정** — 설계서 §4.3/`RUNPOD_GUIDE.md`는 Phase 1을 "1시드(42)만, 12조건(4모델×3데이터셋), `run_all.py`로 생성"이라 명시하는데, 실제 `results/phase1_baseline/`(메인 폴더로 오인되기 쉬운 이름)에는 구형 3시드 디버깅 스크립트(`runpod_phase1.sh`) 산출물(27개, gemma4 빠짐)이 들어있었고, 설계 그대로인 12조건+RQ1+임상분석 결과는 `results/phase1_baseline_rescored/`(마치 임시 백업처럼 보이는 이름)에 있었음. **이름을 서로 바꿔서 바로잡음**: `phase1_baseline`(구, 3시드 27개) → `phase1_baseline_3seed_debug`로, `phase1_baseline_rescored`(구, 1시드 12조건 정본) → `phase1_baseline`으로 rename(`git mv`). `scripts/rescore_phase1.py`/`scripts/robustness_phase1.py`의 기본 경로도 같이 갱신. **아직 커밋 전 — 다음 세션 시작 시 `git status`로 이 rename이 커밋됐는지 먼저 확인할 것.**
 - **2026-07-26 세션 완료 — 우선순위 ①②③(Cross-dataset CF → Phase 1 재실행 → Phase 2 재분석) 전부 끝남** ✅
   - Ablation-C 컨파운드 6조건 재실행 완료 + target modules 최적 조합 확정: **rank=64, alpha=128, target=full(all-linear)** → `configs/finetune/base_qlora.yaml`에 반영, push 완료(커밋 `f52080b`). ratio=1.0/rank=64/target=full은 각각 축 하나씩만 바꿔가며 독립 검증한 것으로, 세 값을 동시에 적용한 조합 자체는 미검증(한계점으로 기록해둘 것).
   - Cross-dataset CF 72/72 조건 측정 완료(커밋 `20be0eb`). 도중 `transformers==5.5.0`의 `TokenizersBackend` 리팩터링으로 `bert-score`가 쓰는 `build_inputs_with_special_tokens`가 빠진 버그 발견·수정(커밋 `121af8e`, `src/evaluate/metrics.py`) — roberta-large/biobert 둘 다 실측 검증됨.

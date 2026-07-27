@@ -4,16 +4,18 @@
 기존 Phase 1 결과에 반영한다. 모델을 다시 돌리지 않고, 저장된 predicted_answer를
 같은 로직으로 재채점하므로 4개 모델 전체에 '동일한' 매처가 일관 적용된다.
 
-원본(results/phase1_baseline)은 보존하고, 재채점 결과를 별도 디렉터리에 쓴다.
+원본(results/phase1_baseline_3seed_debug)은 보존하고, 재채점 결과를 별도 디렉터리에 쓴다.
+(주의: 재채점 결과 디렉터리는 이후 results/phase1_baseline으로 이름이 바뀌었다 —
+논문 산출물은 1시드/12조건 구조이고, 3시드 원본은 phase1_baseline_3seed_debug로 이동됨)
 
 사용법:
     python scripts/rescore_phase1.py \
-        --results_dir results/phase1_baseline \
-        --output_dir results/phase1_baseline_rescored --seed 42
+        --results_dir results/phase1_baseline_3seed_debug \
+        --output_dir results/phase1_baseline --seed 42
 
 이후 재채점 결과로 RQ1 분석:
     python scripts/analyze_phase1.py \
-        --results_dir results/phase1_baseline_rescored --seed 42
+        --results_dir results/phase1_baseline --seed 42
 """
 
 from __future__ import annotations
@@ -142,8 +144,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Phase 1 재채점 (개선 매처, GPU 불필요)"
     )
-    parser.add_argument("--results_dir", default="results/phase1_baseline")
-    parser.add_argument("--output_dir", default="results/phase1_baseline_rescored")
+    parser.add_argument("--results_dir", default="results/phase1_baseline_3seed_debug")
+    parser.add_argument("--output_dir", default="results/phase1_baseline")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 

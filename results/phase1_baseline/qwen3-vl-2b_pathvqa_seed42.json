@@ -16,8 +16,17 @@
     "closed_count": 3362,
     "open_count": 3357,
     "total_count": 6719,
+    "open_bertscore_f1": 0.8487,
+    "open_bertscore_accuracy": 1.0,
+    "overall_acc_ci_low": 0.3361,
+    "overall_acc_ci_high": 0.3584,
+    "closed_acc_ci_low": 0.6175,
+    "closed_acc_ci_high": 0.6493,
+    "open_acc_ci_low": 0.0524,
+    "open_acc_ci_high": 0.0685,
     "avg_time_ms": 419.1,
-    "peak_vram_mb": 4527.3
+    "peak_vram_mb": 4527.3,
+    "rescored": true
   },
   "per_sample": [
     {

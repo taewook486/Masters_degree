@@ -11,11 +11,11 @@
 
 사용법:
     python scripts/robustness_phase1.py \
-        --phase1_dir results/phase1_baseline_rescored \
+        --phase1_dir results/phase1_baseline \
         --contamination_json results/contamination/contamination_analysis.json \
         --seed 42
 출력:
-    results/phase1_baseline_rescored/phase1_robustness.md / .json
+    results/phase1_baseline/phase1_robustness.md / .json
 """
 
 from __future__ import annotations
@@ -190,7 +190,7 @@ def _render_markdown(report: dict) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Phase 1 오염 강건성 재계산")
-    parser.add_argument("--phase1_dir", default="results/phase1_baseline_rescored")
+    parser.add_argument("--phase1_dir", default="results/phase1_baseline")
     parser.add_argument("--contamination_json", default="results/contamination/contamination_analysis.json")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
