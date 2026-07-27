@@ -1,4 +1,4 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-26)
+# 다음 세션 시작점 (마지막 갱신: 2026-07-27)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
@@ -15,7 +15,10 @@
     3. wandb API 키 없이 첫 실행 → 전 trial `Trial N FAILED: No API key configured` — `WANDB_API_KEY` 발급 후 export.
     4. 두 번째 실행 → 전 trial `Trial N FAILED: 'images'` — 원인: `qwen3_vl_2b.yaml`은 항상 Qwen 전용 데이터 포맷(`prepare_qwen_chat_dataset`, `images` 컬럼 없음)을 쓰는데, **unsloth가 설치 안 돼 있어서** standard/PEFT 백엔드로 자동 전환됐고 이 백엔드는 `images` 컬럼을 요구함 → 포맷 불일치로 즉시 실패. `unsloth`가 없어진 원인은 마이그레이션 후 `uv run python -c "import anthropic..."`(`--extra unsloth` 없이)를 실행했을 때 암묵적 재동기화로 빠진 것으로 추정.
     5. `uv sync --extra unsloth`로 복구(부작용: `statsmodels`/`pandas`가 같이 빠짐 — **다음에 RQ2 재분석 돌릴 일 있으면 `uv pip install statsmodels pandas` 먼저 할 것**).
-    6. 세 번째 실행 → wandb 정상 연결(`wandb.ai/taewook486-konkuk-university/medical-vqa-vlm`), 학습 프로세스가 실제로 CPU 600%+ 쓰며 진행 중인 것까지 확인. **그런데 이 시점에 디스크가 다시 96G→99.8G/100G로 치솟음**(원인: 새 tmux 창에서 `HF_HOME` export 없이 실행돼 `/workspace/.cache/huggingface`로 모델 캐시가 샌 것으로 추정 — 4개 모델 8.4G, 이후 안정화됨). `du`(96G 합산)와 RunPod 대시보드(99.8G) 사이 3.8G 차이가 안 맞았는데, `lsof +L1`로 확인해도 유의미한 삭제-후-미해제 파일 없었음 — **MooseFS(네트워크 볼륨) 특유의 삭제 파일 휴지통 지연 반영 가능성으로 추정, 확답은 못 함**(`mfsdirinfo` 등 MFS 클라이언트 도구가 컨테이너에 없어 직접 검증 불가). **세션 종료 시점까지 미해결 — 다음 세션에서 제일 먼저 로그+디스크 상태부터 확인할 것.**
+    6. 세 번째 실행 → wandb 정상 연결(`wandb.ai/taewook486-konkuk-university/medical-vqa-vlm`), 학습 프로세스가 실제로 CPU 600%+ 쓰며 진행 중인 것까지 확인. **그런데 이 시점에 디스크가 다시 96G→99.8G/100G로 치솟음**(원인: 새 tmux 창에서 `HF_HOME` export 없이 실행돼 `/workspace/.cache/huggingface`로 모델 캐시가 샌 것으로 추정 — 4개 모델 8.4G, 이후 안정화됨). `du`(96G 합산)와 RunPod 대시보드(99.8G) 사이 3.8G 차이가 안 맞았는데, `lsof +L1`로 확인해도 유의미한 삭제-후-미해제 파일 없었음 — MooseFS(네트워크 볼륨) 휴지통 지연 반영으로 추정. **몇 분 뒤 재확인 시 디스크가 96G로 자동으로 다시 내려감 — 추정이 맞았던 것으로 보임(별도 조치 없이 해결).**
+    7. **학습이 실제로 정상 진행됨을 확인** — unsloth 백엔드로 로드, `Num examples = 19,654 | Total steps = 200`, loss가 3.23→0.65로 정상 수렴, 평가(1,565~1,680 샘플)까지 완주. **세션 종료 시점까지 `results/phase3_autoresearch_smoke/results.tsv`에 2/8 trial 완료**(`grep completed | wc -l` = 2): manual(minimal targets) `train_time_min=28.1`, random(full targets) `train_time_min=22.3` — 평균 ~25분/trial.
+    - **[중요 발견] 기존 비용 추정치가 크게 낙관적이었을 가능성**: 표본 2개뿐이지만, 평균 ~25분/trial을 그대로 전체(1,210trial)에 대입하면 **~500시간(~21일)** 규모로, `RUNPOD_GUIDE.md`의 기존 추정(~200시간, ~$78-107)을 훨씬 초과함. 다음 세션에서 8/8(또는 그에 가깝게) 완료 후 평균을 다시 내서 확정할 것 — 전체 실행 여부(`scripts/run_phase3.sh`) 결정에 직결되는 핵심 수치임.
+    - **세션 종료 시점 상태**: tmux 세션 `p3smoke` 안에서 스모크 테스트가 계속 실행 중인 채로 세션 마무리(사용자가 자리를 비움, 원격에서 이어볼 예정). 다음 세션 시작 시 `tmux attach -t p3smoke`로 이어보고 진행 상황부터 확인할 것.
 - **2026-07-26 세션 완료 — 우선순위 ①②③(Cross-dataset CF → Phase 1 재실행 → Phase 2 재분석) 전부 끝남** ✅
   - Ablation-C 컨파운드 6조건 재실행 완료 + target modules 최적 조합 확정: **rank=64, alpha=128, target=full(all-linear)** → `configs/finetune/base_qlora.yaml`에 반영, push 완료(커밋 `f52080b`). ratio=1.0/rank=64/target=full은 각각 축 하나씩만 바꿔가며 독립 검증한 것으로, 세 값을 동시에 적용한 조합 자체는 미검증(한계점으로 기록해둘 것).
   - Cross-dataset CF 72/72 조건 측정 완료(커밋 `20be0eb`). 도중 `transformers==5.5.0`의 `TokenizersBackend` 리팩터링으로 `bert-score`가 쓰는 `build_inputs_with_special_tokens`가 빠진 버그 발견·수정(커밋 `121af8e`, `src/evaluate/metrics.py`) — roberta-large/biobert 둘 다 실측 검증됨.
@@ -55,20 +58,23 @@
 
 ## 다음 세션 최우선 작업 (pod에서 실행)
 
-pod은 `troubled_cyan_shrimp-migration`(마이그레이션된 새 pod, 옛 pod는 terminate됨)이고, tmux 세션 `p3smoke`가 살아있을 가능성이 높음 — `tmux attach -t p3smoke`로 먼저 이어볼 것.
+pod은 `troubled_cyan_shrimp-migration`(마이그레이션된 새 pod, 옛 pod는 terminate됨)이고, tmux 세션 `p3smoke`가 살아있을 가능성이 높음 — `tmux attach -t p3smoke`로 먼저 이어볼 것. **소요 시간 추정은 실측 데이터(완료된 trial의 `train_time_min`)로만 할 것 — 추측성 낙관적 전망 금지(2026-07-27 세션에서 반복적으로 틀려서 사용자 일정에 지장을 줌, feedback 기록됨).**
 
 ```bash
-git pull   # d1bbc3f 이상 확인 (Phase 1 폴더 rename 포함)
+git pull   # 5c1eda0 이상 확인 (Phase 1 폴더 rename + 2026-07-27 세션 기록 포함)
 ```
 
-1. **[가장 급함] Phase 3 스모크 테스트 결과 + 디스크 상태부터 확인** — 2026-07-27 세션 종료 시점에 디스크가 99.8G/100G까지 차오른 상태에서 학습이 진행 중이었고, 완료 여부를 못 봄. 아래부터 확인:
+0. **[최우선] Phase 3 스모크 진행 상황부터 실측 확인** — 세션 종료 시점 2/8 trial 완료(manual 28.1분, random 22.3분). 몇 개나 더 끝났는지 먼저 확인하고, **완료된 개수만큼의 실측 평균으로만** 전체 비용을 계산할 것(추정 금지):
    ```bash
-   tmux attach -t p3smoke   # 세션 살아있으면
-   tail -n 30 results/phase3_autoresearch_smoke/run_phase3_smoke.log
+   cat results/phase3_autoresearch_smoke/results.tsv | grep completed
+   cat results/phase3_autoresearch_smoke/results.tsv | grep completed | wc -l
+   ```
+
+1. **디스크 재확인 (참고, 세션 종료 시점엔 96G/100G로 안정 상태였음)**:
+   ```bash
    du -h --max-depth=1 /workspace 2>/dev/null | sort -rh
    ```
-   - 로그에 `No space left on device`/`OSError` 등으로 죽어있으면: `/workspace/.cache/huggingface`(HF_HOME 미설정으로 샌 캐시, 안전하게 삭제 가능 — 진짜 모델 캐시는 `/hf_cache`에 별도로 있음)부터 지우고 재실행.
-   - trial이 성공했으면: `results/phase3_autoresearch_smoke/*/train_result.json`의 `train_time_min`으로 전체(1,210trial) 비용 재계산 → 전체 실행(`scripts/run_phase3.sh`) 여부 결정.
+   - 만약 다시 100G 근처로 찼고 로그에 `No space left on device`/`OSError`가 있으면: `/workspace/.cache/huggingface`(HF_HOME 미설정으로 샌 캐시 — 진짜 모델 캐시는 `/hf_cache`에 별도로 있어 이건 안전하게 삭제 가능)부터 지우고 재실행.
 2. **[주의] 새 tmux 창/세션마다 환경변수 다시 export 필요** — exports는 셸(tmux 창)마다 독립이라, 새 창을 열면 아래를 매번 다시 해줘야 함(안 하면 HF 캐시가 `/workspace/.cache`로 새거나 wandb가 오프라인/에러로 돎). 매번 까먹기 쉬우니 `~/.bashrc`에 등록하는 걸 고려할 것:
    ```bash
    export HF_HOME=/hf_cache
@@ -91,4 +97,7 @@ git pull   # d1bbc3f 이상 확인 (Phase 1 폴더 rename 포함)
 - **`uv sync`의 하드링크가 이 네트워크 볼륨(`/workspace`)에서 가끔 깨짐(2026-07-26 실증)**: `nvidia-cusparselt-cu12`, `nvidia-nvshmem-cu12`, `scipy`가 각각 "설치됨"으로 기록돼 있는데 실제 파일은 로드 안 되는 증상이 반복됨(패키지 하나씩 `uv sync --reinstall-package <pkg>`로 개별 복구 가능하지만 계속 재발할 수 있음). 근본적으로는 `UV_LINK_MODE=copy uv sync --reinstall`로 하드링크 대신 실제 복사를 강제하는 게 더 안정적임 — 다음에 또 이런 `ModuleNotFoundError`/`ImportError: lib*.so`류가 나오면 이걸 먼저 시도할 것.
 - **bert-score + `transformers==5.5.0` 호환성 버그(2026-07-26 수정)**: `transformers` 5.5.0에서 토크나이저가 새 `TokenizersBackend`로 리팩터링되며 `build_inputs_with_special_tokens`가 빠짐 — `bert_score` 0.3.13이 이 메서드를 직접 호출해 `AttributeError`로 죽음. `src/evaluate/metrics.py`의 `_patch_tokenizers_backend_special_tokens`(커밋 `121af8e`)로 공유 베이스 클래스에 호환 shim을 패치해뒀음. 만약 다른 bert-score 계열 스크립트에서 비슷한 에러가 또 나면, 이미 고쳐져 있는지부터(`git log -- src/evaluate/metrics.py`) 확인.
 - **`git` index.lock이 이 저장소(`/mnt/d/...` WSL 마운트)에서 종종 stale하게 남음**: 느린 DrvFs 때문에 `git status`류가 오래 걸리다 index.lock을 남기고, 다음 git 명령이 "Another git process seems to be running"로 막히는 경우가 반복됨. `ps aux | grep git`+`lsof <lockfile>`로 실제 홀더가 없는 걸 확인한 뒤에만 `rm -f .git/index.lock`으로 지울 것(무작정 지우지 말 것).
+- **`uv run python -c ...`(옵션 없이)가 `unsloth`를 조용히 지울 수 있음(2026-07-27 실증)**: 마이그레이션 후 `--extra unsloth` 없이 `uv run python`을 한 번만 실행해도 암묵적 재동기화로 unsloth가 빠짐. 증상은 unsloth 관련 에러가 아니라 한참 뒤 Qwen 모델 학습에서 `KeyError: 'images'`로 나타나 진단이 어려움. Phase 2/3 학습 전엔 `uv run python -c "import unsloth"`로 먼저 확인할 것. 복구(`uv sync --extra unsloth`)는 `statsmodels`/`pandas`를 같이 지울 수 있음 — RQ2 재분석 전엔 재설치 필요.
+- **tmux 창마다 export한 환경변수가 독립적임**: 한 창에서 `export HF_HOME=...`을 해도 다른 창/새로 연 창에는 안 먹음. 새 tmux 창을 열 때마다 `HF_HOME`/`MOAI_CHAT_CACHE_DIR`/`WANDB_API_KEY`/`ANTHROPIC_API_KEY`를 다시 export해야 함 — 안 하면 캐시가 `/workspace/.cache`로 새거나 wandb가 오프라인/에러로 돎.
+- **Phase 3 스모크 결과 파일은 `results/<output_dir>/results.tsv`임 (Phase 2의 `train_result.json` 아님)**: Phase 2와 Phase 3는 결과 저장 방식이 다름 — Phase 3는 `ExperimentTracker`가 trial마다 `results.tsv`에 한 줄씩 append. `train_time_min` 열로 실측 시간 확인.
 - 상세 이력은 `docs/RUNPOD_GUIDE.md`와 (로컬 `.claude` 메모리가 있는 컴퓨터에서는) auto-memory `runpod-experiment-status.md` 참고.
