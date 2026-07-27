@@ -5,7 +5,17 @@
 
 ## 현재 상태
 
-- **2026-07-27 Phase 1 결과 폴더 이름 오류 수정** — 설계서 §4.3/`RUNPOD_GUIDE.md`는 Phase 1을 "1시드(42)만, 12조건(4모델×3데이터셋), `run_all.py`로 생성"이라 명시하는데, 실제 `results/phase1_baseline/`(메인 폴더로 오인되기 쉬운 이름)에는 구형 3시드 디버깅 스크립트(`runpod_phase1.sh`) 산출물(27개, gemma4 빠짐)이 들어있었고, 설계 그대로인 12조건+RQ1+임상분석 결과는 `results/phase1_baseline_rescored/`(마치 임시 백업처럼 보이는 이름)에 있었음. **이름을 서로 바꿔서 바로잡음**: `phase1_baseline`(구, 3시드 27개) → `phase1_baseline_3seed_debug`로, `phase1_baseline_rescored`(구, 1시드 12조건 정본) → `phase1_baseline`으로 rename(`git mv`). `scripts/rescore_phase1.py`/`scripts/robustness_phase1.py`의 기본 경로도 같이 갱신. **아직 커밋 전 — 다음 세션 시작 시 `git status`로 이 rename이 커밋됐는지 먼저 확인할 것.**
+- **2026-07-27 세션 — pod GPU 마이그레이션 사고 + 복구, Phase 1 폴더 정정, Phase 3 스모크 테스트 진행 중(디스크 위기 미해결 상태로 세션 종료)**
+  - **pod GPU 마이그레이션**: 세션 시작 시 옛 pod(`troubled_cyan_shrimp`)가 "GPU no longer available"로 재시작 불가 → RunPod "Automatically migrate" 진행, 첫 확인 땐 `/workspace/Masters_degree`가 비어 보여 데이터 유실처럼 보였으나 **실제로는 대시보드 마이그레이션 진행바가 끝나기 전에 너무 일찍 확인한 것**이었음(진행률 %가 왔다갔다 하다 "migration completed successfully" 토스트가 뜨고 나서야 실제 완료). 완료 후 `adapter_model.safetensors` 77개(Phase 2 75조건+검증 2) + phase2_finetune 조건 폴더 75개 전부 확인, git 히스토리도 정상 — **데이터 유실 없음 확정**. 새 pod 이름은 `troubled_cyan_shrimp-migration`. 옛 pod는 이 확인 후 **terminate 완료**.
+    - 교훈(auto-memory `project-runpod-workflow`에도 기록): 마이그레이션 진행바를 너무 일찍 믿지 말 것 — "migration complete" 알림이 뜨기 전엔 빈 폴더로 보여도 패닉하지 말 것. `git checkout -- .`로 git 추적 파일(코드/JSON/CSV/MD)은 복원 가능하지만, 어댑터 가중치(`.safetensors`)처럼 git 미추적 대용량 파일은 마이그레이션 자체가 끝나야만 살아있음 — `git status --short`에서 `D`(진짜 유실)와 `??`(추적 안 됨이라 정상)를 구분해서 판단할 것.
+  - **Phase 1 결과 폴더 이름 오류 수정 — 커밋 완료(`d1bbc3f`, push 완료)**: 설계서 §4.3/`RUNPOD_GUIDE.md`는 Phase 1을 "1시드(42)만, 12조건(4모델×3데이터셋), `run_all.py`로 생성"이라 명시하는데, 실제 `results/phase1_baseline/`(메인 폴더로 오인되기 쉬운 이름)에는 구형 3시드 디버깅 스크립트(`runpod_phase1.sh`) 산출물(27개, gemma4 빠짐)이 들어있었고, 설계 그대로인 12조건+RQ1+임상분석 결과는 `results/phase1_baseline_rescored/`(마치 임시 백업처럼 보이는 이름)에 있었음. 이름을 서로 바꿔서 바로잡음: `phase1_baseline`(구, 3시드 27개) → `phase1_baseline_3seed_debug`로, `phase1_baseline_rescored`(구, 1시드 12조건 정본) → `phase1_baseline`으로 rename(`git mv`). `scripts/rescore_phase1.py`/`scripts/robustness_phase1.py`의 기본 경로도 같이 갱신.
+  - **Phase 3 HPO 스모크 테스트 — 여러 차례 실패 끝에 겨우 학습 진입, 디스크 위기로 세션 종료 시점에 결과 미확인**:
+    1. 첫 시도: `python3`가 시스템 파이썬을 가리켜 `ModuleNotFoundError: anthropic` — `uv run python`으로 우회(기존에 알려진 패턴, 2026-07-27에도 재발함 — venv activate가 자꾸 풀리는 것으로 보임).
+    2. 데이터셋(PathVQA train, 19,654개) 캐시 굽는 데 ~2시간 소요(간헐적으로 손상된 TIFF 파일 만나 느려짐) — 일회성 비용이라 그대로 진행.
+    3. wandb API 키 없이 첫 실행 → 전 trial `Trial N FAILED: No API key configured` — `WANDB_API_KEY` 발급 후 export.
+    4. 두 번째 실행 → 전 trial `Trial N FAILED: 'images'` — 원인: `qwen3_vl_2b.yaml`은 항상 Qwen 전용 데이터 포맷(`prepare_qwen_chat_dataset`, `images` 컬럼 없음)을 쓰는데, **unsloth가 설치 안 돼 있어서** standard/PEFT 백엔드로 자동 전환됐고 이 백엔드는 `images` 컬럼을 요구함 → 포맷 불일치로 즉시 실패. `unsloth`가 없어진 원인은 마이그레이션 후 `uv run python -c "import anthropic..."`(`--extra unsloth` 없이)를 실행했을 때 암묵적 재동기화로 빠진 것으로 추정.
+    5. `uv sync --extra unsloth`로 복구(부작용: `statsmodels`/`pandas`가 같이 빠짐 — **다음에 RQ2 재분석 돌릴 일 있으면 `uv pip install statsmodels pandas` 먼저 할 것**).
+    6. 세 번째 실행 → wandb 정상 연결(`wandb.ai/taewook486-konkuk-university/medical-vqa-vlm`), 학습 프로세스가 실제로 CPU 600%+ 쓰며 진행 중인 것까지 확인. **그런데 이 시점에 디스크가 다시 96G→99.8G/100G로 치솟음**(원인: 새 tmux 창에서 `HF_HOME` export 없이 실행돼 `/workspace/.cache/huggingface`로 모델 캐시가 샌 것으로 추정 — 4개 모델 8.4G, 이후 안정화됨). `du`(96G 합산)와 RunPod 대시보드(99.8G) 사이 3.8G 차이가 안 맞았는데, `lsof +L1`로 확인해도 유의미한 삭제-후-미해제 파일 없었음 — **MooseFS(네트워크 볼륨) 특유의 삭제 파일 휴지통 지연 반영 가능성으로 추정, 확답은 못 함**(`mfsdirinfo` 등 MFS 클라이언트 도구가 컨테이너에 없어 직접 검증 불가). **세션 종료 시점까지 미해결 — 다음 세션에서 제일 먼저 로그+디스크 상태부터 확인할 것.**
 - **2026-07-26 세션 완료 — 우선순위 ①②③(Cross-dataset CF → Phase 1 재실행 → Phase 2 재분석) 전부 끝남** ✅
   - Ablation-C 컨파운드 6조건 재실행 완료 + target modules 최적 조합 확정: **rank=64, alpha=128, target=full(all-linear)** → `configs/finetune/base_qlora.yaml`에 반영, push 완료(커밋 `f52080b`). ratio=1.0/rank=64/target=full은 각각 축 하나씩만 바꿔가며 독립 검증한 것으로, 세 값을 동시에 적용한 조합 자체는 미검증(한계점으로 기록해둘 것).
   - Cross-dataset CF 72/72 조건 측정 완료(커밋 `20be0eb`). 도중 `transformers==5.5.0`의 `TokenizersBackend` 리팩터링으로 `bert-score`가 쓰는 `build_inputs_with_special_tokens`가 빠진 버그 발견·수정(커밋 `121af8e`, `src/evaluate/metrics.py`) — roberta-large/biobert 둘 다 실측 검증됨.
@@ -45,50 +55,30 @@
 
 ## 다음 세션 최우선 작업 (pod에서 실행)
 
-Cross-dataset CF, Phase 1 재실행(+RQ1/WCA), Phase 2 재분석(RQ2)까지 전부 끝났음(위 "2026-07-26 세션 완료" 참고). 이제 진짜 남은 건 이 3가지:
+pod은 `troubled_cyan_shrimp-migration`(마이그레이션된 새 pod, 옛 pod는 terminate됨)이고, tmux 세션 `p3smoke`가 살아있을 가능성이 높음 — `tmux attach -t p3smoke`로 먼저 이어볼 것.
 
 ```bash
-git pull   # 7a37e42 이상 확인
-
-export HF_HOME=/hf_cache
-export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
+git pull   # d1bbc3f 이상 확인 (Phase 1 폴더 rename 포함)
 ```
 
-1. **[주의, 아직 미확인] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
-2. **Phase 3 HPO — 전체 실행 전에 스모크 테스트부터 (2026-07-26 확정)** — `run_phase3.sh` 주석엔 "스모크 트라이얼 명령을 이미 추가해뒀다"고 돼 있지만 **실제 파일엔 없음**(확인 완료, 2026-07-26). 기존 ~$78/~200 GPU시간 추정치는 예전(버그 있던) 15분 컷오프 기준이라 스크립트 자체 주석도 "실제로는 훨씬 클 가능성 높음"이라 경고 중 — 전체(1,210trial, 4전략×10반복×40trial)를 바로 돌리지 말고 아래 스모크(전략당 1반복×2trial=8trial)부터 실행해서 실측 `train_time_min`으로 총 비용을 재계산할 것. base_qlora.yaml은 이미 최적 조합(rank=64/target=full)으로 갱신돼 있어 그대로 재사용됨.
+1. **[가장 급함] Phase 3 스모크 테스트 결과 + 디스크 상태부터 확인** — 2026-07-27 세션 종료 시점에 디스크가 99.8G/100G까지 차오른 상태에서 학습이 진행 중이었고, 완료 여부를 못 봄. 아래부터 확인:
    ```bash
-   cd /workspace/Masters_degree
+   tmux attach -t p3smoke   # 세션 살아있으면
+   tail -n 30 results/phase3_autoresearch_smoke/run_phase3_smoke.log
+   du -h --max-depth=1 /workspace 2>/dev/null | sort -rh
+   ```
+   - 로그에 `No space left on device`/`OSError` 등으로 죽어있으면: `/workspace/.cache/huggingface`(HF_HOME 미설정으로 샌 캐시, 안전하게 삭제 가능 — 진짜 모델 캐시는 `/hf_cache`에 별도로 있음)부터 지우고 재실행.
+   - trial이 성공했으면: `results/phase3_autoresearch_smoke/*/train_result.json`의 `train_time_min`으로 전체(1,210trial) 비용 재계산 → 전체 실행(`scripts/run_phase3.sh`) 여부 결정.
+2. **[주의] 새 tmux 창/세션마다 환경변수 다시 export 필요** — exports는 셸(tmux 창)마다 독립이라, 새 창을 열면 아래를 매번 다시 해줘야 함(안 하면 HF 캐시가 `/workspace/.cache`로 새거나 wandb가 오프라인/에러로 돎). 매번 까먹기 쉬우니 `~/.bashrc`에 등록하는 걸 고려할 것:
+   ```bash
    export HF_HOME=/hf_cache
    export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
    export WANDB_PROJECT=medical-vqa-vlm
-   export PYTHONUNBUFFERED=1
-
-   # ANTHROPIC_API_KEY 없으면 autoresearch 전략 preflight에서 즉시 중단됨
-   export ANTHROPIC_API_KEY=sk-ant-...   # 발급된 키로 채울 것
-
-   python -c "
-   import anthropic
-   c = anthropic.Anthropic()
-   c.messages.create(model='claude-sonnet-4-6', max_tokens=8, messages=[{'role': 'user', 'content': 'ping'}])
-   print('[preflight] Anthropic API OK')
-   "
-
-   mkdir -p results/phase3_autoresearch_smoke
-
-   python -u -m src.autoresearch.run_phase3 \
-     --model_config configs/models/qwen3_vl_2b.yaml \
-     --finetune_config configs/finetune/base_qlora.yaml \
-     --output_dir results/phase3_autoresearch_smoke \
-     --strategies manual random optuna autoresearch \
-     --repeats 1 \
-     --trials_per_repeat 2 \
-     --seed 42 \
-     --data_dir data \
-     --time_budget_min 90 \
-     2>&1 | tee results/phase3_autoresearch_smoke/run_phase3_smoke.log
+   export WANDB_API_KEY=<발급받은 키>
+   export ANTHROPIC_API_KEY=sk-ant-...
    ```
-   스모크 결과 나오면 trial당 실측 시간으로 전체 비용 재계산 → 그 다음에 전체 실행(`scripts/run_phase3.sh`, `--repeats 10 --trials_per_repeat 40`) 여부 결정. 스모크 결과물은 `results/phase3_autoresearch_smoke/`에 따로 쌓이므로 나중에 진짜 실험 결과(`results/phase3_autoresearch/`)와 안 섞임.
-3. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, Ablation 끝나면 이어서 검토하기로 보류해뒀던 것. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요(인증서 오류로 원격 실시간 검증은 못 함). 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
+3. **[여전히 미확인, 3회 이상 이월됨] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. 계속 다음 세션으로 미뤄지고 있음 — 이번엔 진짜 확인할 것. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
+4. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, 계속 보류 중. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요. 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
 
 ## 알아둘 것
 
