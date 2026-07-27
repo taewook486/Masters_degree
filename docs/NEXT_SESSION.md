@@ -1,10 +1,17 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-26)
+# 다음 세션 시작점 (마지막 갱신: 2026-07-27)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
+- **2026-07-27 밤 — Phase 3 스모크 테스트 실행 중 disk quota 재발, 재발 원인 확정 + 재시작 (완료 여부는 다음 세션에서 확인 필요)**
+  - 증상: 스모크 트라이얼 1(manual/unsloth, `qwen3-vl-2b_pathvqa_seed42`)이 학습(`train_loss=0.8847`)·평가(`eval_loss=0.6237`)까지 정상 완료됐으나, 결과를 기록하는 `src/autoresearch/tracker.py:76`의 `open(self.path, "a", ...)`에서 `OSError: Disk quota exceeded`로 크래시(wandb run은 `Failed`로 표시되지만 학습 자체는 성공한 결과임).
+  - **원인**: bare `python -m src.autoresearch.run_phase3` 실행 세션에서 `HF_HOME`/`MOAI_CHAT_CACHE_DIR` export가 빠져 있었던 게 이번에도 재발(2026-07-22 Ablation 때와 같은 패턴, 아래 §2 참고). 그 결과 (a) `/workspace/.cache/huggingface`에 8.4G 중복 캐시가 또 쌓였고, (b) `chat_cache`가 정식 경로(`/workspace/hf_cache/chat_cache`) 대신 fallback 경로(`data/_chat_cache`)에 4.1G로 빌드됨. `/workspace` 전체가 quota 한도(추정 40G)에 37G까지 붙어 있어서, 아주 작은 파일 쓰기 하나로도 넘어감.
+  - **조치**: `/workspace/.cache/huggingface` 삭제, `data/_chat_cache` → `/workspace/hf_cache/chat_cache`로 이동(문서 표준 경로와 통일, 재빌드 없이 재사용 가능하게) → `/workspace` 29G로 확보. 이 과정에서 exports 없이 별도로 떠 있던 중복 프로세스(4시간째 캐시를 처음부터 다시 빌드 중이었음)를 발견해 kill 후, 정상 exports로 재시작함.
+  - **재시작 후 확인된 것**: train split 캐시 재사용 성공(느린 재빌드 없이 바로 진행), validation/eval split만 빠르게(초당 125개) 새로 생성되는 것까지 확인. **8개 트라이얼(전략4×repeat1×trial2)이 실제로 다 끝났는지는 미확인** — 다음 세션 시작 시 wandb(`wandb.ai/taewook486-konkuk-university/medical-vqa-vlm`)의 Runs 개수가 8인지, 또는 `tail -n 50 results/phase3_autoresearch_smoke/run_phase3_smoke.log`로 먼저 확인할 것.
+  - **[주의, 미확인] `ANTHROPIC_API_KEY` 노출됨** — 이번 세션 중 스크린샷에 pod 터미널의 `export ANTHROPIC_API_KEY=sk-ant-...` 값이 평문으로 그대로 노출됨. Anthropic Console → API Keys에서 해당 키가 살아있는지 확인 후 즉시 revoke·재발급할 것(아래 §1 GitHub PAT 건과 동일 패턴 — 두 건 다 아직 무효화 여부 미확인 상태로 남아있음).
+  - **재발 방지 습관**: bare `python` 대신 `uv run python ...`으로 통일(venv 미활성 상태에서 `ModuleNotFoundError`로 헛다리 짚는 것도 방지됨), 실행 전 항상 `echo $HF_HOME && echo $MOAI_CHAT_CACHE_DIR`로 눈으로 확인 후 시작. `df -h /workspace`는 리전 전체 용량(851T)을 보여줘서 못 믿으므로 `du -h --max-depth=1 /workspace`로 확인할 것(2026-07-26 기록과 동일).
 - **2026-07-26 세션 완료 — 우선순위 ①②③(Cross-dataset CF → Phase 1 재실행 → Phase 2 재분석) 전부 끝남** ✅
   - Ablation-C 컨파운드 6조건 재실행 완료 + target modules 최적 조합 확정: **rank=64, alpha=128, target=full(all-linear)** → `configs/finetune/base_qlora.yaml`에 반영, push 완료(커밋 `f52080b`). ratio=1.0/rank=64/target=full은 각각 축 하나씩만 바꿔가며 독립 검증한 것으로, 세 값을 동시에 적용한 조합 자체는 미검증(한계점으로 기록해둘 것).
   - Cross-dataset CF 72/72 조건 측정 완료(커밋 `20be0eb`). 도중 `transformers==5.5.0`의 `TokenizersBackend` 리팩터링으로 `bert-score`가 쓰는 `build_inputs_with_special_tokens`가 빠진 버그 발견·수정(커밋 `121af8e`, `src/evaluate/metrics.py`) — roberta-large/biobert 둘 다 실측 검증됨.
@@ -54,27 +61,19 @@ export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
 ```
 
 1. **[주의, 아직 미확인] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
-2. **Phase 3 HPO — 전체 실행 전에 스모크 테스트부터 (2026-07-26 확정)** — `run_phase3.sh` 주석엔 "스모크 트라이얼 명령을 이미 추가해뒀다"고 돼 있지만 **실제 파일엔 없음**(확인 완료, 2026-07-26). 기존 ~$78/~200 GPU시간 추정치는 예전(버그 있던) 15분 컷오프 기준이라 스크립트 자체 주석도 "실제로는 훨씬 클 가능성 높음"이라 경고 중 — 전체(1,210trial, 4전략×10반복×40trial)를 바로 돌리지 말고 아래 스모크(전략당 1반복×2trial=8trial)부터 실행해서 실측 `train_time_min`으로 총 비용을 재계산할 것. base_qlora.yaml은 이미 최적 조합(rank=64/target=full)으로 갱신돼 있어 그대로 재사용됨.
+2. **Phase 3 HPO 스모크 테스트 — 2026-07-27 밤 재시작해둔 것, 완료 여부부터 확인** — 위 "2026-07-27 밤" 항목 참고. 8개 트라이얼 다 끝났는지 wandb Runs 개수(목표 8) 또는 로그부터 확인하고, 안 끝났으면 아래로 이어서 진행. **새 키 발급 필요**(위 ANTHROPIC_API_KEY 노출 건).
    ```bash
    cd /workspace/Masters_degree
    export HF_HOME=/hf_cache
    export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
    export WANDB_PROJECT=medical-vqa-vlm
    export PYTHONUNBUFFERED=1
+   export ANTHROPIC_API_KEY=sk-ant-...   # 재발급한 새 키로 채울 것
 
-   # ANTHROPIC_API_KEY 없으면 autoresearch 전략 preflight에서 즉시 중단됨
-   export ANTHROPIC_API_KEY=sk-ant-...   # 발급된 키로 채울 것
+   echo "HF_HOME=$HF_HOME"   # /hf_cache 인지 반드시 눈으로 확인 후 진행
+   echo "MOAI_CHAT_CACHE_DIR=$MOAI_CHAT_CACHE_DIR"
 
-   python -c "
-   import anthropic
-   c = anthropic.Anthropic()
-   c.messages.create(model='claude-sonnet-4-6', max_tokens=8, messages=[{'role': 'user', 'content': 'ping'}])
-   print('[preflight] Anthropic API OK')
-   "
-
-   mkdir -p results/phase3_autoresearch_smoke
-
-   python -u -m src.autoresearch.run_phase3 \
+   uv run python -u -m src.autoresearch.run_phase3 \
      --model_config configs/models/qwen3_vl_2b.yaml \
      --finetune_config configs/finetune/base_qlora.yaml \
      --output_dir results/phase3_autoresearch_smoke \
@@ -84,9 +83,9 @@ export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
      --seed 42 \
      --data_dir data \
      --time_budget_min 90 \
-     2>&1 | tee results/phase3_autoresearch_smoke/run_phase3_smoke.log
+     2>&1 | tee -a results/phase3_autoresearch_smoke/run_phase3_smoke.log
    ```
-   스모크 결과 나오면 trial당 실측 시간으로 전체 비용 재계산 → 그 다음에 전체 실행(`scripts/run_phase3.sh`, `--repeats 10 --trials_per_repeat 40`) 여부 결정. 스모크 결과물은 `results/phase3_autoresearch_smoke/`에 따로 쌓이므로 나중에 진짜 실험 결과(`results/phase3_autoresearch/`)와 안 섞임.
+   (`tee -a`로 append — 기존 로그 안 덮어씀. `python` 대신 `uv run python`으로 venv 활성 여부와 무관하게 항상 올바른 환경 사용.) 스모크 결과 나오면 trial당 실측 시간으로 전체 비용 재계산 → 그 다음에 전체 실행(`scripts/run_phase3.sh`, `--repeats 10 --trials_per_repeat 40`) 여부 결정. 스모크 결과물은 `results/phase3_autoresearch_smoke/`에 따로 쌓이므로 나중에 진짜 실험 결과(`results/phase3_autoresearch/`)와 안 섞임.
 3. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, Ablation 끝나면 이어서 검토하기로 보류해뒀던 것. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요(인증서 오류로 원격 실시간 검증은 못 함). 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
 
 ## 알아둘 것
