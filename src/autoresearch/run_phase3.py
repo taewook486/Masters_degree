@@ -98,7 +98,7 @@ def run_phase3(
                 tracker=tracker,
                 repeat_id=repeat_id,
                 output_dir=str(output_path / f"{strategy_name}_repeat{repeat_id}"),
-                max_trials=remaining,
+                max_trials=expected,
                 seed=repeat_seed,
                 data_dir=data_dir,
                 time_budget_min=time_budget_min,
