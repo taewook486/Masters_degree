@@ -5,9 +5,38 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Phase 2 실행 중
+## [Unreleased] — Phase 3 스모크 진행 중
 
-Phase 2 QLoRA 미세조정 실험 진행 중 (RunPod RTX 4090, 36조건 × max_steps=500)
+Phase 3 자율 HPO 스모크 테스트 진행 중 (2/8 trial, ~25분/trial, 2026-07-27). 전체 실행 규모·비용 재추정 중.
+
+---
+
+## [0.4.0] — 2026-07-27
+
+Phase 2 QLoRA 미세조정 완료(75조건), Phase 3 자율 HPO 착수, Phase 1 방법론 정정.
+
+### Added — Phase 2 완료 및 분석
+
+- **Phase 2 전체 75조건 완료** — Main 36(4모델×3데이터셋×3시드) + Ablation A(비율 5종×3시드) + B(rank 5종×3시드) + C(target 3종×3시드) = 75조건 (RunPod)
+- Ablation 최적 설정 확정: `rank=64, alpha=128, target_modules=full(all-linear)` → `configs/finetune/base_qlora.yaml` 반영 (단, 세 축 동시 적용 조합 자체는 미검증 — 한계점 기록)
+- Cross-dataset CF 72/72 조건 측정 완료 (Table 4.2b(B)). `transformers 5.5.0` TokenizersBackend 리팩터링으로 빠진 `build_inputs_with_special_tokens` 버그 수정 (`src/evaluate/metrics.py`)
+- RQ2 3중 검증(paired t-test + BCa Bootstrap Cohen's d + Wilcoxon): **모델별 이질적 효과** — Qwen2.5-VL-3B(d=+2.65)·Qwen3-VL-2B(d=+1.62) 향상, SmolVLM2-2.2B(d=-2.28) 저하. Mixed-Effects pooled는 이질성 상쇄로 비유의(해석 주의)
+- `scripts/analyze_clinical.py`(WCA), `scripts/analyze_phase2.py`(RQ2), `scripts/analyze_phase3.py`, `scripts/measure_cross_dataset_cf.py` 추가
+
+### Added — Phase 3 (진행 중)
+
+- 자율 HPO 스모크 테스트 착수 — 4전략(Manual/Random/Optuna TPE/Autoresearch) 비교. 2/8 trial 완료(~25분/trial)
+- `src/autoresearch/`: LLM 에이전트 기반 HPO — temperature 스케줄링(1.0→0.3, 초반 탐색/후반 활용), `configs/autoresearch/program.md` 시스템 프롬프트
+
+### Changed — Phase 1 방법론 정정 (설계서 v0.6)
+
+- zero-shot은 greedy 결정적이므로 **3시드 → 1시드(42), 12조건**으로 정정. 불확실성은 부트스트랩 95% CI로 보고
+- RQ1 모델 비교: ANOVA + Tukey HSD → **Cochran's Q + McNemar(Bonferroni)** (공유 테스트셋 짝지은 검정)
+- `results/phase1_baseline/`를 1시드 12조건 정본으로 정정(구 3시드 산출물은 `_3seed_debug`로 분리)
+
+### Fixed — Phase 3 인프라
+
+- `anthropic` 의존성이 `pyproject.toml`/`uv.lock`에 누락돼 Autoresearch 전략이 새 pod에서 즉시 실패하던 문제 수정
 
 ### Fixed — Phase 2 캐시/디스크 인프라 (2026-07-18~19)
 

@@ -78,7 +78,7 @@
 - **실험 추적**: WandB
 - **설정 관리**: OmegaConf (YAML)
 - **평가 지표**: BERTScore (roberta-large + BioBERT)
-- **통계 분석**: SciPy, scikit-learn (ANOVA, Kruskal-Wallis, Mann-Whitney U, Bootstrap CI)
+- **통계 분석**: SciPy, statsmodels, scikit-learn (Cochran's Q + McNemar, BCa Bootstrap CI, Mixed-Effects Model, Kruskal-Wallis, Mann-Whitney U)
 
 ---
 
@@ -157,14 +157,11 @@ uv sync --extra dev
 ### Phase 1: 제로샷 베이스라인 평가
 
 ```bash
-# 전체 평가 실행 (4개 모델 x 3개 데이터셋 x 3개 시드 = 36개 조건)
-.venv/Scripts/python.exe src/baseline/run_all.py
-
-# 특정 모델만 평가
-.venv/Scripts/python.exe src/baseline/run_all.py --model qwen3_vl_2b
+# 전체 평가 실행 (4개 모델 x 3개 데이터셋 x 1개 시드(42) = 12개 조건, greedy 결정적)
+python -m src.baseline.run_all --output_dir results/phase1_baseline --data_dir data --batch_size 8
 
 # 기존 결과 무시하고 재실행
-.venv/Scripts/python.exe src/baseline/run_all.py --no_skip_existing
+python -m src.baseline.run_all --output_dir results/phase1_baseline --no_skip_existing
 
 # 결과 확인
 cat results/phase1_baseline/phase1_summary.csv
@@ -189,11 +186,11 @@ cat results/phase1_baseline/phase1_summary.csv
 |------|------|
 | 대상 모델 | Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B |
 | 대상 데이터셋 | PathVQA, SLAKE, VQA-RAD |
-| 실험 조건 | 4개 모델 x 3개 시드 (42, 123, 456) = 36개 조건 |
+| 실험 조건 | 4개 모델 × 3개 데이터셋 × 1개 시드(42) = 12개 조건 (greedy 결정적) |
 | 평가 지표 | Closed/Open/Overall Accuracy, BERTScore F1 (roberta-large + BioBERT) |
 | 보조 지표 | WCA (Weighted Clinical Accuracy), ECE (Expected Calibration Error) |
 | 오염 통제 | Min-K% Probability Attack (Shi et al., NAACL 2024) |
-| 진행 상태 | **완료** — 3개 시드 × 4개 모델 × 3개 데이터셋 결과 확정 (`results/phase1_baseline/` frozen) |
+| 진행 상태 | **완료** — 1시드(42) × 4모델 × 3데이터셋 = 12조건 확정. RQ1(Cochran's Q + McNemar) · 임상분석(WCA) · RQ2(Mixed-Effects)까지 완료 |
 
 ### Phase 2: QLoRA 미세조정 분석
 
@@ -203,7 +200,7 @@ cat results/phase1_baseline/phase1_summary.csv
 - 학습률, 배치 크기, 에폭 수 영향 분석
 - 데이터셋별 도메인 적응 특성 비교
 
-**진행 상태**: **진행 중** — RunPod RTX 4090에서 `run_phase2_main.sh` 실행 중 (max_steps=500, 36조건 × ~1.8h ≈ 65h 예상)
+**진행 상태**: **완료** — 75조건(Main 36 + Ablation A/B/C 39) 전부 완료. Ablation 최적 설정 확정(rank=64, alpha=128, target=full). RQ2는 모델별 이질적 효과 확인(Qwen 계열 향상, SmolVLM2 저하) + cross-dataset CF 72/72 측정 완료.
 
 ### Phase 3: 자율 하이퍼파라미터 최적화
 
@@ -213,13 +210,13 @@ cat results/phase1_baseline/phase1_summary.csv
 - max_steps 고정(200 steps), effective_batch_size/total_samples_seen 별도 보고
 - 예상 실험 규모: ~1,210 trials, ~200 GPU-hours (RunPod RTX 4090 기준 약 8-9일)
 
-**진행 상태**: 대기 중 (Phase 2 완료 후 착수)
+**진행 상태**: **스모크 테스트 진행 중** — 2/8 trial 완료(~25분/trial, 2026-07-27). 스모크 실측 기준 전체 실행 규모·비용 재추정 중.
 
 ---
 
 ## 재현성
 
-모든 실험은 3개의 고정 시드(42, 123, 456)로 수행됩니다. Phase 3는 각 전략 10회 독립 반복. 통계 검증에는 ANOVA + Tukey HSD (다군 비교), Paired t-test + Cohen's d (전후 비교), Kruskal-Wallis + Mann-Whitney U (HPO 전략 비교), Bootstrap 95% CI (강건성 검증)를 적용합니다. Autoresearch의 LLM 비결정성은 temperature=0, 모델 버전 고정, API 응답 로깅으로 통제합니다.
+Phase 1은 greedy 결정적 평가라 단일 시드(42)로 수행하고 불확실성은 부트스트랩 95% CI로 보고합니다. Phase 2는 3개 고정 시드(42, 123, 456), Phase 3는 각 전략 10회 독립 반복입니다. 통계 검증에는 Cochran's Q + McNemar (Phase 1 모델 비교), Paired t-test + Cohen's d + BCa Bootstrap 95% CI + Mixed-Effects Model (Phase 2 전후 비교), Kruskal-Wallis + Mann-Whitney U (Phase 3 HPO 전략 비교, run-level)를 적용합니다. Autoresearch의 LLM 비결정성은 temperature 스케줄링(1.0→0.3, 초반 탐색/후반 활용), 모델 버전 고정, API 응답 로깅으로 통제합니다.
 
 ```python
 # 시드 고정 예시
@@ -261,7 +258,9 @@ MIT License
 
 | 버전 | 날짜 | 주요 변경 |
 |------|------|----------|
-| [v0.5](docs/THESIS_PROPOSAL_FINAL_v0.5.md) (현재) | 2026-05-16 | 동료 심사 미해결 5건 처리 (run-level 통계, BCa Bootstrap, Min-K%, WCA+ECE, 의료 특화 VLM 간접 비교) |
+| [v0.7](docs/THESIS_PROPOSAL_FINAL_v0.7.md) (현재) | 2026-07-14 | BioBERT 이중 BERTScore primary 규칙 + 한계점 보강 (WCA/다중비교/CF개념/Gemma4 MoE/학습예산 max_steps cap) |
+| [v0.6](docs/THESIS_PROPOSAL_FINAL_v0.6.md) | 2026-07-11 | Phase 1 방법론 정정 (1시드 + 부트스트랩 CI, ANOVA → Cochran's Q/McNemar) |
+| [v0.5](docs/THESIS_PROPOSAL_FINAL_v0.5.md) | 2026-05-16 | 동료 심사 미해결 5건 처리 (run-level 통계, BCa Bootstrap, Min-K%, WCA+ECE, 의료 특화 VLM 간접 비교) |
 | [v0.4](docs/THESIS_PROPOSAL_FINAL_v0.4.md) | 2026-05-15 | 동료 심사 1차 반영 (RQ3 Optuna 격상, BioBERT 병기, cross-dataset CF) |
 | [v0.3](docs/THESIS_PROPOSAL_v0.3.md) | 2026-04-05 | Gemma 4 E2B 추가 (4개 모델) |
 | [v0.2](docs/THESIS_PROPOSAL_v0.2.md) | 2026-03-24 | Florence-2 탈락, BERTScore 추가 |
