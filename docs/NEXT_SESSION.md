@@ -10,7 +10,7 @@
   - Phase 3 재개(resume) 시 이미 완료된 전략의 남은 trial이 0번 도는 버그 수정 — 커밋 `54397e5`.
   - Phase 3 최종 평가 샘플 수 제한 옵션(`--max_test_samples`) 추가 — 커밋 `667e177`.
   - README + CHANGELOG를 실제 진행 상황(Phase 1 1시드, Phase 2 완료, Phase 3 스모크)에 맞춰 동기화 — 커밋 `988e709`. 이후 origin과 merge 완료(`849e083`).
-  - **Phase 3 본 실행(전체 1,210 trial) 관련해서 학과 사무실에 문의해둠** — 답변 대기 중, 다음 세션에서 확인할 것.
+  - **Phase 3 본 실행(전체 1,210 trial) 비용 지원 — 학과 사무실 답변 옴: 지원 불가.** 지도교수에게 메일로 문의해둔 상태, **회신 오면 그때 진행 여부 결정** — 그 전까진 Phase 3 본 실행 보류.
   - **[정정, 조치 불필요] `results/phase3_autoresearch_smoke/random_repeat0/trial_0016`은 미완료가 아니라 고아(orphan) 폴더로 확인됨**: 처음엔 미완료 trial로 의심했으나, `results.tsv`를 직접 확인한 결과 스모크 테스트는 이미 7/7 완료(manual 1, random 2, optuna 2, autoresearch 2)로 정상 종료된 상태였음. 이 폴더는 `results.tsv`의 어떤 행과도 매칭 안 되는 번호 중복 폴더(`optuna_repeat0`에도 별도로 완료된 `trial_0016`이 존재)로, 재개 버그(`54397e5`로 수정됨)가 있던 시점에 잘못 재실행되다 만 흔적으로 추정 — 이어서 돌릴 필요 없음, 나중에 정리 삭제해도 무방.
   - **RunPod pod는 이번 세션 종료 시 중지(stop)시킴.**
 - **2026-07-27 세션 — pod GPU 마이그레이션 사고 + 복구, Phase 1 폴더 정정, Phase 3 스모크 테스트 진행 중(디스크 위기 미해결 상태로 세션 종료)**
@@ -64,26 +64,19 @@
 - Table 4.2b(B) cross-dataset CF 신규 구현·푸시 완료 (커밋 335c808) — **아직 pod에서 실행 안 함, 미검증**
 - SSH 개인키(`runpod.ppk`) gitignore 보호 완료 (커밋 c570c64)
 
-## 다음 세션 최우선 작업 (pod에서 실행)
+## 다음 세션 최우선 작업
 
-pod은 `troubled_cyan_shrimp-migration`(마이그레이션된 새 pod, 옛 pod는 terminate됨)이고, tmux 세션 `p3smoke`가 살아있을 가능성이 높음 — `tmux attach -t p3smoke`로 먼저 이어볼 것. **소요 시간 추정은 실측 데이터(완료된 trial의 `train_time_min`)로만 할 것 — 추측성 낙관적 전망 금지(2026-07-27 세션에서 반복적으로 틀려서 사용자 일정에 지장을 줌, feedback 기록됨).**
+Phase 3 스모크 테스트는 이미 완료(7/7)됐고, 본 실행(1,210 trial) 여부는 **지도교수 회신 대기 중** — 회신 오기 전까진 pod를 켤 필요 없음(비용 절감).
 
 ```bash
-git pull   # 5c1eda0 이상 확인 (Phase 1 폴더 rename + 2026-07-27 세션 기록 포함)
+git pull   # d10ebf8 이상 확인 (Phase 3 스모크 완료 상태 + 학과/지도교수 문의 경위 포함)
 ```
 
-0. **[최우선] Phase 3 스모크 진행 상황부터 실측 확인** — 세션 종료 시점 2/8 trial 완료(manual 28.1분, random 22.3분). 몇 개나 더 끝났는지 먼저 확인하고, **완료된 개수만큼의 실측 평균으로만** 전체 비용을 계산할 것(추정 금지):
-   ```bash
-   cat results/phase3_autoresearch_smoke/results.tsv | grep completed
-   cat results/phase3_autoresearch_smoke/results.tsv | grep completed | wc -l
-   ```
-
-1. **디스크 재확인 (참고, 세션 종료 시점엔 96G/100G로 안정 상태였음)**:
-   ```bash
-   du -h --max-depth=1 /workspace 2>/dev/null | sort -rh
-   ```
-   - 만약 다시 100G 근처로 찼고 로그에 `No space left on device`/`OSError`가 있으면: `/workspace/.cache/huggingface`(HF_HOME 미설정으로 샌 캐시 — 진짜 모델 캐시는 `/hf_cache`에 별도로 있어 이건 안전하게 삭제 가능)부터 지우고 재실행.
-2. **[주의] 새 tmux 창/세션마다 환경변수 다시 export 필요** — exports는 셸(tmux 창)마다 독립이라, 새 창을 열면 아래를 매번 다시 해줘야 함(안 하면 HF 캐시가 `/workspace/.cache`로 새거나 wandb가 오프라인/에러로 돎). 매번 까먹기 쉬우니 `~/.bashrc`에 등록하는 걸 고려할 것:
+0. **[최우선] 지도교수 회신 확인** — 학과 사무실은 Phase 3 본 실행 비용 지원 불가로 답변함. 지도교수 메일 회신에 따라 본 실행 진행 여부·규모(대안: KISTI 등)를 결정. 회신 오면 이 파일에 결정 사항부터 반영할 것.
+1. **[여전히 미확인, 4회 이상 이월됨] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. 계속 다음 세션으로 미뤄지고 있음 — 이번엔 진짜 확인할 것. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
+2. **[미확인, 2회째 이월] `ANTHROPIC_API_KEY` 노출됨** — 2026-07-27 밤 세션 중 스크린샷에 pod 터미널의 `export ANTHROPIC_API_KEY=sk-ant-...` 값이 평문으로 그대로 노출됨(위 GitHub PAT 건과 동일 패턴). Anthropic Console → API Keys에서 해당 키가 살아있는지 확인 후 즉시 revoke·재발급할 것.
+3. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, 학과 지원 불가로 확정되며 중요도 상승. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요. 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
+4. **(지도교수 회신으로 진행 확정 시) pod 재개**: `troubled_cyan_shrimp-migration` pod 켠 뒤 새 tmux 창마다 아래 환경변수 재-export 필요(창별 독립이라 매번 까먹기 쉬움 — `~/.bashrc` 등록 고려):
    ```bash
    export HF_HOME=/hf_cache
    export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
@@ -91,9 +84,7 @@ git pull   # 5c1eda0 이상 확인 (Phase 1 폴더 rename + 2026-07-27 세션 �
    export WANDB_API_KEY=<발급받은 키>
    export ANTHROPIC_API_KEY=sk-ant-...
    ```
-3. **[여전히 미확인, 3회 이상 이월됨] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. 계속 다음 세션으로 미뤄지고 있음 — 이번엔 진짜 확인할 것. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
-3-1. **[신규, 미확인] `ANTHROPIC_API_KEY` 노출됨** — 2026-07-27 밤 세션 중 스크린샷에 pod 터미널의 `export ANTHROPIC_API_KEY=sk-ant-...` 값이 평문으로 그대로 노출됨(위 GitHub PAT 건과 동일 패턴). Anthropic Console → API Keys에서 해당 키가 살아있는지 확인 후 즉시 revoke·재발급할 것.
-4. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, 계속 보류 중. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요. 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
+   본 실행 전 디스크(`du -h --max-depth=1 /workspace`)와 `bash scripts/run_phase3.sh` 인자(특히 신규 `--max_test_samples`) 재확인. **소요 시간 추정은 실측 데이터로만 할 것 — 추측성 낙관적 전망 금지(2026-07-27 세션 feedback 기록됨).**
 
 ## 알아둘 것
 
