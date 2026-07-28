@@ -82,6 +82,7 @@ def run_single_trial(
     seed: int = 42,
     data_dir: str = "data",
     time_budget_min: float = 90.0,
+    max_test_samples: int | None = None,
 ) -> TrialResult:
     """Run a single HPO trial with the given hyperparameters.
 
@@ -99,6 +100,10 @@ def run_single_trial(
         time_budget_min: Wall-clock safety cutoff in minutes (not the
             controlled variable — max_steps is fixed, see strategies.py
             PHASE3_FIXED_MAX_STEPS).
+        max_test_samples: Cap on final test-set evaluation samples (None =
+            full test set). Does not affect max_steps/training — only the
+            post-training accuracy measurement's sample size, same lever
+            already used by measure_cross_dataset_cf.py.
 
     Returns:
         Completed TrialResult.
@@ -143,6 +148,7 @@ def run_single_trial(
             data_dir=data_dir,
             eval_after_training=True,
             time_budget_min=time_budget_min,
+            max_test_samples=max_test_samples,
         )
 
         wall_elapsed_min = (time.time() - wall_start) / 60
@@ -201,6 +207,7 @@ def run_hpo_loop(
     seed: int = 42,
     data_dir: str = "data",
     time_budget_min: float = 90.0,
+    max_test_samples: int | None = None,
 ) -> list[TrialResult]:
     """Run the full HPO loop for one strategy + one repeat.
 
@@ -218,6 +225,8 @@ def run_hpo_loop(
         time_budget_min: Wall-clock safety cutoff per trial in minutes (not
             the controlled variable — max_steps is fixed, see strategies.py
             PHASE3_FIXED_MAX_STEPS).
+        max_test_samples: Cap on final test-set evaluation samples per trial
+            (None = full test set). See run_single_trial for rationale.
 
     Returns:
         List of TrialResult for this run.
@@ -278,6 +287,7 @@ def run_hpo_loop(
             seed=trial_seed,
             data_dir=data_dir,
             time_budget_min=time_budget_min,
+            max_test_samples=max_test_samples,
         )
 
         # Attach agent reasoning if available (autoresearch strategy)
