@@ -42,6 +42,7 @@ def run_phase3(
     seed: int = 42,
     data_dir: str = "data",
     time_budget_min: float = 90.0,
+    max_test_samples: int | None = None,
 ) -> pd.DataFrame:
     """Run all Phase 3 HPO experiments.
 
@@ -56,6 +57,11 @@ def run_phase3(
         data_dir: Dataset directory.
         time_budget_min: Wall-clock safety cutoff per trial in minutes (not the
             controlled variable — see PHASE3_FIXED_MAX_STEPS in strategies.py).
+        max_test_samples: Cap on final per-trial test-set evaluation samples
+            (None = full test set, the paper-default). Reduces wall-clock cost
+            without changing max_steps/repeats/trials_per_repeat — the same
+            cost lever already used by measure_cross_dataset_cf.py (500
+            samples). Does not affect the HPO comparison's statistical design.
 
     Returns:
         Summary DataFrame.
@@ -102,6 +108,7 @@ def run_phase3(
                 seed=repeat_seed,
                 data_dir=data_dir,
                 time_budget_min=time_budget_min,
+                max_test_samples=max_test_samples,
             )
 
     # Build summary
@@ -211,6 +218,16 @@ def main() -> None:
             "throughput (~13s/step at effective_batch=8)."
         ),
     )
+    parser.add_argument(
+        "--max_test_samples", type=int, default=None,
+        help=(
+            "Cap on final per-trial test-set evaluation samples (default: "
+            "None = full test set, use for the paper-final run). Cuts "
+            "wall-clock cost without touching max_steps/repeats/"
+            "trials_per_repeat — same lever as measure_cross_dataset_cf.py's "
+            "--max_samples 500."
+        ),
+    )
     args = parser.parse_args()
 
     setup_logging(log_dir=args.output_dir, experiment_name="run_phase3")
@@ -225,6 +242,7 @@ def main() -> None:
         seed=args.seed,
         data_dir=args.data_dir,
         time_budget_min=args.time_budget_min,
+        max_test_samples=args.max_test_samples,
     )
 
 
