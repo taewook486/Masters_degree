@@ -1,10 +1,17 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-27)
+# 다음 세션 시작점 (마지막 갱신: 2026-07-28)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
+- **2026-07-28 세션 — Phase 3 스모크 테스트 마무리 + 인프라 정리**
+  - Phase 3 HPO 스모크 테스트 결과 백업 완료(7/7 trial, 어댑터 가중치·토크나이저·옵티마이저 상태는 제외) — 커밋 `612191a`.
+  - Phase 3 재개(resume) 시 이미 완료된 전략의 남은 trial이 0번 도는 버그 수정 — 커밋 `54397e5`.
+  - Phase 3 최종 평가 샘플 수 제한 옵션(`--max_test_samples`) 추가 — 커밋 `667e177`.
+  - README + CHANGELOG를 실제 진행 상황(Phase 1 1시드, Phase 2 완료, Phase 3 스모크)에 맞춰 동기화 — 커밋 `988e709`. 이후 origin과 merge 완료(`849e083`).
+  - **Phase 3 본 실행(전체 1,210 trial) 관련해서 학과 사무실에 문의해둠** — 답변 대기 중, 다음 세션에서 확인할 것.
+  - **RunPod pod는 이번 세션 종료 시 중지(stop)시킴.**
 - **2026-07-27 세션 — pod GPU 마이그레이션 사고 + 복구, Phase 1 폴더 정정, Phase 3 스모크 테스트 진행 중(디스크 위기 미해결 상태로 세션 종료)**
   - **pod GPU 마이그레이션**: 세션 시작 시 옛 pod(`troubled_cyan_shrimp`)가 "GPU no longer available"로 재시작 불가 → RunPod "Automatically migrate" 진행, 첫 확인 땐 `/workspace/Masters_degree`가 비어 보여 데이터 유실처럼 보였으나 **실제로는 대시보드 마이그레이션 진행바가 끝나기 전에 너무 일찍 확인한 것**이었음(진행률 %가 왔다갔다 하다 "migration completed successfully" 토스트가 뜨고 나서야 실제 완료). 완료 후 `adapter_model.safetensors` 77개(Phase 2 75조건+검증 2) + phase2_finetune 조건 폴더 75개 전부 확인, git 히스토리도 정상 — **데이터 유실 없음 확정**. 새 pod 이름은 `troubled_cyan_shrimp-migration`. 옛 pod는 이 확인 후 **terminate 완료**.
     - 교훈(auto-memory `project-runpod-workflow`에도 기록): 마이그레이션 진행바를 너무 일찍 믿지 말 것 — "migration complete" 알림이 뜨기 전엔 빈 폴더로 보여도 패닉하지 말 것. `git checkout -- .`로 git 추적 파일(코드/JSON/CSV/MD)은 복원 가능하지만, 어댑터 가중치(`.safetensors`)처럼 git 미추적 대용량 파일은 마이그레이션 자체가 끝나야만 살아있음 — `git status --short`에서 `D`(진짜 유실)와 `??`(추적 안 됨이라 정상)를 구분해서 판단할 것.
