@@ -11,6 +11,7 @@
   - Phase 3 최종 평가 샘플 수 제한 옵션(`--max_test_samples`) 추가 — 커밋 `667e177`.
   - README + CHANGELOG를 실제 진행 상황(Phase 1 1시드, Phase 2 완료, Phase 3 스모크)에 맞춰 동기화 — 커밋 `988e709`. 이후 origin과 merge 완료(`849e083`).
   - **Phase 3 본 실행(전체 1,210 trial) 관련해서 학과 사무실에 문의해둠** — 답변 대기 중, 다음 세션에서 확인할 것.
+  - **[미해결] `results/phase3_autoresearch_smoke/random_repeat0/trial_0016`이 미완료 상태로 pod 중지됨**: 커밋 `612191a` 이후 새로 돈 random 전략의 trial로 보이는데, `train_result.json`/평가 json이 없고 `checkpoints/checkpoint-200/`(중간 체크포인트)만 존재(pod에서 `cat .../trial_0016/train_result.json` → No such file 확인). 다음 세션에서 pod 재시작 후 이 trial만 이어서 완료할 것.
   - **RunPod pod는 이번 세션 종료 시 중지(stop)시킴.**
 - **2026-07-27 세션 — pod GPU 마이그레이션 사고 + 복구, Phase 1 폴더 정정, Phase 3 스모크 테스트 진행 중(디스크 위기 미해결 상태로 세션 종료)**
   - **pod GPU 마이그레이션**: 세션 시작 시 옛 pod(`troubled_cyan_shrimp`)가 "GPU no longer available"로 재시작 불가 → RunPod "Automatically migrate" 진행, 첫 확인 땐 `/workspace/Masters_degree`가 비어 보여 데이터 유실처럼 보였으나 **실제로는 대시보드 마이그레이션 진행바가 끝나기 전에 너무 일찍 확인한 것**이었음(진행률 %가 왔다갔다 하다 "migration completed successfully" 토스트가 뜨고 나서야 실제 완료). 완료 후 `adapter_model.safetensors` 77개(Phase 2 75조건+검증 2) + phase2_finetune 조건 폴더 75개 전부 확인, git 히스토리도 정상 — **데이터 유실 없음 확정**. 새 pod 이름은 `troubled_cyan_shrimp-migration`. 옛 pod는 이 확인 후 **terminate 완료**.
