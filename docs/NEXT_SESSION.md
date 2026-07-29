@@ -10,9 +10,15 @@
   - Phase 3 재개(resume) 시 이미 완료된 전략의 남은 trial이 0번 도는 버그 수정 — 커밋 `54397e5`.
   - Phase 3 최종 평가 샘플 수 제한 옵션(`--max_test_samples`) 추가 — 커밋 `667e177`.
   - README + CHANGELOG를 실제 진행 상황(Phase 1 1시드, Phase 2 완료, Phase 3 스모크)에 맞춰 동기화 — 커밋 `988e709`. 이후 origin과 merge 완료(`849e083`).
-  - **Phase 3 본 실행(전체 1,210 trial) 비용 지원 — 학과 사무실 답변 옴: 지원 불가.** 지도교수에게 메일로 문의해둔 상태, **회신 오면 그때 진행 여부 결정** — 그 전까진 Phase 3 본 실행 보류.
+  - **Phase 3 본 실행(전체 1,210 trial) 비용 지원 — 학과 사무실 답변 옴: 지원 불가.** 지도교수에게 메일 문의했으나 바빠서 회신 없음 → **회신 대기 중단, RunPod 포기하고 로컬 5060 Ti + 4060 듀얼 GPU 조합으로 마무리하기로 확정.**
   - **[정정, 조치 불필요] `results/phase3_autoresearch_smoke/random_repeat0/trial_0016`은 미완료가 아니라 고아(orphan) 폴더로 확인됨**: 처음엔 미완료 trial로 의심했으나, `results.tsv`를 직접 확인한 결과 스모크 테스트는 이미 7/7 완료(manual 1, random 2, optuna 2, autoresearch 2)로 정상 종료된 상태였음. 이 폴더는 `results.tsv`의 어떤 행과도 매칭 안 되는 번호 중복 폴더(`optuna_repeat0`에도 별도로 완료된 `trial_0016`이 존재)로, 재개 버그(`54397e5`로 수정됨)가 있던 시점에 잘못 재실행되다 만 흔적으로 추정 — 이어서 돌릴 필요 없음, 나중에 정리 삭제해도 무방.
   - **RunPod pod는 이번 세션 종료 시 중지(stop)시킴.**
+  - **로컬 듀얼 GPU(5060 Ti + 4060) 전환 — 다른 claude.ai 대화(테스트 계획 상담)를 검증하며 버그 2건 발견·수정**:
+    - `run_phase3.bat`의 `--time_budget_min 15`는 위험함 확인(pod 스모크 실측 22.3~49.6분 — 15분보다 이미 김) → **60분으로 수정**.
+    - `docs/RUNPOD_COST_ESTIMATE.md`의 총 trial 계산 오류(`1 + 400 + 400 + 400 = 1,201`, manual을 반복 횟수 무시하고 1로 계산) → **`10 + 400 + 400 + 400 = 1,210`으로 정정**(코드상 manual도 repeat마다 1trial씩 돌아 실제로는 10trial).
+    - `--model_config qwen3_vl_2b.yaml`(현재값)이 Phase 2 실측(`phase2_summary.csv`, PathVQA overall_acc 0.502 vs qwen25-vl-3b 0.480, 속도도 40% 빠름) 기준으로 이미 최선의 선택임을 확인 — **바꿀 필요 없음**(다른 대화는 qwen25-vl-3b로 바꾸자고 제안했었는데 근거가 부족했음).
+  - **반복 횟수는 10회 유지로 확정** (5회로 줄이면 설계서(v0.5)가 명시한 통계적 검정력 목표를 못 재현함 — Kruskal-Wallis/Mann-Whitney U 검정 단위인 run-level 10개를 지켜야 함).
+  - **로컬 실측 스모크 스크립트 2개 신규 작성, 아직 미실행**: `run_phase3_smoke_gpu0.bat`(`CUDA_VISIBLE_DEVICES=0`), `run_phase3_smoke_gpu1.bat`(`CUDA_VISIBLE_DEVICES=1`) — 각 카드에서 전략당 1trial(총 4개)만 돌려 실측 시간을 잰 뒤, 그 값으로 repeats=10 본 실행의 전략당 trial 수를 정할 예정. GPU 분배는 "전략별"이 아니라 **"repeat 번호로 절반씩"**(예: repeat 0~4=GPU0, 5~9=GPU1) — Optuna TPE는 같은 repeat 안에서만 순차적이고 repeat끼리는 독립이라 이 분배가 더 공평함. 4060(8GB)도 이 모델 기준 peak VRAM 3.9GB라 배치 크기 걱정 없음(Phase 2 실측 확인).
 - **2026-07-27 세션 — pod GPU 마이그레이션 사고 + 복구, Phase 1 폴더 정정, Phase 3 스모크 테스트 진행 중(디스크 위기 미해결 상태로 세션 종료)**
   - **pod GPU 마이그레이션**: 세션 시작 시 옛 pod(`troubled_cyan_shrimp`)가 "GPU no longer available"로 재시작 불가 → RunPod "Automatically migrate" 진행, 첫 확인 땐 `/workspace/Masters_degree`가 비어 보여 데이터 유실처럼 보였으나 **실제로는 대시보드 마이그레이션 진행바가 끝나기 전에 너무 일찍 확인한 것**이었음(진행률 %가 왔다갔다 하다 "migration completed successfully" 토스트가 뜨고 나서야 실제 완료). 완료 후 `adapter_model.safetensors` 77개(Phase 2 75조건+검증 2) + phase2_finetune 조건 폴더 75개 전부 확인, git 히스토리도 정상 — **데이터 유실 없음 확정**. 새 pod 이름은 `troubled_cyan_shrimp-migration`. 옛 pod는 이 확인 후 **terminate 완료**.
     - 교훈(auto-memory `project-runpod-workflow`에도 기록): 마이그레이션 진행바를 너무 일찍 믿지 말 것 — "migration complete" 알림이 뜨기 전엔 빈 폴더로 보여도 패닉하지 말 것. `git checkout -- .`로 git 추적 파일(코드/JSON/CSV/MD)은 복원 가능하지만, 어댑터 가중치(`.safetensors`)처럼 git 미추적 대용량 파일은 마이그레이션 자체가 끝나야만 살아있음 — `git status --short`에서 `D`(진짜 유실)와 `??`(추적 안 됨이라 정상)를 구분해서 판단할 것.
@@ -66,25 +72,20 @@
 
 ## 다음 세션 최우선 작업
 
-Phase 3 스모크 테스트는 이미 완료(7/7)됐고, 본 실행(1,210 trial) 여부는 **지도교수 회신 대기 중** — 회신 오기 전까진 pod를 켤 필요 없음(비용 절감).
+**RunPod은 접었고, 데스크탑(5060 Ti + 4060 듀얼 GPU)에서 Phase 3를 마무리하는 걸로 확정.** pod는 재사용 안 함.
 
 ```bash
-git pull   # d10ebf8 이상 확인 (Phase 3 스모크 완료 상태 + 학과/지도교수 문의 경위 포함)
+git pull   # run_phase3.bat 수정 + run_phase3_smoke_gpu0/1.bat 신규 + NEXT_SESSION 갱신 확인
 ```
 
-0. **[최우선] 지도교수 회신 확인** — 학과 사무실은 Phase 3 본 실행 비용 지원 불가로 답변함. 지도교수 메일 회신에 따라 본 실행 진행 여부·규모(대안: KISTI 등)를 결정. 회신 오면 이 파일에 결정 사항부터 반영할 것.
-1. **[여전히 미확인, 4회 이상 이월됨] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. 계속 다음 세션으로 미뤄지고 있음 — 이번엔 진짜 확인할 것. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
-2. **[미확인, 2회째 이월] `ANTHROPIC_API_KEY` 노출됨** — 2026-07-27 밤 세션 중 스크린샷에 pod 터미널의 `export ANTHROPIC_API_KEY=sk-ant-...` 값이 평문으로 그대로 노출됨(위 GitHub PAT 건과 동일 패턴). Anthropic Console → API Keys에서 해당 키가 살아있는지 확인 후 즉시 revoke·재발급할 것.
-3. **비용 대안 검토(KISTI 등)** — 누적 지출 $120+ 관련, 학과 지원 불가로 확정되며 중요도 상승. 건국대 중앙 HPC는 없음(랩 단위 GPU서버만). KISTI 국가슈퍼컴퓨팅센터(뉴론 GPU 클러스터) 무상지원 트랙이 유력 후보 — `enables.ksc.re.kr`/`www.ksc.re.kr`에서 최신 공모 확인 필요. 참고: `docs/ENVIRONMENT_SETUP.md`, `docs/GPU_RENTAL_INQUIRY_CHECKLIST.md`.
-4. **(지도교수 회신으로 진행 확정 시) pod 재개**: `troubled_cyan_shrimp-migration` pod 켠 뒤 새 tmux 창마다 아래 환경변수 재-export 필요(창별 독립이라 매번 까먹기 쉬움 — `~/.bashrc` 등록 고려):
-   ```bash
-   export HF_HOME=/hf_cache
-   export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
-   export WANDB_PROJECT=medical-vqa-vlm
-   export WANDB_API_KEY=<발급받은 키>
-   export ANTHROPIC_API_KEY=sk-ant-...
-   ```
-   본 실행 전 디스크(`du -h --max-depth=1 /workspace`)와 `bash scripts/run_phase3.sh` 인자(특히 신규 `--max_test_samples`) 재확인. **소요 시간 추정은 실측 데이터로만 할 것 — 추측성 낙관적 전망 금지(2026-07-27 세션 feedback 기록됨).**
+0. **[최우선] 로컬 실측 스모크 실행** — 데스크탑에서:
+   1) `nvidia-smi`로 GPU0/GPU1이 실제로 5060 Ti/4060 중 뭔지 확인 (스크립트는 0=5060Ti 가정하고 작성됨 — 다르면 스크립트 안 `CUDA_VISIBLE_DEVICES` 값 서로 바꿀 것)
+   2) `set ANTHROPIC_API_KEY=sk-ant-...` 설정
+   3) cmd 창 2개에서 `run_phase3_smoke_gpu0.bat`, `run_phase3_smoke_gpu1.bat` 동시 실행(전략당 1trial, 총 4개씩)
+   4) 완료 후 `type results\phase3_local_smoke_gpu0\results.tsv`, `type results\phase3_local_smoke_gpu1\results.tsv`로 `train_time_min` 실측값 확인 — **이 값으로만** repeats=10 본 실행의 전략당 trial 수를 정할 것(추측 금지, 이전 세션 feedback 기록됨).
+1. **[여전히 미확인, 4회 이상 이월됨] GitHub PAT 토큰 무효화 여부** — 2026-07-25 세션 중 `git remote -v` 결과가 노출됐던 건. GitHub → Settings → Developer settings → Personal access tokens에서 살아있는지 확인, 살아있으면 즉시 revoke 후 재발급.
+2. **[미확인, 2회째 이월] `ANTHROPIC_API_KEY` 노출됨** — 2026-07-27 밤 세션 중 스크린샷에 pod 터미널의 `export ANTHROPIC_API_KEY=sk-ant-...` 값이 평문으로 그대로 노출됨. Anthropic Console → API Keys에서 해당 키가 살아있는지 확인 후 즉시 revoke·재발급할 것.
+3. **하드웨어 물리 확인(미확인)** — 5060 Ti 실제 설치 여부, PSU 용량, 케이스 내부 슬롯 간격/길이 여유. 스모크 실행 전 반드시 확인.
 
 ## 알아둘 것
 

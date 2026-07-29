@@ -27,7 +27,7 @@ echo Starting Phase 3 HPO at %DATE% %TIME% >> results\phase3_autoresearch\run_ph
   --trials_per_repeat 40 ^
   --seed 42 ^
   --data_dir data ^
-  --time_budget_min 15 ^
+  --time_budget_min 60 ^
   >> results\phase3_autoresearch\run_phase3.log 2>&1
 
 echo Finished Phase 3 HPO at %DATE% %TIME% >> results\phase3_autoresearch\run_phase3.log
