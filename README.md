@@ -78,7 +78,7 @@
 - **실험 추적**: WandB
 - **설정 관리**: OmegaConf (YAML)
 - **평가 지표**: BERTScore (roberta-large + BioBERT)
-- **통계 분석**: SciPy, scikit-learn (ANOVA, Kruskal-Wallis, Mann-Whitney U, Bootstrap CI)
+- **통계 분석**: SciPy, statsmodels, scikit-learn (Cochran's Q + McNemar, BCa Bootstrap CI, Mixed-Effects Model, Kruskal-Wallis, Mann-Whitney U)
 
 ---
 
@@ -157,14 +157,11 @@ uv sync --extra dev
 ### Phase 1: 제로샷 베이스라인 평가
 
 ```bash
-# 전체 평가 실행 (4개 모델 x 3개 데이터셋 x 3개 시드 = 36개 조건)
-.venv/Scripts/python.exe src/baseline/run_all.py
-
-# 특정 모델만 평가
-.venv/Scripts/python.exe src/baseline/run_all.py --model qwen3_vl_2b
+# 전체 평가 실행 (4개 모델 x 3개 데이터셋 x 1개 시드(42) = 12개 조건, greedy 결정적)
+python -m src.baseline.run_all --output_dir results/phase1_baseline --data_dir data --batch_size 8
 
 # 기존 결과 무시하고 재실행
-.venv/Scripts/python.exe src/baseline/run_all.py --no_skip_existing
+python -m src.baseline.run_all --output_dir results/phase1_baseline --no_skip_existing
 
 # 결과 확인
 cat results/phase1_baseline/phase1_summary.csv
@@ -193,7 +190,7 @@ cat results/phase1_baseline/phase1_summary.csv
 | 평가 지표 | Closed/Open/Overall Accuracy, BERTScore F1 (roberta-large + BioBERT) |
 | 보조 지표 | WCA (Weighted Clinical Accuracy), ECE (Expected Calibration Error, 산출 불가 — §5.3 한계점 참조) |
 | 오염 통제 | Min-K% Probability Attack (Shi et al., NAACL 2024) |
-| 진행 상태 | **완료** — 단일 결정적 평가(seed 42) × 4개 모델 × 3개 데이터셋(12조건), 부트스트랩 95% CI 포함 결과 확정 (`results/phase1_baseline/` frozen) |
+| 진행 상태 | **완료** — 단일 결정적 평가(seed 42) × 4개 모델 × 3개 데이터셋(12조건), 부트스트랩 95% CI 포함 결과 확정(`results/phase1_baseline/` frozen). RQ1(Cochran's Q + McNemar) · 임상분석(WCA) · RQ2(Mixed-Effects)까지 완료 |
 
 ### Phase 2: QLoRA 미세조정 분석
 
@@ -203,7 +200,7 @@ cat results/phase1_baseline/phase1_summary.csv
 - 학습률, 배치 크기, 에폭 수 영향 분석
 - 데이터셋별 도메인 적응 특성 비교
 
-**진행 상태**: **완료** — Main 36조건 + Ablation A/B/C 39조건(rank=64, alpha=128, target=full 최적 조합 확정) = 75/75조건 전부 완료, 결과 백업 완료 (`results/phase2_finetune/`)
+**진행 상태**: **완료** — Main 36조건 + Ablation A/B/C 39조건(rank=64, alpha=128, target=full 최적 조합 확정) = 75/75조건 전부 완료, 결과 백업 완료(`results/phase2_finetune/`). RQ2는 모델별 이질적 효과 확인(Qwen 계열 향상, SmolVLM2 저하) + cross-dataset CF 72/72 측정 완료
 
 ### Phase 3: 자율 하이퍼파라미터 최적화
 
@@ -211,15 +208,15 @@ cat results/phase1_baseline/phase1_summary.csv
 
 - Manual / Random Search / Optuna(TPE) / LLM 에이전트 기반 autoresearch 비교
 - max_steps 고정(200 steps), effective_batch_size/total_samples_seen 별도 보고
-- 예상 실험 규모: ~1,210 trials — GPU 시간 추정치(기존 ~200시간)는 **재검증 중**. 스모크 테스트 실측 2건 평균 ~25분/trial 기준으로는 ~500시간 규모가 될 가능성이 있어, 낙관적 추정을 피하고 실측 완료분으로만 재계산할 예정
+- 예상 실험 규모: ~1,210 trials — GPU 시간 추정치(기존 ~200시간)는 **재검증 필요**. 스모크 테스트 7/7 trial 완료 실측 평균 ~33.7분/trial 기준으로는 전체 규모가 ~680시간까지 늘어날 수 있어, 낙관적 추정을 피하고 로컬 듀얼 GPU 실측 스모크 이후 다시 계산할 예정
 
-**진행 상태**: **진행 중** — 스모크 테스트(소규모 실측 검증) 진행 중, 8개 trial 중 2개 완료(manual 28.1분, random 22.3분). 전체 실행(`scripts/run_phase3.sh`) 여부는 스모크 테스트 실측치로 GPU 시간·비용을 재산정한 뒤 결정
+**진행 상태**: **스모크 테스트 완료(7/7 trial), 본 실행 준비 중** — RunPod 비용 지원 불가로 RunPod을 포기하고 로컬 듀얼 GPU(RTX 5060 Ti + 4060)로 전환 확정(2026-07-28). 반복 횟수는 통계 검정력 확보를 위해 10회 유지. 로컬 실측 스모크 스크립트(`run_phase3_smoke_gpu0/1.bat`)로 GPU당 전략별 1trial 실측 후, 그 값으로 본 실행(`scripts/run_phase3.sh`) 규모를 재산정할 예정 — 아직 미실행
 
 ---
 
 ## 재현성
 
-Phase 1은 단일 결정적 시드(42, zero-shot greedy 디코딩이라 시드 무관하게 결과 동일), Phase 2·3은 3개의 고정 시드(42, 123, 456)로 수행됩니다. Phase 3는 각 전략 10회 독립 반복. 통계 검증에는 Cochran's Q + McNemar (Phase 1 모델 비교), Paired t-test + Cohen's d + BCa Bootstrap + Mixed-Effects Model (Phase 2 전후 비교), Kruskal-Wallis + Mann-Whitney U (Phase 3 HPO 전략 비교), Bootstrap 95% CI (강건성 검증)를 적용합니다. Autoresearch의 LLM 비결정성은 temperature 스케줄링(1.0→0.3, 탐색→활용), 모델 ID 고정, API 응답 로깅으로 통제합니다.
+Phase 1은 단일 결정적 시드(42, zero-shot greedy 디코딩이라 시드 무관하게 결과 동일)로 수행하고 불확실성은 부트스트랩 95% CI로 보고합니다. Phase 2·3은 3개의 고정 시드(42, 123, 456)로 수행됩니다. Phase 3는 각 전략 10회 독립 반복. 통계 검증에는 Cochran's Q + McNemar (Phase 1 모델 비교), Paired t-test + Cohen's d + BCa Bootstrap + Mixed-Effects Model (Phase 2 전후 비교), Kruskal-Wallis + Mann-Whitney U (Phase 3 HPO 전략 비교, run-level), Bootstrap 95% CI (강건성 검증)를 적용합니다. Autoresearch의 LLM 비결정성은 temperature 스케줄링(1.0→0.3, 탐색→활용), 모델 ID 고정, API 응답 로깅으로 통제합니다.
 
 ```python
 # 시드 고정 예시

@@ -1,0 +1,22 @@
+trial_id	strategy	repeat_id	lora_rank	lora_alpha	learning_rate	batch_size	grad_accum_steps	warmup_ratio	weight_decay	lora_targets	max_steps	val_accuracy	val_closed_acc	val_open_acc	train_loss	train_time_min	peak_vram_mb	status	notes	agent_reasoning	phase	temperature
+0	manual	0	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.0	0.0	0.0	0.0	111.8	0.0	failed	No API key configured. Use `wandb login` to log in.			0.0
+1	random	0	4	4	0.000182	1	4	0.014	0.0102	full	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	No API key configured. Use `wandb login` to log in.			0.0
+2	random	0	4	4	0.000182	1	4	0.014	0.0102	full	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	No API key configured. Use `wandb login` to log in.			0.0
+3	optuna	0	64	64	2.3e-05	1	8	0.0059	0.0425	full	200	0.0	0.0	0.0	0.0	0.3	0.0	failed	No API key configured. Use `wandb login` to log in.			0.0
+4	optuna	0	16	16	0.000399	1	8	0.0948	0.0037	full	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	No API key configured. Use `wandb login` to log in.			0.0
+5	autoresearch	0	16	32	0.0001	2	8	0.05	0.01	medium	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	No API key configured. Use `wandb login` to log in.	"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+6	autoresearch	0	32	64	0.0001	2	8	0.05	0.01	medium	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	No API key configured. Use `wandb login` to log in.	"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+7	manual	0	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.0	0.0	0.0	0.0	0.7	0.0	failed	'images'			0.0
+8	random	0	4	4	0.000182	1	4	0.014	0.0102	full	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	'images'			0.0
+9	random	0	4	4	0.000182	1	4	0.014	0.0102	full	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	'images'			0.0
+10	optuna	0	4	4	0.000392	4	8	0.0562	0.0623	minimal	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	'images'			0.0
+11	optuna	0	16	64	6.2e-05	4	4	0.0614	0.0201	minimal	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	'images'			0.0
+12	autoresearch	0	8	16	0.0001	4	4	0.05	0.01	full	200	0.0	0.0	0.0	0.0	0.2	0.0	failed	'images'	"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 1e-4, ""batch_size"": 4, ""grad_accum_steps"": 4, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+13	autoresearch	0	64	128	0.0001	2	8	0.05	0.01	full	200	0.0	0.0	0.0	0.0	0.3	0.0	failed	'images'	"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+14	manual	0	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.4443	0.7912	0.0968	0.8436367225646972	28.1	4589.9	completed				0.0
+15	random	0	4	4	0.000182	1	4	0.014	0.0102	full	200	0.3816	0.6832	0.0795	0.8845520281791687	22.3	5193.3	completed				0.0
+16	optuna	0	4	4	3.1e-05	2	16	0.0053	0.0267	medium	200	0.3267	0.6199	0.0331	1.890552339553833	45.3	4633.0	completed				0.0
+17	optuna	0	64	64	0.00039	2	16	0.0626	0.0394	full	200	0.5568	0.8769	0.2362	0.6339614772796631	49.6	5592.7	completed				0.0
+18	autoresearch	0	16	32	0.0001	2	8	0.05	0.01	medium	200	0.4591	0.8007	0.1171	0.8783727598190307	28.9	5822.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+19	autoresearch	0	32	64	0.0002	2	8	0.05	0.01	medium	200	0.4972	0.8263	0.1677	0.7494368052482605	29.4	6457.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+20	random	0	4	4	0.000156	2	8	0.0147	0.0793	full	200	0.4356	0.76	0.1108	0.8648497033119201	32.5	4620.7	completed				0.0

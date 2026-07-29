@@ -90,7 +90,7 @@
 | 전략 수 | 4 (Manual, Random, Optuna, Autoresearch) |
 | 반복 횟수 | 10 (run-level 통계 확보용) |
 | 전략당 trial | 40 (Manual은 1) |
-| 총 trial | 1 + 400 + 400 + 400 = 1,201 |
+| 총 trial | 10(Manual, 반복 10회×1trial) + 400 + 400 + 400 = 1,210 |
 | trial당 시간 | ~10분 (max_steps=200) |
 | **총 GPU 시간** | **~200시간** |
 | 연속 실행 기간 | 8-9일 (24h 가동) |
