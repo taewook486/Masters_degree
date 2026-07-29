@@ -189,11 +189,11 @@ cat results/phase1_baseline/phase1_summary.csv
 |------|------|
 | 대상 모델 | Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B |
 | 대상 데이터셋 | PathVQA, SLAKE, VQA-RAD |
-| 실험 조건 | 4개 모델 x 3개 시드 (42, 123, 456) = 36개 조건 |
+| 실험 조건 | 4개 모델 x 3개 데이터셋 = 12개 조건 (단일 결정적 평가, seed 42 — zero-shot은 greedy 디코딩이라 시드를 바꿔도 결과가 동일함) |
 | 평가 지표 | Closed/Open/Overall Accuracy, BERTScore F1 (roberta-large + BioBERT) |
-| 보조 지표 | WCA (Weighted Clinical Accuracy), ECE (Expected Calibration Error) |
+| 보조 지표 | WCA (Weighted Clinical Accuracy), ECE (Expected Calibration Error, 산출 불가 — §5.3 한계점 참조) |
 | 오염 통제 | Min-K% Probability Attack (Shi et al., NAACL 2024) |
-| 진행 상태 | **완료** — 3개 시드 × 4개 모델 × 3개 데이터셋 결과 확정 (`results/phase1_baseline/` frozen) |
+| 진행 상태 | **완료** — 단일 결정적 평가(seed 42) × 4개 모델 × 3개 데이터셋(12조건), 부트스트랩 95% CI 포함 결과 확정 (`results/phase1_baseline/` frozen) |
 
 ### Phase 2: QLoRA 미세조정 분석
 
@@ -203,7 +203,7 @@ cat results/phase1_baseline/phase1_summary.csv
 - 학습률, 배치 크기, 에폭 수 영향 분석
 - 데이터셋별 도메인 적응 특성 비교
 
-**진행 상태**: **진행 중** — RunPod RTX 4090에서 `run_phase2_main.sh` 실행 중 (max_steps=500, 36조건 × ~1.8h ≈ 65h 예상)
+**진행 상태**: **완료** — Main 36조건 + Ablation A/B/C 39조건(rank=64, alpha=128, target=full 최적 조합 확정) = 75/75조건 전부 완료, 결과 백업 완료 (`results/phase2_finetune/`)
 
 ### Phase 3: 자율 하이퍼파라미터 최적화
 
@@ -211,15 +211,15 @@ cat results/phase1_baseline/phase1_summary.csv
 
 - Manual / Random Search / Optuna(TPE) / LLM 에이전트 기반 autoresearch 비교
 - max_steps 고정(200 steps), effective_batch_size/total_samples_seen 별도 보고
-- 예상 실험 규모: ~1,210 trials, ~200 GPU-hours (RunPod RTX 4090 기준 약 8-9일)
+- 예상 실험 규모: ~1,210 trials — GPU 시간 추정치(기존 ~200시간)는 **재검증 중**. 스모크 테스트 실측 2건 평균 ~25분/trial 기준으로는 ~500시간 규모가 될 가능성이 있어, 낙관적 추정을 피하고 실측 완료분으로만 재계산할 예정
 
-**진행 상태**: 대기 중 (Phase 2 완료 후 착수)
+**진행 상태**: **진행 중** — 스모크 테스트(소규모 실측 검증) 진행 중, 8개 trial 중 2개 완료(manual 28.1분, random 22.3분). 전체 실행(`scripts/run_phase3.sh`) 여부는 스모크 테스트 실측치로 GPU 시간·비용을 재산정한 뒤 결정
 
 ---
 
 ## 재현성
 
-모든 실험은 3개의 고정 시드(42, 123, 456)로 수행됩니다. Phase 3는 각 전략 10회 독립 반복. 통계 검증에는 ANOVA + Tukey HSD (다군 비교), Paired t-test + Cohen's d (전후 비교), Kruskal-Wallis + Mann-Whitney U (HPO 전략 비교), Bootstrap 95% CI (강건성 검증)를 적용합니다. Autoresearch의 LLM 비결정성은 temperature=0, 모델 버전 고정, API 응답 로깅으로 통제합니다.
+Phase 1은 단일 결정적 시드(42, zero-shot greedy 디코딩이라 시드 무관하게 결과 동일), Phase 2·3은 3개의 고정 시드(42, 123, 456)로 수행됩니다. Phase 3는 각 전략 10회 독립 반복. 통계 검증에는 Cochran's Q + McNemar (Phase 1 모델 비교), Paired t-test + Cohen's d + BCa Bootstrap + Mixed-Effects Model (Phase 2 전후 비교), Kruskal-Wallis + Mann-Whitney U (Phase 3 HPO 전략 비교), Bootstrap 95% CI (강건성 검증)를 적용합니다. Autoresearch의 LLM 비결정성은 temperature 스케줄링(1.0→0.3, 탐색→활용), 모델 ID 고정, API 응답 로깅으로 통제합니다.
 
 ```python
 # 시드 고정 예시
@@ -261,7 +261,9 @@ MIT License
 
 | 버전 | 날짜 | 주요 변경 |
 |------|------|----------|
-| [v0.5](docs/THESIS_PROPOSAL_FINAL_v0.5.md) (현재) | 2026-05-16 | 동료 심사 미해결 5건 처리 (run-level 통계, BCa Bootstrap, Min-K%, WCA+ECE, 의료 특화 VLM 간접 비교) |
+| [v0.11](docs/THESIS_PROPOSAL_FINAL_v0.11.md) (현재) | 2026-07-25 | 설계서-RUNPOD_GUIDE 정합성 검토 (max_steps 탐색/고정 모순 해소, ECE 산출 불가 한계 추가) — v0.7~v0.11 상세 이력은 [THESIS_CHANGELOG.md](docs/THESIS_CHANGELOG.md) 참조 |
+| [v0.6](docs/THESIS_PROPOSAL_FINAL_v0.6.md) | 2026-07-11 | Phase 1 방법론 정정 (결정적 평가: 1시드 + 부트스트랩 CI, ANOVA→Cochran's Q/McNemar) |
+| [v0.5](docs/THESIS_PROPOSAL_FINAL_v0.5.md) | 2026-05-16 | 동료 심사 미해결 5건 처리 (run-level 통계, BCa Bootstrap, Min-K%, WCA+ECE, 의료 특화 VLM 간접 비교) |
 | [v0.4](docs/THESIS_PROPOSAL_FINAL_v0.4.md) | 2026-05-15 | 동료 심사 1차 반영 (RQ3 Optuna 격상, BioBERT 병기, cross-dataset CF) |
 | [v0.3](docs/THESIS_PROPOSAL_v0.3.md) | 2026-04-05 | Gemma 4 E2B 추가 (4개 모델) |
 | [v0.2](docs/THESIS_PROPOSAL_v0.2.md) | 2026-03-24 | Florence-2 탈락, BERTScore 추가 |

@@ -1,7 +1,7 @@
 # 석사학위 논문 설계서
 
 <!-- pdf:strip-meta -->
-> 본문 버전: Internal v0.7 (2026-07-14, 평가 지표 primary 규칙 명시 + 한계점 4건 보강) / 직전 External v1.1
+> 본문 버전: Internal v0.11 (2026-07-25, 설계서-RUNPOD_GUIDE 정합성 검토: max_steps 모순 해소 + 온도 스케줄링 정정 + ECE 산출 불가 한계 반영) / 직전 External v1.1
 > 변경 이력은 [THESIS_CHANGELOG.md](THESIS_CHANGELOG.md) 참조
 <!-- /pdf:strip-meta -->
 
