@@ -1,10 +1,16 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-28)
+# 다음 세션 시작점 (마지막 갱신: 2026-07-31)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
+- **2026-07-31 세션 — RunPod pod 최종 정리(백업 확인 후 terminate)**
+  - 세션 시작 시 pod가 또 마이그레이션됨(`troubled_cyan_shrimp-migration` → `troubled_cyan_shrimp-migration-migration`, RTX 3090). 07-27 마이그레이션 때와 동일 패턴 — 데이터 유실 없음, 진행률 표시만 신뢰 불가.
+  - **`results/` 폴더 전체를 로컬로 백업 완료** (`D:\project\Masters_degree\results_pod_backup\`) — scp 사용. Windows PowerShell에서 겪은 이슈들: (1) `\` 줄바꿈 미지원 → 한 줄 명령으로 수정, (2) `.ppk`(PuTTY 형식) 키를 OpenSSH `scp`가 못 읽음 → PuTTYgen "Export OpenSSH key"로 변환 필요, (3) 변환한 키 파일 권한이 너무 열려있어 거부됨 → `icacls <키파일> /inheritance:r` + `icacls <키파일> /grant:r "<사용자명>:(R)"`로 해결.
+  - **백업 무결성 3중 검증 완료**: ① `adapter_model.safetensors` 86개 전부 일치(손상 파일 0개), ② `git status --short`의 미추적 파일 138개 전부 로컬에 존재(0개 누락), ③ 바이트 단위 총합 비교 — pod 3,402,012,129 bytes vs 로컬 3,402,012,403 bytes (차이 274바이트, 오차 수준). **데이터 유실 없이 완전히 백업됨 확정.**
+  - `results/` 안에 어댑터 가중치·체크포인트가 전부 포함되어 있음을 코드로 확인(`train_qlora.py`/`run_phase2.py`/`run_phase3.py` 전부 `output_dir` 기본값이 `results/phase2_finetune`, `results/phase3_autoresearch*`) — 앞으로 pod 백업 시 `results/` 폴더만 통째로 받으면 충분함.
+  - **두 pod(`troubled_cyan_shrimp-migration`, `troubled_cyan_shrimp-migration-migration`) 모두 terminate 결정.** RunPod은 07-28에 이미 접기로 확정됐던 상태라(학과 비용지원 불가, 지도교수 회신 없음 → 로컬 듀얼 GPU로 전환), 백업만 확인되면 pod를 유지할 이유가 없음.
 - **2026-07-28 세션 — Phase 3 스모크 테스트 마무리 + 인프라 정리**
   - Phase 3 HPO 스모크 테스트 결과 백업 완료(7/7 trial, 어댑터 가중치·토크나이저·옵티마이저 상태는 제외) — 커밋 `612191a`.
   - Phase 3 재개(resume) 시 이미 완료된 전략의 남은 trial이 0번 도는 버그 수정 — 커밋 `54397e5`.
