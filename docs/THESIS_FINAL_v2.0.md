@@ -3,7 +3,7 @@
 <!-- pdf:strip-meta -->
 > 본문 버전: v2.0-draft (작성 중, 2026-07-31 시작)
 > 기반 설계서: [THESIS_PROPOSAL_FINAL_v0.11.md](THESIS_PROPOSAL_FINAL_v0.11.md)
-> 진행 상태: 제4장 실험 결과 — 4.1(Phase 1) 작성 완료, 4.2(Phase 2) 이후 작성 예정, 4.3(Phase 3)은 실험 미완료로 보류
+> 진행 상태: 제1-3장 작성 완료(2장 인용 WebSearch 검증 완료, 설계서의 Min-K% 인용 오류(NAACL→ICLR) 발견·정정). 제4장 4.1-4.2 완료, 4.3(Phase 3)은 실험 미완료로 보류, 4.4·제5장 미작성.
 <!-- /pdf:strip-meta -->
 
 ## 논문 정보
@@ -17,15 +17,240 @@
 
 ## 목차 (설계서 §5 기준)
 
-- 제1장. 서론 — *미작성*
-- 제2장. 이론적 배경 — *미작성*
-- 제3장. 연구 방법 — *미작성*
+- 제1장. 서론 ✅
+- 제2장. 이론적 배경 ✅ (인용 WebSearch 검증 완료)
+- 제3장. 연구 방법 ✅
 - 제4장. 실험 결과 및 분석
-  - 4.1 Phase 1: 제로샷 베이스라인 결과 ✅ (본 문서)
-  - 4.2 Phase 2: QLoRA 파인튜닝 결과 — *다음 작업*
+  - 4.1 Phase 1: 제로샷 베이스라인 결과 ✅
+  - 4.2 Phase 2: QLoRA 파인튜닝 결과 ✅
   - 4.3 Phase 3: 자율 HPO 결과 — *실험 미완료(로컬 스모크 테스트 대기 중)*
   - 4.4 종합 분석 및 논의 — *미작성*
 - 제5장. 결론 — *미작성*
+
+---
+
+## 제1장. 서론
+
+### 1.1 연구 배경
+
+거대언어모델(LLM)의 성공에 힘입어 이미지와 텍스트를 함께 이해하는 Vision-Language Model(VLM)이 GPT-4V, Gemini 등을 중심으로 빠르게 발전하고 있다. 이러한 범용 VLM은 자연 이미지에 대한 질의응답에서는 높은 성능을 보이지만, 의료 영상과 같이 전문 지식이 요구되는 도메인에서는 의학 용어와 병리·방사선학적 소견에 대한 이해 부족으로 성능이 제한되는 경향이 있다. 반면 GPU 자원이 제한된 연구·임상 환경에서 대규모 모델을 처음부터 재학습하는 것은 현실적이지 않으며, 이에 QLoRA(Quantized Low-Rank Adaptation)와 같은 Parameter-Efficient Fine-Tuning(PEFT) 기법이 소비자급 GPU(16-24GB VRAM) 환경에서도 도메인 특화 파인튜닝을 가능케 하는 대안으로 주목받고 있다.
+
+한편 QLoRA와 같은 PEFT 기법을 실제로 적용하려면 LoRA rank, target module, 학습률 등 다수의 하이퍼파라미터를 선택해야 하는데, 이 선택이 최종 성능에 미치는 영향은 체계적으로 규명되지 않은 경우가 많다. 하이퍼파라미터 최적화(HPO)의 자동화는 2024년 NeurIPS 서베이에서도 지적된 VLM PEFT 분야의 미해결 과제이며, 전통적인 Grid/Random Search나 베이지안 최적화(Optuna TPE)를 넘어 LLM 에이전트가 이전 실험 결과를 스스로 해석하고 다음 설정을 제안하는 자율 탐색(autoresearch 스타일) 방식이 새로운 대안으로 제시되고 있다.
+
+### 1.2 연구 목적
+
+본 연구는 소비자 GPU 환경에서 경량 Vision-Language Model을 의료 영상 VQA(Visual Question Answering) 도메인에 적응시키는 전 과정을 실증적으로 검증하는 것을 목적으로 하며, 구체적으로 다음 세 가지를 달성하고자 한다.
+
+1. 16-24GB급 소비자 GPU 환경에서 경량 VLM의 의료 VQA 도메인 적응 가능성을 실증한다.
+2. QLoRA 파인튜닝의 주요 하이퍼파라미터(데이터 규모, LoRA rank, target module 범위)가 성능에 미치는 영향을 체계적으로 분석한다.
+3. autoresearch 스타일의 LLM 에이전트 기반 자율 하이퍼파라미터 탐색이 베이지안 최적화 대비 경쟁력 있는 성능과 해석 가능한 탐색 근거를 제공하는지 검증한다.
+
+이 세 목적은 각각 아래의 연구 질문(RQ)으로 구체화된다.
+
+| # | 연구 질문 | 귀무가설 |
+|---|----------|----------|
+| RQ1 | 경량 VLM(2-3B)의 의료 VQA 제로샷 성능은 모델별로 유의미한 차이가 있는가? | H0: 모델 간 VQA 정확도 차이 없음 |
+| RQ2 | QLoRA 파인튜닝이 의료 VQA 성능을 유의미하게 향상시키는가? | H0: Base = Fine-tuned 성능 |
+| RQ3 | LLM 에이전트 기반 자율 하이퍼파라미터 탐색이 베이지안 최적화(Optuna TPE)와 경쟁적 성능을 달성하면서 해석 가능한 탐색 근거를 제공하는가? | H0: Autoresearch = Optuna (TPE) |
+
+RQ3의 귀무가설을 단순 Random Search가 아닌 Optuna(TPE)로 설정한 것은, LLM 기반 HPO가 단지 "무작위보다 나은" 수준을 넘어 이미 실무 표준으로 자리잡은 베이지안 최적화와 경쟁할 수 있어야 그 도입 근거(자연어 기반 탐색 근거 설명, 사전 지식을 활용한 탐색 공간 구조 이해, 설정 변경 이유의 추적 가능성)가 성립한다고 판단했기 때문이다. Random Search는 하한선(lower bound) 비교 대상으로만 유지한다.
+
+RQ1과 RQ2는 각각 제4장 4.1과 4.2에서 실측 데이터로 검증했으며, RQ3(제4장 4.3)는 본 초안 작성 시점 기준 로컬 GPU 환경에서의 스모크 테스트를 앞두고 있어 이후 별도로 보완한다.
+
+### 1.3 연구 범위 및 제한
+
+본 연구의 실험 범위는 4개 경량 VLM(Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B)과 3개 공개 의료 VQA 데이터셋(PathVQA, SLAKE, VQA-RAD)으로 한정한다. 모델 선정은 16GB급 VRAM에서 QLoRA 파인튜닝이 가능하고 재배포가 자유로운 라이선스(Apache 2.0/MIT)를 갖춘 모델을 기준으로 했으며, 데이터셋은 공개적으로 접근 가능하고 임상 질문 유형이 라벨링된 벤치마크로 한정했다.
+
+연구의 주요 제한점은 다음과 같으며, 상세한 근거와 완화 조치는 제5장 5.3에서 논의한다: (1) 대상 데이터셋이 모델의 사전훈련 시점 이전에 공개되어 사전훈련 데이터 오염 가능성이 존재하므로, 본 연구는 이를 Min-K% Probability 기법으로 능동 측정하고 결론의 강건성을 별도 검증한다(제4장 4.1.1 오염 강건성 검증 참조). (2) LLaVA-Med, Med-Flamingo 등 기존 의료 특화 VLM과의 직접 실험 비교는 본 연구 범위 밖이며 선행 연구 수치와의 간접 비교로 대체한다. (3) GPU 시간·비용 제약으로 QLoRA 학습에 `max_steps` 상한을 적용했으며, 이로 인해 데이터셋 크기에 따라 실효 학습량(epoch 환산)이 달라진다.
+
+### 1.4 논문 구성
+
+본 논문은 다음과 같이 구성된다. 제2장에서는 Vision-Language Model과 Parameter-Efficient Fine-Tuning, 의료 VQA, 자율 하이퍼파라미터 최적화에 관한 이론적 배경과 선행 연구를 검토한다. 제3장에서는 실험 환경, 대상 모델·데이터셋, 3단계 실험(Phase 1 제로샷 베이스라인, Phase 2 QLoRA 파인튜닝, Phase 3 자율 HPO)의 구체적 설계와 평가·통계 분석 방법을 기술한다. 제4장에서는 각 Phase의 실험 결과를 RQ1-RQ3에 따라 제시하고 종합 논의한다. 제5장에서는 연구 결과를 요약하고 기여점과 한계, 향후 연구 방향을 제시한다.
+
+---
+
+## 제2장. 이론적 배경
+
+### 2.1 Vision-Language Model 개요
+
+#### 2.1.1 멀티모달 학습의 발전
+
+Vision-Language Model(VLM)은 이미지 인코더와 대규모 언어모델(LLM)을 결합하여 시각 정보와 언어 정보를 함께 이해·생성하는 모델이다. 초기 멀티모달 학습은 이미지-텍스트 쌍에 대한 대조 학습(contrastive learning)으로 공유 임베딩 공간을 학습하는 방식이 중심이었으며, 이후 LLM의 instruction-following 능력이 발전하면서 이미지 특징을 LLM의 입력 토큰 공간에 투영(projection)하고 instruction-tuning으로 시각 질의응답·설명 생성 능력을 학습시키는 방식이 주류가 되었다. Liu 등의 LLaVA(Visual Instruction Tuning, arXiv:2304.08485)는 GPT-4로 생성한 시각 instruction 데이터로 오픈소스 LLM을 파인튜닝해 상용 모델에 근접한 시각 대화 능력을 보인 대표적 사례로, 이후 다수의 VLM 연구가 이 instruction-tuning 패러다임을 계승했다. GPT-4V, Gemini 등 상용 대규모 VLM은 방대한 파라미터와 학습 데이터로 범용 시각 이해 성능을 확보했으나, 동시에 추론 비용과 배포 제약이 커 소비자급 하드웨어에서의 활용이 어렵다는 한계가 있다.
+
+#### 2.1.2 경량 VLM 아키텍처
+
+본 연구가 대상으로 삼는 4개 모델은 모두 2025-2026년에 공개된 2-3B급 경량 VLM으로, 각기 다른 방식으로 파라미터 효율성을 추구한다. Qwen2.5-VL(Qwen Team, Alibaba, Technical Report arXiv:2502.13923)은 이미지 크기에 따라 시각 토큰 수를 동적으로 조절하는 dynamic resolution 처리와 시간 정보를 절대 시간으로 정렬하는 MRoPE 확장을 특징으로 하며, 문서 파싱과 다국어 OCR에 강점을 보인다. 후속 모델인 Qwen3-VL은 dense(2B/4B/8B/32B)와 Mixture-of-Experts(30B-A3B/235B-A22B) 계열로 확장되었고 "thinking mode"와 DeepStack 방식의 다단계 시각 특징 결합을 도입했다. SmolVLM2(HuggingFace, "SmolVLM: Redefining small and efficient multimodal models", arXiv:2504.05299)는 SigLIP 이미지 인코더와 SmolLM2 언어모델을 결합해 극단적으로 낮은 메모리 사용량(2.2B 모델 기준 영상 추론 시 5.2GB)을 달성하는 데 초점을 맞춘 온디바이스 지향 아키텍처다. Gemma4-E2B(Google)는 Per-Layer Embeddings(PLE) 기법으로 추론 시 2.3B 파라미터만 활성화하면서 5.1B급 총 파라미터의 표현력을 활용하는 Mixture-of-Experts 계열 구조로, 활성 파라미터 기준으로는 경량이나 저장 파라미터 규모는 다른 세 모델보다 크다는 아키텍처적 차이가 있다(이 차이가 결과 해석에 갖는 함의는 제5장 5.3에서 논의한다).
+
+### 2.2 Parameter-Efficient Fine-Tuning
+
+#### 2.2.1 LoRA (Low-Rank Adaptation)
+
+LoRA(Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", arXiv:2106.09685, ICLR 2022)는 사전학습된 가중치 행렬 $W_0$을 고정한 채, 그 변화량 $\Delta W$를 두 개의 저랭크(low-rank) 행렬 $A \in \mathbb{R}^{r \times k}$, $B \in \mathbb{R}^{d \times r}$의 곱 $BA$($r \ll \min(d,k)$)로 근사하여 학습하는 기법이다. 순전파는 $h = W_0 x + BAx$로 계산되며, 학습 대상은 $A$, $B$뿐이므로 전체 파라미터 대비 학습 파라미터 비율을 극적으로 낮출 수 있다(본 연구의 Ablation B에서 rank=64 기준 학습 파라미터 비율은 전체의 약 0.2-1.6% 수준, 제4장 4.2.3 참조). rank $r$은 표현력과 파라미터 효율성 사이의 트레이드오프를 결정하는 핵심 하이퍼파라미터이며, alpha는 $\Delta W$의 스케일을 조정하는 계수다($BAx$에 $\alpha/r$을 곱함).
+
+#### 2.2.2 QLoRA (Quantized LoRA)
+
+QLoRA(Dettmers et al., "QLoRA: Efficient Finetuning of Quantized LLMs", arXiv:2305.14314, NeurIPS 2023)는 LoRA에 4-bit 양자화를 결합하여 VRAM 사용량을 추가로 절감한다. 핵심 구성 요소는 (1) 정규분포를 따르는 가중치에 최적화된 4-bit NormalFloat(NF4) 양자화, (2) 양자화 상수 자체를 다시 양자화하는 이중 양자화(double quantization), (3) GPU 메모리 스파이크를 CPU로 흘려보내는 paged optimizer이다. 기반 모델은 4-bit로 양자화된 상태로 고정하고 그 위에 LoRA 어댑터만 16-bit 정밀도로 학습하므로, 65B급 모델을 단일 48GB GPU에서 파인튜닝하면서도 완전 16-bit 파인튜닝에 근접한 성능을 유지함을 원 논문에서 보였다. 본 연구는 이 QLoRA 방식(NF4 양자화 + LoRA + paged AdamW 8bit)을 4개 경량 VLM 전체에 적용하여, 16GB급 소비자 GPU에서의 의료 도메인 파인튜닝 가능성을 검증한다(제3장 3.6).
+
+#### 2.2.3 기타 PEFT 기법 비교
+
+LoRA/QLoRA 외에도 일부 레이어만 학습하는 partial fine-tuning, 입력 앞단에 학습 가능한 prefix 벡터를 추가하는 prefix-tuning, 트랜스포머 레이어 사이에 소규모 어댑터 모듈을 삽입하는 adapter 방식 등 다양한 PEFT 기법이 제안되어 왔다. 이들과 비교했을 때 LoRA 계열의 장점은 (1) 추론 시 $BA$를 $W_0$에 합산(merge)할 수 있어 추가 지연시간이 없고, (2) 어댑터만 별도로 저장·교체할 수 있어 여러 태스크에 대해 하나의 기반 모델을 재사용할 수 있다는 점이다. 본 연구가 LoRA/QLoRA를 채택한 것은 이 두 장점이 소비자 GPU 환경에서의 반복적인 하이퍼파라미터 탐색(제3장 3.7, Phase 3)에 특히 유리하기 때문이다.
+
+### 2.3 의료 영상 Visual Question Answering
+
+#### 2.3.1 Medical VQA 과제 정의
+
+Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)과 자연어 질문이 주어졌을 때 올바른 답변을 생성하는 과제로, 일반 도메인 VQA와 달리 전문 의학 용어에 대한 이해와 영상 소견에 대한 세밀한 시각적 근거가 함께 요구된다. 질문 유형은 크게 (1) 예/아니오나 선택지 중에서 고르는 closed-ended 질문과, (2) 자유 서술형 답변을 요구하는 open-ended 질문으로 나뉘며, 두 유형은 채점 방식과 난이도가 크게 다르다(본 연구 제4장 4.1.2에서 실측 확인).
+
+#### 2.3.2 주요 벤치마크 데이터셋
+
+본 연구가 사용하는 세 데이터셋은 각기 다른 의료 영상 하위 도메인을 대표한다. PathVQA(He et al., "PathVQA: 30000+ Questions for Medical Visual Question Answering", arXiv:2003.10286, 2020)는 병리학 교과서와 PEIR 디지털 라이브러리에서 추출한 4,998개 병리 조직 영상에 대해 32,799개의 질문-답변 쌍을 제공하며, 미국병리위원회(ABP) 전문의 자격시험 형식을 참고해 7개 질문 유형으로 구성했다. SLAKE(Liu et al., "SLAKE: A Semantically-Labeled Knowledge-Enhanced Dataset for Medical Visual Question Answering", ISBI 2021)는 642개 방사선/CT 영상에 대한 14,028개의 영어-중국어 이중언어 질문-답변 쌍과, 의학 지식 그래프(5,232개 지식 triplet)를 결합한 데이터셋이다. VQA-RAD(Lau et al., "A dataset of clinically generated visual questions and answers about radiology images", Scientific Data 5, 2018)는 임상의가 실제로 방사선 영상(CT/MRI/X-ray)을 보고 자연스럽게 제기한 질문을 수집한 최초의 데이터셋으로, 315개 영상에 대해 약 3,500여 개의 질문-답변 쌍을 담고 있다.
+
+#### 2.3.3 기존 연구 성과
+
+범용 VLM을 의료 도메인에 특화시키려는 시도는 크게 대규모 재학습형과 어댑테이션형으로 나뉜다. LLaVA-Med(Li et al., "LLaVA-Med: Training a Large Language-and-Vision Assistant for Biomedicine in One Day", arXiv:2306.00890, NeurIPS 2023 Datasets and Benchmarks Track)는 PubMed Central의 대규모 의생명 그림-캡션 데이터로 GPT-4 기반 instruction 데이터를 생성하고, 커리큘럼 학습으로 범용 LLaVA를 의생명 도메인에 적응시켰다. Med-Flamingo(Moor et al., "Med-Flamingo: a Multimodal Medical Few-shot Learner", arXiv:2307.15189, 2023)는 OpenFlamingo-9B를 기반으로 의학 논문·교과서의 이미지-텍스트 데이터로 계속 사전학습(continued pretraining)하여, 소수 예시(few-shot)만으로 의료 VQA에 적응하는 능력을 확보했다. CheXagent(Chen et al., "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation", arXiv:2401.12208, 2024)는 흉부 X-ray 판독에 특화된 임상 LLM·시각 인코더·교차 모달 브리지 네트워크로 구성된 foundation model로, 특정 영상 하위 도메인(흉부 X-ray)에 깊이 특화된 접근을 대표한다.
+
+이들 선행 연구는 공통적으로 수십억~수백억 파라미터 규모의 모델을 대상으로 하며, 대규모 의생명 코퍼스에 대한 계속 사전학습이나 대규모 instruction 데이터 생성을 전제로 한다. 이와 달리 본 연구는 2-3B급 경량 모델에 QLoRA로 소규모 도메인 데이터(수천-수만 샘플)만을 사용해 파인튜닝하는, 계산 자원이 제한된 환경에서의 실용적 적응 가능성에 초점을 둔다는 점에서 접근 방식이 다르다. 이들 선행 연구와의 직접적인 실험 비교는 본 연구 범위 밖이며, 제4장 4.4에서 공개된 선행 연구 수치와의 간접 비교(Table 4.4)로 대체한다.
+
+### 2.4 자율 하이퍼파라미터 최적화
+
+#### 2.4.1 전통적 HPO (Grid, Random, Bayesian)
+
+하이퍼파라미터 최적화(HPO)의 가장 단순한 방법은 사전에 정의한 격자(grid) 위의 모든 조합을 평가하는 grid search이나, 탐색 공간의 차원이 늘어날수록 필요한 평가 횟수가 지수적으로 증가한다. Bergstra와 Bengio("Random Search for Hyper-Parameter Optimization", JMLR 13, 2012)는 무작위로 조합을 샘플링하는 random search가 동일한 계산 예산 내에서 grid search보다 실질적으로 더 나은(또는 동등한) 성능을 낼 수 있음을 이론적·경험적으로 보였으며, 이는 실제로 성능에 영향을 미치는 하이퍼파라미터의 유효 차원(effective dimensionality)이 낮은 경우가 많기 때문이다. 베이지안 최적화는 이전 평가 결과로 목적함수의 확률적 대리 모델(surrogate model)을 구성하고, 이를 바탕으로 다음 평가 지점을 선택함으로써 grid/random search보다 적은 평가 횟수로 더 나은 해를 찾는 것을 목표로 한다. 본 연구가 대조군으로 사용하는 Optuna(Akiba et al., "Optuna: A Next-generation Hyperparameter Optimization Framework", KDD 2019)는 Tree-structured Parzen Estimator(TPE) 알고리즘을 채택한 베이지안 최적화 프레임워크로, 탐색 공간을 실행 중 동적으로 정의할 수 있는 define-by-run API와 효율적인 pruning(조기 중단) 전략을 제공한다.
+
+조기 중단 기반 방법 중 Hyperband(Li et al., "Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization", JMLR 18, 2018)는 successive halving을 반복 적용해, 유망하지 않은 설정에는 적은 자원(학습 스텝 등)만 할당하고 유망한 설정에는 점진적으로 더 많은 자원을 배분하는 순수 탐색형 밴딧(bandit) 문제로 HPO를 정식화한다. 이 방법이 성립하려면 조기 학습 곡선(초반 몇 스텝의 성능)과 최종 수렴 성능 사이에 유의한 순위 상관관계가 있어야 하는데, 본 연구의 Phase 2 Ablation A(데이터 비율별 학습 곡선, 제4장 4.2.2)는 이와 유사한 조기 신호-최종 성능 관계를 자체 실험 맥락에서 관찰할 수 있는 근거를 제공한다.
+
+#### 2.4.2 LLM 에이전트 기반 최적화 (autoresearch)
+
+베이지안 최적화가 수치적 대리 모델에 의존하는 것과 달리, 최근에는 LLM 에이전트가 이전 실험 로그를 직접 해석하고 다음 설정을 자연어 추론으로 제안하는 방식이 하이퍼파라미터 탐색의 새로운 대안으로 논의되고 있다. 이 접근의 이론적 차별점은 세 가지로 요약된다: (1) LLM이 사전학습 과정에서 습득한 도메인 지식을 활용해 서로 다른 태스크·아키텍처 간 지식을 전이(cross-domain transfer)할 수 있다는 점, (2) 개별 하이퍼파라미터를 독립 변수로 다루는 베이지안 최적화와 달리 하이퍼파라미터 간 상호작용을 사전 지식에 기반해 구조적으로 이해할 수 있다는 점, (3) 설정을 변경한 이유를 자연어로 명시적으로 기록하여 탐색 과정의 해석 가능성과 추적 가능성을 제공한다는 점이다. 본 연구가 채택한 autoresearch 스타일 루프(이전 결과 읽기 → 자연어 근거와 함께 다음 설정 제안 → 실행 → 결과 기록, 제3장 3.7)는 이 세 차별점이 실제로 베이지안 최적화(Optuna/TPE) 대비 경쟁력 있는 성능과 결합될 수 있는지를 RQ3으로 검증하기 위한 실험 장치다. 다만 이는 아직 정립된 표준 방법론이라기보다 LLM 에이전트의 과학적 실험 자동화 활용이라는 새로운 연구 흐름의 한 사례이며, 본 연구는 이 방식의 일반적 우수성을 주장하기보다 의료 VQA QLoRA 튜닝이라는 구체적 과제에서의 경쟁력을 실증적으로 검증하는 데 초점을 둔다.
+
+### 2.5 선행 연구 요약 및 본 연구의 차별점
+
+앞서 검토한 선행 연구를 종합하면, 의료 특화 VLM 연구(2.3.3)는 대체로 대규모 모델과 대규모 도메인 데이터를 전제로 하며, PEFT 방법론 연구(2.2)는 범용 도메인에서의 파라미터 효율성 검증에 집중되어 있고, HPO 자동화 연구(2.4)는 아직 LLM 에이전트 기반 방식과 확립된 베이지안 최적화를 동일 과제에서 직접 비교한 사례가 드물다. 본 연구는 이 세 흐름의 교차점 — **소비자 GPU 환경 · 경량 VLM · QLoRA 도메인 적응 · LLM 기반 자율 HPO** — 에서, (1) 경량 VLM의 의료 VQA 제로샷·파인튜닝 성능을 통계적으로 엄밀하게 실증하고(RQ1, RQ2), (2) autoresearch 스타일 자율 탐색을 업계 표준인 Optuna(TPE)와 직접 비교하여(RQ3) 그 실용적 가치를 검증한다는 점에서 선행 연구와 차별화된다.
+
+---
+
+## 제3장. 연구 방법
+
+### 3.1 연구 설계 개요
+
+본 연구는 경량 VLM의 의료 VQA 도메인 적응을 3단계 실험(Phase)으로 순차 검증하는 실증 연구로 설계했다. Phase 1은 파인튜닝 이전 4개 모델의 제로샷 성능을 측정하여 RQ1(모델 간 성능 차이)에 답하고, Phase 2는 QLoRA 파인튜닝을 적용해 RQ2(파인튜닝 효과)를 검증하며, 동시에 최적 QLoRA 설정(데이터 규모·LoRA rank·target module)을 Ablation Study로 탐색한다. Phase 3은 Phase 2에서 확인된 최적 설정을 출발점으로, Manual·Random Search·Optuna(TPE)·Autoresearch 4개 HPO 전략을 비교하여 RQ3(자율 탐색의 경쟁력)을 검증한다. 각 Phase는 이전 Phase의 결과(최적 모델, 최적 QLoRA 설정)를 다음 Phase의 고정 조건으로 사용하는 순차적 구조를 갖는다.
+
+### 3.2 실험 환경 및 도구
+
+#### 3.2.1 하드웨어 사양
+
+Phase 1·2는 클라우드 GPU(RunPod, RTX 4090 24GB)를 주 실험 환경으로 사용했으며, 로컬 RTX 5060 Ti(16GB VRAM, Ryzen 5 5600X, RAM 32GB)에서 일부 조건을 재현하여 소비자 GPU(16GB) 환경에서의 재현 가능성을 함께 확인했다. Phase 3은 소속 기관의 비용 지원이 불가하고 클라우드 예산 확보가 어려워진 관계로 RunPod 사용을 중단하고, 로컬 RTX 5060 Ti(16GB) 단독 — 하드웨어 여건에 따라 4060(8GB)과의 듀얼 GPU 구성 — 환경으로 전환하여 진행한다. 이러한 환경 전환의 경위와 영향은 제5장 5.3 한계점에서 상세히 논의한다.
+
+#### 3.2.2 소프트웨어 스택
+
+모델 로딩·QLoRA 파인튜닝은 HuggingFace `transformers`와 `unsloth`(4-bit 양자화 학습 가속) 백엔드를 사용했으며, `peft` 라이브러리로 LoRA 어댑터를 구성했다. Phase 3의 베이지안 최적화 대조군은 `Optuna`(TPE sampler)를, 실험 관리·로깅은 `wandb`를 사용했다. Open-ended 응답 채점의 BERTScore 계산에는 `bert-score` 라이브러리(roberta-large / BioBERT 백본)를, 통계 분석에는 `scipy`·`statsmodels`(Mixed-Effects Model)를 사용했다. Autoresearch 전략의 LLM 에이전트는 Anthropic Claude API를 호출한다.
+
+### 3.3 대상 모델 및 선정 기준
+
+**Table 3.1. 대상 모델**
+
+| 모델 | 파라미터 | 아키텍처 특징 | 예상 QLoRA VRAM |
+|------|---------|-------------|:---:|
+| Qwen3-VL-2B | 2B | Thinking mode, DeepStack | ~8-10 GB |
+| Qwen2.5-VL-3B | 3B | Dynamic Resolution, 19개 언어 OCR | ~8-10 GB |
+| SmolVLM2-2.2B | 2.2B | HuggingFace 경량 VLM | ~8-10 GB |
+| Gemma4-E2B | 2.3B(활성)/5.1B(전체) | PLE(Per-Layer Embeddings), Apache 2.0 | ~12-14 GB |
+
+선정 기준은 (1) 16GB VRAM에서 QLoRA 파인튜닝이 가능할 것, (2) Apache 2.0 또는 MIT 라이선스로 연구 활용이 자유로울 것, (3) 충분한 커뮤니티·프레임워크 지원을 갖출 것의 세 가지다. Gemma4-E2B는 Mixture-of-Experts 계열의 PLE 기술로 추론 시 2.3B 파라미터만 활성화되면서도 5.1B급 표현력을 제공한다는 점에서 포함했으며, 이 아키텍처 특성이 결과 해석에 미치는 영향은 제5장 5.3에서 별도로 논의한다.
+
+### 3.4 데이터셋 및 전처리
+
+**Table 3.2. 대상 데이터셋**
+
+| 데이터셋 | 이미지 수 | QA 쌍 | 언어 | 도메인 | 질문 유형 |
+|----------|:---:|:---:|:---:|:---:|:---:|
+| PathVQA | 4,998 | 32,799 | 영어 | 병리학 | Open+Closed (7종) |
+| SLAKE | 642 | 14,028 | 영어+중국어 | 방사선/CT | Open+Closed |
+| VQA-RAD | 315 | 2,248 | 영어 | 방사선 | Open+Closed |
+
+각 데이터셋은 공식 train/val/test split을 그대로 사용했다.
+
+**데이터 오염 통제**: PathVQA(2018)·SLAKE(2021)·VQA-RAD(2018)는 모두 대상 모델들의 사전훈련 시점(2025-2026) 이전에 공개되어, 사전훈련 데이터 오염(pretraining data contamination) 가능성을 배제할 수 없다. 본 연구는 Min-K% Probability Attack(Shi et al., "Detecting Pretraining Data from Large Language Models", arXiv:2310.16789, ICLR 2024)으로 이를 능동 측정한다. 각 샘플 정답 텍스트의 token-level log-probability 하위 K%(K=20) 평균을 contamination indicator로 사용하며(사전훈련에 노출된 샘플일수록 평균 확률이 높다는 이론에 기반), 데이터셋 내 상위 5% 이상치를 오염 의심 샘플로 분류한 뒤 이를 제거한 축소 샘플셋으로 주요 결론(RQ1)을 재검증한다(제4장 4.1.1 오염 강건성 검증). 절차 및 해석 기준(원본-축소 결과 차이 1%p 미만은 강건, 1-5%p는 한계점 명시, 5%p 초과는 결론 재검토)은 `scripts/measure_contamination.py`로 구현했다.
+
+### 3.5 실험 1: 제로샷 베이스라인 평가 (Phase 1)
+
+4개 모델 × 3개 데이터셋 = 12개 조건에 대해 파인튜닝 이전 제로샷 성능을 측정했다. 평가는 greedy 디코딩을 사용하므로 결정적(deterministic)이다 — 시드를 바꿔도 결과가 동일하여 반복 시행이 무의미하므로, 단일 시드(42)로 평가하고 불확실성은 각 조건 per-sample 정오 판정에 대한 부트스트랩 95% 신뢰구간으로 보고한다. 모델 간 비교는 4개 모델이 동일한 테스트셋으로 평가되는 짝지은(paired) 구조이므로, 독립표본을 가정하는 ANOVA 대신 Cochran's Q 검정(공유 테스트셋 이진 정오, H0: 정확도 동일)과 McNemar 쌍별 사후검정(Bonferroni 보정)을 사용한다.
+
+측정 지표는 Closed-ended accuracy(선택형), Open-ended accuracy(정답 토큰 매칭) 및 BERTScore F1(roberta-large), 각 정확도의 부트스트랩 95% CI, 응답 시간(ms/문항), Peak VRAM(MB)이다.
+
+### 3.6 실험 2: QLoRA 파인튜닝 (Phase 2)
+
+**Table 3.3. 기본 QLoRA 설정**
+
+| 파라미터 | 값 |
+|----------|-----|
+| Quantization | NF4 (4-bit NormalFloat) |
+| LoRA Rank | 64 (Ablation B로 확정) |
+| LoRA Alpha | 128 |
+| LoRA Dropout | 0.05 |
+| Target Modules | all-linear (Ablation C로 확정) |
+| Learning Rate | 2e-4 |
+| Batch Size | 1 (gradient accumulation 8, effective batch = 8) |
+| Optimizer | paged_adamw_8bit |
+
+학습 예산은 목표 3 epoch였으나 클라우드 GPU 시간·비용 제약으로 `max_steps=500`(조건당 samples_seen = 4,000 고정) 상한을 적용했다. 데이터셋 크기와 무관하게 학습량이 고정되므로 소형 VQA-RAD는 약 2 epoch 이상, 중형 SLAKE·대형 PathVQA는 1 epoch 미만만 학습되며, 이 비대칭이 결과 해석에 미치는 영향은 제5장 5.3에서 논의한다.
+
+**실험 조건**: 4개 모델 × 3개 데이터셋 = 12개 조건, 각 조건 3회 반복(seed 42/123/456). LoRA rank=64·target=all-linear는 아래 세 Ablation Study의 결과로 확정한 값이며 상세 결과는 제4장 4.2.2-4.2.4에서 다룬다.
+
+- **Ablation A (데이터 크기 영향)**: PathVQA·Qwen3-VL-2B 고정, 학습 데이터 비율 5/10/25/50/100%
+- **Ablation B (LoRA Rank 영향)**: PathVQA·Qwen3-VL-2B 고정, rank ∈ {4, 8, 16, 32, 64}
+- **Ablation C (Target Module 영향)**: PathVQA·Qwen3-VL-2B 고정, {q/v_proj} vs {q/k/v/o_proj} vs {all-linear}
+
+**Catastrophic Forgetting 측정**은 두 가지로 이중 측정한다. (A) 범용 능력 변화: VQAv2 validation subset(2,000샘플)에서 파인튜닝 전/후 정확도 감소율을 12개 조건 전체에서 측정. (B) 의료 도메인 내 cross-dataset 일반화: 훈련 데이터셋과 다른 데이터셋으로 평가(예: PathVQA 학습 → SLAKE/VQA-RAD 평가)하여 12개 조건 × 2개 cross-dataset = 24회 추가 평가를 수행한다. PathVQA(병리)와 SLAKE/VQA-RAD(방사선)는 이미지 도메인 자체가 다르므로, (B)의 결과는 엄밀한 CF보다는 도메인 일반화 격차로 해석한다(제4장 4.2.5).
+
+### 3.7 실험 3: 자율 하이퍼파라미터 최적화 (Phase 3)
+
+**Table 3.4. Phase 3 탐색 공간**
+
+| 파라미터 | 탐색 범위 | 타입 |
+|----------|----------|------|
+| lora_rank | {4, 8, 16, 32, 64} | 이산 |
+| lora_alpha | rank × {1, 2, 4} | 이산 |
+| learning_rate | [1e-5, 5e-4] | 연속(로그스케일) |
+| batch_size | {1, 2, 4} | 이산 |
+| grad_accum_steps | {4, 8, 16} | 이산 |
+| warmup_ratio | [0.0, 0.1] | 연속 |
+| weight_decay | [0.0, 0.1] | 연속 |
+| lora_targets | {minimal, medium, full} | 범주형 |
+
+**비교 대상 4개 전략**: Manual(연구자 기본값, 1회) / Random Search(무작위 샘플링) / Optuna·TPE(베이지안 최적화) / Autoresearch(LLM 에이전트 자율 탐색). Autoresearch는 (1) 이전 실험 결과(results.tsv)를 읽고 (2) 다음 설정을 자연어 근거와 함께 제안(config.yaml + rationale.md)한 뒤 (3) git commit, (4) 고정 학습 실행, (5) 검증셋 평가, (6) 성능 개선 시 유지·아니면 폐기하는 루프를 반복한다.
+
+전 trial 공통으로 동일 모델(Phase 2 최적 모델)·동일 데이터셋(PathVQA)·고정 `max_steps=200`(안전장치용 wall-clock 상한 `time_budget_min`은 실험 통제 변수가 아닌 이상 조합 방지용)을 사용해 학습량을 통제한다. 예상 실험 규모는 Manual 10 + Random Search 400 + Optuna 400 + Autoresearch 400 = 총 1,210 trial(각 전략 40 trial × 10회 독립 반복)이며, trial당 소요 시간은 로컬 GPU 실측 스모크 테스트로 확정할 예정이다(제4장 4.3).
+
+**통계 검증은 trial-level이 아닌 run-level에서만 수행**한다. Autoresearch와 Optuna는 순차 최적화 특성상 동일 run 내 trial 간 의존성이 있어(trial t의 결과가 t+1의 제안에 영향), 독립 관측치 가정이 위반되기 때문이다. 검정 단위는 각 전략의 10회 독립 반복에서 나온 10개 최종 성능값이며, Kruskal-Wallis test(4그룹 비교)와 Mann-Whitney U test(Autoresearch vs Optuna 쌍별), BCa Bootstrap 95% CI를 사용한다. Trial-level 데이터는 anytime performance curve 등 시각화에만 사용한다.
+
+### 3.8 평가 지표 및 통계 분석 방법
+
+#### 3.8.1 BERTScore 이중 보고
+
+Open-ended 응답은 Exact Match와 BERTScore F1을 함께 보고한다. 범용 기준(roberta-large, threshold ≥ 0.7)을 정확도·통계 검정의 유일한 결정 지표(primary)로 삼고, 의료 특화 기준(BioBERT, dmis-lab/biobert-v1.1)은 보조 지표로만 병기하여 이중 게이팅(두 지표 모두 통과해야 정답 처리)을 하지 않는다.
+
+#### 3.8.2 Catastrophic Forgetting 이중 측정
+
+3.6에서 기술한 (A) VQAv2 기준 범용 능력 변화와 (B) cross-dataset 일반화 격차를 함께 보고하여, 단일 지표로는 포착하기 어려운 파인튜닝의 부작용을 다각도로 측정한다.
+
+#### 3.8.3 임상적 의미 분석 (WCA + ECE)
+
+단순 accuracy는 의료 AI의 임상적 가치를 온전히 포착하지 못한다는 문제의식에서, PathVQA의 7개 질문 유형(diagnosis, location, measurement, description, temporal, yes_no, unknown) 라벨을 이용해 Weighted Clinical Accuracy(WCA)를 산출한다.
+
+`WCA = Σ(유형별 정확도 × 가중치) / Σ가중치`
+
+가중치는 임상 중요도에 따라 diagnosis=1.0(진단 오류는 치료 방향에 직접 영향) > location=0.8 > measurement=0.7 > description=0.6 > temporal=yes_no=0.5(정보량이 제한적인 이진 판단) 순으로 부여했다. 다만 이 가중치는 외부 임상 문헌이나 Delphi 합의 없이 연구자가 임의로 설정한 것으로, 절대적 임상 중요도의 척도로 해석할 수 없으며 primary 지표(정확도·BERTScore)를 보완하는 참고용 보조 지표로만 제한적으로 사용한다.
+
+Expected Calibration Error(ECE, Guo et al., ICML 2017)는 모델의 예측 확신도(confidence)가 실제 정확도와 얼마나 일치하는지를 측정하는 지표로 함께 제시할 계획이었으나, 현재 평가 파이프라인이 per-sample confidence를 저장하지 않아 산출하지 못했다(제5장 5.3 한계점).
+
+#### 3.8.4 Robust 통계 (Bootstrap + Mixed-Effects)
+
+Phase 2의 파인튜닝 효과 검정은 n=9(3 데이터셋 × 3 시드)의 표본 한계를 고려하여 세 가지 방법을 병행한다: (1) paired t-test + Cohen's d(관행적 비교), (2) BCa Bootstrap(10,000 resample)으로 산출한 Cohen's d의 95% CI(robust 추정), (3) Wilcoxon signed-rank test(비모수 검정). 추가로 4개 모델을 통합한 Mixed-Effects Model(`accuracy ~ condition + dataset`, group=seed)을 보조적으로 적용하되, 모델 간 이질적 효과가 pooled 추정에서 상쇄될 수 있음을 감안해 모델별 3중 검증 결과를 1차 근거로, MEM 결과는 보조 설명으로만 사용한다(제4장 4.2.1에서 실제로 이 현상이 관측됨).
+
+#### 3.8.5 데이터 오염 통제 (Min-K% Probability)
+
+방법론은 3.4에서 기술한 바와 같다. 강건성 검증 결과는 제4장 4.1.1에서 다룬다.
 
 ---
 
