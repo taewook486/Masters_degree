@@ -166,6 +166,17 @@ secret-*.*
 /data/
 
 # ===========================================
+# Model checkpoints / adapter weights (large, per-machine — not tracked in git)
+# Kept ignored permanently (not added ad hoc mid-session) so a future
+# `git reset --hard` + `git clean -fd` cannot delete untracked weight files.
+# ===========================================
+/results_pod_backup/
+**/adapter_model.safetensors
+**/adapter_model.bin
+**/optimizer.pt
+**/checkpoint-*/
+
+# ===========================================
 # Scratch/local notes (per-machine, not project deliverables)
 # ===========================================
 /list.txt
