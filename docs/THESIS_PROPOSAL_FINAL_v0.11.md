@@ -86,7 +86,7 @@
 
 PathVQA(2018), SLAKE(2021), VQA-RAD(2018)는 본 연구의 대상 모델(Qwen3-VL 2025, Qwen2.5-VL 2025, SmolVLM2 2025, Gemma4 2026) 사전훈련 시점 이전에 공개되었으므로, **사전훈련 데이터 오염 가능성을 배제할 수 없다**. 본 연구는 이를 능동적으로 측정한다.
 
-**Min-K% Probability Attack (Shi et al., NAACL 2024)**:
+**Min-K% Probability Attack (Shi et al., ICLR 2024)**:
 
 각 sample의 정답 텍스트에 대해 모델의 token-level log-probability를 계산하고, 하위 K%(K=20) token의 평균 log-probability를 contamination indicator로 사용한다.
 
@@ -393,7 +393,7 @@ PathVQA는 7개 질문 유형(Where, What, Why, How, How much/many, When, Yes/no
 - 5.1 연구 요약
 - 5.2 연구 기여
 - 5.3 한계점
-  - **데이터 오염 능동적 통제의 한계**: Min-K% Probability(Shi et al., NAACL 2024)로 contamination 정도를 정량화하나, 이는 간접 indicator이며 완전한 통제는 불가. Clean subset 결과를 보조 보고하여 결론의 robustness 검증.
+  - **데이터 오염 능동적 통제의 한계**: Min-K% Probability(Shi et al., ICLR 2024)로 contamination 정도를 정량화하나, 이는 간접 indicator이며 완전한 통제는 불가. Clean subset 결과를 보조 보고하여 결론의 robustness 검증.
   - **의료 특화 VLM 직접 비교 부재**: LLaVA-Med, Med-Flamingo 등과 동일 환경에서의 직접 실험 비교는 본 연구 범위 외. 동일 데이터셋·평가 프로토콜의 선행 연구 수치와 간접 비교 (Table 4.4).
   - **Phase 3 confounding**: max_steps 고정에도 effective_batch_size에 따른 total_samples_seen 차이 존재. 모든 trial의 effective_batch, samples_seen, wall_clock_time을 투명하게 보고.
   - **LLM 비결정성**: Autoresearch의 API 비결정성으로 완전 재현 불가. 구현은 temperature=0 고정이 아니라 **temperature 스케줄링(trial 진행률에 따라 1.0→0.3, 초반 탐색/후반 활용 균형)**을 사용하며, top_p는 API 기본값을 사용한다(별도 고정 없음). 모델 ID(`claude-sonnet-4-6`)만 고정하고 스냅샷 날짜 접미사는 별도 지정하지 않는다. API 응답 로깅, 10회 반복으로 변동성 흡수.
