@@ -1,0 +1,201 @@
+{
+  "main": {
+    "id": "1b16ccf87de6b372",
+    "type": "split",
+    "children": [
+      {
+        "id": "329e91bb331b440e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "81ec401963692478",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "THESIS_PROPOSAL_FINAL_v0.4.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "THESIS_PROPOSAL_FINAL_v0.4"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "14e41c3f73e2c930",
+    "type": "split",
+    "children": [
+      {
+        "id": "a3f74fd0332a1cf0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "a771b605e7ddce15",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "파일 탐색기"
+            }
+          },
+          {
+            "id": "36c01e912e7fbbbe",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "검색"
+            }
+          },
+          {
+            "id": "1ba9d286fb912743",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "북마크"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "502eb6082609bc8e",
+    "type": "split",
+    "children": [
+      {
+        "id": "d43b9c8db2d64a31",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "1d56490778f78a76",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "THESIS_PROPOSAL_FINAL_v0.3.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "THESIS_PROPOSAL_FINAL_v0.3 의 백링크"
+            }
+          },
+          {
+            "id": "d7876f2cf69eda67",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "THESIS_PROPOSAL_FINAL_v0.3.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "THESIS_PROPOSAL_FINAL_v0.3 의 나가는 링크"
+            }
+          },
+          {
+            "id": "10cf51239bf62234",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "태그"
+            }
+          },
+          {
+            "id": "8fa849aaa62ba8e9",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "모든 속성"
+            }
+          },
+          {
+            "id": "4fe929458d197950",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "THESIS_PROPOSAL_FINAL_v0.3.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "THESIS_PROPOSAL_FINAL_v0.3 의 개요"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:빠른 전환기 열기": false,
+      "graph:그래프 뷰 열기": false,
+      "canvas:새 캔버스 만들기": false,
+      "daily-notes:오늘의 일일 노트 열기": false,
+      "templates:템플릿 삽입": false,
+      "command-palette:명령어 팔레트 열기": false,
+      "bases:새 베이스 생성하기": false
+    }
+  },
+  "active": "81ec401963692478",
+  "lastOpenFiles": [
+    "RUNPOD_GUIDE.md.tmp.7264.1778820594658",
+    "RUNPOD_GUIDE.md.tmp.7264.1778820583463",
+    "RISK_ANALYSIS_v0.4.md",
+    "RISK_ANALYSIS_v0.3.md.tmp.7264.1778820541256",
+    "RISK_ANALYSIS_v0.3.md.tmp.7264.1778820515976",
+    "RISK_ANALYSIS_v0.3.md.tmp.7264.1778820479386",
+    "RISK_ANALYSIS_v0.3.md.tmp.7264.1778820466915",
+    "RISK_ANALYSIS_v0.3.md.tmp.7264.1778820452466",
+    "THESIS_PROPOSAL_FINAL_v0.3.md",
+    "REVIEW_FEEDBACK.md",
+    "새 텍스트 문서.txt",
+    "THESIS_PROPOSAL_FINAL_v0.3.pdf"
+  ]
+}

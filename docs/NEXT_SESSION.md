@@ -5,6 +5,13 @@
 
 ## 현재 상태
 
+- **2026-07-31 세션 — Claude Code SessionStart 훅 에러 원인 진단(수정은 보류, 이 컴퓨터 포맷 예정)**
+  - 증상: 세션 시작 시 SessionStart 훅이 에러남.
+  - **원인 확정**: 프로젝트 설정 `.claude/settings.json`의 `env.PATH` 값이 Windows 스타일(`C:\Users\taewo\...`을 세미콜론 `;`으로 구분)로 되어 있어, WSL(Linux) bash에서는 통째로 하나의 잘못된 경로 문자열로 인식됨 → `ls`/`cat`/`head`/`which`/`git`/`grep` 등 기본 명령어조차 전부 `command not found`로 실패. 이 때문에 SessionStart를 포함한 `.claude/hooks/moai/*.sh` 훅 전체가 (`command -v moai` 같은 PATH 의존 호출이 깨지며) 정상 동작 못 하는 상태였음.
+  - **대조**: 사용자 레벨 `~/.claude/settings.json`에는 이미 올바른 형식(콜론 `:` 구분, WSL 마운트 경로 `/mnt/c/...`)의 PATH가 들어 있어 정상 동작함 — 예: `/home/taewook/.local/bin:/home/taewook/go/bin:/usr/local/bin:...:/mnt/c/WINDOWS/system32:...`. 즉 문제는 프로젝트 설정이 이 정상 PATH를 깨진 값으로 덮어쓰는 것.
+  - git 히스토리 확인 결과, 프로젝트 `.claude/settings.json`의 PATH 값이 "정상(콜론+`/c/...`)"과 "깨짐(세미콜론+`C:\...`)" 사이를 여러 차례 왔다갔다 함 — 수동 편집이라기보다 어떤 자동 갱신(예: `moai update`, ConfigChange 훅, 다른 도구 등)이 반복적으로 깨진 형식을 재도입하는 것으로 추정(원인 도구까지는 특정 못 함).
+  - moai 바이너리 위치 확인됨: `/home/taewook/.local/bin/moai`, `/home/taewook/.local/bin/moai-adk`(WSL 네이티브 `$HOME/.local/bin`) — `$HOME/go/bin`은 없음.
+  - **조치는 하지 않음** — 이 컴퓨터를 포맷할 예정이라 오늘은 진단만 하고 정리함. 새 컴퓨터/재설치 후 아래 "알아둘 것"의 PATH 관련 항목부터 확인할 것.
 - **2026-07-31 세션 — RunPod pod 최종 정리(백업 확인 후 terminate)**
   - 세션 시작 시 pod가 또 마이그레이션됨(`troubled_cyan_shrimp-migration` → `troubled_cyan_shrimp-migration-migration`, RTX 3090). 07-27 마이그레이션 때와 동일 패턴 — 데이터 유실 없음, 진행률 표시만 신뢰 불가.
   - **`results/` 폴더 전체를 로컬로 백업 완료** (`D:\project\Masters_degree\results_pod_backup\`) — scp 사용. Windows PowerShell에서 겪은 이슈들: (1) `\` 줄바꿈 미지원 → 한 줄 명령으로 수정, (2) `.ppk`(PuTTY 형식) 키를 OpenSSH `scp`가 못 읽음 → PuTTYgen "Export OpenSSH key"로 변환 필요, (3) 변환한 키 파일 권한이 너무 열려있어 거부됨 → `icacls <키파일> /inheritance:r` + `icacls <키파일> /grant:r "<사용자명>:(R)"`로 해결.
@@ -95,6 +102,7 @@ git pull   # run_phase3.bat 수정 + run_phase3_smoke_gpu0/1.bat 신규 + NEXT_S
 
 ## 알아둘 것
 
+- **(신규 컴퓨터/WSL 설정 시 최우선 확인) `.claude/settings.json`의 `env.PATH` 형식**: 프로젝트 설정의 PATH가 Windows 스타일(`C:\Users\...`를 세미콜론 `;`으로 구분)로 들어가면 WSL bash에서 `ls`/`cat`/`git` 등 전체 명령어가 깨지고 Claude Code 훅(SessionStart 포함) 전부가 조용히 실패함. 사용자 레벨 `~/.claude/settings.json`의 콜론 `:` 구분 + `/mnt/c/...` 형식이 정상 동작 확인됨(2026-07-31) — 프로젝트 설정에서 PATH를 별도 재정의하지 않거나, 재정의한다면 반드시 이 형식(콜론 구분, `/mnt/c/...`)을 따를 것.
 - **캐시 디스크 분산 배치는 스크립트마다 개별 설정해야 함**: `HF_HOME=/hf_cache`, `MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache`는 공용 함수가 아니라 각 실행 스크립트에 개별적으로 export돼 있음. 2026-07-22 전수 점검 결과 `run_phase2_main.sh`/`run_phase2_ablation.sh`는 있었지만 `run_phase3.sh`/`runpod_phase1.sh`엔 빠져있어서 추가함(커밋 확인은 위 git pull 안내 참고). `runpod_phase1_gemma4.sh`(deprecated, 미수정)와 `.sh` 래퍼 없이 직접 실행하는 `measure_cross_dataset_cf.py`/`run_all.py` 같은 bare python 명령은 **셸에서 직접 export해야 함**(위 최우선 작업 블록에 이미 추가함). 새 실행 스크립트를 추가하거나 복사해서 만들 때 이 export 누락 여부를 반드시 확인할 것 — 누락되면 `$HOME=/workspace`인 이 컨테이너에서는 조용히 `/workspace/.cache`로 캐시가 새며, 몇 시간 뒤 quota 초과로 전체 파이프라인이 죽는 형태로만 드러남(초기 증상은 무관해 보이는 `AttributeError` 등으로 나타날 수 있어 진단이 어려움).
 - **`df -h /workspace`는 신뢰 불가**: `/workspace`는 `mfs#eu-cz-1.runpod.net` 네트워크 볼륨이라 `df -h`가 리전 전체 풀 용량(851T)을 보여줌. 실제 이 pod의 quota 확인은 `du -h --max-depth=1 /workspace`로 해야 함(`-s`와 `--max-depth`는 동시 사용 불가, `du: warning`만 뜨고 결과 없음).
 - **unsloth 어댑터 호환성 — 검증 완료(2026-07-26)**: `measure_cross_dataset_cf.py`의 `PeftModel.from_pretrained` 어댑터 로드, 72/72 조건 전부 정상 동작 확인됨. 더 이상 미검증 아님.
