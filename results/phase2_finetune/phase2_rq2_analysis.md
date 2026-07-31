@@ -1,17 +1,20 @@
 # Phase 2 RQ2 분석 — QLoRA 파인튜닝 효과
 
-- base(zero-shot) seed: 42  ·  조건 수: 0
-- 모델: 
+- base(zero-shot) seed: 42  ·  조건 수: 36
+- 모델: gemma4-e2b, qwen25-vl-3b, qwen3-vl-2b, smolvlm2-2b
 - 검정: paired t-test + BCa Bootstrap 95% CI(Cohen's d) + Wilcoxon signed-rank
 - 파인튜닝 효과 = finetuned − base (overall_accuracy)
-
-> **주의**: base 또는 eval 누락으로 제외된 조건 36개: gemma4-e2b/pathvqa/seed123, gemma4-e2b/pathvqa/seed42, gemma4-e2b/pathvqa/seed456, gemma4-e2b/slake/seed123, gemma4-e2b/slake/seed42, gemma4-e2b/slake/seed456, gemma4-e2b/vqa_rad/seed123, gemma4-e2b/vqa_rad/seed42, gemma4-e2b/vqa_rad/seed456, qwen25-vl-3b/pathvqa/seed123, qwen25-vl-3b/pathvqa/seed42, qwen25-vl-3b/pathvqa/seed456, qwen25-vl-3b/slake/seed123, qwen25-vl-3b/slake/seed42, qwen25-vl-3b/slake/seed456, qwen25-vl-3b/vqa_rad/seed123, qwen25-vl-3b/vqa_rad/seed42, qwen25-vl-3b/vqa_rad/seed456, qwen3-vl-2b/pathvqa/seed123, qwen3-vl-2b/pathvqa/seed42, qwen3-vl-2b/pathvqa/seed456, qwen3-vl-2b/slake/seed123, qwen3-vl-2b/slake/seed42, qwen3-vl-2b/slake/seed456, qwen3-vl-2b/vqa_rad/seed123, qwen3-vl-2b/vqa_rad/seed42, qwen3-vl-2b/vqa_rad/seed456, smolvlm2-2b/pathvqa/seed123, smolvlm2-2b/pathvqa/seed42, smolvlm2-2b/pathvqa/seed456, smolvlm2-2b/slake/seed123, smolvlm2-2b/slake/seed42, smolvlm2-2b/slake/seed456, smolvlm2-2b/vqa_rad/seed123, smolvlm2-2b/vqa_rad/seed42, smolvlm2-2b/vqa_rad/seed456
 
 ## 모델별 파인튜닝 효과
 
 | 모델 | n | base | finetuned | Cohen's d | d 95% CI | t p | Wilcoxon p |
 |------|:-:|:----:|:---------:|:---------:|:--------:|:---:|:----------:|
+| gemma4-e2b | 9 | 0.3285 | 0.2288 | -0.652 | [-1.599, 0.032] | 0.0864 | 0.1289 |
+| qwen25-vl-3b | 9 | 0.4582 | 0.5749 | 2.646 | [1.953, 4.723] | 0 | 0.003906 |
+| qwen3-vl-2b | 9 | 0.4725 | 0.5845 | 1.620 | [0.932, 3.153] | 0.0013 | 0.003906 |
+| smolvlm2-2b | 9 | 0.4253 | 0.4036 | -2.284 | [-3.160, -1.552] | 0.0001 | 0.003906 |
 
 ## Mixed-Effects Model (accuracy ~ condition + dataset, group=seed)
 
-> statsmodels/pandas 미설치 또는 표본 부족으로 생략 (`uv pip install statsmodels pandas`).
+- condition[finetuned] 고정효과 계수: **0.0268** (p = 0.3629)
+- ICC(seed): 0.0  ·  잔차분산: 0.015635  ·  n = 72

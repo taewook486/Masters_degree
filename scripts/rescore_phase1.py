@@ -4,11 +4,16 @@
 기존 Phase 1 결과에 반영한다. 모델을 다시 돌리지 않고, 저장된 predicted_answer를
 같은 로직으로 재채점하므로 4개 모델 전체에 '동일한' 매처가 일관 적용된다.
 
-원본(results/phase1_baseline)은 보존하고, 재채점 결과를 별도 디렉터리에 쓴다.
+원본은 보존하고, 재채점 결과를 별도 디렉터리에 쓴다.
+
+주의(2026-07-31 폴더 정리): `results/phase1_baseline`은 이제 재채점이 끝난 최종본(4모델
+12조건, seed42)이다. 구 3시드 디버그 원본은 `results/phase1_baseline_3seed_debug`로
+이동했다 — 아래 --results_dir 기본값을 그대로 재실행해도 최종본이 재현되지는 않는다
+(그 최종본의 원본 gemma4-e2b raw json은 더 이상 디스크에 없음).
 
 사용법:
     python scripts/rescore_phase1.py \
-        --results_dir results/phase1_baseline \
+        --results_dir results/phase1_baseline_3seed_debug \
         --output_dir results/phase1_baseline_rescored --seed 42
 
 이후 재채점 결과로 RQ1 분석:
@@ -142,7 +147,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Phase 1 재채점 (개선 매처, GPU 불필요)"
     )
-    parser.add_argument("--results_dir", default="results/phase1_baseline")
+    parser.add_argument("--results_dir", default="results/phase1_baseline_3seed_debug")
     parser.add_argument("--output_dir", default="results/phase1_baseline_rescored")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
