@@ -138,7 +138,7 @@ Phase 2는 4개 모델을 3개 데이터셋에 대해 QLoRA(rank=64, alpha=128, 
 
 학습 데이터 비율이 클수록 정확도가 단조 증가하며(0.05→1.0 구간에서 아직 성능 한계(ceiling)에 도달한 징후가 없음), 전 구간 실험 범위 내에서는 **전체 데이터(ratio=1.0) 사용이 최적**이다.
 
-> **관측된 이상치(향후 확인 필요)**: `train_time_min` 컬럼을 보면 동일 조건에서 seed=42만 유독 오래 걸렸다(예: ratio=1.0에서 seed42=369.6분 vs seed123/456=약 28분). seed123/456은 ratio와 무관하게 거의 일정(~28-29분)한 반면 seed42는 ratio에 비례해 길어지는 패턴으로, `max_steps=500` 상한 적용 전/후로 갈린 것으로 의심된다(Ablation-C에서 실제로 발견됐던 것과 같은 유형의 confound, `phase2-ablation-c-confound` 참고). 정확도 자체는 시드 간 크게 다르지 않으나(0.5026/0.5010/0.5020), 학습 예산이 시드마다 달랐을 가능성이 있어 **재확인이 필요하다.**
+> **`train_time_min` 필드 버그(원인 확인됨)**: 위 표에는 포함하지 않았으나, `phase2_summary.csv`의 `train_time_min` 컬럼은 동일 조건에서 seed=42만 유독 크게 나온다(예: ratio=1.0에서 seed42=369.6분 vs seed123/456=약 28분). 각 조건의 `train_result.json`을 직접 대조한 결과, Trainer가 내부적으로 측정하는 `train_runtime_sec`는 전 시드에서 27~29분으로 **일관되게 정상**이었고, 문제는 감싸는 스크립트가 wall-clock으로 재는 `train_time_min`에만 있었다. 이 버그는 (모델, 데이터셋) 조합의 전처리 캐시를 **처음 만드는 조건**에서만 나타나며(캐시 생성 1회성 비용이 wall-clock 시간에 합산됨), Main 36조건 전수 대조에서도 동일 패턴이 확인됐다(예: `qwen25-vl-3b/pathvqa/seed42` 395.4분 vs 실제 44.9분). **정확도·loss 등 학습 결과 지표는 이 버그와 무관하며, 본 절의 정확도 기반 결론에는 영향이 없다.** 시간 비교가 필요한 향후 분석(예: Phase 3 비용 산정)에서는 `train_time_min` 대신 `train_runtime_sec`를 사용해야 한다.
 
 #### 4.2.3 LoRA Rank 영향 (Ablation B)
 
