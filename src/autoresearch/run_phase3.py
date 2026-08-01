@@ -17,7 +17,11 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import logging
+import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pandas as pd
@@ -32,6 +36,47 @@ logger = logging.getLogger(__name__)
 DATASET = "pathvqa"  # Fixed dataset for Phase 3
 
 
+def _run_repeat_subprocess(
+    job: dict,
+    gpu_slot: int,
+    model_config_path: str,
+    base_finetune_config: str,
+    output_dir: str,
+    data_dir: str,
+    time_budget_min: float,
+    max_test_samples: int | None,
+) -> None:
+    """(전략, repeat) 조합 하나를 GPU 1장에 고정한 서브프로세스로 실행한다.
+
+    HF_DATASETS_CACHE를 GPU별로 분리하는 이유: 2026-08-01 스모크 테스트에서
+    실측된 버그(WinError 5/32) — 이 캐시 경로가 GPU 프로세스 간에 겹치면
+    Dataset.from_generator()의 내부 빌더 캐시를 여러 프로세스가 동시에 쓰다가
+    파일 접근 충돌로 죽는다. run_phase3_smoke_gpu0/1.bat에서 검증된 것과
+    동일한 분리 방식을 그대로 따른다.
+    """
+    env = os.environ.copy()
+    env["CUDA_VISIBLE_DEVICES"] = str(gpu_slot)
+    env["HF_DATASETS_CACHE"] = f"D:\\cache\\huggingface_datasets_gpu{gpu_slot}"
+
+    cmd = [
+        sys.executable, "-m", "src.autoresearch.run_one_repeat",
+        "--model_config_path", model_config_path,
+        "--finetune_config_path", base_finetune_config,
+        "--output_dir", output_dir,
+        "--strategy_name", job["strategy_name"],
+        "--repeat_id", str(job["repeat_id"]),
+        "--max_trials", str(job["expected"]),
+        "--seed", str(job["repeat_seed"]),
+        "--data_dir", data_dir,
+        "--time_budget_min", str(time_budget_min),
+    ]
+    if max_test_samples is not None:
+        cmd += ["--max_test_samples", str(max_test_samples)]
+
+    logger.info(f"\n{'#'*60}\n{job['log_label']} (GPU {gpu_slot})\n{'#'*60}")
+    subprocess.run(cmd, check=True, env=env)
+
+
 def run_phase3(
     model_config_path: str,
     base_finetune_config: str,
@@ -43,6 +88,7 @@ def run_phase3(
     data_dir: str = "data",
     time_budget_min: float = 90.0,
     max_test_samples: int | None = None,
+    max_parallel: int = 1,
 ) -> pd.DataFrame:
     """Run all Phase 3 HPO experiments.
 
@@ -62,6 +108,13 @@ def run_phase3(
             without changing max_steps/repeats/trials_per_repeat — the same
             cost lever already used by measure_cross_dataset_cf.py (500
             samples). Does not affect the HPO comparison's statistical design.
+        max_parallel: Number of (strategy, repeat) combinations to run
+            concurrently, one physical GPU each (via CUDA_VISIBLE_DEVICES on a
+            subprocess per combination — see run_one_repeat.py). Trials
+            *within* one (strategy, repeat) stay sequential regardless, since
+            optuna/autoresearch pick each trial's hyperparameters from the
+            previous trials' results. 1 = fully sequential in-process, byte
+            -identical to the pre-parallel behavior (no regression).
 
     Returns:
         Summary DataFrame.
@@ -71,9 +124,12 @@ def run_phase3(
 
     tracker = ExperimentTracker(output_path / "results.tsv")
 
+    # Build the list of (strategy, repeat) combinations that still need trials.
+    # This pre-pass is file-I/O-only (cheap) and stays sequential regardless of
+    # max_parallel, mirroring run_phase2.py's _run_jobs skip_existing pre-pass.
+    jobs: list[dict] = []
     for strategy_name in strategies:
         for repeat_id in range(n_repeats):
-            # Check if this combination already has enough trials
             existing = tracker.load_by_strategy(strategy_name, repeat_id)
             completed = [t for t in existing if t.status == "completed"]
 
@@ -85,31 +141,61 @@ def run_phase3(
                 )
                 continue
 
-            remaining = expected - len(completed)
-            logger.info(
-                f"\n{'#'*60}\n"
-                f"Strategy: {strategy_name}, Repeat: {repeat_id}, "
-                f"Trials to run: {remaining}\n"
-                f"{'#'*60}"
-            )
+            jobs.append({
+                "strategy_name": strategy_name,
+                "repeat_id": repeat_id,
+                "expected": expected,
+                "repeat_seed": seed + repeat_id * 1000,
+                "log_label": f"{strategy_name}/repeat{repeat_id} "
+                             f"({expected - len(completed)} trials to run)",
+            })
 
-            strategy = get_strategy(strategy_name)
-            repeat_seed = seed + repeat_id * 1000  # Different seed per repeat
-
+    if max_parallel <= 1:
+        # Byte-identical to the pre-parallel behavior: in-process, sequential.
+        for job in jobs:
+            logger.info(f"\n{'#'*60}\n{job['log_label']}\n{'#'*60}")
+            strategy = get_strategy(job["strategy_name"])
             run_hpo_loop(
                 strategy=strategy,
                 model_config_path=model_config_path,
                 base_finetune_config=base_finetune_config,
                 dataset_name=DATASET,
                 tracker=tracker,
-                repeat_id=repeat_id,
-                output_dir=str(output_path / f"{strategy_name}_repeat{repeat_id}"),
-                max_trials=expected,
-                seed=repeat_seed,
+                repeat_id=job["repeat_id"],
+                output_dir=str(
+                    output_path / f"{job['strategy_name']}_repeat{job['repeat_id']}"
+                ),
+                max_trials=job["expected"],
+                seed=job["repeat_seed"],
                 data_dir=data_dir,
                 time_budget_min=time_budget_min,
                 max_test_samples=max_test_samples,
             )
+    else:
+        for batch_start in range(0, len(jobs), max_parallel):
+            batch = jobs[batch_start : batch_start + max_parallel]
+            executor_cls = concurrent.futures.ThreadPoolExecutor
+            with executor_cls(max_workers=len(batch)) as executor:
+                future_to_job = {
+                    executor.submit(
+                        _run_repeat_subprocess,
+                        job=job,
+                        gpu_slot=slot,
+                        model_config_path=model_config_path,
+                        base_finetune_config=base_finetune_config,
+                        output_dir=output_dir,
+                        data_dir=data_dir,
+                        time_budget_min=time_budget_min,
+                        max_test_samples=max_test_samples,
+                    ): job
+                    for slot, job in enumerate(batch)
+                }
+                for future in concurrent.futures.as_completed(future_to_job):
+                    job = future_to_job[future]
+                    try:
+                        future.result()
+                    except Exception as e:
+                        logger.error(f"FAILED: {job['log_label']}: {e}")
 
     # Build summary
     return _build_phase3_summary(tracker, output_path)
@@ -228,6 +314,17 @@ def main() -> None:
             "--max_samples 500."
         ),
     )
+    parser.add_argument(
+        "--max_parallel", type=int, default=1,
+        help=(
+            "Number of (strategy, repeat) combinations to run concurrently, "
+            "one physical GPU each (default: 1 = fully sequential, same as "
+            "before). Each combination runs in its own subprocess pinned to "
+            "a GPU via CUDA_VISIBLE_DEVICES; trials within one combination "
+            "stay sequential since optuna/autoresearch pick each trial from "
+            "the previous trials' results."
+        ),
+    )
     args = parser.parse_args()
 
     setup_logging(log_dir=args.output_dir, experiment_name="run_phase3")
@@ -243,6 +340,7 @@ def main() -> None:
         data_dir=args.data_dir,
         time_budget_min=args.time_budget_min,
         max_test_samples=args.max_test_samples,
+        max_parallel=args.max_parallel,
     )
 
 

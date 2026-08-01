@@ -177,6 +177,7 @@ secret-*.*
 **/adapter_model.bin
 **/optimizer.pt
 **/checkpoint-*/
+**/adapter/tokenizer.json
 
 # ===========================================
 # Scratch/local notes (per-machine, not project deliverables)

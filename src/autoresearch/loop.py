@@ -178,14 +178,14 @@ def run_single_trial(
         trial.status = "failed"
         trial.notes = "OOM"
         trial.train_time_min = round((time.time() - wall_start) / 60, 1)
-        logger.error(f"Trial {trial_id} FAILED: OOM")
+        logger.exception(f"Trial {trial_id} FAILED: OOM")
         torch.cuda.empty_cache()
 
     except Exception as e:
         trial.status = "failed"
         trial.notes = str(e)[:200]
         trial.train_time_min = round((time.time() - wall_start) / 60, 1)
-        logger.error(f"Trial {trial_id} FAILED: {e}")
+        logger.exception(f"Trial {trial_id} FAILED: {e}")
 
     # Cleanup
     gc.collect()

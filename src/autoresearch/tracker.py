@@ -13,6 +13,8 @@ from dataclasses import asdict, dataclass, fields
 from datetime import datetime, timezone
 from pathlib import Path
 
+from filelock import FileLock
+
 logger = logging.getLogger(__name__)
 
 
@@ -62,9 +64,14 @@ class ExperimentTracker:
     def __init__(self, results_path: str | Path):
         self.path = Path(results_path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
+        # run_phase3.py --max_parallel로 여러 프로세스가 같은 results.tsv를
+        # 공유할 때(REQ: (전략,repeat) 단위 병렬 실행), 헤더 작성/append/
+        # trial_id 발급이 서로 겹치지 않도록 프로세스 간 파일 락으로 직렬화한다.
+        self._lock = FileLock(str(self.path) + ".lock")
 
-        if not self.path.exists():
-            self._write_header()
+        with self._lock:
+            if not self.path.exists():
+                self._write_header()
 
     def _write_header(self) -> None:
         with open(self.path, "w", newline="", encoding="utf-8") as f:
@@ -73,9 +80,10 @@ class ExperimentTracker:
 
     def append(self, trial: TrialResult) -> None:
         """Append a single trial result."""
-        with open(self.path, "a", newline="", encoding="utf-8") as f:
-            writer = csv.DictWriter(f, fieldnames=TSV_COLUMNS, delimiter="\t")
-            writer.writerow(asdict(trial))
+        with self._lock:
+            with open(self.path, "a", newline="", encoding="utf-8") as f:
+                writer = csv.DictWriter(f, fieldnames=TSV_COLUMNS, delimiter="\t")
+                writer.writerow(asdict(trial))
         logger.info(
             f"Trial {trial.trial_id} recorded: val_acc={trial.val_accuracy:.4f} "
             f"({trial.strategy}, repeat={trial.repeat_id})"
@@ -127,11 +135,24 @@ class ExperimentTracker:
         return filtered
 
     def next_trial_id(self) -> int:
-        """Get the next available trial_id."""
-        trials = self.load_all()
-        if not trials:
-            return 0
-        return max(t.trial_id for t in trials) + 1
+        """다음 trial_id를 예약해서 반환한다.
+
+        --max_parallel로 여러 프로세스가 서로 다른 (전략,repeat) job을
+        동시에 돌릴 때, 이 id는 학습이 끝나는 수십 분 뒤에야 append()로
+        results.tsv에 실제로 남는다. results.tsv를 스캔해 max+1만 구하면
+        그 사이에 다른 프로세스가 같은 id를 또 받아가는 race가 생긴다.
+        그래서 예약 시점에 카운터 파일(.counter)에 즉시 다음 값을
+        기록해, 아직 append되지 않은 id도 "이미 나간 id"로 잡히게 한다.
+        """
+        counter_path = Path(str(self.path) + ".counter")
+        with self._lock:
+            if counter_path.exists():
+                next_id = int(counter_path.read_text().strip())
+            else:
+                trials = self.load_all()
+                next_id = max((t.trial_id for t in trials), default=-1) + 1
+            counter_path.write_text(str(next_id + 1))
+        return next_id
 
     def best_trial(self, strategy: str, repeat_id: int | None = None) -> TrialResult | None:
         """Get the best trial by val_accuracy for a strategy."""

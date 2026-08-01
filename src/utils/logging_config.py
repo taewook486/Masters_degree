@@ -42,8 +42,13 @@ def setup_logging(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = log_path / f"{experiment_name}_{timestamp}.log"
 
-    # 로거 설정
-    logger = logging.getLogger(experiment_name)
+    # 루트 로거에 설정: 각 모듈은 logging.getLogger(__name__)로 서로 다른 이름의
+    # 로거를 쓰는데(예: "src.autoresearch.loop"), experiment_name으로 된 로거에
+    # 핸들러를 붙이면 이름이 달라 전파(propagate)되지 않아 아무 것도 안 찍히는
+    # 버그였다(Phase 3 스모크 2026-08-01 재현: "Trial N COMPLETED" 로그가 파일/콘솔
+    # 어디에도 안 남고 사라짐). 루트 로거에 붙이면 propagate=True인 모든 하위
+    # 모듈 로거의 레코드가 여기로 올라와 처리된다.
+    logger = logging.getLogger()
     logger.setLevel(level)
 
     # 기존 핸들러 제거 (중복 방지) — close() 먼저 호출하여 파일 핸들 누수 방지

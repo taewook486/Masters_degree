@@ -2,23 +2,27 @@
 cd /d "D:\project\Masters_degree"
 set PYTHONUNBUFFERED=1
 set WANDB_PROJECT=medical-vqa-vlm
+set WANDB_MODE=disabled
 set CUDA_VISIBLE_DEVICES=1
+set HF_DATASETS_CACHE=D:\cache\huggingface_datasets_gpu1
 
 REM ============================================================
-REM Phase 3 로컬 실측 스모크 테스트 - GPU1
+REM Phase 3 local measured smoke test - GPU1
 REM
-REM 목적: 듀얼 GPU 본 실행(repeats=10) trial 수를 정하기 전에,
-REM       이 카드에서 전략당 1 trial(총 4개)만 돌려 실제 소요 시간을 잰다.
-REM       추정치가 아니라 이 results.tsv의 train_time_min 실측값으로만
-REM       본 실행 규모를 결정할 것.
+REM Purpose: before deciding trial count for the dual-GPU main run
+REM          [repeats=10], run 1 trial per strategy [4 total] on this
+REM          card and measure actual wall-clock time. Do not estimate -
+REM          use only the measured train_time_min from results.tsv to
+REM          size the main run.
 REM
-REM IMPORTANT: 실행 전 nvidia-smi로 CUDA_VISIBLE_DEVICES=1이 실제로
-REM            어느 카드(5060 Ti/4060)인지 확인할 것.
+REM IMPORTANT: before running, use nvidia-smi to confirm which card
+REM            [5060 Ti or 4060] CUDA_VISIBLE_DEVICES=1 actually maps to.
 REM IMPORTANT: Set ANTHROPIC_API_KEY for autoresearch strategy.
 REM IMPORTANT: Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID for phone alerts.
-REM            완료/실패 시 텔레그램으로 알림을 보냄. 창을 강제로 닫거나
-REM            프로세스를 강제종료(kill)한 경우는 알림 코드가 실행될 기회가
-REM            없어 못 잡음 — 정상 종료/에러 종료만 감지 가능.
+REM            Sends a Telegram alert on completion or failure. If the
+REM            window is force-closed or the process is killed, the
+REM            alert code never runs - only normal exit or error exit
+REM            is detected.
 REM ============================================================
 
 if "%ANTHROPIC_API_KEY%"=="" (
@@ -54,8 +58,8 @@ echo Finished Phase 3 local smoke (GPU1) at %DATE% %TIME% (exit=%PHASE3_EXIT_COD
 
 if not "%TELEGRAM_BOT_TOKEN%"=="" (
     if %PHASE3_EXIT_CODE% EQU 0 (
-        curl -s -X POST "https://api.telegram.org/bot%TELEGRAM_BOT_TOKEN%/sendMessage" -d chat_id=%TELEGRAM_CHAT_ID% -d text="[Phase3 GPU1] 스모크 테스트 완료. results/phase3_local_smoke_gpu1/results.tsv 확인." >nul
+        curl -s -X POST "https://api.telegram.org/bot%TELEGRAM_BOT_TOKEN%/sendMessage" -d chat_id=%TELEGRAM_CHAT_ID% -d text="[Phase3 GPU1] Smoke test complete. Check results/phase3_local_smoke_gpu1/results.tsv" >nul
     ) else (
-        curl -s -X POST "https://api.telegram.org/bot%TELEGRAM_BOT_TOKEN%/sendMessage" -d chat_id=%TELEGRAM_CHAT_ID% -d text="[Phase3 GPU1] 스모크 테스트 실패/중단 (exit=%PHASE3_EXIT_CODE%). results/phase3_local_smoke_gpu1/run_phase3.log 확인." >nul
+        curl -s -X POST "https://api.telegram.org/bot%TELEGRAM_BOT_TOKEN%/sendMessage" -d chat_id=%TELEGRAM_CHAT_ID% -d text="[Phase3 GPU1] Smoke test failed or aborted (exit=%PHASE3_EXIT_CODE%). Check results/phase3_local_smoke_gpu1/run_phase3.log" >nul
     )
 )

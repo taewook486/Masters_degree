@@ -1,0 +1,5 @@
+trial_id,strategy,repeat_id,val_accuracy,train_loss,train_time_min,lora_rank,learning_rate,lora_targets,max_steps
+9,manual,0,0.4435,0.8431734895706177,26.4,16,0.0002,minimal,200
+11,optuna,0,0.3977,1.0456539034843444,47.2,8,4e-05,medium,200
+13,random,0,0.3759,0.9682050228118897,27.2,16,4.5e-05,minimal,200
+14,autoresearch,0,0.3806,0.8847577333450317,25.2,4,0.000182,full,200
