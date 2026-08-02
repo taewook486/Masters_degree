@@ -26,6 +26,9 @@ cd /workspace/Masters_degree
 
 export PYTHONUNBUFFERED=1
 export WANDB_PROJECT=medical-vqa-vlm
+# run_phase2_main.sh와 동일하게 오프라인 고정 (train_qlora.py의 report_to="wandb"가
+# 온라인 동기화를 시도하면 멈출 수 있음 — 이전엔 run_phase3.sh에만 누락돼 있었음)
+export WANDB_MODE=offline
 # run_phase2_main.sh/run_phase2_ablation.sh와 동일하게 캐시를 분산 배치 (누락 시
 # 이 컨테이너는 $HOME=/workspace라 HF_HOME 기본값이 /workspace/.cache로 새어
 # 볼륨 quota를 채우고 Disk quota exceeded로 죽는다 — Ablation에서 실제로 겪은 버그,
