@@ -26,6 +26,13 @@ REM (D:\cache\huggingface_datasets_gpu0/gpu1) -- both assigned automatically
 REM per subprocess, so no manual GPU env vars needed here. Uses whatever
 REM 2 GPUs are visible to this process; if only 1 GPU is present, drop
 REM --max_parallel 2 (or set it to 1) to fall back to single-GPU sequential.
+REM
+REM time_budget_min 60->90 (2026-08-02): 2026-08-01 local dual-GPU smoke
+REM measured the worst-case combo (rank=64, effective_batch=64) at 66.9min
+REM (results/phase3_local_smoke_gpu1/random_repeat0/trial_0010), already
+REM above the old 60min cap. Raised to 90min so max_steps=200 finishes
+REM before the wall-clock safety net fires on every combo in the search
+REM space, matching the decision recorded in THESIS_PROPOSAL_FINAL_v0.11.md.
 REM IMPORTANT: Set ANTHROPIC_API_KEY for autoresearch strategy.
 REM IMPORTANT: Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID for phone alerts.
 REM            Sends a Telegram alert on completion or failure (same pattern
@@ -60,7 +67,7 @@ echo Starting Phase 3 HPO at %DATE% %TIME% >> results\phase3_autoresearch\run_ph
   --trials_per_repeat 20 ^
   --seed 42 ^
   --data_dir data ^
-  --time_budget_min 60 ^
+  --time_budget_min 90 ^
   --max_test_samples 500 ^
   --max_parallel 2 ^
   >> results\phase3_autoresearch\run_phase3.log 2>&1

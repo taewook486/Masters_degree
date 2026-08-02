@@ -31,7 +31,7 @@ export WANDB_PROJECT=medical-vqa-vlm
 # 볼륨 quota를 채우고 Disk quota exceeded로 죽는다 — Ablation에서 실제로 겪은 버그,
 # 2026-07-22 커밋 2db2361에서 run_phase2_ablation.sh에 반영, 여기도 동일 적용)
 export HF_HOME=/hf_cache
-export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
+export MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache
 
 # --- REQUIRED: Set your Anthropic API key ---
 # Preflight: if 'autoresearch' is among the strategies, verify the API works.
@@ -60,9 +60,14 @@ MODEL_CONFIG="configs/models/qwen3_vl_2b.yaml"
 
 mkdir -p results/phase3_autoresearch
 
+# GPU 개수만큼 (strategy, repeat) job을 동시 배정 (run_phase3.py --max_parallel,
+# 로컬 run_phase3.bat과 동일한 자동 감지 아이디어를 pod의 실제 GPU 수에 맞춰 적용)
+MAX_PARALLEL=$(python -c "import torch; print(torch.cuda.device_count())")
+
 echo "============================================================"
 echo "Starting Phase 3 HPO at $(date)"
 echo "Model: ${MODEL_CONFIG}"
+echo "GPU count (max_parallel): ${MAX_PARALLEL}"
 echo "============================================================"
 
 python -u -m src.autoresearch.run_phase3 \
@@ -71,10 +76,12 @@ python -u -m src.autoresearch.run_phase3 \
   --output_dir results/phase3_autoresearch \
   --strategies manual random optuna autoresearch \
   --repeats 10 \
-  --trials_per_repeat 40 \
+  --trials_per_repeat 20 \
   --seed 42 \
   --data_dir data \
   --time_budget_min 90 \
+  --max_test_samples 500 \
+  --max_parallel "${MAX_PARALLEL}" \
   2>&1 | tee results/phase3_autoresearch/run_phase3.log
 
 echo ""

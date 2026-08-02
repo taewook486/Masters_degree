@@ -1,0 +1,5 @@
+strategy,n_repeats,best_acc_mean,best_acc_std,best_acc_max,avg_trials,total_trials
+autoresearch,1,0.338,0.0,0.338,1.0,1
+manual,1,0.38,0.0,0.38,1.0,1
+optuna,1,0.392,0.0,0.392,1.0,1
+random,1,0.324,0.0,0.324,1.0,1

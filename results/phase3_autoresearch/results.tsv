@@ -1,0 +1,7 @@
+trial_id	strategy	repeat_id	lora_rank	lora_alpha	learning_rate	batch_size	grad_accum_steps	warmup_ratio	weight_decay	lora_targets	max_steps	val_accuracy	val_closed_acc	val_open_acc	train_loss	train_time_min	peak_vram_mb	status	notes	agent_reasoning	phase	temperature
+0	manual	1	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.38	0.7172	0.0586	0.8437182092666626	22.8	4346.5	completed				0.0
+1	manual	0	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.38	0.7131	0.0625	0.8432071399688721	23.7	4346.5	completed				0.0
+3	manual	3	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.378	0.709	0.0625	0.8434207797050476	22.8	4346.5	completed				0.0
+2	manual	2	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.384	0.7213	0.0625	0.8438401055335999	23.7	4346.5	completed				0.0
+5	manual	5	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.374	0.7008	0.0625	0.8430820608139038	25.3	4346.5	completed				0.0
+4	manual	4	16	32	0.0002	1	8	0.03	0.01	minimal	200	0.378	0.709	0.0625	0.8437205195426941	26.1	4346.5	completed				0.0

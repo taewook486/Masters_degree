@@ -29,6 +29,7 @@
 | v0.9 | (보고 안 함) | 2026-07-16 | 16GB×2 멀티-GPU pod 실험 환경 명시 + 조건별 병렬 실행(`--max_parallel`) 최적화 반영 |
 | v0.10 | (보고 안 함) | 2026-07-16 | Phase 3 LLM 비결정성 통제 서술 정정(temperature=0→실제 스케줄링 1.0→0.3) + `anthropic` 의존성 누락 수정 |
 | v0.11 | (보고 안 함) | 2026-07-25 | 설계서-RUNPOD_GUIDE 정합성 검토: §4.5 max_steps 탐색/고정 모순 해소 + ECE 산출 불가 한계 신규 + Ablation 일반화 서술 정정 |
+| v0.12 | (보고 안 함) | 2026-08-02 | §4.5 Phase 3 실행 규모 재산출: trials_per_repeat 40→20 축소(1,210→610 trial) + 총 소요시간 추정치 정정(RunPod 8-9일 → 로컬 듀얼 GPU 12.8일) |
 | (예정) | **v2.0** | 2026-07 예상 | Phase 1/2 실험 결과 포함 본 심사용 |
 
 ### 시맨틱 버전 규칙 (External)
@@ -36,6 +37,27 @@
 - **MAJOR (v1, v2, ...)**: 연구 방향, RQ, 또는 큰 결과 추가 (예: Phase 1 실험 결과 포함)
 - **MINOR (v1.1, v1.2)**: 방법론 추가/개선 (예: 동료 심사 반영, 모델 추가)
 - **PATCH (v1.1.1)**: 오타, 표 형식 수정
+
+---
+
+## Internal v0.12 — 2026-08-02
+
+**Phase 3 실행 규모 재산출** — 2026-08-01 로컬 듀얼 GPU(RTX 5060 Ti + RTX 4060) 스모크 실측 결과를 반영해 `trials_per_repeat`를 축소하고 총 소요시간 추정치를 정정. 코드 변경 없음, 문서 전용 정정(코드 자체는 8/1 세션에서 이미 `run_phase3.bat`에 반영 완료).
+
+### 반영 내용
+
+- **§4.5 trials_per_repeat 40→20 축소**: 원안(비교 대상 표, 자율 탐색 루프 step 7, 예상 실험 규모, Table 4.3)의 전략당 40 trial을 20 trial로 정정. `repeats=10`(run-level 통계 검정 단위)은 불변 유지 — 축소는 통계 검정력을 훼손하지 않는 범위에서 적용된 유일한 안전 레버.
+- **총 trial 수 재확정**: 1,210회(Manual 10 + RS/Optuna/Autoresearch 각 400) → 610회(Manual 10 + RS/Optuna/Autoresearch 각 200).
+- **총 소요시간 추정치 정정**: "RunPod RTX 4090 단일 GPU 기준 약 8-9일"(재검증 필요로 표시돼 있던 초기 추정치) → 로컬 듀얼 GPU 병렬(`--max_parallel 2`) 실측 기반 "약 12.8일"로 재계산. 초기 추정치가 validation/test eval 시간을 누락한 과소추정이었음을 스모크 실측으로 확인.
+- **§5.3 신규 한계점**: trials_per_repeat 축소로 인한 전략당 탐색 공간 커버리지 저하(특히 Optuna/Autoresearch의 sequential exploration) 트레이드오프를 명시.
+
+### 코드 산출물
+
+없음 — 문서 전용 정정(`docs/THESIS_PROPOSAL_FINAL_v0.12.md`). 실제 코드 변경(`run_phase3.bat`의 `--repeats 10 --trials_per_repeat 20 --max_test_samples 500 --max_parallel 2` 확정, `src/autoresearch/tracker.py`/`run_one_repeat.py`/`run_phase3.py`의 `--max_parallel` 신규)은 2026-08-01 세션에서 선행 완료됨.
+
+### 지도교수 확인 필요
+
+**있음** — 전략당 탐색 trial 수 축소(40→20)는 실험 방법론(탐색 공간 커버리지)에 영향을 미치는 변경이므로, 다음 지도교수 미팅 시 보고 권장.
 
 ---
 

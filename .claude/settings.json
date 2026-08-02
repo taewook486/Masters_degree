@@ -11,8 +11,7 @@
     "CLAUDE_CODE_NO_FLICKER": "1",
     "CLAUDE_CODE_SUBPROCESS_ENV_SCRUB": "1",
     "ENABLE_TOOL_SEARCH": "1",
-    "MOAI_CONFIG_SOURCE": "sections",
-    "PATH": "C:\\Users\\taewo\\.local\\bin;C:\\Users\\taewo\\go\\bin;/usr/local/bin;/usr/local/sbin;/usr/bin;/bin;/usr/sbin;/sbin"
+    "MOAI_CONFIG_SOURCE": "sections"
   },
   "hooks": {
     "ConfigChange": [

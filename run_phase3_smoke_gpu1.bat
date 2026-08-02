@@ -17,6 +17,8 @@ REM          size the main run.
 REM
 REM IMPORTANT: before running, use nvidia-smi to confirm which card
 REM            [5060 Ti or 4060] CUDA_VISIBLE_DEVICES=1 actually maps to.
+REM time_budget_min 60->90 (2026-08-02): 2026-08-01 smoke on this same
+REM script measured the worst-case combo at 66.9min, already above 60min.
 REM IMPORTANT: Set ANTHROPIC_API_KEY for autoresearch strategy.
 REM IMPORTANT: Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID for phone alerts.
 REM            Sends a Telegram alert on completion or failure. If the
@@ -50,7 +52,7 @@ echo Starting Phase 3 local smoke (GPU1) at %DATE% %TIME% >> results\phase3_loca
   --trials_per_repeat 1 ^
   --seed 42 ^
   --data_dir data ^
-  --time_budget_min 60 ^
+  --time_budget_min 90 ^
   >> results\phase3_local_smoke_gpu1\run_phase3.log 2>&1
 
 set PHASE3_EXIT_CODE=%ERRORLEVEL%

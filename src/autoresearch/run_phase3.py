@@ -20,6 +20,7 @@ import argparse
 import concurrent.futures
 import logging
 import os
+import platform
 import subprocess
 import sys
 from pathlib import Path
@@ -56,7 +57,10 @@ def _run_repeat_subprocess(
     """
     env = os.environ.copy()
     env["CUDA_VISIBLE_DEVICES"] = str(gpu_slot)
-    env["HF_DATASETS_CACHE"] = f"D:\\cache\\huggingface_datasets_gpu{gpu_slot}"
+    if platform.system() == "Windows":
+        env["HF_DATASETS_CACHE"] = f"D:\\cache\\huggingface_datasets_gpu{gpu_slot}"
+    else:
+        env["HF_DATASETS_CACHE"] = f"/hf_cache/huggingface_datasets_gpu{gpu_slot}"
 
     cmd = [
         sys.executable, "-m", "src.autoresearch.run_one_repeat",

@@ -266,4 +266,7 @@ dist-ssr/
 # ===========================================
 .vercel/
 .netlify/
-.firebase/
+.firebase/.moai/logs/
+.moai/lessons-inbox.jsonl
+.moai/harness/
+unsloth_compiled_cache/
