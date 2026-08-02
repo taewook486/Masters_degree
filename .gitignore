@@ -270,3 +270,8 @@ dist-ssr/
 .moai/lessons-inbox.jsonl
 .moai/harness/
 unsloth_compiled_cache/
+
+.moai/logs/
+.moai/lessons-inbox.jsonl
+.moai/harness/
+unsloth_compiled_cache/
