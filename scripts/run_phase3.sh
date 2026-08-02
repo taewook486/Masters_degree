@@ -18,6 +18,9 @@
 # before committing to the full 1,210-trial run.
 #
 # IMPORTANT: Set ANTHROPIC_API_KEY for autoresearch strategy.
+#            Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID for phone alerts on
+#            completion/failure (same curl pattern as run_phase3.bat; if the
+#            pod/session is killed outright, the alert code never runs).
 #            Update --model_config with the best model from Phase 2.
 # =============================================================
 
@@ -57,6 +60,11 @@ print('[preflight] Anthropic API OK')
 " || { echo "ABORT: Anthropic API preflight failed. Fix the key/quota before running autoresearch (else it silently falls back to random)."; exit 1; }
 fi
 
+if [ -z "${TELEGRAM_BOT_TOKEN}" ]; then
+    echo "WARNING: TELEGRAM_BOT_TOKEN not set. Phone alerts will be skipped."
+    echo "Set it with: export TELEGRAM_BOT_TOKEN=... && export TELEGRAM_CHAT_ID=..."
+fi
+
 # --- UPDATE THIS after Phase 2 results ---
 MODEL_CONFIG="configs/models/qwen3_vl_2b.yaml"
 # -------------------------------------------
@@ -85,9 +93,27 @@ python -u -m src.autoresearch.run_phase3 \
   --time_budget_min 90 \
   --max_test_samples 500 \
   --max_parallel "${MAX_PARALLEL}" \
-  2>&1 | tee results/phase3_autoresearch/run_phase3.log
+  2>&1 | tee -a results/phase3_autoresearch/run_phase3.log
+# PIPESTATUS[0] = python's real exit code (tee always exits 0, so a bare $?
+# here would hide a training failure — same ERRORLEVEL-capture intent as
+# run_phase3.bat).
+PHASE3_EXIT_CODE=${PIPESTATUS[0]}
 
 echo ""
 echo "============================================================"
-echo "Phase 3 HPO finished at $(date)"
+echo "Phase 3 HPO finished at $(date) (exit=${PHASE3_EXIT_CODE})"
 echo "============================================================"
+
+if [ -n "${TELEGRAM_BOT_TOKEN}" ]; then
+    if [ "${PHASE3_EXIT_CODE}" -eq 0 ]; then
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            -d text="[Phase3 Main] HPO run complete. Check results/phase3_autoresearch/results.tsv" >/dev/null
+    else
+        curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            -d text="[Phase3 Main] HPO run failed or aborted (exit=${PHASE3_EXIT_CODE}). Check results/phase3_autoresearch/run_phase3.log" >/dev/null
+    fi
+fi
+
+exit "${PHASE3_EXIT_CODE}"
