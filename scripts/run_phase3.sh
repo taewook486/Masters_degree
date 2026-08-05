@@ -29,9 +29,12 @@ cd /workspace/Masters_degree
 
 export PYTHONUNBUFFERED=1
 export WANDB_PROJECT=medical-vqa-vlm
-# run_phase2_main.sh와 동일하게 오프라인 고정 (train_qlora.py의 report_to="wandb"가
-# 온라인 동기화를 시도하면 멈출 수 있음 — 이전엔 run_phase3.sh에만 누락돼 있었음)
-export WANDB_MODE=offline
+# offline 모드는 --max_parallel로 두 프로세스가 동시에 wandb-core 로컬 서비스를
+# 띄우려 할 때 리소스 경합으로 30초 포트 폴링이 타임아웃날 수 있다(Phase 3 RunPod
+# 3090 본실행 2026-08-05 실제 재현: ServicePollForTokenError로 trial 전체 실패).
+# 로컬 run_phase3.bat은 애초에 disabled를 쓰고 있어 이 문제가 없었다. 이 실험은
+# results.tsv가 결과 원천이라 wandb 대시보드가 필수가 아니므로 disabled로 통일한다.
+export WANDB_MODE=disabled
 # run_phase2_main.sh/run_phase2_ablation.sh와 동일하게 캐시를 분산 배치 (누락 시
 # 이 컨테이너는 $HOME=/workspace라 HF_HOME 기본값이 /workspace/.cache로 새어
 # 볼륨 quota를 채우고 Disk quota exceeded로 죽는다 — Ablation에서 실제로 겪은 버그,
