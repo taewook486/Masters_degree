@@ -34,12 +34,32 @@ def _atomic_save_to_disk(ds: Dataset, final_dir: Path) -> None:
     qwen_pathvqa_train 캐시가 이렇게 깨진 채 남았다). 임시 경로 rename은 같은
     파일시스템 내에서 원자적이므로, 중간에 죽어도 final_dir은 "아예 없음" 상태를
     유지해 다음 실행이 정상적으로 재빌드를 시도한다.
+
+    --max_parallel로 두 프로세스가 같은 cache_dir을 동시에 처음 빌드할 때(둘 다
+    cache_dir.exists()==False를 보고 진입), 먼저 끝낸 쪽이 os.replace로 final_dir을
+    만들고 나면 늦은 쪽의 os.replace는 destination이 이미 있는 비어있지 않은
+    디렉터리라 FileExistsError/OSError(ENOTEMPTY)로 실패한다(Phase 3 RunPod
+    2026-08-05 실제 재현: manual repeat6/repeat7이 동시에 train 캐시를 빌드하다
+    repeat7이 이 에러로 trial 전체 실패). os.replace 자체는 원자적이라 데이터
+    손상 위험은 없고, 단지 "이미 완성본이 있으니 내 임시본은 버려도 된다"는
+    경합 결과를 예외로 처리 안 했을 뿐이다. final_dir이 이미 존재하면 승자의
+    결과를 그대로 인정하고 내 tmp_dir만 정리한다.
     """
     tmp_dir = final_dir.parent / f".tmp-{final_dir.name}-{os.getpid()}"
     if tmp_dir.exists():
         shutil.rmtree(tmp_dir)
     ds.save_to_disk(str(tmp_dir))
-    os.replace(tmp_dir, final_dir)
+    try:
+        os.replace(tmp_dir, final_dir)
+    except OSError:
+        if final_dir.exists():
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+            logger.info(
+                f"[chat-cache] concurrent build already completed by another "
+                f"process, discarding own copy and reusing {final_dir}"
+            )
+        else:
+            raise
 
 
 def _bounded_samples(
@@ -77,8 +97,9 @@ def _chat_cache_dir(
     """준비된(chat 포맷) 데이터셋의 디스크 캐시 경로.
 
     조건마다 이미지 19k개를 디코딩→재인코딩(Dataset.from_list)하면 조건당 ~30분이라
-    36조건 Main이 비현실적이 된다. (dataset, split, format, samples, ratio)로 키를 만들어
-    한 번만 빌드하고 이후 load_from_disk(mmap)로 즉시 로드 + 학습 중 배치별 lazy 디코딩.
+    36조건 Main이 비현실적이 된다. (dataset, split, format, samples, ratio)로
+    키를 만들어 한 번만 빌드하고 이후 load_from_disk(mmap)로 즉시 로드 +
+    학습 중 배치별 lazy 디코딩.
     """
     parts = [fmt, dataset_name, split]
     if subset_ratio is not None:
@@ -109,9 +130,12 @@ def prepare_chat_dataset(
         subset_ratio: Fraction of data to use (0.0-1.0), for Ablation Study A.
 
     Returns:
-        HuggingFace Dataset with columns: image, question, answer, question_type, messages.
+        HuggingFace Dataset with columns:
+        image, question, answer, question_type, messages.
     """
-    cache_dir = _chat_cache_dir(data_dir, "std", dataset_name, split, max_samples, subset_ratio)
+    cache_dir = _chat_cache_dir(
+        data_dir, "std", dataset_name, split, max_samples, subset_ratio
+    )
     if cache_dir.exists():
         logger.info(f"[chat-cache] load {dataset_name}/{split} (std) from {cache_dir}")
         return load_from_disk(str(cache_dir))
@@ -121,7 +145,9 @@ def prepare_chat_dataset(
     # 넘겨 SIGKILL로 죽는다(Phase 2 Main 2026-07-17 실제 재현). Dataset.from_generator로
     # 배치 단위 스트리밍 빌드해 이미지 전체를 메모리에 동시에 들고 있지 않게 한다.
     def _records() -> Iterator[dict]:
-        for s in _bounded_samples(dataset_name, split, data_dir, max_samples, subset_ratio):
+        for s in _bounded_samples(
+            dataset_name, split, data_dir, max_samples, subset_ratio
+        ):
             prompt_text = MEDICAL_PROMPT.format(question=s.question)
             messages = [
                 {
@@ -142,7 +168,8 @@ def prepare_chat_dataset(
                 # trl 0.24 native VLM collator(DataCollatorForVisionLanguageModeling)는
                 # "images"(복수 리스트) 컬럼을 읽는다. messages content는 이미 리스트라
                 # prepare_multimodal_messages가 no-op → 이미지 토큰 이중 삽입 없음.
-                # 단수 "image"는 collator가 안 읽으므로 제거(대용량 train셋 이미지 중복 저장/RAM 방지).
+                # 단수 "image"는 collator가 안 읽으므로 제거
+                # (대용량 train셋 이미지 중복 저장/RAM 방지).
                 "images": [s.image],
                 "question": s.question,
                 "answer": s.answer,
@@ -175,14 +202,18 @@ def prepare_qwen_chat_dataset(
     Returns:
         HuggingFace Dataset with columns: image, messages (Qwen format).
     """
-    cache_dir = _chat_cache_dir(data_dir, "qwen", dataset_name, split, max_samples, subset_ratio)
+    cache_dir = _chat_cache_dir(
+        data_dir, "qwen", dataset_name, split, max_samples, subset_ratio
+    )
     if cache_dir.exists():
         logger.info(f"[chat-cache] load {dataset_name}/{split} (qwen) from {cache_dir}")
         return load_from_disk(str(cache_dir))
 
     # prepare_chat_dataset과 동일한 이유로 스트리밍 빌드(전체 리스트 materialize 회피).
     def _records() -> Iterator[dict]:
-        for s in _bounded_samples(dataset_name, split, data_dir, max_samples, subset_ratio):
+        for s in _bounded_samples(
+            dataset_name, split, data_dir, max_samples, subset_ratio
+        ):
             prompt_text = MEDICAL_PROMPT.format(question=s.question)
             # Qwen expects {"type": "image", "image": <PIL.Image>} in content
             messages = [
