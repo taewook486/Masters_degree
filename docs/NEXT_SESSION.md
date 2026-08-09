@@ -1,10 +1,16 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-07-31)
+# 다음 세션 시작점 (마지막 갱신: 2026-08-09)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
+- **2026-08-09 세션 — RunPod Phase3 본실행 진행상황 확인 (RunPod로 재전환된 상태, 아래 "다음 세션 최우선 작업"의 로컬 GPU 계획은 이후 상황과 다름)**
+  - **[중요] 07-31 세션에서 "RunPod 접고 로컬 듀얼 GPU로 전환" 결정했었는데, 08-05~08-06 세션부터 RunPod(3090)로 다시 전환되어 Phase3 본실행이 계속 진행 중임** — 상세 경위는 로컬 auto-memory `2026-08-06-phase3-runpod-main-run-status` / `2026-08-07-phase3-runpod-monitoring-handoff` / `2026-08-08-phase3-notify-system-session-wrap` 참고(다른 컴퓨터엔 없을 수 있음).
+  - **SSH 접속 정보(재사용)**: `ssh -i runpod_openssh.pem -p 40127 root@213.192.2.86`, pod 작업경로 `/workspace/Masters_degree`. 키 원본은 저장소 루트 `runpod_openssh.pem`(반드시 gitignore 확인 — 절대 커밋 금지).
+  - **2026-08-09 08:03 UTC 기준 진행률**: manual 200/200 완료, random 200/200 완료, optuna 125/200 진행중(repeat 6~7 학습 중, trial당 평균 30분, 남은 75개 약 37~40시간 예상), autoresearch 0/200 대기(optuna 끝나야 시작). 최고 성능은 optuna trial 304(repeat 3) val_accuracy=0.4700.
+  - **자동 완료 알림 구축돼 있음**: pod에 `scripts/notify_optuna_done.sh`를 nohup+disown으로 상시 실행 중(PID는 세션마다 다름, `ps aux | grep notify_optuna`로 확인) — optuna 200/200, autoresearch 200/200 각 시점에 텔레그램으로 자동 알림 발송. **SSH 세션이나 Claude Code 세션과 무관하게 pod 자체에서 독립 동작**하므로, 완료 전까지는 다른 컴퓨터에서도 별도 조치 불필요 — 궁금하면 위 SSH로 접속해 `python3 scripts/summarize_stage.py optuna`(또는 `optuna autoresearch`)로 최신 요약만 재생성해서 확인.
+  - **[보안, 확인 필요] 텔레그램 봇 토큰이 이번 세션 대화 로그에 평문 노출됨**(`scripts/notify_optuna_done.sh` 안에 하드코딩된 `TELEGRAM_BOT_TOKEN` 값을 cat으로 출력함). 새로 유출된 건 아니고 원래 스크립트에 하드코딩돼 있던 값이지만, 민감하다고 판단되면 봇 토큰 재발급 고려할 것(BotFather에서 `/revoke`).
 - **2026-07-31 세션 — Claude Code SessionStart 훅 에러 원인 진단(수정은 보류, 이 컴퓨터 포맷 예정)**
   - 증상: 세션 시작 시 SessionStart 훅이 에러남.
   - **원인 확정**: 프로젝트 설정 `.claude/settings.json`의 `env.PATH` 값이 Windows 스타일(`C:\Users\taewo\...`을 세미콜론 `;`으로 구분)로 되어 있어, WSL(Linux) bash에서는 통째로 하나의 잘못된 경로 문자열로 인식됨 → `ls`/`cat`/`head`/`which`/`git`/`grep` 등 기본 명령어조차 전부 `command not found`로 실패. 이 때문에 SessionStart를 포함한 `.claude/hooks/moai/*.sh` 훅 전체가 (`command -v moai` 같은 PATH 의존 호출이 깨지며) 정상 동작 못 하는 상태였음.
@@ -85,7 +91,9 @@
 
 ## 다음 세션 최우선 작업
 
-**RunPod은 접었고, 데스크탑(5060 Ti + 4060 듀얼 GPU)에서 Phase 3를 마무리하는 걸로 확정.** pod는 재사용 안 함.
+**[2026-08-09 갱신] 아래 "RunPod은 접었고..." 이하 블록은 07-31 시점 결정 기준이라 최신 상황과 다름 — 실제로는 RunPod로 재전환되어 Phase3 본실행이 진행 중임(위 "현재 상태"의 2026-08-09 항목 참고). 지금 당장 할 일은 없고, optuna/autoresearch가 200/200 도달하면 pod가 텔레그램으로 자동 알려줌. 궁금하면 SSH로 접속해 진행률만 확인하면 됨(명령은 위 항목 참고). 아래는 이전 결정 기록이라 참고용으로만 남겨둠.**
+
+~~RunPod은 접었고, 데스크탑(5060 Ti + 4060 듀얼 GPU)에서 Phase 3를 마무리하는 걸로 확정.~~ pod는 재사용 안 함. *(→ 08-05 이후 번복됨, 위 참고)*
 
 ```bash
 git pull   # run_phase3.bat 수정 + run_phase3_smoke_gpu0/1.bat 신규 + NEXT_SESSION 갱신 확인
