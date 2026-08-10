@@ -1,0 +1,43 @@
+=== random stage summary ===
+total rows: 200  completed: 200  failed/other: 0
+
+best trial: trial_id=223 repeat=9 val_accuracy=0.4440
+  lora_rank=64 lora_alpha=256 lr=0.000208 batch_size=2 grad_accum=16 warmup_ratio=0.0723 weight_decay=0.0134 lora_targets=full
+  val_closed_acc=0.7951 val_open_acc=0.1094 train_loss=0.6049
+
+val_accuracy: mean=0.3672 std=0.0321 min=0.3160 max=0.4440
+train_time_min: mean=25.4 total=5078.6
+
+per-repeat completed count:
+  repeat 0: 20
+  repeat 1: 20
+  repeat 2: 20
+  repeat 3: 20
+  repeat 4: 20
+  repeat 5: 20
+  repeat 6: 20
+  repeat 7: 20
+  repeat 8: 20
+  repeat 9: 20
+
+=== optuna stage summary ===
+total rows: 200  completed: 200  failed/other: 0
+
+best trial: trial_id=304 repeat=3 val_accuracy=0.4700
+  lora_rank=32 lora_alpha=128 lr=0.000491 batch_size=4 grad_accum=16 warmup_ratio=0.0893 weight_decay=0.0536 lora_targets=full
+  val_closed_acc=0.8115 val_open_acc=0.1445 train_loss=0.5555
+
+val_accuracy: mean=0.3905 std=0.0374 min=0.3160 max=0.4700
+train_time_min: mean=29.8 total=5967.3
+
+per-repeat completed count:
+  repeat 0: 20
+  repeat 1: 20
+  repeat 2: 20
+  repeat 3: 20
+  repeat 4: 20
+  repeat 5: 20
+  repeat 6: 20
+  repeat 7: 20
+  repeat 8: 20
+  repeat 9: 20

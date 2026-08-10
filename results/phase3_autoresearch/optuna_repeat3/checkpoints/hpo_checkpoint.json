@@ -1,0 +1,6 @@
+{
+  "strategy": "optuna",
+  "repeat_id": 3,
+  "completed_trials": 20,
+  "last_trial_id": 308
+}

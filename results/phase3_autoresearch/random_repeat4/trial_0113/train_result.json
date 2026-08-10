@@ -1,0 +1,53 @@
+{
+  "metadata": {
+    "model_name": "qwen3-vl-2b",
+    "model_id": "Qwen/Qwen3-VL-2B-Instruct",
+    "dataset": "pathvqa",
+    "seed": 4043,
+    "subset_ratio": null,
+    "backend": "Unsloth",
+    "timestamp": "2026-08-06T14:38:30.374059+00:00"
+  },
+  "lora_config": {
+    "rank": 64,
+    "alpha": 64,
+    "dropout": 0.05,
+    "target_modules": [
+      "q_proj",
+      "v_proj"
+    ]
+  },
+  "training": {
+    "train_samples": 19654,
+    "eval_samples": 6259,
+    "train_loss": 0.9573411822319031,
+    "train_runtime_sec": 2266.9928,
+    "train_time_min": 38.3,
+    "trainable_params": 12845056,
+    "total_params": 1517522944,
+    "trainable_pct": 0.85,
+    "peak_vram_mb": 5337.0
+  },
+  "eval_summary": {
+    "closed_accuracy": 0.7377,
+    "open_accuracy": 0.0469,
+    "overall_accuracy": 0.384,
+    "closed_count": 244,
+    "open_count": 256,
+    "total_count": 500,
+    "open_bertscore_f1": 0.8523,
+    "open_bertscore_accuracy": 1.0,
+    "open_bertscore_f1_biobert": 0.6446,
+    "open_bertscore_accuracy_biobert": 0.168,
+    "open_bertscore_spearman": 0.5598,
+    "open_bertscore_pearson": 0.7342,
+    "overall_acc_ci_low": 0.342,
+    "overall_acc_ci_high": 0.426,
+    "closed_acc_ci_low": 0.6803,
+    "closed_acc_ci_high": 0.791,
+    "open_acc_ci_low": 0.0234,
+    "open_acc_ci_high": 0.0742,
+    "avg_time_ms": 165.9,
+    "peak_vram_mb": 3586.8
+  }
+}

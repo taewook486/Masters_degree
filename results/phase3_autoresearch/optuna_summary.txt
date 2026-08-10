@@ -1,0 +1,19 @@
+=== optuna stage summary ===
+total rows: 125  completed: 125  failed/other: 0
+
+best trial: trial_id=304 repeat=3 val_accuracy=0.4700
+  lora_rank=32 lora_alpha=128 lr=0.000491 batch_size=4 grad_accum=16 warmup_ratio=0.0893 weight_decay=0.0536 lora_targets=full
+  val_closed_acc=0.8115 val_open_acc=0.1445 train_loss=0.5555
+
+val_accuracy: mean=0.3886 std=0.0372 min=0.3160 max=0.4700
+train_time_min: mean=30.0 total=3749.4
+
+per-repeat completed count:
+  repeat 0: 20
+  repeat 1: 20
+  repeat 2: 20
+  repeat 3: 20
+  repeat 4: 20
+  repeat 5: 20
+  repeat 6: 3
+  repeat 7: 2
