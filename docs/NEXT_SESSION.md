@@ -1,10 +1,16 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-08-09)
+# 다음 세션 시작점 (마지막 갱신: 2026-08-11)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
+- **2026-08-11 세션 — Phase3 optuna 완료 확인 + pod volume 디스크 위기 발견·해소 + Claude Code 자체 모니터링 루프 가동**
+  - SSH 접속 정보 동일: `ssh -i runpod_openssh.pem -p 40127 root@213.192.2.86`, 작업경로 `/workspace/Masters_degree`. **[신규 팁] `.pem` 키가 `/mnt/d`(윈도우 드라이브, WSL 마운트) 안에 있으면 `chmod`가 안 먹혀서(Permission denied) SSH 접속이 실패함 — 리눅스 파일시스템(예: `/tmp`)으로 복사한 뒤 `chmod 600` 해야 함.**
+  - **2026-08-11 01:53 UTC 기준 진행률**: optuna **200/200 완료**(최고 trial 304, val_accuracy=0.4700 — 지금까지 전체 최고). autoresearch 74~75/200 진행중(repeat0/1 완료, repeat2/3 진행중, repeat4~9 미시작; 내 최고는 trial 492, val_accuracy=0.4320). 완료된 74개 trial 평균 27.2분/trial, GPU 2장 병렬 기준 잔여 126개 약 28.6시간 소요 예상 → **8/12(수) 오전경 Phase3 전체 완료 전망**.
+  - **[중요] pod volume 디스크 위기 발견 + 해소**: RunPod 대시보드가 87.3/100G(볼륨 quota)를 보여줬는데, 처음엔 컨테이너 루트(`df -h /`, overlay 36G/80G)만 확인해서 놓칠 뻔함 — **`/workspace`는 별도 네트워크볼륨(mfs) 마운트라 반드시 `df -h /workspace` 또는 `du -sh --one-file-system /workspace`로 따로 확인해야 함**(overlay만 보면 실제 볼륨 사용량을 과소평가함). 원인: 이미 완료+git 백업된 random(13GB)+optuna(21GB) 어댑터 가중치(`.safetensors`) 34GB가 그대로 남아있었음. 잔여 필요량(~14GB)에 여유공간(~12.7GB)이 부족해 완주 전 디스크 꽉 찰 위험이었음. `run_phase3.py`엔 `skip_existing` 재실행 판단 로직이 없어(코드로 확인) 삭제해도 재학습 트리거 안 걸리는 것 확인 후 삭제 → `/workspace` 80G→46G로 감소, 학습 프로세스 영향 없음 확인. **비슷한 상황 재발하면 완료된 단계(random/optuna)의 어댑터 가중치만 같은 방식으로 지우면 됨** — val_accuracy 등 핵심 지표는 git에 이미 백업돼 있어 결과에 영향 없음.
+  - **Claude Code 세션 내 자체 모니터링 루프 가동 중(`/loop` dynamic, 1시간 간격)**: SSH로 진행률·프로세스·디스크 재확인 반복, autoresearch 200/200 도달 시 `scripts/summarize_stage.py`로 전체 요약+최적 하이퍼파라미터 자동 보고 예정. **단, 이 루프는 그 특정 Claude Code 세션에서만 동작 — 세션 종료 시 멈춤.** 별개로 pod 자체의 텔레그램 자동 알림(`scripts/notify_optuna_done.sh`, nohup으로 세션과 무관하게 독립 동작)은 계속 살아있으므로, **다른 컴퓨터/세션에서는 텔레그램 알림이 최종 신뢰 채널**임 — optuna 완료 알림은 이미 발송됐을 것, autoresearch 200/200 도달 시 전체 요약과 함께 알림이 옴.
+  - **지금 당장 할 일 없음** — optuna 완료 확인됐고 디스크 위기도 해소됨, autoresearch가 끝나기를 기다리면 됨.
 - **2026-08-09 세션 — RunPod Phase3 본실행 진행상황 확인 (RunPod로 재전환된 상태, 아래 "다음 세션 최우선 작업"의 로컬 GPU 계획은 이후 상황과 다름)**
   - **[중요] 07-31 세션에서 "RunPod 접고 로컬 듀얼 GPU로 전환" 결정했었는데, 08-05~08-06 세션부터 RunPod(3090)로 다시 전환되어 Phase3 본실행이 계속 진행 중임** — 상세 경위는 로컬 auto-memory `2026-08-06-phase3-runpod-main-run-status` / `2026-08-07-phase3-runpod-monitoring-handoff` / `2026-08-08-phase3-notify-system-session-wrap` 참고(다른 컴퓨터엔 없을 수 있음).
   - **SSH 접속 정보(재사용)**: `ssh -i runpod_openssh.pem -p 40127 root@213.192.2.86`, pod 작업경로 `/workspace/Masters_degree`. 키 원본은 저장소 루트 `runpod_openssh.pem`(반드시 gitignore 확인 — 절대 커밋 금지).
@@ -92,7 +98,7 @@
 
 ## 다음 세션 최우선 작업
 
-**[2026-08-09 갱신] 아래 "RunPod은 접었고..." 이하 블록은 07-31 시점 결정 기준이라 최신 상황과 다름 — 실제로는 RunPod로 재전환되어 Phase3 본실행이 진행 중임(위 "현재 상태"의 2026-08-09 항목 참고). 지금 당장 할 일은 없고, optuna/autoresearch가 200/200 도달하면 pod가 텔레그램으로 자동 알려줌. 궁금하면 SSH로 접속해 진행률만 확인하면 됨(명령은 위 항목 참고). 아래는 이전 결정 기록이라 참고용으로만 남겨둠.**
+**[2026-08-11 갱신] 아래 "RunPod은 접었고..." 이하 블록은 07-31 시점 결정 기준이라 최신 상황과 다름 — 실제로는 RunPod로 재전환되어 Phase3 본실행이 진행 중임(위 "현재 상태"의 2026-08-11 항목 참고). 지금 당장 할 일은 없고, autoresearch가 200/200 도달하면 pod가 텔레그램으로 자동 알려줌(optuna는 이미 완료됨). 궁금하면 SSH로 접속해 진행률만 확인하면 됨(명령은 위 항목 참고, 단 `.pem` 키는 `/mnt/...` 밖으로 복사 후 `chmod 600` 필요). 아래는 이전 결정 기록이라 참고용으로만 남겨둠.**
 
 ~~RunPod은 접었고, 데스크탑(5060 Ti + 4060 듀얼 GPU)에서 Phase 3를 마무리하는 걸로 확정.~~ pod는 재사용 안 함. *(→ 08-05 이후 번복됨, 위 참고)*
 
