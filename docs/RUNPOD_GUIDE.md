@@ -310,7 +310,7 @@ python scripts/analyze_phase2.py \
 
 > Catastrophic Forgetting은 각 조건의 `train_result.json` → `catastrophic_forgetting` 필드(VQAv2 기준 degradation)에 저장된다. WCA 임상 분석은 PathVQA 조건 디렉터리에 `scripts/analyze_clinical.py --results_dir results/phase2_finetune/<조건>` 로 적용한다.
 
-### Phase 2 Cross-dataset CF (Table 4.2b-B, v0.4 신설)
+### Phase 2 Cross-dataset CF (논문 Table 4.2e, 설계서 Table 4.2b-B)
 
 설계서 §4.4 (B) "의료 도메인 내 cross-dataset 일반화" — 훈련 데이터셋 ≠ 평가 데이터셋 조합(예: PathVQA로 학습 → SLAKE·VQA-RAD로 평가)으로 12개 조건 × 2개 cross-dataset = 24회 추가 평가를 수행한다. Phase 2 Main(36/36) 완료 후 실행한다.
 
@@ -321,12 +321,12 @@ python scripts/measure_cross_dataset_cf.py \
   --max_samples 500
 ```
 
-> **[중요] `--max_samples 500`**: full test set으로 돌리면 PathVQA(6,719개)가 24회 반복 평가되어 ~16시간(보조 지표 치고 과함) 소요 추정 → 500 샘플로 제한해 ~2-3시간으로 단축(사용자 확정, 2026-07-19). 이 스크립트는 새로 구현된 뒤 pod에서 아직 실행·검증된 적이 없으므로, 처음 실행 시 에러가 나면 바로 진단할 것 — 특히 `PeftModel.from_pretrained`로 unsloth 학습 어댑터(qwen3-vl-2b/qwen25-vl-3b)를 불러오는 부분의 호환성이 실증되지 않았다.
+> **[중요] `--max_samples 500`**: full test set으로 돌리면 PathVQA(6,719개)가 24회 반복 평가되어 ~16시간(보조 지표 치고 과함) 소요 추정 → 500 샘플로 제한해 ~2-3시간으로 단축(사용자 확정, 2026-07-19). **실행·검증 완료(2026-07-26)**: 72/72 조건 전부 정상 동작했으며, 한때 미검증으로 표시했던 `PeftModel.from_pretrained`의 unsloth 학습 어댑터(qwen3-vl-2b/qwen25-vl-3b) 로드 호환성도 실증되었다.
 
 **산출물**:
 - `results/phase2_finetune/<조건>/cross_cf_<train>_to_<eval>.json` (72개)
 - `results/phase2_finetune/cross_dataset_cf_summary.csv` (집계)
-- `results/phase2_finetune/cross_dataset_cf_summary.md` (사람이 읽는 리포트, Table 4.2b-B 원본)
+- `results/phase2_finetune/cross_dataset_cf_summary.md` (사람이 읽는 리포트, 논문 Table 4.2e 원본)
 
 ---
 
@@ -351,9 +351,14 @@ bash scripts/run_phase2_ablation.sh
 
 ## 6. Phase 3: Autonomous HPO
 
-**목표**: 4개 전략(Manual/RS/Optuna/Autoresearch) × 10회 반복 × 40 trial = HPO 비교 실험
+**목표**: 4개 전략(Manual/RS/Optuna/Autoresearch) × 10회 독립 반복 × 20 trial = HPO 비교 실험
 
-**예상 규모**: ~1,210 trials. **GPU-hours/비용 추정치(~200h, ~$78-107)는 재검증 필요** — max_steps는 이제 전 trial 공통 200스텝으로 고정되고(v0.11, 이전엔 탐색 공간과 고정 조건이 서로 모순돼 실제로는 {100,200,400,800} 중 표본을 뽑고 있었음), 안전장치용 시간 상한(`time_budget_min`)도 15분→90분으로 상향했다. Phase 2 main 실측 처리량(스텝당 약 13초, effective_batch=8 기준)을 적용하면 trial당 최소 ~35-45분이 걸려 기존 "~10분/trial" 추정보다 클 가능성이 높다. **아래 스모크 먼저 실행해 실측 후 총 시간·비용을 재산출할 것.**
+**실행 규모 (2026-08-12 완료, 실측)**: **총 610 trial** = Manual 10(반복당 1) + Random 200 + Optuna 200 + Autoresearch 200. 당초 설계는 전략당 40 trial(총 1,210)이었으나 GPU 시간 재산출 결과 원안이 약 2배 소요될 것으로 추정되어, run-level 검정 단위인 반복 횟수(10회)는 유지한 채 `trials_per_repeat`를 40→20으로 축소했다(논문 §3.7, 설계서 v0.12).
+
+**실측 소요 시간**:
+- 학습 시간 합계 **약 279 GPU-시간**(전략별 `train_time_min` 합: Manual 228 / Random 5,079 / Optuna 5,967 / Autoresearch 5,450분). 평가 시간은 미포함.
+- 벽시계 기준 **trial당 약 32분**(학습 평균 25.8분 + 평가). RTX 3090 2장 병렬로 32분마다 2 trial 완료.
+- `max_steps`는 전 trial 공통 200스텝 고정, 안전장치용 시간 상한 `time_budget_min=90`(실험 통제 변수 아님).
 
 > Phase 2 완료 및 ANTHROPIC_API_KEY 설정 후 실행
 
@@ -364,9 +369,9 @@ nano scripts/run_phase3.sh
 # MODEL_CONFIG를 Phase 2 best model로 수정
 ```
 
-### 실행 전: 스모크로 trial당 실제 소요 시간 확인 (권장)
+### 실행 전: 스모크로 trial당 실제 소요 시간 확인 (환경이 바뀐 경우)
 
-전체 1,210 trial을 돌리기 전에, 전략당 1-2 trial만 먼저 실행해 실제 wall-clock을 측정하고 총 GPU-시간·비용 추정치를 갱신한다.
+본 연구의 실측치는 위 "실측 소요 시간"에 기록돼 있다(RTX 3090 2장 기준 trial당 약 32분). **다른 GPU·다른 모델로 재현할 때만** 아래 스모크로 wall-clock을 먼저 측정해 총 소요 시간을 재산출한다.
 
 ```bash
 python -u -m src.autoresearch.run_phase3 \
@@ -403,7 +408,15 @@ python scripts/analyze_phase3.py --results_dir results/phase3_autoresearch
 - `results/phase3_autoresearch/phase3_rq3_analysis.md` — 사람이 읽는 리포트
 - `results/phase3_autoresearch/phase3_rq3_analysis.json` — 기계 판독용
 
-> trial-level 데이터(탐색 궤적, anytime performance curve)는 이 스크립트의 범위 밖이며, 필요 시 `results/phase3_autoresearch/results.tsv`를 직접 시각화한다.
+> trial-level 데이터(탐색 궤적, anytime performance curve)는 이 스크립트의 범위 밖이다. 전용 스크립트가 별도로 있다:
+>
+> ```bash
+> python scripts/plot_phase3_anytime.py --results_dir results/phase3_autoresearch
+> # 산출물: phase3_anytime.png/.pdf (곡선), phase3_anytime_curve.csv (원본 수치),
+> #         phase3_anytime_summary.md (최고 성능 도달 trial 요약)
+> ```
+>
+> 이 스크립트는 각 반복의 누적 최고 성능을 10회 반복의 중앙값 + IQR로 집계한다(평균이 아닌 중앙값을 쓰는 이유는 run-level 검정이 비모수 검정이라 시각화의 분포 가정을 맞춘 것). 데이터는 pandas가 아니라 `ExperimentTracker`(csv 모듈)로 읽는다 — `results.tsv`의 `agent_reasoning` 컬럼에 줄바꿈이 포함돼 있어 행 단위 파서로는 정확히 집계되지 않는다.
 
 ---
 
@@ -473,19 +486,23 @@ bash scripts/run_phase3.sh
 
 ---
 
-## 예상 실험 시간 및 비용 (RTX 4090 기준)
+## 실험 시간 및 비용
 
-| Phase | GPU-hours | 일수 (24h) | 비용 (Community) |
-|-------|:---------:|:---------:|:---------------:|
-| Phase 1 | ~9h | 0.4일 | ~$4 |
-| Phase 2 | ~65h | 2.7일 | ~$25 |
-| Phase 3 | ~200h (**재검증 필요**\*) | 8.3일 | ~$78 |
-| **합계** | **~274h (재검증 필요\*)** | **~11.4일** | **~$107** |
+| Phase | GPU-hours | 근거 |
+|-------|:---------:|------|
+| Phase 1 | ~9h (추정) | 12조건 제로샷 평가 |
+| Phase 2 | ~65h (추정) | 75조건 QLoRA 파인튜닝 |
+| **Phase 3** | **~279h (실측)** | 610 trial `train_time_min` 합계 16,724분. 평가 시간 미포함 |
 
-> RTX 4090 2대 병렬 시 기간 약 절반으로 단축 (비용 동일)
+**Phase 3 실측 상세 (2026-08-12 완료, RTX 3090 2장)**:
+- 전략별 학습 시간: Manual 228분 / Random 5,079분 / Optuna 5,967분 / Autoresearch 5,450분
+- trial당 벽시계 약 32분(학습 평균 25.8분 + 평가) → 2장 병렬로 32분마다 2 trial
+- 축소 결정(전략당 40→20 trial)이 없었다면 이 두 배 규모가 됐을 것이다.
 
-> \* **Phase 3 추정치는 확정값이 아님** — §6 본문 참조. max_steps 탐색/고정 모순 해소(v0.11) 이후 스모크 테스트 실측(2건 평균 ~25분/trial) 기준으로는 전체 규모가 ~500시간까지 늘어날 수 있다. 스모크 테스트를 먼저 완료해 실측치로 재계산할 것 — 낙관적 추정 금지.
+> Phase 1·2 수치는 초기 추정치를 그대로 둔 것으로 실측 대조를 거치지 않았다. Phase 3만 실행 완료 후 실측으로 대체했다.
+
+> **비용 주의**: 위 GPU-hours에 시간당 단가를 곱하면 대략적 비용이 나오나, 단가는 GPU 종류·리전·spot 여부에 따라 달라지므로 여기에 고정 금액을 적지 않는다. RunPod 대시보드에서 지출 한도(spending limit)를 설정해 둘 것.
 
 ---
 
-*최종 업데이트: 2026-07-25 (v0.11 설계서-RUNPOD_GUIDE 정합성 검토 — Phase 3 max_steps 모순 해소 반영)*
+*최종 업데이트: 2026-08-13 (Phase 3 완료에 따른 실측치 반영, 표 번호 논문 기준 갱신, cross-dataset CF 검증 완료 반영)*
