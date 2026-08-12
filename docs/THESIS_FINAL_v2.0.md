@@ -286,7 +286,7 @@ Phase 1은 파인튜닝 이전 4개 경량 VLM(Gemma4-E2B, Qwen2.5-VL-3B, Qwen3-
 
 전체 데이터셋을 합산(pooled)한 정확도 기준으로 4개 모델의 성능은 다음과 같다(n=8,231, 3개 데이터셋 합산 문항 수).
 
-**Table 4.1b. Pooled 정확도 및 통계 검정**
+**Table 4.1a. Pooled 정확도 및 통계 검정**
 
 | 순위 | 모델 | Pooled Overall Acc | 95% CI |
 |:---:|------|:-------------------:|:------:|
@@ -313,7 +313,7 @@ McNemar 쌍별 사후검정(Bonferroni 보정)에서, **Gemma4-E2B는 pooled 기
 
 WCA(Weighted Clinical Accuracy) 분석을 위해 PathVQA(seed 42) 문항을 7개 임상 질문 유형(diagnosis·location·measurement·description·temporal·yes_no·unknown)으로 분류하고 유형별 정확도를 산출했다(가중치는 5.3에서 논의하는 대로 임상 문헌 검증 없는 임시 척도이며, 여기서는 참고용 오류 패턴 식별에만 사용한다).
 
-**Table 4.1c. PathVQA 질문 유형별 정확도**
+**Table 4.1b. PathVQA 질문 유형별 정확도**
 
 | 유형 | 샘플 수 | Gemma4-E2B | Qwen2.5-VL-3B | Qwen3-VL-2B | SmolVLM2-2.2B |
 |------|:-------:|:----------:|:--------------:|:-----------:|:--------------:|
@@ -370,7 +370,7 @@ Phase 2는 4개 모델을 3개 데이터셋에 대해 QLoRA(rank=64, alpha=128, 
 
 #### 4.2.3 LoRA Rank 영향 (Ablation B)
 
-**Table 4.2c. LoRA rank별 성능 (Qwen3-VL-2B, PathVQA, 3시드 평균)**
+**Table 4.2b. LoRA rank별 성능 (Qwen3-VL-2B, PathVQA, 3시드 평균)**
 
 | LoRA Rank | Peak VRAM (MB) | Overall Acc (평균) |
 |:---:|:---:|:---:|
@@ -384,7 +384,7 @@ Rank가 클수록 성능이 단조 증가하나 32→64 구간에서 증가폭�
 
 #### 4.2.4 Target Module 영향 (Ablation C)
 
-**Table 4.2d. Target module 범위별 성능 (Qwen3-VL-2B, PathVQA, 3시드 평균)**
+**Table 4.2c. Target module 범위별 성능 (Qwen3-VL-2B, PathVQA, 3시드 평균)**
 
 | 설정 | Target Modules | 학습 파라미터 비율 | Overall Acc (평균) |
 |------|----------------|:---:|:---:|
@@ -398,7 +398,7 @@ Target module 범위가 넓을수록(더 많은 linear layer에 LoRA 적용) 성
 
 **(A) 범용 능력 상실 — VQAv2 validation subset(2,000샘플) 기준**
 
-**Table 4.2b. 모델별 VQAv2 성능 저하율 (n=9 = 3데이터셋×3시드 평균)**
+**Table 4.2d. 모델별 VQAv2 성능 저하율 (n=9 = 3데이터셋×3시드 평균)**
 
 | 모델 | 평균 저하율(%) | 표준편차 | 범위 |
 |------|:---:|:---:|:---:|
@@ -411,7 +411,7 @@ VQAv2 기준 일반 능력 상실 정도는 모델별로 극명하게 갈린다.
 
 **(B) Cross-dataset 일반화 격차 — 학습 도메인과 다른 데이터셋 평가 시 변화율**
 
-**Table 4.2b-B. 모델별 cross-dataset 성능 변화율 (n=18 = 2평가셋×3학습셋×3시드)**
+**Table 4.2e. 모델별 cross-dataset 성능 변화율 (n=18 = 2평가셋×3학습셋×3시드)**
 
 | 모델 | 평균 변화율(%) | 표준편차 | 양(+)의 방향 비율 |
 |------|:---:|:---:|:---:|
@@ -766,9 +766,9 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 �
 
 | 파일 | 내용 | 본문 위치 |
 |------|------|-----------|
-| `results/phase2_finetune/phase2_summary.csv` | 75조건(Main 36 + Ablation 39) 요약 | Table 4.2, 4.2a, 4.2c, 4.2d |
+| `results/phase2_finetune/phase2_summary.csv` | 75조건(Main 36 + Ablation 39) 요약 | Table 4.2, 4.2a, 4.2b, 4.2c |
 | `results/phase2_finetune/phase2_rq2_analysis.md` | RQ2 3중 검증 + Mixed-Effects Model | 4.2.1 |
-| `results/phase2_finetune/cross_dataset_cf_summary.md` | cross-dataset CF 72조건 | Table 4.2b-B |
+| `results/phase2_finetune/cross_dataset_cf_summary.md` | cross-dataset CF 72조건 | Table 4.2e |
 
 **Phase 3 — 자율 하이퍼파라미터 최적화**
 
