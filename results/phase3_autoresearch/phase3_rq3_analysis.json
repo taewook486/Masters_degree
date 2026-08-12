@@ -1,0 +1,98 @@
+{
+  "n_repeats": {
+    "manual": 10,
+    "random": 10,
+    "optuna": 10,
+    "autoresearch": 10
+  },
+  "missing_strategies": [],
+  "bootstrap_ci": {
+    "manual": {
+      "mean": 0.3776,
+      "ci_low": 0.376,
+      "ci_high": 0.3794,
+      "n": 10
+    },
+    "random": {
+      "mean": 0.4186,
+      "ci_low": 0.4106,
+      "ci_high": 0.4274,
+      "n": 10
+    },
+    "optuna": {
+      "mean": 0.449,
+      "ci_low": 0.4368,
+      "ci_high": 0.4594,
+      "n": 10
+    },
+    "autoresearch": {
+      "mean": 0.4184,
+      "ci_low": 0.4064,
+      "ci_high": 0.4328,
+      "n": 10
+    }
+  },
+  "kruskal_wallis": {
+    "h_stat": 27.916117802032378,
+    "p_value": 3.782297995614247e-06,
+    "significant": true
+  },
+  "mann_whitney_autoresearch_vs_optuna": {
+    "u_stat": 16.0,
+    "p_value": 0.011145821378803395,
+    "n1": 10,
+    "n2": 10,
+    "rank_biserial_r": -0.6799999999999999,
+    "significant": true
+  },
+  "run_level_values": {
+    "manual": [
+      0.38,
+      0.38,
+      0.384,
+      0.378,
+      0.378,
+      0.374,
+      0.374,
+      0.376,
+      0.376,
+      0.376
+    ],
+    "random": [
+      0.402,
+      0.406,
+      0.414,
+      0.44,
+      0.406,
+      0.422,
+      0.41,
+      0.416,
+      0.426,
+      0.444
+    ],
+    "optuna": [
+      0.454,
+      0.444,
+      0.46,
+      0.47,
+      0.406,
+      0.468,
+      0.43,
+      0.456,
+      0.442,
+      0.46
+    ],
+    "autoresearch": [
+      0.404,
+      0.4,
+      0.448,
+      0.402,
+      0.406,
+      0.404,
+      0.414,
+      0.406,
+      0.464,
+      0.436
+    ]
+  }
+}

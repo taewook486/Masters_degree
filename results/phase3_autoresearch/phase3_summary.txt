@@ -1,3 +1,37 @@
+=== manual stage summary ===
+total rows: 20  completed: 10  failed/other: 10
+
+best trial: trial_id=2 repeat=2 val_accuracy=0.3840
+  lora_rank=16 lora_alpha=32 lr=0.0002 batch_size=1 grad_accum=8 warmup_ratio=0.03 weight_decay=0.01 lora_targets=minimal
+  val_closed_acc=0.7213 val_open_acc=0.0625 train_loss=0.8438
+
+val_accuracy: mean=0.3776 std=0.0031 min=0.3740 max=0.3840
+train_time_min: mean=22.8 total=228.3
+
+per-repeat completed count:
+  repeat 0: 1
+  repeat 1: 1
+  repeat 2: 1
+  repeat 3: 1
+  repeat 4: 1
+  repeat 5: 1
+  repeat 6: 1
+  repeat 7: 1
+  repeat 8: 1
+  repeat 9: 1
+
+failed/other rows (10):
+  trial_id=9 status=failed
+  trial_id=8 status=failed
+  trial_id=10 status=failed
+  trial_id=11 status=failed
+  trial_id=14 status=failed
+  trial_id=15 status=failed
+  trial_id=18 status=failed
+  trial_id=19 status=failed
+  trial_id=22 status=failed
+  trial_id=25 status=failed
+
 === random stage summary ===
 total rows: 200  completed: 200  failed/other: 0
 
@@ -29,6 +63,28 @@ best trial: trial_id=304 repeat=3 val_accuracy=0.4700
 
 val_accuracy: mean=0.3905 std=0.0374 min=0.3160 max=0.4700
 train_time_min: mean=29.8 total=5967.3
+
+per-repeat completed count:
+  repeat 0: 20
+  repeat 1: 20
+  repeat 2: 20
+  repeat 3: 20
+  repeat 4: 20
+  repeat 5: 20
+  repeat 6: 20
+  repeat 7: 20
+  repeat 8: 20
+  repeat 9: 20
+
+=== autoresearch stage summary ===
+total rows: 200  completed: 200  failed/other: 0
+
+best trial: trial_id=628 repeat=8 val_accuracy=0.4640
+  lora_rank=64 lora_alpha=256 lr=0.0002 batch_size=4 grad_accum=16 warmup_ratio=0.05 weight_decay=0.01 lora_targets=full
+  val_closed_acc=0.7992 val_open_acc=0.1445 train_loss=0.5578
+
+val_accuracy: mean=0.3980 std=0.0145 min=0.3560 max=0.4640
+train_time_min: mean=27.2 total=5450.0
 
 per-repeat completed count:
   repeat 0: 20

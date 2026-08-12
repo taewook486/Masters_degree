@@ -616,7 +616,9 @@ Phase 2와 Phase 3은 하이퍼파라미터 탐색을 서로 다른 방식으로
 **RQ3 — LLM 에이전트의 자율 탐색이 베이지안 최적화와 경쟁적 성능을 달성하며 해석 가능한 탐색 근거를 제공하는가?**
 귀무가설(Autoresearch = Optuna)은 기각되었으나, **그 방향은 가설이 기대한 것과 반대였다.** run-level 비교에서 Optuna(0.4490)가 Autoresearch(0.4184)보다 유의하게 우수했고(Mann-Whitney U = 16.00, p = .0112, r = -0.68), Autoresearch는 하한선 비교 대상인 Random Search(0.4186)와도 통계적으로 구분되지 않았다. 다만 세 자동 탐색 전략이 모두 수동 설정(0.3776)을 상회하여 자동 탐색 자체의 유효성은 확인되었다.
 
-RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**에 관해서는, Autoresearch가 네 전략 중 유일하게 매 trial의 제안 근거를 자연어로 산출했다는 점에서 형식적으로는 충족되었다. 그러나 그 근거가 더 나은 탐색으로 이어지지는 않았다 — 에이전트는 20 trial 중 평균 12.5개의 고유 설정만 시도했고(Random·Optuna는 20/20), 동일 설정을 반복 제안하며 조기 고착하는 패턴이 10회 반복 전체에서 관측되었다(4.3.4). 요컨대 **탐색 근거의 산출과 탐색 품질의 향상은 본 연구 범위에서 함께 나타나지 않았다.**
+RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 설계에서 충분히 검증되지 못했다.** 에이전트에게 주어진 시스템 프롬프트(부록 B)가 "설명이나 다른 텍스트 없이 JSON 객체만 응답하라"고 명시적으로 지시했기 때문에, 자연어 근거의 산출은 애초에 요구되지 않았다. 실제로 200개 trial 중 **147개(73.5%)는 하이퍼파라미터 JSON만을 반환했고, 자연어 서술이 포함된 것은 53개(26.5%)에 그쳤다.** 따라서 "LLM 에이전트가 해석 가능한 탐색 근거를 제공하는가"라는 질문에 대해 본 연구는 긍정도 부정도 할 수 없으며, 이는 결과가 아니라 **설계상의 결함**이다(5.3(8)).
+
+한편 탐색 품질 자체는 저조했다. 에이전트는 20 trial 중 평균 12.5개의 고유 설정만 시도했고(Random·Optuna는 20/20), 동일 설정을 반복 제안하며 조기 고착하는 패턴이 10회 반복 전체에서 관측되었다(4.3.4).
 
 ### 5.2 연구 기여
 
@@ -632,7 +634,7 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**에 관해서는, 
 
 ### 5.3 한계점
 
-**(1) 데이터 오염 통제의 한계.** 대상 데이터셋은 모델의 사전훈련 시점 이전에 공개되었으므로 사전훈련 데이터 오염 가능성이 존재한다. 본 연구는 Min-K% Probability(Shi et al., NAACL 2024)로 노출 의심 샘플을 식별하고 이를 제거한 축소셋에서 결론의 강건성을 확인했으나(4.1.1), Min-K%는 어디까지나 간접 지표이며 오염의 완전한 통제나 정확한 정량화는 불가능하다.
+**(1) 데이터 오염 통제의 한계.** 대상 데이터셋은 모델의 사전훈련 시점 이전에 공개되었으므로 사전훈련 데이터 오염 가능성이 존재한다. 본 연구는 Min-K% Probability(Shi et al., ICLR 2024)로 노출 의심 샘플을 식별하고 이를 제거한 축소셋에서 결론의 강건성을 확인했으나(4.1.1), Min-K%는 어디까지나 간접 지표이며 오염의 완전한 통제나 정확한 정량화는 불가능하다.
 
 **(2) 의료 특화 VLM과의 비교 부재.** LLaVA-Med, Med-Flamingo, CheXagent 등 의료 특화 VLM과의 직접 실험 비교는 본 연구 범위 밖이다(2.5). 이들은 수십억~수백억 파라미터 규모에 대규모 의생명 코퍼스 사전학습을 전제하므로 본 연구의 2-3B·소규모 데이터 조건과 실험 설계가 근본적으로 다르다. 선행 연구의 보고 수치와의 간접 비교 또한 평가 split·채점 기준·전처리가 상이하여 본 초안에는 수록하지 않았으며, 동일 프로토콜 하의 재현 비교는 향후 과제로 남는다.
 
@@ -646,11 +648,19 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**에 관해서는, 
 
 **(7) 임상적 의미 평가의 간접성.** Weighted Clinical Accuracy(WCA)의 질문 유형별 가중치는 외부 임상 문헌이나 전문가 합의 없이 연구자가 부여한 임시 척도이며(3.8.3), 절대적 임상 중요도의 척도로 해석할 수 없다. Expected Calibration Error(ECE)는 현재 평가 파이프라인이 per-sample confidence를 저장하지 않아 산출하지 못했다. 또한 Phase 3은 질문 유형별 분해를 수행하지 않았으므로, 4.4.4에서 제기한 "정확도 향상이 임상적 가치가 낮은 유형에 편중되었을 가능성"은 검증되지 않은 해석에 머문다.
 
+**(8) 자율 에이전트 설정의 내적 불일치.** 본 연구가 사후에 확인한 가장 중대한 한계로, Autoresearch 조건은 다음 세 가지 설정 불일치를 포함한다. 이는 4.3의 부정적 결과를 "LLM 에이전트의 본질적 한계"로 일반화할 수 없게 만드는 요인이므로 명시한다.
+
+- **탐색 근거 산출을 프롬프트가 금지했다.** 시스템 프롬프트(부록 B)는 "설명·마크다운·기타 텍스트 없이 JSON 객체만 응답하라"고 지시한다. 그 결과 200 trial 중 73.5%가 JSON만 반환했다. RQ3가 요구한 "해석 가능한 탐색 근거"는 측정 대상이 되기 전에 설계에 의해 배제되었다.
+- **탐색 일정이 실제 예산과 어긋난다.** 프롬프트는 탐색 단계를 절대 trial 번호로 규정한다 — 초기 탐색 0~5, 중기 착취 5~20("최고 설정을 가져와 1~2개 파라미터만 변경"), 후기 정밀화 20+. 그러나 실제 예산은 반복당 20 trial이므로 **후기 정밀화 단계는 한 번도 발동하지 않았고, 예산의 약 75%가 "최고 설정 주변만 변형"하도록 지시된 구간에서 소비**되었다. 4.3.4가 관측한 중복 제안(고유 설정 12.5/20)은 에이전트의 판단 실패라기보다 이 지시를 충실히 따른 결과일 가능성이 있다. 코드 측 단계 전환 로직(`src/autoresearch/agent.py`)은 진행률 비율(0.25/0.75) 기준이어서 예산에 맞게 조정되나, 프롬프트 텍스트는 그렇지 않아 양자가 어긋난다.
+- **무효 파라미터를 탐색 대상으로 제시했다.** 프롬프트는 `epochs`를 탐색 공간에 포함하고 "데이터가 제한적일 때 더 많은 epoch(3-5)이 도움이 된다"는 지침까지 제공하지만, 구현(`src/autoresearch/agent.py`)은 제안된 `epochs`를 폐기하고 `max_steps=200`으로 고정한다. 실제 로그에서 에이전트가 "모든 trial이 200 step뿐이라 학습 부족으로 보인다", "epochs가 변경되지 않았다"고 진단하는 사례가 관측되는데(부록 D), 이는 정확한 진단이었으나 해당 조정 수단은 애초에 작동하지 않았다.
+
+이 세 항목은 모두 Autoresearch 조건에만 적용되며 Random·Optuna 조건에는 해당하지 않는다. 따라서 4.3.1의 비교는 "동일 탐색 공간에서의 알고리즘 비교"라기보다 **"이 프롬프트 구성으로 운용된 에이전트와 기존 알고리즘의 비교"**로 한정해 해석해야 한다.
+
 ### 5.4 향후 연구 방향
 
 **첫째, 탐색 예산을 확대한 자율 HPO 재검증이 필요하다.** Autoresearch는 최고 성능 도달 trial의 IQR 상한이 예산 한계값(20)에 걸쳐 있어, 절반 가까운 run이 예산 소진 시점까지 개선 중이었다(4.3.3). 40~100 trial 규모에서 Optuna와의 격차가 유지되는지, 아니면 역전되는지는 본 연구가 답하지 못한 질문이다.
 
-**둘째, 중복 제안을 억제하는 에이전트 설계를 검토할 필요가 있다.** 4.3.4가 진단한 실패 메커니즘은 이미 시도한 설정을 회피하는 명시적 제약, 그리고 반복 실행 간 확률적 변동을 성능 개선과 구분하는 판단 기준을 프롬프트나 루프 구조에 도입함으로써 완화될 여지가 있다. 본 연구는 이러한 개선안을 제안할 뿐 검증하지는 않았다.
+**둘째, 설정 불일치를 제거한 상태에서 자율 HPO를 재평가해야 한다.** 5.3(8)이 지적한 세 가지 불일치 — 탐색 근거 산출 금지, 절대 trial 번호 기준의 탐색 일정, 무효 파라미터(`epochs`) 노출 — 는 모두 프롬프트와 구현의 정합성 문제이므로 수정 가능하다. 이를 바로잡은 뒤에야 "LLM 에이전트가 베이지안 최적화와 경쟁 가능한가"라는 질문에 대한 공정한 답을 얻을 수 있다. 아울러 이미 시도한 설정을 회피하는 명시적 제약과, 반복 실행 간 확률적 변동을 성능 개선과 구분하는 판단 기준(4.4.6의 노이즈 규모 참조)을 도입하는 방안도 함께 검토할 필요가 있다. 본 연구는 이러한 개선안을 제안할 뿐 검증하지는 않았다.
 
 **셋째, 개방형 응답 성능의 개선이 가장 시급한 과제다.** 파인튜닝과 하이퍼파라미터 최적화를 모두 동원했음에도 open 정확도는 closed의 20% 수준을 넘지 못했으며(4.4.4), 임상적 중요도가 높은 diagnosis·description 유형이 여기에 집중되어 있다. 생성형 응답 자체를 겨냥한 학습 목표나 평가 지표의 재설계가 요구된다.
 
@@ -660,4 +670,244 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**에 관해서는, 
 
 ---
 
-*(다음 작업: 참고문헌 · 부록 A~D)*
+## 참고문헌
+
+본 목록은 본문에 실제로 인용된 문헌만 수록한다. 서지정보는 본문 인용 시점에 확인한 범위로 기재했으며, **원문 대조가 완료되지 않은 항목은 `[확인 필요]`로 표시**했다. 제출 전 해당 항목의 저자 전체 이름·권호·페이지·DOI를 원문에서 확인해 보완해야 한다.
+
+**Parameter-Efficient Fine-Tuning**
+
+1. Hu, E. J., et al. "LoRA: Low-Rank Adaptation of Large Language Models." arXiv:2106.09685. ICLR 2022.
+2. Dettmers, T., et al. "QLoRA: Efficient Finetuning of Quantized LLMs." arXiv:2305.14314. NeurIPS 2023.
+
+**Vision-Language Model**
+
+3. Liu, H., et al. "Visual Instruction Tuning (LLaVA)." arXiv:2304.08485. [확인 필요: 게재 학회·연도]
+4. Qwen Team, Alibaba. "Qwen2.5-VL Technical Report." arXiv:2502.13923. [확인 필요: 저자 표기 형식]
+5. HuggingFace. "SmolVLM: Redefining small and efficient multimodal models." arXiv:2504.05299. [확인 필요: 저자 표기 형식]
+
+**의료 특화 VLM**
+
+6. Li, C., et al. "LLaVA-Med: Training a Large Language-and-Vision Assistant for Biomedicine in One Day." arXiv:2306.00890. NeurIPS 2023 Datasets and Benchmarks Track.
+7. Moor, M., et al. "Med-Flamingo: a Multimodal Medical Few-shot Learner." arXiv:2307.15189. 2023. [확인 필요: 게재 학회]
+8. Chen, Z., et al. "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation." arXiv:2401.12208. 2024. [확인 필요: 게재 학회]
+
+**의료 VQA 데이터셋**
+
+9. He, X., et al. "PathVQA: 30000+ Questions for Medical Visual Question Answering." arXiv:2003.10286. 2020. [확인 필요: 게재 학회]
+10. Liu, B., et al. "SLAKE: A Semantically-Labeled Knowledge-Enhanced Dataset for Medical Visual Question Answering." ISBI 2021. [확인 필요: 페이지]
+11. Lau, J. J., et al. "A dataset of clinically generated visual questions and answers about radiology images (VQA-RAD)." Scientific Data 5, 2018. [확인 필요: 논문 번호·DOI]
+
+**하이퍼파라미터 최적화**
+
+12. Akiba, T., et al. "Optuna: A Next-generation Hyperparameter Optimization Framework." KDD 2019. [확인 필요: 페이지]
+13. Li, L., et al. "Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization." JMLR 18, 2018. [확인 필요: 페이지]
+
+**평가 방법론**
+
+14. Shi, W., et al. "Detecting Pretraining Data from Large Language Models (Min-K% Probability)." arXiv:2310.16789. ICLR 2024.
+15. Guo, C., et al. "On Calibration of Modern Neural Networks." ICML 2017. [확인 필요: 논문 제목 원문 대조·페이지]
+
+> **주의**: 위 15건은 본문 인용에서 기계적으로 수집한 것이다. 저자명은 본문에 "et al."로만 표기된 경우가 많아 **제1저자 성(姓)만 확인된 상태**이며, 공저자 전체 목록은 원문 확인이 필요하다. 확인 없이 추정해 기재하지 않았다.
+
+---
+
+## 부록
+
+### 부록 A. 실험 결과 파일 경로
+
+본 연구의 모든 수치는 아래 파일에서 산출되었다. 논문 본문의 표·검정 결과는 모두 이 파일들로 역추적할 수 있다.
+
+**Phase 1 — 제로샷 베이스라인**
+
+| 파일 | 내용 | 본문 위치 |
+|------|------|-----------|
+| `results/phase1_baseline/` | 12조건(4모델×3데이터셋, seed 42) 원본 결과 | Table 4.1 |
+| `results/phase1_baseline/phase1_robustness.md` | Min-K% 오염 강건성 재검정 | 4.1.1 |
+
+**Phase 2 — QLoRA 파인튜닝**
+
+| 파일 | 내용 | 본문 위치 |
+|------|------|-----------|
+| `results/phase2_finetune/phase2_summary.csv` | 75조건(Main 36 + Ablation 39) 요약 | Table 4.2, 4.2a, 4.2c, 4.2d |
+| `results/phase2_finetune/phase2_rq2_analysis.md` | RQ2 3중 검증 + Mixed-Effects Model | 4.2.1 |
+| `results/phase2_finetune/cross_dataset_cf_summary.md` | cross-dataset CF 72조건 | Table 4.2b-B |
+
+**Phase 3 — 자율 하이퍼파라미터 최적화**
+
+| 파일 | 내용 | 본문 위치 |
+|------|------|-----------|
+| `results/phase3_autoresearch/results.tsv` | 610 trial 전수 기록(하이퍼파라미터·성능·근거) | 4.3 전반 |
+| `results/phase3_autoresearch/phase3_rq3_analysis.md` / `.json` | run-level Kruskal-Wallis·Mann-Whitney·Bootstrap CI | Table 4.3, 4.3.1 |
+| `results/phase3_autoresearch/phase3_summary.txt` | 전략별 최고 trial 및 분포 통계 | Table 4.3a, 4.3c |
+| `results/phase3_autoresearch/phase3_anytime_curve.csv` | anytime 곡선 원본 수치(trial별 중앙값·IQR·n) | 4.3.3 |
+| `results/phase3_autoresearch/phase3_anytime_summary.md` | 최고 성능 도달 시점 요약 | Table 4.3b |
+| `results/phase3_autoresearch/phase3_anytime.png` / `.pdf` | anytime performance 곡선 그림 | 4.3.3 |
+
+> `results.tsv`의 `agent_reasoning` 컬럼은 줄바꿈이 포함된 인용 문자열을 담고 있어 행 단위 도구(`wc -l` 등)로는 정확히 집계되지 않는다. 집계·분석 시에는 `src/autoresearch/tracker.py`의 `ExperimentTracker`(csv 모듈 기반)를 사용해야 한다.
+
+### 부록 B. Autoresearch 에이전트 시스템 프롬프트
+
+아래는 `configs/autoresearch/program.md`의 전문이다. 5.3(8)에서 지적한 세 가지 설정 불일치의 근거이므로 원문 그대로 수록한다. **밑줄 친 부분이 문제가 된 지점이다.**
+
+```markdown
+# Autonomous HPO Agent - System Prompt
+
+You are an autonomous hyperparameter optimization agent for medical VQA
+fine-tuning research.
+
+## Task
+Given the history of previous QLoRA fine-tuning experiments, suggest the NEXT
+hyperparameter configuration that is most likely to improve validation accuracy
+on the PathVQA medical VQA dataset.
+
+## Search Space
+| Parameter        | Range                       | Type                     |
+|------------------|-----------------------------|--------------------------|
+| lora_rank        | {4, 8, 16, 32, 64}          | discrete                 |
+| lora_alpha       | rank × {1, 2, 4}            | discrete                 |
+| learning_rate    | [1e-5, 5e-4]                | continuous (log-scale)   |
+| batch_size       | {1, 2, 4}                   | discrete                 |
+| grad_accum_steps | {4, 8, 16}                  | discrete                 |
+| warmup_ratio     | [0.0, 0.1]                  | continuous               |
+| weight_decay     | [0.0, 0.1]                  | continuous               |
+| lora_targets     | {"minimal","medium","full"} | categorical              |
+| epochs           | {1, 2, 3, 5}                | discrete   ← (i) 무효    |
+
+Where: minimal = [q_proj, v_proj] / medium = [q_proj, k_proj, v_proj, o_proj]
+       full = all linear layers
+
+## Strategy Guidelines
+1. Early exploration (trials 0-5): Try diverse configurations to map the
+   landscape. Vary multiple parameters at once.
+2. Mid exploitation (trials 5-20): Focus on promising regions. Take the best
+   configuration and vary 1-2 parameters at a time.        ← (ii) 예산 불일치
+3. Late refinement (trials 20+): Fine-tune around the best configuration with
+   small perturbations.                                    ← (ii) 미발동 구간
+
+## Key Insights for Medical VQA
+- Medical images benefit from higher LoRA ranks (16-64).
+- Learning rate is often the most sensitive parameter.
+- `medium` or `full` target modules often outperform `minimal`.
+- Effective batch size = batch_size × grad_accum_steps. Keep in 4-16 range.
+- More epochs (3-5) help when training data is limited.    ← (i) 무효 파라미터
+- Warmup ratio 0.03-0.06 is generally safe.
+
+## Response Format
+Respond with ONLY a valid JSON object. No explanation, no markdown fences,
+no other text.                                             ← (iii) 근거 산출 금지
+```
+
+**(i) 무효 파라미터**: `epochs`는 탐색 공간과 지침에 모두 등장하나, 구현(`src/autoresearch/agent.py`)이 제안값을 폐기하고 `max_steps=200`으로 고정한다.
+**(ii) 예산 불일치**: 실제 예산은 반복당 20 trial이므로 "Late refinement (trials 20+)"는 발동하지 않으며, 예산의 약 75%가 "최고 설정을 1~2개 파라미터만 변경" 구간에 해당한다.
+**(iii) 근거 산출 금지**: RQ3가 요구한 "해석 가능한 탐색 근거"를 프롬프트가 명시적으로 배제한다.
+
+**에이전트 실행 설정**: 모델 `claude-sonnet-4-6`, `max_tokens=512`, `temperature=0`(전 trial 기록으로 확인). 온도 고정과 10회 독립 반복으로 API 비결정성을 완화했다(5.3(4)).
+
+### 부록 C. 재현 가이드
+
+아래 명령은 본 연구가 실제로 실행한 것이며, 저장소의 스크립트 인자와 일치한다.
+
+**환경 준비**
+
+```bash
+uv sync --extra unsloth        # unsloth 백엔드 필수 (Qwen 계열 데이터 포맷)
+uv run python -c "import unsloth"   # 설치 확인
+export HF_HOME=/hf_cache                          # 캐시 분산 (디스크 quota 대비)
+export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
+export WANDB_API_KEY=...       # 학습 로깅
+export ANTHROPIC_API_KEY=...   # Phase 3 autoresearch 전략에만 필요
+```
+
+> `python3`가 시스템 파이썬을 가리켜 `ModuleNotFoundError`가 발생하는 사례가 반복 관측되었으므로, 모든 실행은 `uv run python` 형태로 통일한다.
+
+**Phase 1 — 제로샷 베이스라인**
+
+```bash
+bash scripts/runpod_phase1.sh    # 12조건(4모델 × 3데이터셋), seed 42
+```
+
+**Phase 2 — QLoRA 파인튜닝**
+
+```bash
+uv run python -u -m src.finetune.run_phase2 \
+  --config_dir configs/models \
+  --finetune_config configs/finetune/base_qlora.yaml \
+  --output_dir results/phase2_finetune \
+  --seeds 42 123 456 \
+  --data_dir data \
+  --max_eval_samples 500
+
+bash scripts/run_phase2_ablation.sh   # Ablation A/B/C (PathVQA, Qwen3-VL-2B 고정)
+```
+
+**Phase 3 — 자율 하이퍼파라미터 최적화**
+
+```bash
+uv run python -u -m src.autoresearch.run_phase3 \
+  --model_config configs/models/qwen3_vl_2b.yaml \
+  --finetune_config configs/finetune/base_qlora.yaml \
+  --output_dir results/phase3_autoresearch \
+  --strategies manual random optuna autoresearch \
+  --repeats 10 \
+  --trials_per_repeat 20 \
+  --seed 42 \
+  --data_dir data \
+  --time_budget_min 90 \
+  --max_test_samples 500 \
+  --max_parallel 2
+```
+
+> `--time_budget_min 90`은 실험 통제 변수가 아니라 이상 조합으로 인한 무한 학습을 막는 안전장치다. 학습량 통제는 `max_steps=200`(코드 상수)이 담당한다. `--max_parallel 2`는 GPU 2장에 (전략, 반복) 단위 작업을 배분한다.
+
+**분석 및 그림 생성**
+
+```bash
+uv run python scripts/analyze_phase3.py --results_dir results/phase3_autoresearch
+uv run python scripts/summarize_stage.py manual random optuna autoresearch
+uv run python scripts/plot_phase3_anytime.py --results_dir results/phase3_autoresearch
+```
+
+### 부록 D. Autoresearch 제안 근거 로그 발췌
+
+`results.tsv`의 `agent_reasoning` 컬럼 원문에서 발췌했다. 200개 완료 trial 중 **147개(73.5%)는 아래 (1)과 같이 JSON만 반환**했고, 자연어 서술이 포함된 것은 53개(26.5%)였다(5.1, 5.3(8)).
+
+**(1) 전형적 응답 — 근거 없이 설정만 반환 (전체의 73.5%)**
+
+```json
+{"lora_rank": 64, "lora_alpha": 256, "learning_rate": 2.0e-4, "batch_size": 2,
+ "grad_accum_steps": 8, "warmup_ratio": 0.05, "weight_decay": 0.01,
+ "lora_targets": "full", "epochs": 3}
+```
+
+프롬프트가 설명을 금지했으므로(부록 B (iii)) 이 형태가 지시에 부합하는 응답이다.
+
+**(2) 자연어 서술이 포함된 사례 — 정확한 진단, 그러나 작동하지 않는 수단**
+
+```
+Looking at the results:
+1. `full` targets consistently outperform `medium`
+2. LR ~3e-4 seems best (trials 435, 449, 451 all at 0.402)
+3. Rank 32 with alpha 64 at 3e-4 appears to be a local optimum
+4. All trials use bs=2, ga=8, and only 200 steps - likely under-trained
+5. Epochs haven't been varied
+```
+
+주목할 점은 4·5번 항목이다. 에이전트는 **학습량 부족을 정확히 진단**하고 `epochs`가 변경되지 않았음을 지적했으나, 구현은 제안된 `epochs`를 폐기하고 `max_steps=200`으로 고정하므로(부록 B (i)) 이 진단을 실행에 옮길 수단이 없었다. 1~3번 항목은 4.3.2에서 확인된 전략 공통의 수렴 영역(`full` targets, rank 32~64)과 일치하여, 에이전트의 결과 해석 자체는 타당했음을 보여준다.
+
+**(3) 조기 고착 사례 — 반복 8**
+
+반복 8에서 에이전트는 trial 602 이후 아래 설정을 **11회 연속 제안**했다(4.3.4).
+
+```json
+{"lora_rank": 64, "lora_alpha": 256, "learning_rate": 2.0e-4, "batch_size": 2,
+ "grad_accum_steps": 8, "warmup_ratio": 0.05, "weight_decay": 0.01,
+ "lora_targets": "full", "epochs": 3}
+```
+
+동일 설정임에도 측정된 val_accuracy는 0.388~0.444 범위에서 변동했다. 이 변동은 설정 차이가 아니라 학습·평가의 확률적 변동이며, 그 폭(약 0.056)은 본 연구가 검출한 전략 간 평균 차이(0.031)보다 크다(4.4.6). 프롬프트가 trial 5~20 구간에서 "최고 설정을 가져와 1~2개 파라미터만 변경"하도록 지시한 점(부록 B (ii))을 함께 고려하면, 이 고착은 에이전트의 판단 실패보다 지시에 대한 충실한 이행에 가깝다.
+
+> 전체 로그는 `results/phase3_autoresearch/results.tsv`의 `agent_reasoning` 컬럼 및 각 trial 디렉터리의 `rationale.md`에 있다.
+
+---
+
+*(제출 전 확인: 참고문헌의 `[확인 필요]` 항목 원문 대조)*

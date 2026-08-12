@@ -427,3 +427,891 @@ Original error:
 433	autoresearch	0	64	128	0.0002	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.6493601751327515	26.0	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
 435	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.402	0.7664	0.0547	0.6587757539749145	26.1	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
 434	autoresearch	1	32	64	0.0003	2	8	0.05	0.01	full	200	0.396	0.7541	0.0547	0.6585226273536682	26.2	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+437	autoresearch	1	8	16	0.00015	2	8	0.05	0.01	minimal	200	0.358	0.7049	0.0273	0.9722979044914246	21.5	6392.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""minimal"", ""epochs"": 3}"		0.0
+436	autoresearch	0	8	16	0.00015	2	8	0.05	0.01	full	200	0.394	0.7705	0.0352	0.7827266120910644	26.4	6445.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+438	autoresearch	1	32	128	0.00025	2	8	0.05	0.01	full	200	0.388	0.7295	0.0625	0.6394980692863464	26.6	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+439	autoresearch	0	32	128	0.00025	2	8	0.05	0.01	full	200	0.392	0.7459	0.0547	0.640315272808075	26.1	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+440	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.4	0.7787	0.0391	0.6758338737487793	26.6	7796.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+441	autoresearch	0	16	64	0.00035	2	8	0.05	0.02	full	200	0.398	0.7664	0.0469	0.651439082622528	26.2	7703.7	completed		"{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 3.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.02, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+442	autoresearch	1	32	64	0.00015	2	8	0.05	0.01	full	200	0.392	0.7746	0.0273	0.6920916485786438	26.2	8394.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+443	autoresearch	0	32	64	0.0002	2	8	0.05	0.01	full	200	0.392	0.7664	0.0352	0.675694100856781	26.0	8394.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+444	autoresearch	1	64	128	0.0002	2	8	0.05	0.01	full	200	0.39	0.7459	0.0508	0.6495948076248169	26.9	9146.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+445	autoresearch	0	32	64	0.00015	2	8	0.05	0.01	full	200	0.388	0.7664	0.0273	0.6921627569198608	26.1	8992.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+446	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.396	0.7705	0.0391	0.6759057188034058	26.5	9590.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+447	autoresearch	0	64	128	0.0003	2	8	0.05	0.01	full	200	0.392	0.7459	0.0547	0.6372681784629822	26.5	9744.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+448	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.394	0.7705	0.0352	0.6755051350593567	26.4	10188.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+449	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.398	0.7664	0.0469	0.6587010216712952	26.6	10188.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+450	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.39	0.7623	0.0352	0.6757392191886902	26.5	10786.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+451	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.398	0.7541	0.0586	0.6580042982101441	27.2	10786.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+452	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.394	0.7705	0.0352	0.6757111620903015	26.2	11384.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+453	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.394	0.7582	0.0469	0.6584076023101807	26.2	11384.4	completed		"Looking at the results:
+
+1. `full` targets consistently outperform `medium`
+2. LR ~3e-4 seems best (trials 435, 449, 451 all at 0.402)
+3. Rank 32 with alpha 64 at 3e-4 appears to be a local optimum
+4. All trials use bs=2, ga=8, and only 200 steps - likely under-trained
+5. Epochs haven't been varied - all trials appear short; more epochs could help significantly
+6. warmup_ratio and weight_decay haven't been explored (likely defaults)
+
+Key unexplored dimensions: epochs (more training), different batch configs, warmup/weight_decay tuning. The biggest untested lever is training longer with the best config.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+454	autoresearch	1	32	64	0.0002	4	4	0.05	0.01	full	200	0.398	0.7787	0.0352	0.6759209609031678	20.0	11986.5	completed		"Looking at the results:
+
+1. `full` targets consistently outperform `minimal` and `medium`
+2. rank=32, alpha=64, lr=2e-4 seems to be the sweet spot (trials 440, 446, 448, 450, 452 all cluster around 0.39-0.40)
+3. rank=64 didn't improve over rank=32
+4. All trials used 200 steps with bs=2, ga=8 (effective batch=16)
+5. Warmup and weight decay haven't been varied - all using defaults
+6. More epochs haven't been tested - 200 steps is quite short for PathVQA ~20K samples
+
+Key unexplored areas:
+- More training steps/epochs
+- Different batch size / grad accumulation combinations
+- Varying warmup_ratio and weight_decay
+- rank=16 with full targets
+
+The most promising next step: try the best config (rank=32, alpha=64, lr=2e-4, full) but with more epochs (3 instead of implied 1) and adjust warmup/weight decay. Also try bs=4 to reduce noise.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 4, ""grad_accum_steps"": 4, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+455	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.402	0.7623	0.0586	0.6584969854354858	26.0	11982.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+456	autoresearch	1	16	64	0.0002	2	8	0.05	0.01	full	200	0.394	0.7664	0.0391	0.6744471192359924	26.2	12491.8	completed		"Looking at the results:
+
+1. `full` targets consistently outperform `minimal` and `medium`
+2. rank=32, alpha=64, lr=2e-4 seems to be a sweet spot (trial 440 best at 0.4000)
+3. Many trials are near-duplicates - need to explore different dimensions
+4. Epochs haven't been varied (all 200 steps) - more epochs could help
+5. Warmup ratio and weight decay haven't been varied much
+6. batch_size=4, ga=4 (trial 454) gave 0.3980 - similar effective batch size but slightly different
+
+Unexplored combinations:
+- Higher epochs (3-5) with the best config
+- Different warmup ratios
+- rank=16 with full targets and optimal LR
+- alpha multiplier variations (rank × 4 = 256 for rank=64)
+
+The most promising unexplored direction: try rank=32, full targets with more epochs (3) and a slightly higher LR (~2.5e-4), with adjusted warmup. Or try rank=16 with full targets which hasn't been done yet.
+
+Let me try rank=16 with full targets and lr=2e-4 (unexplored combo), plus more epochs:
+
+{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+457	autoresearch	0	32	64	0.0003	4	4	0.05	0.01	full	200	0.4	0.7623	0.0547	0.6581421685218811	20.0	12584.5	completed		"Looking at the results:
+
+1. `full` targets consistently outperform `medium`
+2. rank=32, alpha=64, lr=3e-4 appears near-optimal (multiple trials confirm ~0.398-0.402)
+3. Most trials use bs=2, ga=8 (effective batch=16), warmup/weight_decay likely at defaults
+4. Epochs have been 200 steps - need to try more epochs for better convergence
+5. Unexplored: different batch sizes, more epochs, warmup_ratio variations, weight_decay tuning
+
+Key insight: All trials seem to be at 200 steps. With PathVQA ~20K samples, 3-5 epochs would be much more. Let me try increasing epochs significantly, and also adjust warmup/weight_decay which haven't been explicitly varied.
+
+I'll try rank=32, alpha=64, lr=3e-4 (the best config) but with epochs=3, different batch config (bs=4, ga=4 for same effective batch but different dynamics), explicit warmup=0.05, weight_decay=0.01.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 4, ""grad_accum_steps"": 4, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+458	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.388	0.7623	0.0312	0.6754810333251953	26.1	13182.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+459	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6582782053947449	26.1	13182.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+460	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.39	0.7623	0.0352	0.6754789519309997	26.2	13780.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+461	autoresearch	0	32	64	0.0003	1	16	0.05	0.01	full	200	0.398	0.7582	0.0547	0.6586135458946228	38.3	13780.6	completed		"Looking at the results:
+
+1. Best configs use rank=32, alpha=64, lr=3e-4, full targets (val_acc=0.4020)
+2. All trials use epochs equivalent to 200 steps - need to try more epochs
+3. batch_size and grad_accum have been mostly fixed at bs=2, ga=8
+4. warmup_ratio and weight_decay haven't been varied (likely at defaults)
+5. The learning rate sweet spot appears around 3e-4
+6. Rank 32 with full targets seems optimal so far
+
+Key unexplored areas:
+- More epochs (3-5) - all trials seem to be ~200 steps which with bs=2, ga=8 is very few steps
+- Different warmup ratios
+- Different weight decay values
+- Trying bs=1 with ga=16 for same effective batch but more gradient accumulation
+
+Let me try: rank=32, alpha=64, lr=3e-4, full targets but with more epochs (3), different warmup (0.05), weight_decay=0.01, and bs=1, ga=8 to get a fresh configuration.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 1, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+462	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.392	0.7705	0.0312	0.6759113645553589	26.1	14378.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+463	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.404	0.7664	0.0586	0.6585523748397827	26.3	14378.5	completed		"Looking at the results:
+
+1. **Best config**: rank=32, alpha=64, lr=3e-4, bs=2, ga=8, full targets, val_acc=0.4020
+2. **Batch size variations** (trials 457, 461) show minimal impact - effective batch size doesn't matter much here
+3. **All recent trials** are stuck around 0.398-0.402 with 200 steps - this suggests 200 steps may be insufficient
+4. **Unexplored**: epochs/longer training, warmup_ratio variations, weight_decay variations, medium targets with higher rank
+5. The model may need more training steps to converge - all trials use 200 steps
+
+Key insight: Every trial has used the same number of steps (200). Training longer (more epochs) with the best hyperparameters is a clear unexplored dimension that could break through the plateau.
+
+Also, warmup_ratio and weight_decay have been constant (likely defaults) - worth exploring.
+
+Let me try: rank=32, alpha=64, lr=3e-4, full, with more epochs (3) and explicit warmup/weight_decay tuning.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+464	autoresearch	1	32	64	0.0002	2	8	0.05	0.05	full	200	0.386	0.7541	0.0352	0.675691523551941	26.0	14976.5	completed		"Looking at the results:
+
+1. The best config is rank=32, alpha=64, lr=2e-4, bs=2, ga=8, full targets (val_acc=0.4000)
+2. Many trials are near-duplicates with tiny variance (0.388-0.400) - the search is stuck
+3. Unexplored dimensions: epochs (all at 200 steps, never varied), warmup_ratio and weight_decay (never explicitly varied from defaults), medium targets with higher rank, different learning rates beyond the tested range
+
+Key observations:
+- All trials use 200 steps - this is likely just 1 epoch equivalent. More epochs could help significantly
+- lr=3e-4 with rank=32 got 0.396, lr=2e-4 got 0.400, lr=1.5e-4 got 0.392 - sweet spot around 2e-4
+- rank=64 didn't outperform rank=32, suggesting rank=32 is sufficient
+- minimal targets performed worst (0.358)
+- weight_decay and warmup_ratio haven't been meaningfully explored
+
+Strategy: Try more epochs (3) with the best core config but adjust warmup and weight_decay, which could meaningfully improve generalization on limited medical data.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+465	autoresearch	0	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7623	0.0547	0.6584637188911437	26.8	14976.5	completed		"Looking at the experiment history:
+
+1. **Best configs**: rank=32, alpha=64, lr=3e-4, full targets consistently performs around 0.398-0.404
+2. **Unexplored**: epochs > 1 (all trials use 200 steps which likely corresponds to ~1 epoch), warmup_ratio and weight_decay variations haven't been tested (likely using defaults)
+3. **Diminishing returns**: Rank variation (8-64) shows minimal impact; batch size variation shows minimal impact
+4. **Key gap**: More epochs could significantly help - PathVQA is ~20K samples, more training steps needed
+
+The most promising unexplored direction is training for more epochs (3-5) with the best configuration, plus trying different warmup/weight_decay values.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+466	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.394	0.7705	0.0352	0.675584545135498	26.3	15574.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+467	autoresearch	0	32	64	0.00025	2	8	0.05	0.01	full	200	0.398	0.7582	0.0547	0.6650835657119751	26.4	15574.5	completed		"Looking at the experiment history:
+
+1. **Key observations:**
+   - The best config is rank=32, alpha=64, lr=3e-4, bs=2, ga=8, full targets (~0.402-0.404)
+   - All recent trials (449-465) are essentially the same config with minor variance - likely stochastic noise
+   - `full` targets consistently outperform `medium` (0.376 vs 0.402+)
+   - Higher rank (64) with lr=2e-4 got 0.396, suggesting rank=32 at lr=3e-4 is near-optimal for this step count
+   - **Critical unexplored factor: epochs/steps** - all trials use only 200 steps, which is very limited for PathVQA's ~20K training set
+
+2. **Diminishing returns:** Rank variation (8-64) shows little difference once `full` targets are used. The bottleneck appears to be training duration.
+
+3. **Unexplored combinations:**
+   - More epochs (3-5) with the best config
+   - Different warmup ratios and weight decay values
+   - Lower learning rates with more steps (cosine decay effect)
+
+**Strategy:** The most impactful unexplored variable is training longer. With 200 steps and bs=2, ga=8 (effective bs=16), we're only seeing ~1600 samples out of 20K. Increasing epochs significantly should help. Also try slightly higher warmup and weight decay.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+468	autoresearch	1	32	64	0.0002	2	8	0.05	0.01	full	200	0.394	0.7705	0.0352	0.6757744598388672	26.5	16172.5	completed		"Looking at the experiment history, I can see:
+
+1. The best result (0.4000) is trial 440: rank=32, alpha=64, lr=2e-4, bs=2, ga=8, full targets
+2. Many trials are near-duplicates of this configuration with minimal variation
+3. Key unexplored dimensions: **epochs** (all trials at 200 steps, likely ~1 epoch), **warmup_ratio**, **weight_decay**, and **learning rate schedule**
+4. Higher epochs haven't been tested - with only 200 steps, the model may be undertrained
+5. The `medium` target with rank=16 got 0.38, but `full` with rank=32 gets ~0.39-0.40
+6. Alpha ratio: rank=32, alpha=128 (ratio=4) got 0.388 vs alpha=64 (ratio=2) got 0.400 - ratio=2 seems better
+
+**Key insight**: All trials use 200 steps. With PathVQA ~20K training samples and batch_size=2, grad_accum=8 (effective batch=16), one epoch ≈ 1250 steps. We need more epochs to see real improvement. Let me try more epochs with the best base config, plus adjust warmup and weight decay.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+469	autoresearch	0	32	64	0.0003	2	8	0.05	0.05	full	200	0.398	0.7623	0.0508	0.6585509514808655	26.1	16172.5	completed		"Looking at the experiment history, I notice:
+
+1. Most trials are stuck around 0.398-0.404 with rank=32, lr=3e-4, full targets - suggesting we've hit a local optimum with these settings
+2. All trials have been at 200 steps (likely 1 epoch equivalent) - more epochs haven't been tested
+3. Warmup ratio and weight decay variations haven't been explored much
+4. The best result (0.404) keeps appearing with rank=32, lr=3e-4, full - but we need to break out of this region
+5. Higher epochs (3-5) are recommended for limited data like PathVQA (~20K train samples)
+
+Key unexplored areas:
+- More epochs (3 or 5) with the best configuration
+- Different warmup ratios (most seem to use default ~0.03)
+- Higher weight decay
+- Trying rank=16 with full targets and lr=3e-4 (only tested with medium)
+
+The most promising next step is to train longer with the best configuration, as 200 steps is very short for PathVQA with 20K samples.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+470	autoresearch	2	16	32	0.0001	2	8	0.05	0.01	medium	200	0.378	0.7172	0.0547	0.8784842252731323	23.5	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+471	autoresearch	3	16	32	0.0001	2	8	0.05	0.01	medium	200	0.374	0.709	0.0547	0.8783507490158081	23.5	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+473	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6489978218078614	26.1	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+472	autoresearch	2	64	128	0.0002	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.6491999840736389	26.2	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+475	autoresearch	2	32	64	0.0003	2	8	0.05	0.01	full	200	0.404	0.7705	0.0547	0.6585490131378173	26.9	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+474	autoresearch	3	32	64	0.0001	2	8	0.05	0.01	full	200	0.394	0.7664	0.0391	0.7181216239929199	27.0	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+477	autoresearch	3	8	16	0.0003	2	8	0.05	0.01	full	200	0.378	0.7336	0.0391	0.7233931231498718	27.4	6445.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+476	autoresearch	2	32	64	0.0001	2	8	0.05	0.01	full	200	0.39	0.7582	0.0391	0.7183084440231323	27.8	6600.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+479	autoresearch	2	32	128	0.0003	2	8	0.05	0.01	full	200	0.394	0.7418	0.0625	0.636694073677063	27.7	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+478	autoresearch	3	32	128	0.00025	2	8	0.05	0.01	full	200	0.388	0.7336	0.0586	0.6402149367332458	27.7	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+480	autoresearch	2	16	64	0.0003	2	8	0.05	0.01	full	200	0.406	0.7746	0.0547	0.657793710231781	27.1	7703.7	completed		"{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+481	autoresearch	3	64	128	0.0003	2	8	0.05	0.01	full	200	0.388	0.7418	0.0508	0.6360290336608887	27.1	7950.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+482	autoresearch	2	16	32	0.0003	2	8	0.05	0.01	full	200	0.386	0.7582	0.0312	0.6852572774887085	26.3	8301.7	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+483	autoresearch	3	64	256	0.0002	2	8	0.05	0.01	full	200	0.398	0.7582	0.0547	0.6309704995155334	26.7	8548.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+484	autoresearch	2	16	64	0.0002	2	8	0.05	0.01	full	200	0.394	0.7623	0.043	0.6745586848258972	27.0	8899.7	completed		"{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+485	autoresearch	3	64	128	0.00015	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6602218055725098	27.0	9146.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+486	autoresearch	2	8	32	0.0003	2	8	0.05	0.01	full	200	0.388	0.7459	0.0469	0.6876716136932373	26.6	9435.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 32, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+487	autoresearch	3	32	64	0.00015	2	8	0.05	0.02	full	200	0.39	0.7705	0.0273	0.6920016813278198	26.8	9590.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.02, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+488	autoresearch	2	32	64	0.0002	2	8	0.05	0.01	full	200	0.388	0.7623	0.0312	0.6758277153968811	26.4	10188.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+489	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.392	0.75	0.0508	0.649299168586731	26.5	10342.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+490	autoresearch	2	16	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6576784992218018	26.1	10693.7	completed		"Looking at the results:
+
+1. **LR 3e-4 generally outperforms 1e-4 and 2e-4** - trials 475, 479, 480, 482, 486 all used 3e-4 and tend to cluster at top
+2. **`full` targets outperform `medium`** - trial 470 (medium, 0.378) vs similar full configs
+3. **Best: rank=16, alpha=64, lr=3e-4, full** (trial 480, 0.406)
+4. **Rank 32 with alpha=64 at 3e-4 got 0.404** - close second
+5. **Higher alpha ratio (alpha=2×rank) seems better** than 1× ratio - trial 480 (alpha=64=4×16) beat trial 482 (alpha=32=2×16)
+
+Unexplored areas:
+- **Epochs > 1** (all trials used ~200 steps, likely 1 epoch) - more epochs could help
+- **Different batch size / grad_accum** combinations
+- **Rank 64 with full targets at 3e-4** (trial 472 used 2e-4)
+- **Warmup ratio and weight decay** haven't been varied (likely defaults)
+
+Strategy: Try rank=16, alpha=64, lr=3e-4, full targets but with **more epochs (3)** and adjusted warmup/weight_decay, keeping effective batch size same.
+
+{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+491	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.402	0.7664	0.0547	0.6491629266738892	26.6	10940.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+493	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.402	0.7705	0.0508	0.649290246963501	26.6	11538.5	completed		"Looking at the results:
+
+1. `full` targets consistently outperform `medium`
+2. Rank 64 with alpha 128 at lr ~2e-4 is the sweet spot (trials 473, 485, 491 all ~0.40)
+3. All trials use 200 steps with bs=2, ga=8 - need to explore more epochs
+4. Warmup ratio and weight decay haven't been varied - all defaults
+5. The best configs cluster around rank=64, alpha=128, lr=2e-4, but none have tried more epochs
+
+Key unexplored: epochs > 1 step count, different batch configurations, warmup/weight_decay tuning. The 200-step limit may be constraining learning. Let me try rank=64, alpha=128, lr=2e-4 with more epochs (3) and tuned warmup/weight_decay to push beyond the plateau.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+492	autoresearch	2	16	64	0.0003	2	16	0.05	0.01	full	200	0.432	0.7992	0.082	0.6392881226539612	41.8	11325.9	completed		"{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+494	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6491717100143433	27.0	12136.5	completed		"Looking at the experiment history:
+
+1. **Rank 64 + full targets** consistently performs best (~0.400)
+2. **Learning rate ~2e-4** seems optimal (0.15e-4 and 3e-4 both slightly worse)
+3. **Alpha=128 vs 256** - 256 slightly worse, 128 seems good
+4. All trials use epochs corresponding to 200 steps, batch_size=2, grad_accum=8
+5. Unexplored: different epochs (more training), different warmup/weight_decay, batch configurations
+
+Key insight: All trials have been at 200 steps with similar warmup/weight_decay defaults. Training longer with more epochs could help significantly for the limited PathVQA dataset. Also, warmup_ratio and weight_decay haven't been varied.
+
+Let me try rank=64, alpha=128, lr=2e-4 (best combo) but with **more epochs (3)** and tuned warmup/weight_decay to see if longer training helps:
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+495	autoresearch	2	32	64	0.0003	2	16	0.05	0.01	full	200	0.426	0.7869	0.082	0.6403971576690674	40.8	12016.6	completed		"Looking at the results:
+
+1. Trial 492 (best, 0.4320) used grad_accum_steps=16 vs 8 - this doubled the effective batch size and helped significantly
+2. lr=3e-4 with full targets consistently outperforms lower LR
+3. rank=16, alpha=64 with full targets at 3e-4 is the sweet spot so far
+4. The jump from ga=8 to ga=16 was the biggest single improvement (+0.032)
+
+Key unexplored combinations:
+- ga=16 with different ranks (only tested rank=16 so far)
+- More epochs (all trials at 200 steps, ~1 epoch equivalent)
+- Higher alpha ratios with the winning config
+- Batch size variation with ga=16
+
+Next logical step: Try rank=32 with ga=16 (unexplored), keeping the winning lr=3e-4, full targets, and also try increasing epochs slightly by adjusting steps.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+496	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6492389678955078	26.0	12734.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+498	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.394	0.7541	0.0508	0.6491587257385254	26.2	13332.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+497	autoresearch	2	16	64	0.0004	2	16	0.05	0.01	full	200	0.422	0.7705	0.0898	0.6227189087867737	40.7	12521.9	completed		"Looking at the results:
+
+1. **Key findings**:
+   - Trial 492 (rank=16, alpha=64, lr=3e-4, ga=16) is best at 0.4320
+   - Trial 495 (rank=32, alpha=64, lr=3e-4, ga=16) got 0.4260 - similar but slightly worse
+   - Increasing grad_accum from 8→16 gave a notable boost (~+0.03)
+   - lr=3e-4 consistently outperforms lower LRs
+   - `full` targets outperform `medium`
+   - rank=16 with alpha=64 (ratio=4) seems sweet spot
+
+2. **Unexplored combinations**:
+   - ga=16 with rank=16 but different alpha (e.g., 32 instead of 64)
+   - Higher lr (e.g., 4e-4) with the best config
+   - More epochs (currently all at 200 steps, not epoch-controlled explicitly)
+   - batch_size=4 with ga=8 (same effective batch=32)
+   - warmup_ratio and weight_decay haven't been varied much
+
+3. **Next step**: Try rank=16, alpha=64, lr=3e-4, ga=16 with batch_size=4 (larger effective batch = 64) to test if that helps further, or try a slightly higher lr=4e-4 with the winning config. Let me try lr=4e-4 with the best setup to see if we can push further.
+
+{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 4e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+499	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.398	0.7623	0.0508	0.6491907978057861	26.5	13930.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+500	autoresearch	2	16	64	0.00025	2	16	0.05	0.01	full	200	0.418	0.7746	0.0781	0.647977352142334	40.8	13119.9	completed		"Looking at the results:
+
+1. **grad_accum_steps=16 is clearly better** than 8 (trial 492: 0.4320 vs 490: 0.4000 with same other params)
+2. **rank=16, alpha=64, lr=3e-4, full targets** seems to be the sweet spot
+3. **lr=4e-4** (trial 497) slightly underperforms vs 3e-4 (trial 492)
+4. **rank=32 with ga=16** (trial 495: 0.4260) is good but not as good as rank=16
+5. Unexplored: different epochs (all trials show 200 steps), warmup_ratio/weight_decay variations, and trying lr slightly below 3e-4 with ga=16
+
+Key next step: Try the best config (rank=16, alpha=64, lr=3e-4, full, ga=16) but with more epochs or slightly different warmup/weight_decay. Also, lr=2.5e-4 with ga=16 is unexplored.
+
+{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+501	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6495773816108703	26.7	14528.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+503	autoresearch	3	64	128	0.0002	2	8	0.05	0.05	full	200	0.4	0.7664	0.0508	0.6490234136581421	26.4	15126.5	completed		"Looking at the experiment history, I can see:
+
+1. The best configs cluster around rank=64, alpha=128, lr=2e-4, full targets - but there's been excessive repetition of this exact config with minimal variation
+2. Epochs haven't been varied - all trials use 200 steps (likely ~1 epoch). More epochs could help significantly for PathVQA
+3. Warmup ratio and weight decay haven't been systematically explored
+4. Batch size and grad_accum haven't been varied
+5. The accuracy plateau around 0.40 suggests we need a different dimension to explore - more training steps/epochs
+
+Key unexplored: More epochs with the best config (rank=64, alpha=128, lr=2e-4, full), and varying warmup/weight_decay. Let me try more epochs with slightly different regularization.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+502	autoresearch	2	64	128	0.0003	2	16	0.05	0.01	full	200	0.428	0.7828	0.0898	0.609161274433136	40.8	13964.7	completed		"Looking at the results:
+
+1. **grad_accum_steps=16 clearly helps** - trials 492, 495, 497, 500 all outperform earlier trials with ga=8
+2. **Best config**: rank=16, alpha=64, lr=3e-4, bs=2, ga=16, full → 0.4320
+3. **LR sensitivity**: 3e-4 > 2.5e-4 > 4e-4 > 2e-4 in the ga=16 group
+4. **Rank**: 16 slightly edges out 32 with ga=16
+5. **Unexplored**: epochs > 1 (all trials at 200 steps), different warmup/weight_decay values, rank=64 with ga=16
+
+Key insight: All trials have been 200 steps. With PathVQA ~20K training samples and bs=2, ga=16 (effective bs=32), one epoch ≈ 625 steps. More epochs could significantly help. Let me try rank=16, alpha=64, lr=3e-4 with more epochs (3) to train longer, while also trying rank=64 with ga=16.
+
+I'll try rank=64 with ga=16 (unexplored combination) with lr=3e-4 and more epochs:
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+504	autoresearch	3	64	128	0.0002	2	8	0.05	0.01	full	200	0.394	0.7541	0.0508	0.6493847393989562	26.6	15724.5	completed		"Looking at the experiment history, I notice:
+
+1. The last ~10 trials are nearly identical (rank=64, alpha=128, lr=2e-4, full) with val_acc plateauing around 0.400-0.402
+2. The best result (0.4020) came from rank=64, alpha=128, lr=2e-4, full
+3. Key unexplored dimensions: epochs (all trials show 200 steps), warmup_ratio, weight_decay variations, and batch configurations
+4. More epochs could help given PathVQA's ~20K training samples
+5. Higher alpha (256) with rank=64 got 0.3980 - slightly worse, so alpha=128 seems better
+6. lr=1.5e-4 with rank=64 got 0.4000, lr=2e-4 seems slightly better
+
+To escape the plateau, I should try: more epochs (3 instead of implied ~1), different warmup, or try a meaningfully different configuration like rank=64 with more training steps via more epochs.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+505	autoresearch	2	32	128	0.0003	2	16	0.05	0.01	full	200	0.442	0.7992	0.1016	0.6072961258888244	40.7	14408.6	completed		"Looking at the data:
+
+1. **grad_accum_steps=16 clearly helps** - trials 492, 495, 502 all outperform similar configs with ga=8
+2. **Best config**: rank=16, alpha=64, lr=3e-4, bs=2, ga=16, full → 0.4320
+3. **rank=64 with ga=16** got 0.4280 - higher rank didn't help much
+4. **lr=3e-4 seems optimal** - lr=4e-4 (trial 497) slightly worse at 0.4220
+5. **Unexplored**: larger alpha multiplier (alpha=128 with rank=16), different warmup/weight_decay values, epochs variation
+
+Key insight: Trial 492 is best with rank=16, alpha=64 (alpha=4×rank). Let me try rank=16 with alpha=32 (2×rank) at lr=3e-4 with ga=16 - wait, that's close to tried configs. 
+
+Better: Try rank=32, alpha=128 (4×rank) with lr=3e-4, ga=16 - this combination hasn't been tried (trial 495 used alpha=64 with rank=32).
+
+{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+506	autoresearch	3	64	256	0.0002	2	8	0.06	0.01	full	200	0.39	0.75	0.0469	0.6349546980857849	27.5	16322.5	completed		"Looking at the experiment history, I can see:
+
+1. The best configs use rank=64, alpha=128, lr=2e-4, full targets - but there's massive repetition with nearly identical results (~0.400)
+2. Diminishing returns are clear on rank (64 vs 32 shows small gains)
+3. Almost all trials use bs=2, ga=8 (effective batch=16), warmup/weight_decay not varied much
+4. Epochs haven't been varied - all trials show 200 steps, likely 1 epoch equivalent
+5. Unexplored: different epochs, different warmup ratios, different batch configurations, alpha=256 with rank=64
+
+Key insight: The model may be undertrained. More epochs could help significantly. Also, warmup_ratio and weight_decay have been constant throughout - these are worth exploring. Let me try more epochs with the best configuration parameters, plus adjust warmup and weight decay.
+
+{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.06, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+507	autoresearch	2	64	256	0.0003	2	16	0.05	0.01	full	200	0.442	0.8033	0.0977	0.595316333770752	40.0	15160.7	completed		"Looking at the results:
+
+1. **grad_accum_steps=16** consistently outperforms 8 (trial 492: 0.4320 vs 490: 0.4000 with same other params)
+2. **lora_alpha=128** with rank=32 gave best result (trial 505: 0.4420)
+3. **lr=3e-4** appears optimal
+4. **full targets** clearly best
+5. **rank=32 or 64** with higher alpha seems promising
+6. **epochs** haven't been varied - all trials use 200 steps, likely ~1 epoch
+
+Key unexplored: higher epochs (more training steps), rank=64 with alpha=128 and ga=16, warmup/weight_decay variations.
+
+Trial 502 (rank=64, alpha=128, lr=3e-4, ga=16) got 0.4280 - slightly below 505. Let me try rank=64 with alpha=256 (4x multiplier) and ga=16, or try rank=32, alpha=128 with more epochs.
+
+Best unexplored: Try rank=32, alpha=128, lr=3e-4 with epochs=3 (more training) and ga=16 - but need to ensure it's not a duplicate. Trial 505 was epochs unclear (200 steps). Let me try with warmup and weight decay tuned, and epochs=3 explicitly, plus slightly different alpha.
+
+Try rank=64, alpha=256, lr=3e-4, ga=16 - unexplored alpha=256 for rank=64.
+
+{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+508	autoresearch	2	32	128	0.0003	2	16	0.05	0.01	full	200	0.444	0.8033	0.1016	0.6068720149993897	39.9	15604.6	completed		"Looking at the results:
+
+1. **grad_accum_steps=16** clearly outperforms 8 (0.43+ vs 0.40-)
+2. **Higher alpha ratios** (alpha=2×rank) seem beneficial - trials 505 (32/128) and 507 (64/256) both hit 0.4420
+3. **lr=3e-4** is consistently strong
+4. **rank=32 with alpha=128** (trial 505) and **rank=64 with alpha=256** (trial 507) are tied best
+5. Unexplored: rank=64 with alpha=128 at ga=16 was tried (0.4280), but rank=64 with alpha=256 at ga=16 gave 0.4420
+6. Haven't tried **more epochs** - all trials are 200 steps, likely ~1 epoch. More epochs could help significantly.
+7. Haven't varied **warmup_ratio** or **weight_decay** much.
+8. Could try rank=32, alpha=128, lr=3e-4, ga=16 with slightly different warmup/weight_decay - but that's close to 505.
+
+Next logical step: Try rank=64, alpha=256 (same as best 507) but push further - maybe try a slightly lower lr like 2.5e-4 to see if 3e-4 is optimal, or try rank=32, alpha=128 with a tweaked warmup. Actually, the most unexplored dimension is **epochs** - let me try the best config with more epochs.
+
+{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+509	autoresearch	2	32	128	0.0003	2	16	0.05	0.01	full	200	0.448	0.8115	0.1016	0.6070294332504272	39.9	16202.6	completed		"Looking at the results:
+
+1. **grad_accum_steps=16** clearly outperforms ga=8 (best results all use ga=16)
+2. **rank=32, alpha=128** with lr=3e-4 is the sweet spot (trials 505, 508 both hit 0.444)
+3. **Higher alpha multiplier (4x rank)** seems beneficial (alpha=128 with rank=32 > alpha=64)
+4. **lora_targets=""full""** consistently wins over medium/minimal
+5. Unexplored: epochs>1 (all trials use 200 steps, likely ~1 epoch), different warmup/weight_decay values, rank=64 with alpha=256
+
+Key insight: All trials have been 200 steps. Increasing epochs could significantly help. Also, rank=64 with alpha=256 at ga=16 hasn't been tried yet. Let me try rank=64, alpha=256, lr=3e-4, ga=16 with more epochs or different warmup - wait, trial 507 already did rank=64, alpha=256, lr=3e-4, ga=16 (0.4420).
+
+Unexplored: rank=32, alpha=128, lr=3e-4 with different warmup_ratio or weight_decay. Current trials likely use default warmup/weight_decay. Let me try slightly higher warmup_ratio (0.05) and weight_decay (0.01) with the best config, or try rank=64, alpha=256 with slightly different lr like 2.5e-4.
+
+{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+511	autoresearch	5	16	32	0.0001	2	8	0.05	0.01	medium	200	0.376	0.7131	0.0547	0.8784226107597352	24.0	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+510	autoresearch	4	16	32	0.0001	2	8	0.05	0.01	medium	200	0.38	0.7213	0.0547	0.8783908128738404	24.2	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+512	autoresearch	5	64	128	0.0002	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.6493754363059998	25.5	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+513	autoresearch	4	64	128	0.0002	2	8	0.05	0.01	full	200	0.394	0.7541	0.0508	0.6487596940994262	25.7	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+514	autoresearch	5	32	64	0.0001	2	8	0.05	0.01	full	200	0.39	0.7541	0.043	0.7179294776916504	25.9	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+515	autoresearch	4	32	64	0.0001	2	8	0.05	0.01	full	200	0.39	0.7582	0.0391	0.7180915713310242	25.8	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+517	autoresearch	4	8	16	0.0003	2	8	0.05	0.01	minimal	200	0.388	0.7336	0.0586	0.862785964012146	20.8	6392.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""minimal"", ""epochs"": 3}"		0.0
+516	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.402	0.7623	0.0586	0.6581877589225769	25.6	6600.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+518	autoresearch	4	32	64	0.00025	2	8	0.05	0.01	full	200	0.396	0.7541	0.0547	0.6655194854736328	25.7	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+519	autoresearch	5	64	128	0.0003	2	8	0.05	0.01	full	200	0.386	0.7418	0.0469	0.6360732460021973	25.9	7352.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+520	autoresearch	4	32	128	0.00025	2	8	0.05	0.01	full	200	0.386	0.7336	0.0547	0.6397332191467285	25.8	7796.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+521	autoresearch	5	32	128	0.0003	2	8	0.05	0.01	full	200	0.39	0.7377	0.0586	0.6358382368087768	25.9	7796.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+522	autoresearch	4	32	64	0.0002	2	8	0.05	0.01	full	200	0.39	0.7664	0.0312	0.6758381152153015	25.6	8394.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+523	autoresearch	5	32	64	0.00015	2	8	0.05	0.01	full	200	0.392	0.7705	0.0312	0.6921259498596192	25.7	8394.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+524	autoresearch	4	64	128	0.00025	2	8	0.05	0.01	full	200	0.39	0.7459	0.0508	0.6404812216758728	26.5	9146.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+525	autoresearch	5	16	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7623	0.0547	0.6576905798912048	25.8	8899.7	completed		"{""lora_rank"": 16, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+526	autoresearch	4	32	64	0.00015	2	8	0.05	0.02	full	200	0.384	0.7582	0.0273	0.6921475648880004	27.0	9590.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.02, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+527	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.402	0.7582	0.0625	0.6584857249259949	27.4	9590.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+528	autoresearch	4	64	128	0.00025	2	8	0.05	0.01	medium	200	0.394	0.7582	0.0469	0.698378233909607	23.3	10077.2	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+529	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6585780382156372	26.7	10188.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+530	autoresearch	4	64	128	0.00025	2	8	0.05	0.01	full	200	0.38	0.7336	0.043	0.6406248044967652	26.7	10940.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+531	autoresearch	5	32	64	0.0003	4	4	0.05	0.01	full	200	0.392	0.75	0.0508	0.6587425637245178	20.5	10790.5	completed		"Looking at the results:
+
+1. Best configs use rank=32, lr=3e-4, full targets (trials 516, 527, 529 all ~0.402)
+2. Higher rank (64) didn't help over rank=32
+3. All trials used bs=2, ga=8 (effective batch=16), epochs not specified but steps=200
+4. warmup_ratio and weight_decay haven't been varied - all likely using defaults
+5. Unexplored: different batch sizes, more epochs, warmup/weight_decay tuning, medium targets with higher LR
+
+The plateau around 0.402 suggests I should try:
+- More training steps/epochs (currently only 200 steps)
+- Different effective batch size
+- Tune warmup_ratio and weight_decay explicitly
+- Try medium targets with lr=3e-4 (only tried medium with lr=1e-4)
+
+Key unexplored: increasing epochs to get more steps, and varying warmup/weight_decay. Let me try rank=32, lr=3e-4, full, but with different batch config and explicit warmup/weight_decay, and more epochs.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 4, ""grad_accum_steps"": 4, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+532	autoresearch	4	32	64	0.00025	2	8	0.05	0.01	full	200	0.404	0.7664	0.0586	0.6652658295631408	26.4	11384.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+533	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7623	0.0547	0.6583165264129639	25.8	11388.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+534	autoresearch	4	32	64	0.00025	2	8	0.05	0.01	full	200	0.406	0.7746	0.0547	0.6653081107139588	26.3	11982.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+535	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6582926440238953	25.9	11986.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+536	autoresearch	4	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6585956525802612	26.5	12580.4	completed		"Looking at the results:
+
+1. Best configs: rank=32, alpha=64, lr=2.5e-4, full targets (trials 532, 534 both at 0.404-0.406)
+2. Higher alpha (128 vs 64) at same rank hurt performance (trial 520 vs 532)
+3. Full targets generally better than medium/minimal at higher ranks
+4. LR 2.5e-4 seems optimal in the range tested
+5. Unexplored: different batch sizes, grad_accum steps, warmup/weight_decay variations, and epochs beyond what's implied by 200 steps
+
+The effective batch size has been constant at 16 (bs=2, ga=8). I should try varying grad_accum or batch size, and also try more epochs with the best config. Also warmup_ratio and weight_decay haven't been varied much.
+
+Let me try rank=32, alpha=64, lr=2.5e-4, full, but with different grad_accum=16 (larger effective batch = 32) or try epochs=3 with more steps. Actually the steps column shows 200 for all - this might be fixed steps, not epochs.
+
+Let me try a slightly higher learning rate (3e-4) with rank=32, alpha=64, full targets, and vary warmup/weight_decay:
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+537	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7623	0.0547	0.6584165573120118	26.1	12584.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+539	autoresearch	5	32	64	0.0003	2	8	0.05	0.05	full	200	0.402	0.7705	0.0508	0.6582318234443665	27.0	13182.5	completed		"Looking at the results, I can see:
+
+1. The best config is rank=32, alpha=64, lr=3e-4, bs=2, ga=8, full targets (val_acc=0.4020)
+2. Many recent trials are duplicates of this configuration - need to explore new territory
+3. Unexplored: different epochs (most trials at 200 steps), warmup_ratio variations, weight_decay variations, and lower learning rates haven't been tried with full targets at rank=32
+4. Increasing epochs could help since PathVQA has ~20K training samples
+5. Haven't tried batch_size=1 with grad_accum=16 (same effective batch but different gradient noise)
+6. Haven't explored higher learning rates like 4e-4 or 5e-4
+
+Key insight: All trials seem to be at ~200 steps which may be too few. Let me try more epochs with a slightly adjusted warmup and weight decay to see if longer training helps.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+538	autoresearch	4	32	64	0.00025	2	8	0.05	0.05	full	200	0.402	0.7664	0.0547	0.6646532535552978	27.8	13178.4	completed		"Looking at the results:
+
+1. Best config: rank=32, alpha=64, lr=2.5e-4, full targets → 0.4060
+2. lr=2.5e-4 with rank=32/full seems to be the sweet spot
+3. Higher alpha (128) with rank=32 hurt (0.3860 vs 0.4060)
+4. Epochs have been fixed at 200 steps - haven't tried more epochs yet
+5. Warmup/weight_decay haven't been varied much
+6. Batch size has been constant at bs=2, ga=8 (effective=16)
+
+Key unexplored dimensions:
+- More epochs (longer training)
+- Different warmup_ratio / weight_decay
+- Smaller effective batch size (bs=1, ga=8 = eff 8)
+- rank=32, alpha=64, lr=2.5e-4 with medium targets (not yet tried)
+
+The best config seems saturated at 200 steps. Let me try rank=32, alpha=64, lr=2.5e-4 with more epochs (3) and tune warmup/weight_decay slightly, keeping full targets. Also try a slightly different weight_decay to regularize better.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+540	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6585828518867493	25.8	13780.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+541	autoresearch	4	16	32	0.00025	2	8	0.05	0.01	full	200	0.388	0.7664	0.0273	0.6967773342132568	26.5	13683.7	completed		"Looking at the results:
+
+1. **Best config**: rank=32, alpha=64, lr=2.5e-4, full targets → 0.4060
+2. **rank=64 with full** underperforms rank=32 at same LR - diminishing returns on rank
+3. **alpha=128 with rank=32** (trial 520) hurt performance vs alpha=64
+4. **lr=2.5e-4** is clearly the sweet spot; lower (1.5e-4, 1e-4) and higher (3e-4) both slightly worse
+5. **Unexplored**: epochs > 1 (all trials at 200 steps), different batch sizes, warmup/weight_decay variations, lora_rank=16 with full targets
+
+Key insight: All trials used same steps (~200), but never varied epochs. Training longer with the best config could help significantly. Also, rank=16 with full targets + lr=2.5e-4 is unexplored.
+
+Let me try rank=16 with full targets and lr=2.5e-4 to test if smaller rank is sufficient, plus increase epochs to 3 to allow more training steps.
+
+{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+542	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.398	0.7582	0.0547	0.6587078428268432	25.9	14378.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+543	autoresearch	4	32	64	0.00025	2	8	0.05	0.01	full	200	0.406	0.7746	0.0547	0.6652784156799316	26.3	14374.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+545	autoresearch	4	32	64	0.00025	2	4	0.05	0.01	full	200	0.392	0.7418	0.0586	0.6986665964126587	19.0	14956.5	completed		"Looking at the results:
+
+1. Best configs cluster around rank=32, alpha=64, lr=2.5e-4, full targets (~0.404-0.406)
+2. Higher rank (64) with full targets doesn't consistently beat rank=32
+3. Lower LR (1.5e-4, 1.0e-4) underperforms
+4. All trials use bs=2, ga=8 (effective batch=16), epochs=200 steps
+
+Unexplored: epochs variation (all at 200 steps), warmup_ratio and weight_decay variations, batch_size changes, grad_accum changes. The best config is rank=32, alpha=64, lr=2.5e-4, full. Let me try increasing epochs (more training steps) with the best hyperparameters, or try a different effective batch size.
+
+Key unexplored: more epochs (3-5 actual epochs vs fixed 200 steps), different grad_accum, or weight_decay tuning. Let me try rank=32, alpha=64, lr=2.5e-4, full with more epochs and slightly different warmup/weight_decay, and smaller grad_accum to see if that helps.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 4, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+544	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.6586356472969055	26.0	14976.5	completed		"Looking at the results, I can see:
+
+1. The best config is rank=32, alpha=64, lr=3e-4, bs=2, ga=8, full targets (val_acc=0.4020)
+2. Many recent trials are near-duplicates of this config with minimal variation
+3. Unexplored dimensions: epochs (all trials at 200 steps, likely ~1 epoch), warmup_ratio variations, weight_decay variations, medium targets with higher LR, and different batch configurations
+4. Rank 64 at lr=2e-4 got 0.3960 - higher rank with optimal LR unexplored
+5. More epochs could significantly help given PathVQA's limited training data
+
+Key unexplored: More epochs with the best config, or trying rank=16 with full targets at lr=3e-4 with more training steps, or trying medium targets with lr=3e-4.
+
+I'll try more epochs (3) with the best configuration parameters but with a slight LR adjustment and explicit warmup/weight_decay settings - this is meaningfully different from all previous trials:
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+546	autoresearch	4	32	64	0.00025	2	8	0.05	0.05	full	200	0.402	0.7664	0.0547	0.665071678161621	26.6	15570.4	completed		"Looking at the data:
+
+1. Best configs cluster around rank=32, alpha=64, lr=2.5e-4, full targets, bs=2, ga=8
+2. Trial 545 tested ga=4 (smaller effective batch) → 0.3920, worse than ga=8
+3. rank=64 with full targets hasn't beaten rank=32 consistently
+4. Epochs haven't been varied - all trials are 200 steps, likely ~1 epoch
+5. warmup_ratio and weight_decay haven't been explored much
+6. More epochs could help with limited PathVQA data
+
+Key unexplored dimensions:
+- More epochs (2-3) with the best config
+- Different warmup/weight_decay values
+- batch_size=4 with the best config
+
+Let me try increasing epochs to 3 with the best configuration (rank=32, alpha=64, lr=2.5e-4, full) to see if more training helps, combined with a slightly higher weight_decay and warmup_ratio:
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+547	autoresearch	5	32	64	0.0002	2	8	0.05	0.05	full	200	0.398	0.7746	0.0391	0.675747971534729	26.0	15574.5	completed		"Looking at the results, I can see:
+
+1. The best configs cluster around rank=32, alpha=64, lr=3e-4, full targets, bs=2, ga=8
+2. Many recent trials are near-duplicates with minimal variation in val_acc (0.396-0.402)
+3. Unexplored: different epochs (only 200 steps shown, likely 1 epoch), different warmup/weight_decay, lower LR with more epochs, medium targets at higher LR
+4. Trial 512 (rank=64, lr=2e-4, full) got 0.396 - higher rank with moderate LR
+5. More epochs haven't been tried - training longer could help with PathVQA's ~20K samples
+6. Warmup ratio and weight decay variations haven't been explored
+
+Key insight: All trials are at 200 steps. Increasing epochs (more steps) with a slightly lower LR could break through the plateau. Let me try rank=32, lr=2e-4 with more epochs and different warmup/weight_decay.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+548	autoresearch	4	32	64	0.00025	2	8	0.06	0.05	full	200	0.402	0.7787	0.043	0.670204086303711	26.6	16168.4	completed		"Looking at the results:
+
+1. Best config is rank=32, alpha=64, lr=2.5e-4, bs=2, ga=8, full targets (~0.404-0.406)
+2. Higher rank (64) doesn't help much over 32; lower rank (16) hurts
+3. lr=2.5e-4 is the sweet spot; 3.0e-4 slightly worse, 1.5-2.0e-4 worse
+4. ga=4 (trial 545) hurt vs ga=8
+5. Unexplored: epochs > 1 (all trials at 200 steps), warmup_ratio variation, weight_decay variation, batch_size=4, grad_accum=16
+
+Key insight: All trials use 200 steps. Training longer (more epochs) could help significantly with PathVQA's ~20K training samples. Also haven't tried batch_size=4 with ga=16 (same effective batch but different dynamics), or different warmup/weight_decay values.
+
+Let me try the best config but with more epochs and a slightly different warmup/weight_decay to break out of the plateau:
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.06, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+549	autoresearch	5	32	64	0.0003	2	8	0.05	0.01	full	200	0.404	0.7664	0.0586	0.658511905670166	25.7	16172.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+550	autoresearch	7	16	32	0.0001	2	8	0.05	0.01	medium	200	0.38	0.7213	0.0547	0.8782619619369507	23.9	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+551	autoresearch	6	16	32	0.0001	2	8	0.05	0.01	medium	200	0.378	0.7172	0.0547	0.8782462191581726	24.1	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+552	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.406	0.7787	0.0508	0.649516110420227	27.5	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+553	autoresearch	6	64	128	0.0002	2	8	0.05	0.01	full	200	0.394	0.7541	0.0508	0.6493495750427246	27.6	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+554	autoresearch	7	32	64	0.0001	2	8	0.05	0.01	full	200	0.388	0.7582	0.0352	0.718064124584198	26.3	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+555	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	full	200	0.402	0.7664	0.0547	0.658568651676178	26.4	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+556	autoresearch	7	8	16	0.0003	2	8	0.05	0.01	minimal	200	0.382	0.7213	0.0586	0.8627188992500305	21.5	6392.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""minimal"", ""epochs"": 3}"		0.0
+557	autoresearch	6	8	16	0.00015	2	8	0.05	0.01	minimal	200	0.356	0.6926	0.0352	0.9723573470115662	21.5	6392.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""minimal"", ""epochs"": 3}"		0.0
+558	autoresearch	7	32	128	0.0003	2	8	0.05	0.01	full	200	0.39	0.7418	0.0547	0.6362988448143005	26.2	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+559	autoresearch	6	32	128	0.00025	2	8	0.05	0.01	full	200	0.396	0.7418	0.0664	0.6400687050819397	26.4	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+560	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	medium	200	0.392	0.7582	0.043	0.7104052877426148	22.7	7685.2	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+561	autoresearch	6	32	64	0.0002	2	8	0.05	0.01	medium	200	0.402	0.7664	0.0547	0.7493628907203674	22.9	7653.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+562	autoresearch	7	64	256	0.0002	2	8	0.05	0.01	full	200	0.392	0.75	0.0508	0.633111879825592	26.4	8548.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+563	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	full	200	0.398	0.7582	0.0547	0.6585580348968506	26.4	8394.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+565	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.406	0.791	0.0391	0.7226619052886963	23.0	8849.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+564	autoresearch	7	64	128	0.00015	2	8	0.05	0.01	full	200	0.402	0.7705	0.0508	0.6604653406143188	26.1	9146.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+566	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.406	0.7869	0.043	0.7227848148345948	27.2	9447.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+567	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.402	0.7705	0.0508	0.6494171857833863	32.3	9744.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+568	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.404	0.7787	0.0469	0.7233589673042298	23.8	10045.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+569	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6487650990486145	26.2	10342.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+570	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.41	0.7951	0.043	0.7228610563278198	23.4	10643.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+571	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.402	0.7705	0.0508	0.6491257739067078	28.1	10940.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+572	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.398	0.7746	0.0391	0.7220949125289917	26.5	11241.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+573	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.6494388461112977	27.4	11538.5	completed		"Looking at the results:
+
+1. Trial 552 (rank=64, alpha=128, lr=2e-4, full) achieved best val_acc=0.4060
+2. Most trials use default warmup/weight_decay settings and only 200 steps (~1 epoch)
+3. The top configs cluster around rank=64, lr=2e-4, full targets
+4. Key unexplored dimensions: more epochs (longer training), different batch configs, warmup/weight_decay variation
+5. Effective batch size has been fixed at 16 (bs=2, ga=8) throughout - unexplored
+
+The biggest gap is training duration - all trials ran only 200 steps. With PathVQA ~20K samples, more epochs could significantly help. Also, warmup_ratio and weight_decay haven't been varied. Let me try rank=64, full targets, lr=2e-4 (best combo) but with more epochs and tuned regularization.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+574	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.41	0.7869	0.0508	0.7221421217918396	23.7	11839.3	completed		"Looking at the results:
+
+1. The best config is rank=32, alpha=64, lr=3e-4, medium targets (val_acc=0.4100)
+2. Full vs medium at same rank/lr: medium slightly better (0.4060 vs 0.3980)
+3. Minimal targets perform worst (0.3560)
+4. Higher LR (3e-4) beats lower LR (1e-4, 2e-4)
+5. Most trials used 200 steps - need to try more epochs
+6. Warmup ratio and weight decay haven't been varied yet
+7. Batch size and grad_accum haven't been varied
+
+Key unexplored dimensions: epochs (all trials seem short at 200 steps), warmup_ratio variations, weight_decay variations, and higher rank with medium targets.
+
+The most impactful unexplored change: increase epochs significantly (try 3 epochs) with the best config, and vary warmup/weight_decay slightly.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+575	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.649093885421753	26.2	12136.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+576	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.408	0.791	0.043	0.7217077159881592	22.5	12437.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+577	autoresearch	7	64	128	0.00025	2	8	0.05	0.01	full	200	0.394	0.75	0.0547	0.6404306364059448	26.4	12734.5	completed		"Looking at the results:
+
+1. Trial 552 (best): rank=64, alpha=128, lr=2e-4, full targets → 0.4060
+2. Trials 567-575 are near-duplicates of trial 552 with minimal variation → suggests the search got stuck
+3. Higher rank (64) + full targets + lr~2e-4 is the best region found
+4. Alpha=256 (trial 562) didn't help over alpha=128
+5. Lower lr=1.5e-4 (trial 564) gave 0.4020, slightly worse
+6. Unexplored: different epochs (only 200 steps = ~1 epoch equivalent), different batch sizes, warmup/weight_decay variations, lr slightly above 2e-4
+
+Key unexplored combinations:
+- More epochs (training longer could help with 20K dataset)
+- Higher learning rate (e.g., 2.5e-4 or 3e-4) with rank=64, full
+- Different grad_accum (effective batch size change)
+- Warmup and weight decay haven't been varied much
+
+I'll try rank=64, alpha=128, lr=2.5e-4, full targets, but with more epochs (3) and adjusted warmup/weight_decay to explore whether longer training + slightly higher LR helps:
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+578	autoresearch	6	32	64	0.0003	2	16	0.05	0.01	medium	200	0.4	0.7705	0.0469	0.7189857769012451	35.2	13069.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+579	autoresearch	7	64	128	0.0002	4	4	0.05	0.01	full	200	0.4	0.7664	0.0508	0.6493823957443238	20.6	13336.6	completed		"Looking at the results:
+
+1. Trial 552 (rank=64, alpha=128, lr=2e-4, full) is the best at 0.4060
+2. Many trials with identical configs (rank=64, alpha=128, lr=2e-4, full) show variance 0.396-0.402, suggesting noise
+3. Higher rank (64) + full targets + lr~2e-4 seems to be the sweet spot
+4. Unexplored: more epochs (all trials at 200 steps), different batch sizes, warmup/weight_decay variations, lr below 1.5e-4
+
+Key insight: All trials used 200 steps. With PathVQA ~20K training samples and effective batch size 16 (bs=2, ga=8), 200 steps = only ~3200 samples. More epochs could significantly help. Let me try the best config with more epochs (3 epochs ≈ ~3750 steps) and slight LR adjustment, plus try a different grad_accum to increase effective batch size.
+
+Also unexplored: batch_size=4 with ga=4 (same effective batch=16 but different dynamics), and warmup/weight_decay haven't been varied meaningfully.
+
+Let me try: rank=64, alpha=128, lr=2e-4, full targets but with more epochs and tuned warmup/weight_decay:
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 4, ""grad_accum_steps"": 4, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+580	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.406	0.791	0.0391	0.7221386456489562	23.1	13633.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+581	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.398	0.7623	0.0508	0.6492678856849671	26.7	13934.6	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+582	autoresearch	6	32	64	0.0003	2	8	0.05	0.01	medium	200	0.406	0.7869	0.043	0.7218871808052063	23.1	14231.3	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+583	autoresearch	7	64	128	0.0002	2	8	0.05	0.05	full	200	0.396	0.7582	0.0508	0.6495906829833984	26.6	14532.6	completed		"Looking at the results:
+
+1. Trial 552 (rank=64, alpha=128, lr=2e-4, full) is the best at 0.4060
+2. Many subsequent trials repeated similar configs with minimal variation - there's been excessive exploitation of the rank=64, full configuration
+3. Key unexplored areas: different epochs (all trials at 200 steps), warmup/weight_decay variations, and higher learning rates with full targets haven't been fully explored
+4. The batch_size=4, ga=4 trial (579) matched 0.4000 - effective batch size 16 vs 16 is same, so that's not the differentiator
+5. Lower LR (1.5e-4) with full gave 0.4020 - slightly worse than 2e-4
+6. Alpha=256 (trial 562) at 0.3920 - higher alpha didn't help
+
+What's unexplored:
+- More epochs (3-5) - all trials seem to be ~200 steps which may be too few
+- Different warmup ratios and weight decay values haven't been varied
+- rank=32 with full targets and lr=2e-4 (tried 1e-4 only)
+- rank=64 with medium targets was 0.3920 - what about rank=32 medium with 2e-4?
+
+Most promising: Try rank=64, full, lr=2e-4 but with more epochs (3) to see if longer training helps, and add proper warmup/weight_decay tuning.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+584	autoresearch	6	64	128	0.0003	2	8	0.05	0.01	medium	200	0.414	0.7869	0.0586	0.6898332357406616	22.9	14861.2	completed		"Looking at the results, I can see:
+
+1. The best config is rank=32, alpha=64, lr=3e-4, bs=2, ga=8, medium targets - but many trials are identical repeats showing stochasticity ~0.398-0.410
+2. `full` targets with rank=32 gave 0.402, `medium` gave 0.406-0.410 - medium slightly better
+3. Higher rank (64) with full gave 0.394, lower rank (8) minimal gave 0.356
+4. lr=3e-4 outperforms 2e-4 and 1e-4 for similar configs
+5. grad_accum=16 (larger effective batch) gave 0.400 vs ~0.406-0.410 for ga=8 - slightly worse
+6. Unexplored: different epochs (only 200 steps tested), warmup_ratio variations, weight_decay variations, batch_size=4, lr slightly higher than 3e-4
+
+Key unexplored areas: more epochs (longer training), slightly higher LR (3.5e-4 or 4e-4), rank=64 with medium targets, batch_size=4.
+
+Let me try rank=64 with medium targets and lr=3e-4 - higher capacity with the better target set. Also try more epochs to see if longer training helps.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+585	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.398	0.7623	0.0508	0.649058403968811	26.0	15130.6	completed		"Looking at the results:
+
+1. Best config is rank=64, alpha=128, lr=2e-4, bs=2, ga=8, full targets (0.4060)
+2. Many trials are near-duplicates of this best config with minimal variation - showing diminishing returns
+3. Unexplored: different epochs (all at 200 steps), warmup_ratio/weight_decay variations, rank=32 with full+higher LR, batch_size=1 with more grad_accum
+
+Key observations:
+- All trials use ~200 steps which may be too few epochs for PathVQA (~20K samples)
+- The best config hasn't been tried with more epochs
+- warmup_ratio and weight_decay haven't been varied meaningfully
+- batch_size=1 with grad_accum=16 (same effective batch but different gradient noise) unexplored
+
+I should try rank=64, full targets with lr=2e-4 but with MORE epochs (3 epochs instead of ~200 steps), and adjust warmup/weight_decay. This is the most impactful unexplored dimension.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+586	autoresearch	6	64	256	0.0003	2	8	0.05	0.01	medium	200	0.384	0.7377	0.0469	0.6634856152534485	23.0	15459.2	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+587	autoresearch	7	64	128	0.0002	2	8	0.05	0.01	full	200	0.402	0.7705	0.0508	0.6492494964599609	28.9	15728.6	completed		"Looking at the results:
+
+1. Best config is trial 552: rank=64, alpha=128, lr=2e-4, bs=2, ga=8, full, val_acc=0.4060
+2. Many repeated experiments around the best config show diminishing returns - val_acc plateaus at 0.396-0.406
+3. Unexplored: different epochs (only 200 steps shown, likely 1 epoch), warmup_ratio variations, weight_decay variations, and higher effective batch sizes
+4. Trial 554 (rank=32, full, lr=1e-4) got 0.388 - lower rank with lower LR underperformed
+5. The plateau suggests we need a different axis to explore: more epochs could help significantly with PathVQA's limited data
+
+Key unexplored combinations:
+- More epochs (3-5) with the best hyperparams
+- Different warmup ratios
+- Weight decay variations
+- rank=64, alpha=256 (alpha=rank×4) with more epochs
+
+Since all trials show 200 steps (likely 1 epoch), training for more epochs with the best configuration seems most promising. Let me try rank=64, full, lr=2e-4 but with epochs=3 and add some weight decay and warmup:
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+588	autoresearch	6	64	128	0.00035	2	8	0.05	0.01	medium	200	0.394	0.7541	0.0508	0.6833478784561158	25.5	16057.2	completed		"Looking at the data:
+
+1. **Rank 64 + alpha 128 + medium targets** gave the best result (0.4140) - higher rank helps
+2. **alpha 256 with rank 64** hurt performance (0.3840) - alpha=128 seems better for rank 64
+3. **full vs medium**: full targets didn't consistently outperform medium at rank 32
+4. **Unexplored**: epochs > 1 (all trials used ~200 steps which is roughly 1 epoch), warmup/weight_decay variations, batch size variations, and rank 64 with full targets at 3e-4 LR
+
+The most promising unexplored direction: rank 64 with medium targets worked best, but we haven't tried more epochs (longer training) or slightly higher LR with rank 64. Let me try rank 64, alpha 128, medium targets with a slightly different LR (3.5e-4) and more epochs to see if longer training helps.
+
+Actually, looking at steps=200 for all trials - we should try more epochs (steps would increase). Let me try rank 64, alpha 128, lr=3.5e-4, medium, with epochs=3 to get more training.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+589	autoresearch	7	64	128	0.0001	2	8	0.05	0.01	full	200	0.38	0.75	0.0273	0.6798227715492249	29.4	16326.6	completed		"Looking at the results:
+
+1. Best config is rank=64, alpha=128, lr=2e-4, bs=2, ga=8, full targets (0.4060)
+2. Many repeated trials around this config show diminishing returns - the region is well-explored
+3. Unexplored dimensions: epochs (all trials use 200 steps, likely 1 epoch), warmup_ratio variations, weight_decay variations, and lower learning rates with more epochs
+
+Key observations:
+- All trials use 200 steps - likely 1 epoch. More epochs could help significantly
+- rank=64 + full targets seems best, but lr sensitivity is narrow
+- warmup_ratio and weight_decay haven't been varied (likely at defaults)
+- Need to try more epochs to escape the 200-step plateau
+
+Let me try rank=64, full targets, lr=1e-4 (slightly lower for stability with more epochs), with explicit warmup and weight decay, and more epochs (3):
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 1.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+591	autoresearch	8	16	32	0.0001	2	8	0.05	0.01	medium	200	0.378	0.7172	0.0547	0.878430380821228	23.7	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+590	autoresearch	9	16	32	0.0001	2	8	0.05	0.01	medium	200	0.378	0.7172	0.0547	0.8784290957450867	23.7	4626.4	completed		"{""lora_rank"": 16, ""lora_alpha"": 32, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+592	autoresearch	8	64	128	0.0002	2	8	0.05	0.01	full	200	0.4	0.7623	0.0547	0.6494215321540833	26.8	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+593	autoresearch	9	64	128	0.0002	2	8	0.05	0.01	full	200	0.392	0.75	0.0508	0.6494759583473205	27.3	5558.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+594	autoresearch	8	32	64	0.0001	2	8	0.05	0.01	full	200	0.39	0.7582	0.0391	0.7178581380844116	25.4	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+595	autoresearch	9	32	64	0.0003	2	8	0.05	0.01	full	200	0.398	0.7582	0.0547	0.6589576935768128	25.8	6002.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+597	autoresearch	9	8	16	0.00015	2	8	0.05	0.01	minimal	200	0.36	0.7049	0.0312	0.9723101592063904	20.8	6392.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""minimal"", ""epochs"": 3}"		0.0
+596	autoresearch	8	8	16	0.0003	2	8	0.05	0.01	full	200	0.382	0.7418	0.0391	0.7233077096939087	25.5	6445.7	completed		"{""lora_rank"": 8, ""lora_alpha"": 16, ""learning_rate"": 3e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+598	autoresearch	9	32	128	0.00025	2	8	0.05	0.01	full	200	0.392	0.7295	0.0703	0.6404515814781189	25.7	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 128, ""learning_rate"": 2.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+599	autoresearch	8	32	64	0.0002	2	8	0.05	0.01	full	200	0.392	0.7664	0.0352	0.6754894399642944	25.5	7198.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+601	autoresearch	8	64	128	0.0002	2	8	0.05	0.01	medium	200	0.398	0.7705	0.043	0.7113125371932983	22.5	7685.2	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""medium"", ""epochs"": 3}"		0.0
+600	autoresearch	9	32	64	0.0002	2	8	0.05	0.01	full	200	0.394	0.7705	0.0352	0.6754748272895813	26.1	7796.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+602	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.402	0.7664	0.0547	0.6322019481658936	28.8	8548.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+603	autoresearch	9	32	64	0.00035	2	8	0.05	0.01	full	200	0.394	0.7582	0.0469	0.6519393682479858	28.6	8394.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+604	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.406	0.7746	0.0547	0.6319828104972839	26.3	9146.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+605	autoresearch	9	64	128	0.0003	2	8	0.05	0.01	full	200	0.394	0.7418	0.0625	0.6375999569892883	25.9	9146.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+606	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.402	0.7664	0.0547	0.630806736946106	29.3	9744.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+607	autoresearch	9	32	64	0.00015	2	8	0.05	0.05	full	200	0.386	0.7623	0.0273	0.6922735714912415	29.4	9590.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.05, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+608	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.402	0.7623	0.0586	0.6314587807655334	25.6	10342.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+609	autoresearch	9	32	64	0.0003	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.658533182144165	25.5	10188.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+610	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.418	0.791	0.0625	0.631635148525238	25.9	10940.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+611	autoresearch	9	32	64	0.0003	2	8	0.05	0.01	full	200	0.398	0.7541	0.0586	0.6582800579071045	25.7	10786.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+612	autoresearch	8	64	256	0.00015	2	8	0.05	0.01	full	200	0.392	0.7459	0.0547	0.6367185497283936	26.0	11538.5	completed		"Looking at the results:
+
+1. **rank=64, alpha=256, lr=2e-4, full targets** is clearly the best region (trials 602-610 all ~0.40+, with 610 reaching 0.418)
+2. The configuration has been repeated many times with minor variance - diminishing returns on pure repetition
+3. Unexplored dimensions: **epochs** (all trials used ~200 steps, likely epoch=1-2), **warmup_ratio** (unknown), **weight_decay** (unknown), **learning_rate** variations around 2e-4
+
+Key move: Keep the winning config (rank=64, alpha=256, full) but try **more epochs** to see if longer training helps, and vary the learning rate slightly downward (1.5e-4) to see if we can squeeze more accuracy. Also try a higher warmup ratio to stabilize training.
+
+{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 1.5e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+613	autoresearch	9	32	64	0.0003	2	8	0.05	0.01	full	200	0.396	0.7582	0.0508	0.6587758111953735	25.8	11384.4	completed		"Looking at the results:
+
+1. `full` targets consistently outperform `minimal` and `medium`
+2. rank=32 with lr~3e-4 seems to be a sweet spot
+3. All trials use bs=2, ga=8 (effective batch=16), and only 200 steps (~1 epoch)
+4. Warmup ratio and weight decay haven't been varied - all trials likely use defaults
+5. More epochs could help significantly - PathVQA has ~20K samples, 200 steps is very limited
+6. lora_alpha=64 (alpha=rank ratio of 2) seems slightly better than alpha=128 (ratio of 4) at rank=32
+
+Key unexplored dimensions: epochs (all at ~1), warmup_ratio variations, weight_decay, and trying rank=16 with full targets.
+
+The biggest unexplored opportunity is **more training steps/epochs**. With only 200 steps, the model is severely undertrained. Let me suggest more epochs with the best configuration (rank=32, lr=3e-4, full targets) plus proper warmup and weight decay.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+614	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.408	0.7746	0.0586	0.6312799096107483	27.1	12136.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+615	autoresearch	9	32	64	0.0003	2	8	0.05	0.01	full	200	0.402	0.7623	0.0586	0.6587840604782105	26.8	11982.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+616	autoresearch	8	64	256	0.0002	2	8	0.06	0.01	full	200	0.388	0.7459	0.0469	0.6358781623840332	26.9	12734.5	completed		"Looking at the results:
+
+1. rank=64, alpha=256, lr=2e-4, full targets is clearly the best region (trials 602-614)
+2. lr=1.5e-4 underperformed vs 2e-4 (trial 612: 0.3920 vs ~0.41)
+3. The batch_size and grad_accum_steps have been fixed at 2/8 throughout - unexplored
+4. epochs has been fixed at implied ~200 steps - more epochs could help
+5. warmup_ratio and weight_decay haven't been varied meaningfully
+6. Try increasing epochs (more training steps) with the best config, or try slightly higher lr like 2.5e-4, or vary grad_accum_steps
+
+Key unexplored: epochs=3 or 5 would give more steps, larger effective training. Also grad_accum=16 with bs=1 for different dynamics. Let me try epochs=3 with the best config to see if more training helps, while also adjusting warmup_ratio slightly.
+
+{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.06, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+617	autoresearch	9	32	64	0.0003	2	8	0.05	0.01	full	200	0.406	0.7664	0.0625	0.6583824634552002	27.2	12580.4	completed		"Looking at the results:
+
+1. **Full targets clearly wins** over minimal/medium
+2. **Rank 32 with alpha 64** seems optimal (rank 64 doesn't improve much)
+3. **LR ~3e-4** is the sweet spot (best results at 3.0e-4, 3.5e-4)
+4. **More epochs** haven't been tested yet - all trials are 200 steps, likely 1 epoch
+5. **Warmup and weight decay** haven't been varied - all at defaults
+6. **Batch size and grad accum** haven't been varied from bs=2, ga=8
+
+Key unexplored dimensions: epochs (more training), warmup_ratio, weight_decay, and different batch configurations.
+
+The most promising next step is to try more epochs (3) with the best configuration (rank=32, alpha=64, lr=3e-4, full targets) while also adjusting warmup_ratio and weight_decay to non-default values.
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+618	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.398	0.7623	0.0508	0.6319449663162231	27.1	13332.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+619	autoresearch	9	32	64	0.0003	2	8	0.05	0.01	full	200	0.398	0.7623	0.0508	0.6584836435317993	26.8	13178.4	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+620	autoresearch	8	64	256	0.0002	2	8	0.05	0.01	full	200	0.396	0.75	0.0586	0.6311326837539672	28.0	13930.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+621	autoresearch	9	32	64	0.0003	2	16	0.05	0.01	full	200	0.428	0.791	0.082	0.6412477374076844	42.9	13810.6	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+622	autoresearch	8	64	256	0.0002	2	16	0.05	0.01	full	200	0.444	0.791	0.1133	0.5986640048027039	42.4	14562.7	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+623	autoresearch	9	32	64	0.0003	2	16	0.05	0.01	full	200	0.43	0.7951	0.082	0.6405257463455201	42.0	14408.6	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 2}"		0.0
+624	autoresearch	8	64	256	0.0002	2	16	0.05	0.01	full	200	0.438	0.7869	0.1055	0.5983889293670654	41.0	15160.7	completed		"Looking at the results:
+
+1. The biggest jump came from trial 622: increasing `grad_accum_steps` from 8 to 16 gave +0.038 accuracy (0.396→0.444). This doubles effective batch size from 16 to 32.
+2. `rank=64, alpha=256, lr=2e-4, full` is clearly the best base config.
+3. `epochs` has been stuck at the equivalent of 200 steps — more epochs should help significantly.
+4. `warmup_ratio` and `weight_decay` haven't been varied meaningfully.
+5. Next logical step: keep the winning config (rank=64, alpha=256, lr=2e-4, full, ga=16) but try increasing epochs to 3 and adding proper warmup/weight_decay.
+
+{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+625	autoresearch	9	32	64	0.0003	1	16	0.05	0.01	full	200	0.398	0.7623	0.0508	0.6580479454994201	38.2	14972.5	completed		"{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-04, ""batch_size"": 1, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+626	autoresearch	8	64	256	0.0002	1	16	0.05	0.01	full	200	0.394	0.7541	0.0508	0.6322084617614746	38.3	15724.5	completed		"{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-04, ""batch_size"": 1, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+627	autoresearch	9	32	64	0.0003	4	8	0.05	0.01	full	200	0.43	0.791	0.0859	0.6407680201530457	29.1	15608.7	completed		"Looking at the results:
+
+1. **Key finding**: grad_accum_steps=16 with bs=2 (effective batch=32) gave a big jump from ~0.398 to 0.428-0.430
+2. **bs=1 with ga=16** (effective batch=16) underperformed at 0.398 - so larger effective batch helps
+3. **lr=3e-4, rank=32, alpha=64, full targets** is the sweet spot
+4. **Unexplored**: Higher epochs (3-5), different warmup/weight_decay, bs=4 with ga=16 (effective batch=64)
+
+The most promising next step: try bs=4 with ga=16 (effective batch=64) to test if even larger effective batch helps, or try more epochs. Since steps=200 has been fixed, let me try increasing epochs to get more training, combined with the best config. Also, warmup_ratio and weight_decay have been at defaults - adding proper warmup (0.05) and weight_decay (0.01) might help.
+
+Let me try bs=4, ga=8 (effective batch=32, same as best) but with warmup and weight_decay tuned, plus more epochs:
+
+{""lora_rank"": 32, ""lora_alpha"": 64, ""learning_rate"": 3.0e-4, ""batch_size"": 4, ""grad_accum_steps"": 8, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+629	autoresearch	9	64	128	0.0003	2	16	0.05	0.01	full	200	0.436	0.791	0.0977	0.6090545988082886	41.4	16360.8	completed		"Looking at the results:
+
+1. **Key finding**: grad_accum_steps=16 gave the biggest jump (0.398→0.428-0.430)
+2. **batch_size**: bs=2 with ga=16 (eff_batch=32) matches bs=4 with ga=8 (eff_batch=32) - both at 0.430
+3. **Unexplored**: More epochs (currently all 200 steps), warmup/weight_decay variations, rank 64 with ga=16
+
+The most promising next step: try rank=64 with ga=16 (larger effective batch + more capacity), or try increasing epochs. Since all trials used 200 steps, trying more epochs with the best config (rank=32, lr=3e-4, full, bs=2, ga=16) could help significantly.
+
+Also, warmup_ratio and weight_decay have been at defaults - varying these could help.
+
+Let me try: rank=64, alpha=128, lr=3e-4, bs=2, ga=16, full targets with slightly higher warmup and weight decay.
+
+{""lora_rank"": 64, ""lora_alpha"": 128, ""learning_rate"": 3.0e-4, ""batch_size"": 2, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
+628	autoresearch	8	64	256	0.0002	4	16	0.05	0.01	full	200	0.464	0.7992	0.1445	0.5577939164638519	47.0	16419.2	completed		"Looking at the results:
+
+1. **Key finding**: Trial 622 (ga=16, bs=2) jumped to 0.4440 vs ~0.40 with ga=8. Larger effective batch size (32 vs 16) helped significantly.
+2. **Trial 626** (bs=1, ga=16, effective=16) dropped to 0.394 - so bs=2 with ga=16 (effective=32) is the sweet spot.
+3. **lr=1.5e-4** (trial 612) was worse than 2e-4, confirming 2e-4 is better.
+4. **Unexplored**: More epochs (currently all 200 steps), warmup_ratio variation, weight_decay variation, and trying ga=16 with bs=4 (effective batch=64).
+
+Next logical step: Try bs=4 with ga=16 (effective batch=64) to see if even larger effective batch helps, or try the winning config (rank=64, alpha=256, lr=2e-4, bs=2, ga=16) with more epochs. Since steps=200 has been fixed, let me try varying warmup_ratio and weight_decay with the best config, plus try bs=4 ga=16.
+
+{""lora_rank"": 64, ""lora_alpha"": 256, ""learning_rate"": 2.0e-4, ""batch_size"": 4, ""grad_accum_steps"": 16, ""warmup_ratio"": 0.05, ""weight_decay"": 0.01, ""lora_targets"": ""full"", ""epochs"": 3}"		0.0
