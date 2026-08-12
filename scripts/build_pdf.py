@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import logging
 import re
+import shutil
 import subprocess
 import sys
 from datetime import date as date_type
@@ -240,16 +241,31 @@ _RE_VERSION_INLINE = re.compile(
 
 
 def _find_chrome() -> Path | None:
-    """Windows Chrome/Edge 실행 파일 경로 자동 탐색."""
+    """Chrome/Edge 실행 파일 경로 자동 탐색 (Windows 네이티브 + WSL + Linux)."""
     candidates = [
+        # Windows 네이티브
         Path(r"C:\Program Files\Google\Chrome\Application\chrome.exe"),
         Path(r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"),
         Path(r"C:\Program Files\Microsoft\Edge\Application\msedge.exe"),
         Path(r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"),
+        # WSL에서 Windows 설치본을 쓰는 경우 (/mnt/c 마운트)
+        Path("/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"),
+        Path("/mnt/c/Program Files (x86)/Google/Chrome/Application/chrome.exe"),
+        Path("/mnt/c/Program Files/Microsoft/Edge/Application/msedge.exe"),
+        Path("/mnt/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"),
     ]
     for path in candidates:
         if path.exists():
             return path
+
+    # Linux 네이티브 설치본 (PATH 탐색)
+    linux_names = (
+        "google-chrome", "google-chrome-stable", "chromium", "chromium-browser",
+    )
+    for name in linux_names:
+        found = shutil.which(name)
+        if found:
+            return Path(found)
     return None
 
 
