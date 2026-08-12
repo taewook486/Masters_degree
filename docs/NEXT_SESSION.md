@@ -1,10 +1,29 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-08-11)
+# 다음 세션 시작점 (마지막 갱신: 2026-08-12 밤)
 
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
 ## 현재 상태
 
+- **2026-08-12 — 🎉 Phase 3 본실행 610 trial 전부 완료 + 논문 제4~5장 작성 완료**
+  - **완료 시각**: 2026-08-12 11:45 UTC(한국시간 20:45). manual 10 + random 200 + optuna 200 + autoresearch 200 = **610 trial 전수 완료**, GPU·프로세스 모두 해제됨. pod 디스크 73G(임계 85G 대비 여유).
+  - **RQ3 결과 = negative result (정면 서술로 확정, 사용자 승인)**: run-level(n=10) 기준 **Optuna 0.4490 > Random 0.4186 ≈ Autoresearch 0.4184 > Manual 0.3776**. Kruskal-Wallis H=27.92, p<.001. Mann-Whitney(Autoresearch vs Optuna) U=16.00, p=.0112, **r=-0.68 → Optuna 우세**(부호 규약: `src/evaluate/statistics.py:297-304`, r>0이면 첫 인자 우세. `analyze_phase3.py:94`가 (autoresearch, optuna) 순서로 호출). Optuna CI 하한 0.4368 > Autoresearch CI 상한 0.4328으로 **구간 비겹침**까지 확인.
+  - **[핵심 발견] 실패 원인 규명**: Autoresearch는 **trial-level 평균이 가장 높고(0.3980) 표준편차가 가장 낮음(0.0145)** — 제안 품질이 나쁜 게 아니라 **중복 제안으로 실효 예산이 축소**됨. 반복당 고유 하이퍼파라미터 조합이 **12.5/20**(Random·Optuna는 10회 반복 전부 20/20). repeat8 사례: trial 602부터 동일 설정 11회 연속 제안, 그동안 val_accuracy는 0.388~0.444로 변동(= 노이즈를 개선 신호로 오인한 정황).
+  - **[방법론 발견] 노이즈 > 효과**: 동일 설정 반복 시 변동폭 0.056 > 전략 간 평균차 0.031. 단일 trial로는 전략 우열 판단 불가 → 10회 반복 설계(§3.7)의 사후 정당화. §4.4.6에 기록.
+  - **논문 작성 완료 — §4.3, §4.4, 제5장 전체**(커밋 `1c7b268`). 제1~5장 본문이 모두 채워짐(663줄).
+  - **작성 중 발견·수정한 문서 결함 3건**: ① §2.5가 "제4장 4.4에서 Table 4.4(선행연구 간접 비교)로 대체한다"고 약속했으나 **그 표가 실재하지 않음** → 검증 없는 수치를 지어낼 수 없어 §2.5를 실제 상태(미수행 + §5.3(2) 한계 명시)로 정정함. **원하면 WebSearch로 LLaVA-Med/Med-Flamingo 보고 수치를 검증해 Table 4.4를 실제로 만들 수 있음(되돌릴 수 있는 선택)**. ② §1.2의 "RQ3는 이후 별도로 보완한다" 낡은 서술 갱신. ③ 유니코드 마이너스(−)와 ASCII 하이픈(-) 혼용 → ASCII로 통일.
+  - **[중요] §5.3 한계점은 설계서를 그대로 옮기지 않고 실제 수행 여부를 대조해서 작성함**: (3) **Phase 3 실효 학습량 교란이 실제로 큼** — `max_steps=200` 고정에도 실제 학습 샘플 수(batch×grad_accum×max_steps)는 **800~12,800으로 16배 차이**. Manual(1,600샘플)의 열세엔 학습량 열세가 섞여 있음. 단 Optuna·Autoresearch 최고 설정은 **둘 다 12,800으로 동일**해 RQ3 핵심 비교는 이 교란으로 설명되지 않음. (5) 설계서가 계획한 **SLAKE rank 보조검증은 0건, 미수행**으로 정직하게 기록.
+  - **신규 스크립트**(커밋 `49ec76f`): `scripts/plot_phase3_anytime.py` + `src/evaluate/visualize.py::plot_anytime_performance`. anytime performance 곡선(누적 최고 성능, 중앙값+IQR) 그림·CSV·요약표 3종 생성. **평균이 아닌 중앙값+IQR을 쓴 이유는 run-level 검정이 비모수라 시각화의 분포 가정을 맞춘 것.** 데이터는 pandas 대신 `ExperimentTracker`(csv 모듈)로 읽음 — `agent_reasoning` 컬럼에 줄바꿈이 있어서.
+  - **초안 파일 `docs/THESIS_4.3_DRAFT.md`(커밋 `d5b69e6`)는 이제 역할을 다함** — 본문에 §4.3이 실제로 작성됐으므로 삭제해도 무방(아직 삭제 안 함).
+  - **해소된 열린 항목 2건**: ① `summarize_stage.py`의 `pandas on_bad_lines="skip"`이 유효 trial을 누락시키는지 → **awk 집계와 완전 일치, 문제없음**. ② Phase3 `train_time_min` 이상치(§4.2.2 캐시 버그 연장) → **없음**(최대 49분, 무거운 설정으로 설명됨) → 비용 수치 사용 가능.
+  - **다음 세션에 할 일**: ① **참고문헌**(본문 `grep -noE '[A-Za-z]+ et al\.'`로 수집, 확인 불가한 서지정보는 지어내지 말고 `[확인 필요]` 표기) + **부록 A~D**(A: 결과파일 경로 포인터, B: `configs/autoresearch/program.md`, C: 실제 스크립트 플래그 기반 재현가이드, D: 실제 rationale 로그 발췌 — pod `results/phase3_autoresearch/*/trial_*/rationale.md` 및 results.tsv의 `agent_reasoning` 컬럼) → ② (선택) Table 4.4 선행연구 간접 비교 실제 작성 여부 결정 → ③ 전체 자체검토 후 최종 제출본 정리.
+  - **[미해결, 계속 이월] 보안 2건**: GitHub PAT 토큰(2026-07-25 노출)과 `ANTHROPIC_API_KEY`(2026-07-27 노출) 무효화 여부 여전히 미확인. **remote URL에 토큰이 박혀 있으므로 `git remote -v` 출력을 그대로 노출하지 말 것**(push 출력도 `sed -E 's#https://[^@]*@#https://***@#g'`로 마스킹 권장).
+- **2026-08-11 저녁 세션 마무리 — autoresearch 126/200, 논문 §3.7 정정 완료, 완료 후 자동화 계획 확정**
+  - **세션 종료 시점 진행률(2026-08-11 16:03 UTC)**: autoresearch **126/200(63%)** — repeat0~5 완료(각 20/20), repeat6/7 진행중, repeat8/9 대기. 디스크 56G(임계 85G 대비 여유). 최근 30trial 평균 25.8분/trial → 남은 74개, GPU 2장 병렬 기준 **약 16시간 → 8/12(수) 08:00 UTC = 한국시간 17:00경 완료 예상**.
+  - **trial-level 최고 성능(참고용, 최종 결론 아님)**: optuna 0.4700(trial 304, 전체 1위) > autoresearch 0.4480(trial 509) > random 0.4440(trial 223) > manual 0.3840. **최종 RQ3 결론은 trial-level이 아니라 run-level(반복별 최고값 10개) 통계 검정으로 나오므로, 위 순위를 결론으로 인용하지 말 것** — `scripts/analyze_phase3.py` 실행 결과가 정본.
+  - **논문 §3.7 trial 수 불일치 정정 완료(커밋됨)**: 기존 본문은 설계 원안(각 전략 40trial×10회 = 총 1,210trial)을 그대로 쓰고 있었으나 실제 실행은 `trials_per_repeat=20`(총 610trial)이었음. 08-01 세션에서 GPU 시간(원안 ~25일 → 12.8일)을 이유로 사용자 승인 하에 축소한 의도적 결정이었으므로, §3.7을 **실제 실행 규모(610trial) + 축소 사유 + 트레이드오프 명시**로 수정함. repeats=10은 통계 검정력 근거라 불변임을 함께 서술.
+  - **[중요] 이번 세션에서 돌리던 Claude Code 모니터링 루프(`/loop`)는 세션 종료와 함께 멈춤.** 다음 세션에서 이어서 감시하려면 `/loop`를 다시 걸어야 함. **단, pod 자체 텔레그램 알림(`scripts/notify_optuna_done.sh`, nohup 독립 실행)은 계속 살아있으므로 autoresearch 200/200 도달 시 알림은 정상적으로 옴**(테스트 메시지로 발송 정상 확인 완료).
+  - **다음 세션에 할 일(완료 후 작업 계획, 이번 세션에서 합의된 내용)**: ① `python3 scripts/analyze_phase3.py --results_dir results/phase3_autoresearch`(run-level Kruskal-Wallis + Mann-Whitney U + Bootstrap 95% CI) + `python3 scripts/summarize_stage.py random optuna autoresearch` 실행 → ② 논문 **§4.3 Phase 3 결과** 작성(§4.1/4.2와 동일한 표·서술 스타일, run-level 표 n=10 + 검정 결과 + 전략별 최적 하이퍼파라미터) → ③ 결과가 일관되면 **§4.4 종합 분석 및 논의**도 작성(억지 포장 금지, 애매하면 사용자에게 프레이밍 문의) → ④ **제5장 결론**(5.1 요약/5.2 기여/5.3 한계점/5.4 향후연구 — 5.3은 설계서 `THESIS_PROPOSAL_FINAL_v0.6.md` 391-402행의 6개 항목 그대로) → ⑤ **참고문헌**(본문 `grep -noE '[A-Za-z]+ et al\.'`로 수집, 확인 불가한 서지정보는 지어내지 말고 `[확인 필요]` 표기) + **부록 A~D**(A: 결과파일 경로 포인터, B: `configs/autoresearch/program.md`, C: 실제 스크립트 플래그 기반 재현가이드, D: 실제 rationale 로그 발췌) → ⑥ 숫자·표·주장 자체검토 후 커밋+푸시.
 - **2026-08-11 세션 — Phase3 optuna 완료 확인 + pod volume 디스크 위기 발견·해소 + Claude Code 자체 모니터링 루프 가동**
   - SSH 접속 정보 동일: `ssh -i runpod_openssh.pem -p 40127 root@213.192.2.86`, 작업경로 `/workspace/Masters_degree`. **[신규 팁] `.pem` 키가 `/mnt/d`(윈도우 드라이브, WSL 마운트) 안에 있으면 `chmod`가 안 먹혀서(Permission denied) SSH 접속이 실패함 — 리눅스 파일시스템(예: `/tmp`)으로 복사한 뒤 `chmod 600` 해야 함.**
   - **2026-08-11 01:53 UTC 기준 진행률**: optuna **200/200 완료**(최고 trial 304, val_accuracy=0.4700 — 지금까지 전체 최고). autoresearch 74~75/200 진행중(repeat0/1 완료, repeat2/3 진행중, repeat4~9 미시작; 내 최고는 trial 492, val_accuracy=0.4320). 완료된 74개 trial 평균 27.2분/trial, GPU 2장 병렬 기준 잔여 126개 약 28.6시간 소요 예상 → **8/12(수) 오전경 Phase3 전체 완료 전망**.
