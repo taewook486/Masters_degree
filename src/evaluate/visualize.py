@@ -10,6 +10,7 @@ from pathlib import Path
 
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.ticker
 import pandas as pd
 import seaborn as sns
 
@@ -147,6 +148,108 @@ def plot_hpo_trajectories(trials_df: pd.DataFrame, output_dir: str) -> str:
     ax.grid(True, alpha=0.3)
 
     out_path = str(Path(output_dir) / "phase3_trajectories")
+    fig.savefig(out_path + ".png")
+    fig.savefig(out_path + ".pdf")
+    plt.close(fig)
+
+    return out_path + ".png"
+
+
+def plot_anytime_performance(
+    curve_df: pd.DataFrame,
+    output_dir: str,
+    filename: str = "phase3_anytime",
+) -> str:
+    """Anytime performance 곡선: trial 진행에 따른 누적 최고 val_accuracy.
+
+    `plot_hpo_trajectories`와의 차이: 저 함수는 trial별 '원본' 정확도를
+    그대로 그리지만, 이 함수는 (1) 각 run의 '누적 최고'를 그리고
+    (2) 독립 반복 10회를 중앙값 + IQR 밴드로 집계한다. 논문 §4.3.3의
+    탐색 효율 비교용 그림이다.
+
+    평균이 아니라 중앙값 + IQR을 쓰는 이유: 본 연구의 run-level 검정이
+    비모수 검정(Kruskal-Wallis / Mann-Whitney)이므로 시각화도 같은
+    분포 가정을 따르게 맞춘 것이다.
+
+    Args:
+        curve_df: 'strategy', 'trial_index', 'median', 'q1', 'q3', 'n'
+            컬럼을 포함하는 DataFrame. `scripts/plot_phase3_anytime.py`가 생성한다.
+        output_dir: 출력 디렉토리 경로.
+        filename: 확장자를 제외한 출력 파일명.
+
+    Returns:
+        생성된 PNG 파일 경로.
+    """
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    palette = sns.color_palette("colorblind", n_colors=curve_df["strategy"].nunique())
+    x_max = int(curve_df["trial_index"].max())
+
+    for color, (strategy, group) in zip(
+        palette, curve_df.groupby("strategy", sort=True)
+    ):
+        group = group.sort_values("trial_index")
+
+        # Manual처럼 반복당 trial이 1개뿐인 전략은 곡선이 점 하나로만 찍혀
+        # 비교가 안 된다. 전 구간에 걸친 수평 기준선으로 그린다.
+        if len(group) == 1:
+            baseline = float(group["median"].iloc[0])
+            ax.axhline(
+                baseline,
+                color=color,
+                linestyle="--",
+                linewidth=1.8,
+                label=f"{strategy} (baseline, n={int(group['n'].iloc[0])})",
+            )
+            continue
+
+        ax.plot(
+            group["trial_index"],
+            group["median"],
+            marker="o",
+            markersize=4,
+            color=color,
+            label=f"{strategy} (median of {int(group['n'].max())} runs)",
+        )
+        ax.fill_between(
+            group["trial_index"], group["q1"], group["q3"], color=color, alpha=0.15
+        )
+
+    # 일부 반복이 아직 해당 trial 수에 도달하지 못한 구간을 표시한다.
+    # (전 반복이 완주한 뒤에는 이 선이 그려지지 않는다.)
+    multi = curve_df[curve_df.groupby("strategy")["trial_index"].transform("max") > 1]
+    if not multi.empty:
+        full_n = multi.groupby("strategy")["n"].transform("max")
+        incomplete = multi[multi["n"] < full_n]
+        if not incomplete.empty:
+            cutoff = int(incomplete["trial_index"].min())
+            ax.axvline(cutoff - 0.5, color="grey", linestyle=":", linewidth=1.5)
+            # 그림 라벨은 기존 Phase 1/2 그림과 동일하게 영문으로 통일한다
+            # (한글 글리프가 matplotlib 기본 폰트에 없어 PDF에서 깨짐).
+            # x는 데이터 좌표, y는 축 비율(0~1)로 잡아 축 하단에 잘리지 않게 띄운다
+            ax.text(
+                cutoff - 0.4,
+                0.04,
+                " incomplete runs beyond this point",
+                transform=ax.get_xaxis_transform(),
+                fontsize=9,
+                color="grey",
+                va="bottom",
+            )
+
+    ax.set_title("Anytime Performance by HPO Strategy")
+    ax.set_xlabel("Trial Index (within a repeat)")
+    ax.set_ylabel("Cumulative Best val_accuracy")
+    ax.set_xlim(0.5, x_max + 0.5)
+    # trial 번호는 정수이므로 눈금도 정수로만 찍는다 (기본값은 2.5, 7.5처럼 소수로 찍힘)
+    ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+    # 곡선이 좌하 -> 우상으로 상승하므로 좌상단이 비어 있다.
+    # 하단 미완료 주석과 겹치지 않도록 범례를 그쪽에 둔다.
+    ax.legend(title="Strategy", loc="upper left")
+    ax.grid(True, alpha=0.3)
+
+    out_path = str(Path(output_dir) / filename)
     fig.savefig(out_path + ".png")
     fig.savefig(out_path + ".pdf")
     plt.close(fig)
