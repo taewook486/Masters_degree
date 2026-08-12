@@ -672,42 +672,42 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 �
 
 ## 참고문헌
 
-본 목록은 본문에 실제로 인용된 문헌만 수록한다. 서지정보는 본문 인용 시점에 확인한 범위로 기재했으며, **원문 대조가 완료되지 않은 항목은 `[확인 필요]`로 표시**했다. 제출 전 해당 항목의 저자 전체 이름·권호·페이지·DOI를 원문에서 확인해 보완해야 한다.
+본 목록은 본문에 실제로 인용된 문헌만 수록한다. 각 항목의 저자·게재처·권호·페이지·DOI는 2026년 8월 원문(arXiv 초록 페이지, 출판사 공식 페이지, PubMed 서지 레코드)을 직접 대조해 확인했다.
 
 **Parameter-Efficient Fine-Tuning**
 
-1. Hu, E. J., et al. "LoRA: Low-Rank Adaptation of Large Language Models." arXiv:2106.09685. ICLR 2022.
-2. Dettmers, T., et al. "QLoRA: Efficient Finetuning of Quantized LLMs." arXiv:2305.14314. NeurIPS 2023.
+1. Hu, E. J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., & Chen, W. "LoRA: Low-Rank Adaptation of Large Language Models." *International Conference on Learning Representations (ICLR)*, 2022. arXiv:2106.09685. (OpenReview: nZeVKeeFYf9)
+2. Dettmers, T., Pagnoni, A., Holtzman, A., & Zettlemoyer, L. "QLoRA: Efficient Finetuning of Quantized LLMs." *Advances in Neural Information Processing Systems (NeurIPS)*, 2023 (Oral). arXiv:2305.14314.
 
 **Vision-Language Model**
 
-3. Liu, H., et al. "Visual Instruction Tuning (LLaVA)." arXiv:2304.08485. [확인 필요: 게재 학회·연도]
-4. Qwen Team, Alibaba. "Qwen2.5-VL Technical Report." arXiv:2502.13923. [확인 필요: 저자 표기 형식]
-5. HuggingFace. "SmolVLM: Redefining small and efficient multimodal models." arXiv:2504.05299. [확인 필요: 저자 표기 형식]
+3. Liu, H., Li, C., Wu, Q., & Lee, Y. J. "Visual Instruction Tuning." *Advances in Neural Information Processing Systems (NeurIPS)*, 2023 (Oral). arXiv:2304.08485.
+4. Bai, S., Chen, K., et al. (Qwen Team, Alibaba Group). "Qwen2.5-VL Technical Report." arXiv:2502.13923, 2025. (총 27인 공저, 기술 보고서 — 학술대회 게재본 없음)
+5. Marafioti, A., Zohar, O., Farré, M., Noyan, M., Bakouch, E., et al. "SmolVLM: Redefining small and efficient multimodal models." arXiv:2504.05299, 2025. (총 17인 공저, 프리프린트)
 
 **의료 특화 VLM**
 
-6. Li, C., et al. "LLaVA-Med: Training a Large Language-and-Vision Assistant for Biomedicine in One Day." arXiv:2306.00890. NeurIPS 2023 Datasets and Benchmarks Track.
-7. Moor, M., et al. "Med-Flamingo: a Multimodal Medical Few-shot Learner." arXiv:2307.15189. 2023. [확인 필요: 게재 학회]
-8. Chen, Z., et al. "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation." arXiv:2401.12208. 2024. [확인 필요: 게재 학회]
+6. Li, C., Wong, C., Zhang, S., Usuyama, N., Liu, H., Yang, J., Naumann, T., Poon, H., & Gao, J. "LLaVA-Med: Training a Large Language-and-Vision Assistant for Biomedicine in One Day." *NeurIPS 2023 Datasets and Benchmarks Track*, 2023 (Spotlight). arXiv:2306.00890.
+7. Moor, M., Huang, Q., Wu, S., Yasunaga, M., Dalmia, Y., Leskovec, J., Zakka, C., Reis, E. P., & Rajpurkar, P. "Med-Flamingo: a Multimodal Medical Few-shot Learner." *Proceedings of the 3rd Machine Learning for Health Symposium (ML4H)*, PMLR 225:353-367, 2023. arXiv:2307.15189.
+8. Chen, Z., Varma, M., Xu, J., Paschali, M., Van Veen, D., et al. "A Vision-Language Foundation Model to Enhance Efficiency of Chest X-ray Interpretation." arXiv:2401.12208, 2024. (총 23인 공저. 초판 제목은 "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation"이었으나 2024년 12월 개정판에서 현재 제목으로 변경됨. 본문 2.5의 CheXagent가 이 문헌이다.)
 
 **의료 VQA 데이터셋**
 
-9. He, X., et al. "PathVQA: 30000+ Questions for Medical Visual Question Answering." arXiv:2003.10286. 2020. [확인 필요: 게재 학회]
-10. Liu, B., et al. "SLAKE: A Semantically-Labeled Knowledge-Enhanced Dataset for Medical Visual Question Answering." ISBI 2021. [확인 필요: 페이지]
-11. Lau, J. J., et al. "A dataset of clinically generated visual questions and answers about radiology images (VQA-RAD)." Scientific Data 5, 2018. [확인 필요: 논문 번호·DOI]
+9. He, X., Zhang, Y., Mou, L., Xing, E., & Xie, P. "PathVQA: 30000+ Questions for Medical Visual Question Answering." arXiv:2003.10286, 2020. (프리프린트 — 학술대회 게재본 없음)
+10. Liu, B., Zhan, L.-M., Xu, L., Ma, L., Yang, Y., & Wu, X.-M. "SLAKE: A Semantically-Labeled Knowledge-Enhanced Dataset for Medical Visual Question Answering." *2021 IEEE 18th International Symposium on Biomedical Imaging (ISBI)*, pp. 1650-1654, 2021. DOI: 10.1109/ISBI48211.2021.9434010.
+11. Lau, J. J., Gayen, S., Ben Abacha, A., & Demner-Fushman, D. "A dataset of clinically generated visual questions and answers about radiology images." *Scientific Data*, 5, 180251, 2018. DOI: 10.1038/sdata.2018.251.
 
 **하이퍼파라미터 최적화**
 
-12. Akiba, T., et al. "Optuna: A Next-generation Hyperparameter Optimization Framework." KDD 2019. [확인 필요: 페이지]
-13. Li, L., et al. "Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization." JMLR 18, 2018. [확인 필요: 페이지]
+12. Akiba, T., Sano, S., Yanase, T., Ohta, T., & Koyama, M. "Optuna: A Next-generation Hyperparameter Optimization Framework." *Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD)*, pp. 2623-2631, 2019. DOI: 10.1145/3292500.3330701.
+13. Li, L., Jamieson, K., DeSalvo, G., Rostamizadeh, A., & Talwalkar, A. "Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization." *Journal of Machine Learning Research*, 18(185), pp. 1-52, 2018.
 
 **평가 방법론**
 
-14. Shi, W., et al. "Detecting Pretraining Data from Large Language Models (Min-K% Probability)." arXiv:2310.16789. ICLR 2024.
-15. Guo, C., et al. "On Calibration of Modern Neural Networks." ICML 2017. [확인 필요: 논문 제목 원문 대조·페이지]
+14. Shi, W., Ajith, A., Xia, M., Huang, Y., Liu, D., Blevins, T., Chen, D., & Zettlemoyer, L. "Detecting Pretraining Data from Large Language Models." *The Twelfth International Conference on Learning Representations (ICLR)*, 2024. arXiv:2310.16789. (OpenReview: zWqr3MQuNs. 본문의 Min-K% Probability 기법)
+15. Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. "On Calibration of Modern Neural Networks." *Proceedings of the 34th International Conference on Machine Learning (ICML)*, PMLR 70, pp. 1321-1330, 2017.
 
-> **주의**: 위 15건은 본문 인용에서 기계적으로 수집한 것이다. 저자명은 본문에 "et al."로만 표기된 경우가 많아 **제1저자 성(姓)만 확인된 상태**이며, 공저자 전체 목록은 원문 확인이 필요하다. 확인 없이 추정해 기재하지 않았다.
+> **표기 원칙**: 저자가 20인을 초과하는 문헌(4·5·8번)은 제1저자부터 5인까지 기재하고 총 인원을 병기했다. 3·7·10·11·12·13·15번은 원문에 표시된 전체 공저자를 모두 기재했다. 1·2·6·14번은 arXiv 및 출판사 페이지에서 확인한 공저자 목록을 기재했다.
 
 ---
 
@@ -910,4 +910,4 @@ Looking at the results:
 
 ---
 
-*(제출 전 확인: 참고문헌의 `[확인 필요]` 항목 원문 대조)*
+*(참고문헌 15건은 2026년 8월 원문 대조 완료. 남은 작업: 인용 표기 형식을 학과 지정 양식으로 통일)*
