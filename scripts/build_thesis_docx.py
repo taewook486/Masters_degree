@@ -77,15 +77,24 @@ def parse_meta(md_path: Path) -> dict[str, str]:
             "Graduate School of Information & Telecommunications,\n"
             "Konkuk University"
         ),
+        "grad_school_en_line": "Graduate School of Information & Telecommunications",
         "advisor": "[지도교수 성명]",
         "degree": "[학위명]",  # 예: 공학
+        "degree_en": "[Master of xxx]",
         "date_award": "[학위수여 년월]",   # 전기 2월 / 후기 8월
         "date_submit": "[청구 년월]",      # 전기 10~11월 / 후기 4~5월
         "date_approve": "[인준 년월]",     # 전기 11~12월 / 후기 5~6월
     }
 
 
-def parse_markdown(md_path: Path) -> list[Block]:
+START_RE = {
+    "ko": re.compile(r"^## (국문초록|제1장)"),
+    "en": re.compile(r"^## (ABSTRACT|Chapter I)"),
+}
+ABSTRACT_HEADING = {"ko": "국문초록", "en": "ABSTRACT"}
+
+
+def parse_markdown(md_path: Path, lang: str = "ko") -> list[Block]:
     """논문 마크다운을 블록 목록으로 변환한다.
 
     앞부속(제목/논문 정보/작성용 목차)은 양식이 따로 갖고 있으므로 건너뛴다.
@@ -101,9 +110,9 @@ def parse_markdown(md_path: Path) -> list[Block]:
         raw = lines[i]
         line = raw.rstrip()
 
-        # 앞부속 건너뛰기: 국문초록부터 수록
+        # 앞부속 건너뛰기: 초록부터 수록
         if not started:
-            if re.match(r"^## (국문초록|제1장)", line):
+            if START_RE[lang].match(line):
                 started = True
             else:
                 i += 1
@@ -370,6 +379,40 @@ def fill_front_matter(doc, meta: dict[str, str]) -> None:
         _fill_toc_paragraph(p, instr)
 
 
+def fill_front_matter_en(doc, meta: dict[str, str]) -> None:
+    """영문 양식의 속표지·청구지·인준지를 문구 치환으로 채운다.
+
+    영문 양식은 병합 셀이 많아 행/열 인덱스가 불안정하므로,
+    양식이 담고 있는 안내 문구를 키로 삼아 치환한다.
+    """
+    dept_en = meta["dept_en"]
+    repl = {
+        "Thesis for Degree of Master(14pt)": "Thesis for Degree of Master",
+        "Supervisor : Prof. ○○○(14pt)": f"Supervisor : Prof. {meta['advisor']}",
+        "TITLE(20pt)": meta["title_en"],
+        "subtitle(16pt)": "",
+        "Submitted by(14t)": "Submitted by",
+        "Submitted by(14pt)": "Submitted by",
+        "[Author Name](18pt)": meta["author_en"],
+        "August, 2025(16pt)": meta["date_award"],
+        "Department of [xxx] (16pt)": dept_en,
+        "Graduate School of Konkuk University(16pt)": meta["grad_school_en_line"],
+        "submitted to the Department of [xxx]": f"submitted to the {dept_en}",
+        "[Master of Art / Master of xxx].(14pt)": f"{meta['degree_en']}.",
+        "April or May, 2025(16pt)": meta["date_submit"],
+        "[Author Name] is approved.(18pt)": f"{meta['author_en']} is approved.",
+        "Approved by Examination Committee(14pt)": "Approved by Examination Committee",
+        "May or June, 2025(16pt)": meta["date_approve"],
+    }
+    for table in doc.tables:
+        for row in table.rows:
+            for cell in row.cells:
+                for p in cell.paragraphs:
+                    key = p.text.strip()
+                    if key in repl:
+                        _set_para_text(p, repl[key])
+
+
 def _ensure_caption_style(doc):
     """표 캡션 전용 스타일(표목차 수집용)을 만든다."""
     name = "표캡션"
@@ -413,32 +456,44 @@ def build(lang: str, md_path: Path, out_path: Path) -> None:
     body = doc.element.body
     _ensure_caption_style(doc)
 
-    blocks = parse_markdown(md_path)
+    blocks = parse_markdown(md_path, lang)
+    # 메타데이터(제목·소속)는 언어와 무관하게 국문 정본에서 읽는다.
+    meta = parse_meta(Path("docs/THESIS_FINAL_v2.0.md"))
     if lang == "ko":
-        fill_front_matter(doc, parse_meta(md_path))
+        fill_front_matter(doc, meta)
+    else:
+        fill_front_matter_en(doc, meta)
 
-    # 섹션 경계 문단 3개(속표지·청구지·목차 뒤)는 보존한다.
+    # 마지막 두 섹션 경계가 각각 앞부속 시작/끝을 가리킨다.
     sect_paras = [i for i, el in enumerate(body.iterchildren()) if _has_sectpr(el)]
-    if len(sect_paras) < 4:
+    if len(sect_paras) < 3:
         raise SystemExit(f"양식 섹션 구조가 예상과 다릅니다 (경계 {len(sect_paras)}개)")
 
-    front_start = sect_paras[2] + 1   # 표목차 시작
-    front_end = sect_paras[3]         # 국문초록 끝(섹션 경계 직전)
+    front_start = sect_paras[-2] + 1   # 앞부속(목차·표목차·초록) 시작
+    front_end = sect_paras[-1]         # 앞부속 끝(섹션 경계 직전)
     _clear_between(body, front_start, front_end)
 
     children = list(body.iterchildren())
     anchor_front = children[front_start]  # 섹션 경계 문단
 
-    # --- 앞부속: 표목차 + 초록 -------------------------------------------
-    _add_para(doc, anchor_front, "표 목차", SZ_CHAPTER, True,
+    # --- 앞부속: (영문은 목차 포함) 표목차 + 초록 -------------------------
+    if lang == "en":
+        _add_para(doc, anchor_front, "TABLE OF CONTENTS", SZ_CHAPTER, True,
+                  WD_ALIGN_PARAGRAPH.CENTER, indent=False)
+        _add_para(doc, anchor_front, "", SZ_BODY, indent=False)
+        _add_toc_field(doc, anchor_front, r' TOC \o "1-3" \h \z \u ')
+        _add_para(doc, anchor_front, "", SZ_BODY, indent=False)
+
+    heading_tables = "표 목차" if lang == "ko" else "List of Tables"
+    _add_para(doc, anchor_front, heading_tables, SZ_CHAPTER, True,
               WD_ALIGN_PARAGRAPH.CENTER, indent=False)
     _add_para(doc, anchor_front, "", SZ_BODY, indent=False)
     _add_toc_field(doc, anchor_front, r' TOC \h \z \t "표캡션,1" ')
     _add_para(doc, anchor_front, "", SZ_BODY, indent=False)
 
-    abstract_blocks = _slice(blocks, "국문초록")
+    abstract_blocks = _slice(blocks, ABSTRACT_HEADING[lang])
     if abstract_blocks:
-        _add_para(doc, anchor_front, "국문초록", SZ_SECTION, True,
+        _add_para(doc, anchor_front, ABSTRACT_HEADING[lang], SZ_SECTION, True,
                   WD_ALIGN_PARAGRAPH.LEFT, indent=False)
         _add_para(doc, anchor_front, "", SZ_BODY, indent=False)
         _emit(doc, anchor_front, abstract_blocks, skip_heading=True)
