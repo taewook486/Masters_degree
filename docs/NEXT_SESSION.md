@@ -5,9 +5,9 @@
 
 ## ⚠️ 즉시 확인할 것 (2026-08-13)
 
-1. **텔레그램 봇 토큰 revoke** — `scripts/notify_optuna_done.sh`에 하드코딩됐던 토큰이 커밋 `a715c3f`로 **공개 저장소**에 올라가 있었음. 코드는 환경변수 방식으로 고쳤지만(`0d56aff`) **git 히스토리엔 그대로 남아 있음**. 텔레그램 `@BotFather` → `/revoke` → 해당 봇 선택으로 폐기하고 새 토큰 발급할 것. 새 토큰은 코드에 넣지 말고 pod의 `/workspace/Masters_degree/.env`에 `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`로 저장(`.gitignore`가 `.env` 이미 차단).
-2. **RunPod 팟 상태** — 08-13 시점 사용자가 웹 콘솔에서 **Stop** 처리하기로 함. 실제 중지됐는지 확인할 것. 팟 안에서는 `runpodctl`이 API 키 미설정이라 종료 불가 → 콘솔에서만 가능.
-3. **지출 한도(spending limit) 설정** — RunPod 콘솔에서 월 상한 걸어두기로 함(미설정 시 재발 위험).
+1. ~~**텔레그램 봇 토큰 revoke**~~ — ✅ **08-13 완료**. 유출됐던 토큰(커밋 `a715c3f`로 공개 저장소에 노출)은 BotFather `/revoke`로 폐기됨. git 히스토리에 남은 문자열은 이제 무효라 추가 조치 불필요. **단, 팟을 다시 켜서 알림을 쓸 때는 새 토큰을 코드에 넣지 말고** `/workspace/Masters_degree/.env`에 `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`로 저장할 것(`.gitignore`가 `.env` 이미 차단, 스크립트는 없으면 즉시 exit 1).
+2. **RunPod 팟 상태** — 08-13 Stop 처리함. SSH 접속이 거부되는 것까지 확인(중지와 일치하는 신호). 팟 안에서는 `runpodctl`이 API 키 미설정이라 종료 불가 → 시작/종료는 웹 콘솔에서만 가능.
+3. **지출 한도(spending limit) 설정** — RunPod 콘솔에서 월 상한 걸어두기로 함. **미설정 시 재발 위험**이므로 아직 안 했으면 지금 할 것.
 
 ## 현재 상태
 
