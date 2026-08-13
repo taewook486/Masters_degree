@@ -54,9 +54,10 @@ class Block:
 
 
 def parse_meta(md_path: Path) -> dict[str, str]:
-    """논문 머리말의 '논문 정보'에서 제목·소속을 읽는다.
+    """논문 머리말의 '논문 정보'에서 제목을 읽고, 제출 정보를 함께 돌려준다.
 
-    확정되지 않은 항목(지도교수·학위명·년월)은 대괄호 플레이스홀더로 둔다.
+    지도교수·학위명·학위수여 시기는 확정값이며, 청구·인준 시기는
+    학위수여 시기(전기/후기)로부터 매뉴얼 규정 범위 안에서 정한 값이다.
     """
     text = md_path.read_text(encoding="utf-8")
 
@@ -78,12 +79,18 @@ def parse_meta(md_path: Path) -> dict[str, str]:
             "Konkuk University"
         ),
         "grad_school_en_line": "Graduate School of Information & Telecommunications",
-        "advisor": "[지도교수 성명]",
-        "degree": "[학위명]",  # 예: 공학
-        "degree_en": "[Master of xxx]",
-        "date_award": "[학위수여 년월]",   # 전기 2월 / 후기 8월
-        "date_submit": "[청구 년월]",      # 전기 10~11월 / 후기 4~5월
-        "date_approve": "[인준 년월]",     # 전기 11~12월 / 후기 5~6월
+        # 2027년 2월(전기) 학위수여 기준. 매뉴얼상 청구는 전기 10~11월,
+        # 인준은 전기 11~12월이므로 그 범위에서 확정했다.
+        "advisor": "민덕기",
+        "advisor_en": "Dugki Min",
+        "degree": "공학",
+        "degree_en": "Master of Engineering",
+        "date_award": "2027년 2월",
+        "date_award_en": "February, 2027",
+        "date_submit": "2026년 11월",
+        "date_submit_en": "November, 2026",
+        "date_approve": "2026년 12월",
+        "date_approve_en": "December, 2026",
     }
 
 
@@ -395,21 +402,21 @@ def fill_front_matter_en(doc, meta: dict[str, str]) -> None:
     dept_en = meta["dept_en"]
     repl = {
         "Thesis for Degree of Master(14pt)": "Thesis for Degree of Master",
-        "Supervisor : Prof. ○○○(14pt)": f"Supervisor : Prof. {meta['advisor']}",
+        "Supervisor : Prof. ○○○(14pt)": f"Supervisor : Prof. {meta['advisor_en']}",
         "TITLE(20pt)": meta["title_en"],
         "subtitle(16pt)": "",
         "Submitted by(14t)": "Submitted by",
         "Submitted by(14pt)": "Submitted by",
         "[Author Name](18pt)": meta["author_en"],
-        "August, 2025(16pt)": meta["date_award"],
+        "August, 2025(16pt)": meta["date_award_en"],
         "Department of [xxx] (16pt)": dept_en,
         "Graduate School of Konkuk University(16pt)": meta["grad_school_en_line"],
         "submitted to the Department of [xxx]": f"submitted to the {dept_en}",
         "[Master of Art / Master of xxx].(14pt)": f"{meta['degree_en']}.",
-        "April or May, 2025(16pt)": meta["date_submit"],
+        "April or May, 2025(16pt)": meta["date_submit_en"],
         "[Author Name] is approved.(18pt)": f"{meta['author_en']} is approved.",
         "Approved by Examination Committee(14pt)": "Approved by Examination Committee",
-        "May or June, 2025(16pt)": meta["date_approve"],
+        "May or June, 2025(16pt)": meta["date_approve_en"],
     }
     for table in doc.tables:
         for row in table.rows:
