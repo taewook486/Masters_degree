@@ -413,6 +413,31 @@ def fill_front_matter_en(doc, meta: dict[str, str]) -> None:
                         _set_para_text(p, repl[key])
 
 
+def _enable_field_update(doc) -> None:
+    """문서를 열 때 목차 필드를 갱신하도록 표시한다.
+
+    이 설정이 없으면 Word가 필드를 비워둔 채 열고, 사용자가 필드 안에
+    커서를 두고 F9를 눌러야만 목차가 채워진다.
+    """
+    settings = doc.settings.element
+    tag = qn("w:updateFields")
+    el = settings.find(tag)
+    if el is None:
+        el = settings.makeelement(tag, {})
+        # settings.xml은 요소 순서가 스키마로 정해져 있다.
+        # updateFields는 hdrShapeDefaults 바로 앞에 와야 하므로,
+        # 그 뒤에 오는 요소 중 첫 번째를 찾아 그 앞에 넣는다.
+        for name in ("w:hdrShapeDefaults", "w:footnotePr", "w:endnotePr",
+                     "w:compat", "w:docVars", "w:rsids", "w:mathPr"):
+            nxt = settings.find(qn(name))
+            if nxt is not None:
+                nxt.addprevious(el)
+                break
+        else:
+            settings.append(el)
+    el.set(qn("w:val"), "true")
+
+
 def _ensure_caption_style(doc):
     """표 캡션 전용 스타일(표목차 수집용)을 만든다."""
     name = "표캡션"
@@ -455,6 +480,7 @@ def build(lang: str, md_path: Path, out_path: Path) -> None:
     doc = docx.Document(str(out_path))
     body = doc.element.body
     _ensure_caption_style(doc)
+    _enable_field_update(doc)
 
     blocks = parse_markdown(md_path, lang)
     # 메타데이터(제목·소속)는 언어와 무관하게 국문 정본에서 읽는다.
