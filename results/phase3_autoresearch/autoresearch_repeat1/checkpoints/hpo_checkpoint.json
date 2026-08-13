@@ -1,6 +1,6 @@
 {
   "strategy": "autoresearch",
   "repeat_id": 1,
-  "completed_trials": 3,
-  "last_trial_id": 434
+  "completed_trials": 20,
+  "last_trial_id": 468
 }

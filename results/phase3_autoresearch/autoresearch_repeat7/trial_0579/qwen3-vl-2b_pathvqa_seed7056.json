@@ -1,0 +1,4546 @@
+{
+  "metadata": {
+    "model_name": "qwen3-vl-2b",
+    "model_id": "Qwen/Qwen3-VL-2B-Instruct",
+    "dataset": "pathvqa",
+    "split": "test",
+    "seed": 7056,
+    "num_samples": 500,
+    "batch_size": 4,
+    "timestamp": "2026-08-11T21:51:32.978863+00:00",
+    "environment": {
+      "python_version": "3.12.3",
+      "os": "Linux 6.8.0-107-generic",
+      "torch_version": "2.10.0+cu128",
+      "cuda_version": "12.8",
+      "gpu_name": "NVIDIA GeForce RTX 3090",
+      "gpu_memory_mb": 24124,
+      "transformers_version": "5.5.0",
+      "peft_version": "0.18.1"
+    }
+  },
+  "summary": {
+    "closed_accuracy": 0.7664,
+    "open_accuracy": 0.0508,
+    "overall_accuracy": 0.4,
+    "closed_count": 244,
+    "open_count": 256,
+    "total_count": 500,
+    "open_bertscore_f1": 0.8578,
+    "open_bertscore_accuracy": 1.0,
+    "open_bertscore_f1_biobert": 0.6482,
+    "open_bertscore_accuracy_biobert": 0.1758,
+    "open_bertscore_spearman": 0.6403,
+    "open_bertscore_pearson": 0.7736,
+    "overall_acc_ci_low": 0.358,
+    "overall_acc_ci_high": 0.444,
+    "closed_acc_ci_low": 0.709,
+    "closed_acc_ci_high": 0.8197,
+    "open_acc_ci_low": 0.0273,
+    "open_acc_ci_high": 0.0781,
+    "avg_time_ms": 214.3,
+    "peak_vram_mb": 11753.6
+  },
+  "per_sample": [
+    {
+      "index": 0,
+      "question": "what are positively charged, thus allowing the compaction of the negatively charged dna?",
+      "gold_answer": "the histone subunits",
+      "predicted_answer": "the dna helix",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 179.0
+    },
+    {
+      "index": 1,
+      "question": "how are the histone subunits charged?",
+      "gold_answer": "positively charged",
+      "predicted_answer": "with positive charges",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 179.0
+    },
+    {
+      "index": 2,
+      "question": "what is showing increased eosinophilia of cytoplasm, and swelling of occasional cells?",
+      "gold_answer": "early (reversible) ischemic injury",
+      "predicted_answer": "the tumour cells",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 179.0
+    },
+    {
+      "index": 3,
+      "question": "does mycobacterium avium infection in a duodenal biopsy from a patient with aids show massive intracellular macrophage infection with acid-fast organisms filamentous and pink in this acid-fast stain preparation?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 179.0
+    },
+    {
+      "index": 4,
+      "question": "what shows branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "microscopy",
+      "predicted_answer": "the left panel",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 192.4
+    },
+    {
+      "index": 5,
+      "question": "does microscopy show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 192.4
+    },
+    {
+      "index": 6,
+      "question": "does pbf show branching papillae having flbrovascular stalk covered by a single layer of cuboidal cells having ground-glass nuclei?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 192.4
+    },
+    {
+      "index": 7,
+      "question": "what is involvedd in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "chematic mechanisms",
+      "predicted_answer": "the immune system",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 192.4
+    },
+    {
+      "index": 8,
+      "question": "what is chematic mechanisms involved in?",
+      "gold_answer": "pathogenesis of two main types of diabetes mellitus",
+      "predicted_answer": "the development of type 2 diabetes",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 306.9
+    },
+    {
+      "index": 9,
+      "question": "is chematic mechanisms involved in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 306.9
+    },
+    {
+      "index": 10,
+      "question": "are numbers in the illustrations involved in pathogenesis of two main types of diabetes mellitus?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 306.9
+    },
+    {
+      "index": 11,
+      "question": "what shows trabeculae with osteoclastic activity at the margins?",
+      "gold_answer": "trabecular bone forming the marrow space",
+      "predicted_answer": "the left panel",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 306.9
+    },
+    {
+      "index": 12,
+      "question": "what does the trabecular bone forming the marrow space show at the margins?",
+      "gold_answer": "trabeculae with osteoclastic activity",
+      "predicted_answer": "a few osteoblasts",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 365.2
+    },
+    {
+      "index": 13,
+      "question": "where does the trabecular bone forming the marrow space show?",
+      "gold_answer": "at the margins",
+      "predicted_answer": "the trabecular bone forming the marrow space",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 365.2
+    },
+    {
+      "index": 14,
+      "question": "are there inadequate t cells to mount a granulomatous response?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 365.2
+    },
+    {
+      "index": 15,
+      "question": "how does the trabecular bone forming the marrow space show trabeculae?",
+      "gold_answer": "with osteoclastic activity",
+      "predicted_answer": "with a central osteoid and osteoblastic activity",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 365.2
+    },
+    {
+      "index": 16,
+      "question": "does the trabecular bone forming the marrow space show trabeculae with osteoclastic activity at the margins?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 226.5
+    },
+    {
+      "index": 17,
+      "question": "does the upper dermis show trabeculae with osteoclastic activity at the margins?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 226.5
+    },
+    {
+      "index": 18,
+      "question": "what shows concentric lamellae along with osteocytic lacunae surrounding central blood vessels, while the trabecular bone forming the marrow space shows trabeculae with osteoclastic activity at the margins?",
+      "gold_answer": "cortical bone forming the outer shell",
+      "predicted_answer": "the left panel",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 226.5
+    },
+    {
+      "index": 19,
+      "question": "what does the cortical bone forming the outer shell show?",
+      "gold_answer": "concentric lamellae along with osteocytic lacunae surrounding central blood vessels",
+      "predicted_answer": "a typical osteoid formation",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 226.5
+    },
+    {
+      "index": 20,
+      "question": "does the cortical bone forming the outer shell show concentric lamellae along with osteocytic lacunae surrounding central blood vessels, while the trabecular bone forming the marrow space shows trabeculae with osteoclastic activity at the margins?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 263.7
+    },
+    {
+      "index": 21,
+      "question": "does inbox show concentric lamellae along with osteocytic lacunae surrounding central blood vessels, while the trabecular bone forming the marrow space shows trabeculae with osteoclastic activity at the margins?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 263.7
+    },
+    {
+      "index": 22,
+      "question": "what begins as a focus of microabscess in a vascular loop in the marrow which expands to stimulate?",
+      "gold_answer": "process",
+      "predicted_answer": "a large area of marrow necrosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 263.7
+    },
+    {
+      "index": 23,
+      "question": "what does process begin as?",
+      "gold_answer": "a focus of microabscess in a vascular loop in the marrow which expands to stimulate",
+      "predicted_answer": "a small ulcer",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 263.7
+    },
+    {
+      "index": 24,
+      "question": "does process begin as a focus of microabscess in a vascular loop in the marrow which expands to stimulate?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 540.6
+    },
+    {
+      "index": 25,
+      "question": "what is aids?",
+      "gold_answer": "acquired immunodeficiency syndrome",
+      "predicted_answer": "aids is a chronic infection caused by the human immunodeficiency virus (hiv)",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 540.6
+    },
+    {
+      "index": 26,
+      "question": "does photomicrograph on right under higher magnification begin as a focus of microabscess in a vascular loop in the marrow which expands to stimulate?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 540.6
+    },
+    {
+      "index": 27,
+      "question": "what is there of reactive woven bone formation by the periosteum?",
+      "gold_answer": "beginning",
+      "predicted_answer": "a large cystic lesion",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 540.6
+    },
+    {
+      "index": 28,
+      "question": "is there beginning of reactive woven bone formation by the periosteum?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 263.0
+    },
+    {
+      "index": 29,
+      "question": "is the cyst wall beginning of reactive woven bone formation by the periosteum?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 263.0
+    },
+    {
+      "index": 30,
+      "question": "what expands further causing necrosis of the cortex called sequestrum?",
+      "gold_answer": "abscess",
+      "predicted_answer": "the tumor",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 263.0
+    },
+    {
+      "index": 31,
+      "question": "what does the abscess expand?",
+      "gold_answer": "further causing necrosis of the cortex called sequestrum",
+      "predicted_answer": "into the pericardium",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 263.0
+    },
+    {
+      "index": 32,
+      "question": "does the abscess expand further causing necrosis of the cortex called sequestrum?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 196.7
+    },
+    {
+      "index": 33,
+      "question": "do the alveolar walls expand further causing necrosis of the cortex called sequestrum?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 196.7
+    },
+    {
+      "index": 34,
+      "question": "what is called involucrum?",
+      "gold_answer": "formation of viable new reactive bone surrounding the sequestrum",
+      "predicted_answer": "the red mass",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 196.7
+    },
+    {
+      "index": 35,
+      "question": "what is the formation of viable new reactive bone surrounding the sequestrum called?",
+      "gold_answer": "involucrum",
+      "predicted_answer": "sequestrum",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 196.7
+    },
+    {
+      "index": 36,
+      "question": "what is composed of fibrous plaques?",
+      "gold_answer": "aorta with mild atherosclerosis",
+      "predicted_answer": "the wall of the aneurysm",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 310.7
+    },
+    {
+      "index": 37,
+      "question": "is the formation of viable new reactive bone surrounding the sequestrum called involucrum?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 310.7
+    },
+    {
+      "index": 38,
+      "question": "is an asbestos body called involucrum?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 310.7
+    },
+    {
+      "index": 39,
+      "question": "what produces a draining sinus?",
+      "gold_answer": "extension of infection into the joint space",
+      "predicted_answer": "the thrombus",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 310.7
+    },
+    {
+      "index": 40,
+      "question": "what does the extension of infection into the joint space, epiphysis and the skin produce?",
+      "gold_answer": "a draining sinus",
+      "predicted_answer": "a large abscess",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 186.8
+    },
+    {
+      "index": 41,
+      "question": "does the extension of infection into the joint space, epiphysis and the skin produce a draining sinus?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 186.8
+    },
+    {
+      "index": 42,
+      "question": "does part of the endocervical mucosa produce a draining sinus?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 186.8
+    },
+    {
+      "index": 43,
+      "question": "what is expanded externally due to a gelatinous tumour?",
+      "gold_answer": "bone",
+      "predicted_answer": "the uterus",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 186.8
+    },
+    {
+      "index": 44,
+      "question": "why is the bone expanded?",
+      "gold_answer": "due to a gelatinous tumour",
+      "predicted_answer": "due to the presence of a large tumor",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 277.6
+    },
+    {
+      "index": 45,
+      "question": "is the bone expanded externally due to a gelatinous tumour?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 277.6
+    },
+    {
+      "index": 46,
+      "question": "is the basal layer expanded externally due to a gelatinous tumour?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 277.6
+    },
+    {
+      "index": 47,
+      "question": "what is aorta with mild atherosclerosis composed of?",
+      "gold_answer": "fibrous plaques",
+      "predicted_answer": "fibrous tissue",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 277.6
+    },
+    {
+      "index": 48,
+      "question": "what shows lobulated mass with bluish cartilaginous hue infiltrating the soft tissues?",
+      "gold_answer": "sectioned surface",
+      "predicted_answer": "the tumor",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 201.0
+    },
+    {
+      "index": 49,
+      "question": "how does sectioned surface show lobulated mass?",
+      "gold_answer": "with bluish cartilaginous hue infiltrating the soft tissues",
+      "predicted_answer": "with multiple cystic spaces",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 201.0
+    },
+    {
+      "index": 50,
+      "question": "does sectioned surface show lobulated mass with bluish cartilaginous hue infiltrating the soft tissues?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 201.0
+    },
+    {
+      "index": 51,
+      "question": "does the amputated head of the long bone show lobulated mass with bluish cartilaginous hue infiltrating the soft tissues?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 201.0
+    },
+    {
+      "index": 52,
+      "question": "what is expanded in the region of epiphysis?",
+      "gold_answer": "end of the long bone",
+      "predicted_answer": "the bone",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 171.6
+    },
+    {
+      "index": 53,
+      "question": "what is the end of the long bone expanded in?",
+      "gold_answer": "region of epiphysis",
+      "predicted_answer": "the marrow cavity",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 171.6
+    },
+    {
+      "index": 54,
+      "question": "where is the end of the long bone expanded?",
+      "gold_answer": "in region of epiphysis",
+      "predicted_answer": "in the marrow cavity",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 171.6
+    },
+    {
+      "index": 55,
+      "question": "is the end of the long bone expanded in the region of epiphysis?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 171.6
+    },
+    {
+      "index": 56,
+      "question": "is section from margin of amoebic ulcer expanded in the region of epiphysis?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 116.4
+    },
+    {
+      "index": 57,
+      "question": "what shows circumscribed, dark tan, haemorrhagic and necrotic tumour?",
+      "gold_answer": "sectioned surface",
+      "predicted_answer": "the lesion",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 116.4
+    },
+    {
+      "index": 58,
+      "question": "is the aorta with mild atherosclerosis composed of fibrous plaques?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 116.4
+    },
+    {
+      "index": 59,
+      "question": "does sectioned surface show circumscribed, dark tan, haemorrhagic and necrotic tumour?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 116.4
+    },
+    {
+      "index": 60,
+      "question": "does the sectioned surface of rectal wall show circumscribed, dark tan, haemorrhagic and necrotic tumour?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 148.6
+    },
+    {
+      "index": 61,
+      "question": "what is expanded in the region of epiphysis?",
+      "gold_answer": "end of the long bone",
+      "predicted_answer": "the lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 148.6
+    },
+    {
+      "index": 62,
+      "question": "what is the end of the long bone expanded in?",
+      "gold_answer": "region of epiphysis",
+      "predicted_answer": "the periphery",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 148.6
+    },
+    {
+      "index": 63,
+      "question": "is the end of the long bone expanded in the region of epiphysis?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 148.6
+    },
+    {
+      "index": 64,
+      "question": "is viral dna expanded in the region of epiphysis?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 146.7
+    },
+    {
+      "index": 65,
+      "question": "what shows circumscribed, dark tan, haemorrhagic and necrotic tumour?",
+      "gold_answer": "sectioned surface",
+      "predicted_answer": "the tumour",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 146.7
+    },
+    {
+      "index": 66,
+      "question": "does sectioned surface show circumscribed, dark tan, haemorrhagic and necrotic tumour?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 146.7
+    },
+    {
+      "index": 67,
+      "question": "does iron on absorption from upper small intestine show circumscribed, dark tan, haemorrhagic and necrotic tumour?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 146.7
+    },
+    {
+      "index": 68,
+      "question": "are characteristic microscopic features irregular lobules of uniform small tumour cells with indistinct cytoplasmic outlines which are separated by fibrous tissue septa having rich vascularity?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 223.6
+    },
+    {
+      "index": 69,
+      "question": "what shows scattered inflammatory cells, calcification arrowheads, and neovascularization?",
+      "gold_answer": "high-power view of the junction of the fibrous cap and core",
+      "predicted_answer": "the tumour",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 223.6
+    },
+    {
+      "index": 70,
+      "question": "what are also included?",
+      "gold_answer": "areas of necrosis and inflammatory infiltrate",
+      "predicted_answer": "the features of the lesion",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 223.6
+    },
+    {
+      "index": 71,
+      "question": "are areas of necrosis and inflammatory infiltrate also included?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 223.6
+    },
+    {
+      "index": 72,
+      "question": "are the lipofuscin pigment granules also included?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 260.7
+    },
+    {
+      "index": 73,
+      "question": "what shows pas positive tumour cells in perivascular location?",
+      "gold_answer": "inbox in the right photomicrograph",
+      "predicted_answer": "the inset",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 260.7
+    },
+    {
+      "index": 74,
+      "question": "what does inbox in the right photomicrograph show?",
+      "gold_answer": "pas positive tumour cells in perivascular location",
+      "predicted_answer": "a single large tumour cell",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 260.7
+    },
+    {
+      "index": 75,
+      "question": "does inbox in the right photomicrograph show pas positive tumour cells in perivascular location?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 260.7
+    },
+    {
+      "index": 76,
+      "question": "does the cytoplasm show pas positive tumour cells in perivascular location?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 481.5
+    },
+    {
+      "index": 77,
+      "question": "what shows a well-differentiated tumour composed of spindle-shaped cells forming interlacing fascicles producing a typical herring-bone pattern?",
+      "gold_answer": "microscopy",
+      "predicted_answer": "the tumour",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 481.5
+    },
+    {
+      "index": 78,
+      "question": "what does microscopy show?",
+      "gold_answer": "microscopy",
+      "predicted_answer": "a fibrous septal septum with a few scattered areas of fibrosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 481.5
+    },
+    {
+      "index": 79,
+      "question": "does microscopy show a well-differentiated tumour composed of spindle-shaped cells forming interlacing fascicles producing a typical herring-bone pattern?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 481.5
+    },
+    {
+      "index": 80,
+      "question": "what did high-power view of the junction of the fibrous cap and core show?",
+      "gold_answer": "scattered inflammatory cells",
+      "predicted_answer": "a large number of inflammatory cells",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 245.0
+    },
+    {
+      "index": 81,
+      "question": "does the necrotic tissue show a well-differentiated tumour composed of spindle-shaped cells forming interlacing fascicles producing a typical herring-bone pattern?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 245.0
+    },
+    {
+      "index": 82,
+      "question": "what are also seen?",
+      "gold_answer": "a few mitotic figures",
+      "predicted_answer": "the characteristic fibrous septa",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 245.0
+    },
+    {
+      "index": 83,
+      "question": "are a few mitotic figures also seen?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 245.0
+    },
+    {
+      "index": 84,
+      "question": "what shows admixture of spindle-shaped pleomorphic cells forming storiform pattern and histiocyte-like round to oval cells?",
+      "gold_answer": "tumour",
+      "predicted_answer": "the tumour",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 258.4
+    },
+    {
+      "index": 85,
+      "question": "what does the tumour show?",
+      "gold_answer": "admixture of spindle-shaped pleomorphic cells forming storiform pattern and histiocyte-like round to oval cells",
+      "predicted_answer": "a characteristic tumour pattern",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 258.4
+    },
+    {
+      "index": 86,
+      "question": "does the tumour show admixture of spindle-shaped pleomorphic cells forming storiform pattern and histiocyte-like round to oval cells?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 258.4
+    },
+    {
+      "index": 87,
+      "question": "does ziehl-neelsen show admixture of spindle-shaped pleomorphic cells forming storiform pattern and histiocyte-like round to oval cells?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 258.4
+    },
+    {
+      "index": 88,
+      "question": "is the nuclei of affected tubules soft, lobulated, yellowish and greasy?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 276.9
+    },
+    {
+      "index": 89,
+      "question": "what have features of both syncytial and fibroblastic type and form whorled appearance?",
+      "gold_answer": "cells",
+      "predicted_answer": "the tumour cells",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 276.9
+    },
+    {
+      "index": 90,
+      "question": "what do the cells have?",
+      "gold_answer": "features of both syncytial and fibroblastic type and form whorled appearance",
+      "predicted_answer": "a central eosinophilic inclusion",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 276.9
+    },
+    {
+      "index": 91,
+      "question": "did the high-power view of the junction of the fibrous cap and core show scattered inflammatory cells, calcification arrowheads, and neovascularization?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 276.9
+    },
+    {
+      "index": 92,
+      "question": "do the cells have features of both syncytial and fibroblastic type and form whorled appearance?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 300.9
+    },
+    {
+      "index": 93,
+      "question": "do the tips of dermal papillae have features of both syncytial and fibroblastic type and form whorled appearance?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 300.9
+    },
+    {
+      "index": 94,
+      "question": "what contain psammoma bodies?",
+      "gold_answer": "some of the whorls",
+      "predicted_answer": "the fibrous septa",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 300.9
+    },
+    {
+      "index": 95,
+      "question": "what do some of the whorls contain?",
+      "gold_answer": "psammoma bodies",
+      "predicted_answer": "a single large, irregularly shaped nucleus",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 300.9
+    },
+    {
+      "index": 96,
+      "question": "do some of the whorls contain psammoma bodies?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 158.0
+    },
+    {
+      "index": 97,
+      "question": "do a gaucher cell in bone marrow contain psammoma bodies?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 158.0
+    },
+    {
+      "index": 98,
+      "question": "what shows a separate encapsulated gelatinous mass?",
+      "gold_answer": "lower part of the image",
+      "predicted_answer": "the cut surface",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 158.0
+    },
+    {
+      "index": 99,
+      "question": "what does lower part of the image show?",
+      "gold_answer": "a separate encapsulated gelatinous mass",
+      "predicted_answer": "a typical lesion",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 158.0
+    },
+    {
+      "index": 100,
+      "question": "does lower part of the image show a separate encapsulated gelatinous mass?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 108.2
+    },
+    {
+      "index": 101,
+      "question": "does hurthle show a separate encapsulated gelatinous mass?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 108.2
+    },
+    {
+      "index": 102,
+      "question": "did the cause of reversible injury show scattered inflammatory cells, calcification arrowheads, and neovascularization?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 108.2
+    },
+    {
+      "index": 103,
+      "question": "what is multilobulated with increased fat while lower part of the image shows a separate encapsulated gelatinous mass?",
+      "gold_answer": "main mass",
+      "predicted_answer": "the tumor",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 108.2
+    },
+    {
+      "index": 104,
+      "question": "what is the main mass multilobulated with?",
+      "gold_answer": "increased fat while lower part of the image shows a separate encapsulated gelatinous mass",
+      "predicted_answer": "a few cystic spaces",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 182.8
+    },
+    {
+      "index": 105,
+      "question": "is the main mass multilobulated with increased fat while lower part of the image shows a separate encapsulated gelatinous mass?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 182.8
+    },
+    {
+      "index": 106,
+      "question": "is pidural haematoma multilobulated with increased fat while lower part of the image shows a separate encapsulated gelatinous mass?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 182.8
+    },
+    {
+      "index": 107,
+      "question": "what shows circumscribed?",
+      "gold_answer": "cut surface of both the masses",
+      "predicted_answer": "the tumor",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 182.8
+    },
+    {
+      "index": 108,
+      "question": "does the masses show circumscribed?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 161.7
+    },
+    {
+      "index": 109,
+      "question": "do collections of histiocytes show circumscribed?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 161.7
+    },
+    {
+      "index": 110,
+      "question": "does this image show opened abdomen in situ excellent example inflamed gut and yellow-green pus?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 161.7
+    },
+    {
+      "index": 111,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 161.7
+    },
+    {
+      "index": 112,
+      "question": "is peritoneum present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 308.1
+    },
+    {
+      "index": 113,
+      "question": "what does ischemic injury show?",
+      "gold_answer": "surface blebs",
+      "predicted_answer": "a marked increase in the number of inflammatory cells",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 308.1
+    },
+    {
+      "index": 114,
+      "question": "is part of the vessel uninvolved?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 308.1
+    },
+    {
+      "index": 115,
+      "question": "is subdiaphragmatic abscess present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 308.1
+    },
+    {
+      "index": 116,
+      "question": "what is present?",
+      "gold_answer": "acute peritonitis",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 173.3
+    },
+    {
+      "index": 117,
+      "question": "is acute peritonitis present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 173.3
+    },
+    {
+      "index": 118,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "abdomen",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 173.3
+    },
+    {
+      "index": 119,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 173.3
+    },
+    {
+      "index": 120,
+      "question": "what is present?",
+      "gold_answer": "acute peritonitis",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 173.7
+    },
+    {
+      "index": 121,
+      "question": "does this image show opened abdomen with large lesions typical?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.7
+    },
+    {
+      "index": 122,
+      "question": "does omphalocele show opened abdomen with large lesions typical?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.7
+    },
+    {
+      "index": 123,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 173.7
+    },
+    {
+      "index": 124,
+      "question": "is peritoneum present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 185.2
+    },
+    {
+      "index": 125,
+      "question": "is mycobacterium avium infection in a duodenal biopsy from a patient with aids uninvolved?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 185.2
+    },
+    {
+      "index": 126,
+      "question": "is omphalocele present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 185.2
+    },
+    {
+      "index": 127,
+      "question": "what is present?",
+      "gold_answer": "carcinomatosis",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 185.2
+    },
+    {
+      "index": 128,
+      "question": "is carcinomatosis present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 175.8
+    },
+    {
+      "index": 129,
+      "question": "is peritoneum present?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 175.8
+    },
+    {
+      "index": 130,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "female reproductive system",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 175.8
+    },
+    {
+      "index": 131,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 175.8
+    },
+    {
+      "index": 132,
+      "question": "what is present?",
+      "gold_answer": "carcinomatosis",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.6
+    },
+    {
+      "index": 133,
+      "question": "does this image show opened peritoneal cavity showing cecum and appendix on left side?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 172.6
+    },
+    {
+      "index": 134,
+      "question": "does omphalocele show opened peritoneal cavity showing cecum and appendix on left side?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 172.6
+    },
+    {
+      "index": 135,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.6
+    },
+    {
+      "index": 136,
+      "question": "what demonstrate sheets of plump, proliferating spindle cells and slitlike vascular spaces?",
+      "gold_answer": "histologic view of the nodular stage",
+      "predicted_answer": "the tumor cells",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 166.9
+    },
+    {
+      "index": 137,
+      "question": "is abdomen present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 166.9
+    },
+    {
+      "index": 138,
+      "question": "is tuberculous peritonitis present?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 166.9
+    },
+    {
+      "index": 139,
+      "question": "what is present?",
+      "gold_answer": "situs inversus",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 166.9
+    },
+    {
+      "index": 140,
+      "question": "is situs inversus present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 175.0
+    },
+    {
+      "index": 141,
+      "question": "is carcinomatosis present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 175.0
+    },
+    {
+      "index": 142,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "abdomen",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 175.0
+    },
+    {
+      "index": 143,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 175.0
+    },
+    {
+      "index": 144,
+      "question": "what is present?",
+      "gold_answer": "situs inversus",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 166.8
+    },
+    {
+      "index": 145,
+      "question": "what illustrates pus from the peritoneal cavity?",
+      "gold_answer": "case of peritonitis slide",
+      "predicted_answer": "the specimen",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 166.8
+    },
+    {
+      "index": 146,
+      "question": "what does case of peritonitis slide illustrate?",
+      "gold_answer": "pus from the peritoneal cavity",
+      "predicted_answer": "peritonitis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 166.8
+    },
+    {
+      "index": 147,
+      "question": "did histologic view of the nodular stage demonstrate sheets of plump, proliferating spindle cells and slitlike vascular spaces?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 166.8
+    },
+    {
+      "index": 148,
+      "question": "does case of peritonitis slide illustrate pus from the peritoneal cavity?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 213.8
+    },
+    {
+      "index": 149,
+      "question": "does acute peritonitis illustrate pus from the peritoneal cavity?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 213.8
+    },
+    {
+      "index": 150,
+      "question": "what does this image show?",
+      "gold_answer": "case of peritonitis slide illustrates pus from the peritoneal cavity",
+      "predicted_answer": "sputum",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 213.8
+    },
+    {
+      "index": 151,
+      "question": "does this image show case of peritonitis slide illustrates pus from the peritoneal cavity?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 213.8
+    },
+    {
+      "index": 152,
+      "question": "does case of peritonitis slide show case of peritonitis slide illustrates pus from the peritoneal cavity?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.4
+    },
+    {
+      "index": 153,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "hematologic",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 173.4
+    },
+    {
+      "index": 154,
+      "question": "is abdomen present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 173.4
+    },
+    {
+      "index": 155,
+      "question": "is tuberculous peritonitis present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.4
+    },
+    {
+      "index": 156,
+      "question": "what is present?",
+      "gold_answer": "pus in test tube",
+      "predicted_answer": "hematologic",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 167.4
+    },
+    {
+      "index": 157,
+      "question": "is pus in test tube present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 167.4
+    },
+    {
+      "index": 158,
+      "question": "did periodic acid-schiff demonstrate sheets of plump, proliferating spindle cells and slitlike vascular spaces?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 167.4
+    },
+    {
+      "index": 159,
+      "question": "is subdiaphragmatic abscess present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 167.4
+    },
+    {
+      "index": 160,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "urinary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.7
+    },
+    {
+      "index": 161,
+      "question": "what illustrates pus from the peritoneal cavity?",
+      "gold_answer": "case of peritonitis slide",
+      "predicted_answer": "the specimen",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.7
+    },
+    {
+      "index": 162,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "hematologic",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.7
+    },
+    {
+      "index": 163,
+      "question": "what is present?",
+      "gold_answer": "pus in test tube",
+      "predicted_answer": "hematologic",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.7
+    },
+    {
+      "index": 164,
+      "question": "what psoas natural color large ovoid typical sarcoma?",
+      "gold_answer": "opened muscle",
+      "predicted_answer": "spleen",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 228.8
+    },
+    {
+      "index": 165,
+      "question": "does opened muscle psoa natural color large ovoid typical sarcoma?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 228.8
+    },
+    {
+      "index": 166,
+      "question": "does carcinomatosis psoa natural color large ovoid typical sarcoma?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 228.8
+    },
+    {
+      "index": 167,
+      "question": "what does this image show?",
+      "gold_answer": "opened muscle probably psoas natural color large ovoid typical sarcoma",
+      "predicted_answer": "adenocarcinoma",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 228.8
+    },
+    {
+      "index": 168,
+      "question": "does this image show opened muscle probably psoas natural color large ovoid typical sarcoma?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 320.2
+    },
+    {
+      "index": 169,
+      "question": "what is concentric thickening of the left ventricular wall causing?",
+      "gold_answer": "reduction in lumen size",
+      "predicted_answer": "the heart to be enlarged",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 320.2
+    },
+    {
+      "index": 170,
+      "question": "does acute lymphocytic leukemia show opened muscle probably psoas natural color large ovoid typical sarcoma?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 320.2
+    },
+    {
+      "index": 171,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 320.2
+    },
+    {
+      "index": 172,
+      "question": "is abdomen present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 149.5
+    },
+    {
+      "index": 173,
+      "question": "is tuberculous peritonitis present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 149.5
+    },
+    {
+      "index": 174,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.5
+    },
+    {
+      "index": 175,
+      "question": "is peritoneum present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 149.5
+    },
+    {
+      "index": 176,
+      "question": "is an opened peritoneal cavity cause by fibrous band strangulation present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 172.7
+    },
+    {
+      "index": 177,
+      "question": "what is present?",
+      "gold_answer": "retroperitoneal leiomyosarcoma",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.7
+    },
+    {
+      "index": 178,
+      "question": "is retroperitoneal leiomyosarcoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 172.7
+    },
+    {
+      "index": 179,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "female reproductive system",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.7
+    },
+    {
+      "index": 180,
+      "question": "what is causing reduction in lumen size?",
+      "gold_answer": "concentric thickening of the left ventricular wall",
+      "predicted_answer": "cardiovascular",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 167.0
+    },
+    {
+      "index": 181,
+      "question": "what psoas natural color large ovoid typical sarcoma?",
+      "gold_answer": "opened muscle",
+      "predicted_answer": "spleen",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 167.0
+    },
+    {
+      "index": 182,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 167.0
+    },
+    {
+      "index": 183,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 167.0
+    },
+    {
+      "index": 184,
+      "question": "what is present?",
+      "gold_answer": "retroperitoneal leiomyosarcoma",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.0
+    },
+    {
+      "index": 185,
+      "question": "how does opened muscle psoa color large ovoid typical sarcoma?",
+      "gold_answer": "natural",
+      "predicted_answer": "with necrosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.0
+    },
+    {
+      "index": 186,
+      "question": "how does opened muscle psoa natural color ovoid typical sarcoma?",
+      "gold_answer": "large",
+      "predicted_answer": "with necrosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.0
+    },
+    {
+      "index": 187,
+      "question": "how does opened muscle psoa natural color large ovoid sarcoma?",
+      "gold_answer": "typical",
+      "predicted_answer": "with necrosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.0
+    },
+    {
+      "index": 188,
+      "question": "what shows cut surface with fish flesh appearance and extensive necrosis very good for illustrating appearance of a sarcoma?",
+      "gold_answer": "this section showing liver tumor mass in hilar area tumor",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 203.6
+    },
+    {
+      "index": 189,
+      "question": "what does this section showing liver with tumor mass in hilar area tumor show?",
+      "gold_answer": "cut surface fish flesh appearance and extensive necrosis very good for illustrating appearance of a sarcoma",
+      "predicted_answer": "tumor mass",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 203.6
+    },
+    {
+      "index": 190,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "hepatobiliary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 203.6
+    },
+    {
+      "index": 191,
+      "question": "is there marked concentric thickening of the left ventricular wall causing reduction in lumen size?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 203.6
+    },
+    {
+      "index": 192,
+      "question": "is abdomen present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 200.4
+    },
+    {
+      "index": 193,
+      "question": "is tuberculous peritonitis present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 200.4
+    },
+    {
+      "index": 194,
+      "question": "what is present?",
+      "gold_answer": "retroperitoneum",
+      "predicted_answer": "hepatobiliary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 200.4
+    },
+    {
+      "index": 195,
+      "question": "is retroperitoneum present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 200.4
+    },
+    {
+      "index": 196,
+      "question": "is metastatic carcinoma present?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 200.5
+    },
+    {
+      "index": 197,
+      "question": "what is present?",
+      "gold_answer": "leiomyosarcoma",
+      "predicted_answer": "hepatobiliary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 200.5
+    },
+    {
+      "index": 198,
+      "question": "is leiomyosarcoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 200.5
+    },
+    {
+      "index": 199,
+      "question": "is acute peritonitis present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 200.5
+    },
+    {
+      "index": 200,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 203.8
+    },
+    {
+      "index": 201,
+      "question": "what shows cut surface with fish flesh appearance and extensive necrosis very good for illustrating appearance of a sarcoma?",
+      "gold_answer": "this section showing liver tumor mass in hilar area tumor",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 203.8
+    },
+    {
+      "index": 202,
+      "question": "is low-power view of a cross section of a skin blister showing the epidermis marked concentric thickening of the left ventricular wall causing reduction in lumen size?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 203.8
+    },
+    {
+      "index": 203,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "hepatobiliary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 203.8
+    },
+    {
+      "index": 204,
+      "question": "what is present?",
+      "gold_answer": "retroperitoneum",
+      "predicted_answer": "hepatobiliary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 239.5
+    },
+    {
+      "index": 205,
+      "question": "what is present?",
+      "gold_answer": "leiomyosarcoma",
+      "predicted_answer": "hepatobiliary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 239.5
+    },
+    {
+      "index": 206,
+      "question": "what cut surface natural color yellow and white typical gross sarcoma?",
+      "gold_answer": "nodular tumor",
+      "predicted_answer": "adenocarcinoma",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 239.5
+    },
+    {
+      "index": 207,
+      "question": "what is nodular tumor cut?",
+      "gold_answer": "surface natural color yellow and white typical gross sarcoma",
+      "predicted_answer": "surface",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 239.5
+    },
+    {
+      "index": 208,
+      "question": "is nodular tumor cut surface natural color yellow and white typical gross sarcoma?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 235.0
+    },
+    {
+      "index": 209,
+      "question": "what does this image show?",
+      "gold_answer": "nodular tumor cut surface natural color yellow and white typical gross sarcoma",
+      "predicted_answer": "adenocarcinoma",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 235.0
+    },
+    {
+      "index": 210,
+      "question": "does this image show nodular tumor cut surface natural color yellow and white typical gross sarcoma?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 235.0
+    },
+    {
+      "index": 211,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 235.0
+    },
+    {
+      "index": 212,
+      "question": "is abdomen present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 410.8
+    },
+    {
+      "index": 213,
+      "question": "what are shown on the right in this four-chamber view of the heart?",
+      "gold_answer": "the left ventricle and left atrium",
+      "predicted_answer": "the enlarged right ventricle and the enlarged right atrium",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 410.8
+    },
+    {
+      "index": 214,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 410.8
+    },
+    {
+      "index": 215,
+      "question": "is peritoneum present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 410.8
+    },
+    {
+      "index": 216,
+      "question": "what is present?",
+      "gold_answer": "retroperitoneal liposarcoma",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 225.4
+    },
+    {
+      "index": 217,
+      "question": "is retroperitoneal liposarcoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 225.4
+    },
+    {
+      "index": 218,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "female reproductive system",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 225.4
+    },
+    {
+      "index": 219,
+      "question": "what cut surface natural color yellow and white typical gross sarcoma?",
+      "gold_answer": "nodular tumor",
+      "predicted_answer": "adenocarcinoma",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 225.4
+    },
+    {
+      "index": 220,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 157.2
+    },
+    {
+      "index": 221,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 157.2
+    },
+    {
+      "index": 222,
+      "question": "what is present?",
+      "gold_answer": "retroperitoneal liposarcoma",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 157.2
+    },
+    {
+      "index": 223,
+      "question": "how is nodular tumor cut surface color yellow and white typical gross sarcoma?",
+      "gold_answer": "natural",
+      "predicted_answer": "not",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 157.2
+    },
+    {
+      "index": 224,
+      "question": "does early ischemic injury show surface blebs, increase eosinophilia of cytoplasm, and swelling of occasional cells?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 265.9
+    },
+    {
+      "index": 225,
+      "question": "where is the atrium shown?",
+      "gold_answer": "on the right in this four-chamber view of the heart",
+      "predicted_answer": "in the left side of the image",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 265.9
+    },
+    {
+      "index": 226,
+      "question": "how is nodular tumor cut surface natural color and white typical gross sarcoma?",
+      "gold_answer": "yellow",
+      "predicted_answer": "typical",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 265.9
+    },
+    {
+      "index": 227,
+      "question": "how is nodular tumor cut surface natural color yellow and typical gross sarcoma?",
+      "gold_answer": "white",
+      "predicted_answer": "white",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 265.9
+    },
+    {
+      "index": 228,
+      "question": "how is nodular tumor cut surface natural color yellow and white gross sarcoma?",
+      "gold_answer": "typical",
+      "predicted_answer": "large",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 123.8
+    },
+    {
+      "index": 229,
+      "question": "how is nodular tumor cut surface natural color yellow and white typical sarcoma?",
+      "gold_answer": "gross",
+      "predicted_answer": "not",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 123.8
+    },
+    {
+      "index": 230,
+      "question": "does this image show excellent?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 123.8
+    },
+    {
+      "index": 231,
+      "question": "does abdomen show excellent?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 123.8
+    },
+    {
+      "index": 232,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 171.9
+    },
+    {
+      "index": 233,
+      "question": "is abdomen present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 171.9
+    },
+    {
+      "index": 234,
+      "question": "is slices of liver and spleen typical tuberculous exudate is present on capsule of liver and spleen present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 171.9
+    },
+    {
+      "index": 235,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 171.9
+    },
+    {
+      "index": 236,
+      "question": "is the atrium shown on the right in this four-chamber view of the heart?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 166.2
+    },
+    {
+      "index": 237,
+      "question": "is peritoneum present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 166.2
+    },
+    {
+      "index": 238,
+      "question": "is this section showing liver with tumor mass in hilar area tumor present?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 166.2
+    },
+    {
+      "index": 239,
+      "question": "what is present?",
+      "gold_answer": "metastatic carcinoma",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 166.2
+    },
+    {
+      "index": 240,
+      "question": "is metastatic carcinoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 244.1
+    },
+    {
+      "index": 241,
+      "question": "is subdiaphragmatic abscess present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 244.1
+    },
+    {
+      "index": 242,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "gastrointestinal system",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 244.1
+    },
+    {
+      "index": 243,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 244.1
+    },
+    {
+      "index": 244,
+      "question": "what is present?",
+      "gold_answer": "peritoneum",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 168.4
+    },
+    {
+      "index": 245,
+      "question": "what is present?",
+      "gold_answer": "metastatic carcinoma",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 168.4
+    },
+    {
+      "index": 246,
+      "question": "what does this image show?",
+      "gold_answer": "in situ of abdomen excellent fibrinopurulent peritonitis",
+      "predicted_answer": "spleen",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 168.4
+    },
+    {
+      "index": 247,
+      "question": "are the extensive subcutaneous fibrosis shown on the right in this four-chamber view of the heart?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 168.4
+    },
+    {
+      "index": 248,
+      "question": "does this image show in situ of abdomen excellent fibrinopurulent peritonitis?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 182.7
+    },
+    {
+      "index": 249,
+      "question": "does carcinomatosis show in situ of abdomen excellent fibrinopurulent peritonitis?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 182.7
+    },
+    {
+      "index": 250,
+      "question": "what is present?",
+      "gold_answer": "acute peritonitis",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 182.7
+    },
+    {
+      "index": 251,
+      "question": "is acute peritonitis present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 182.7
+    },
+    {
+      "index": 252,
+      "question": "is opened abdominal cavity with massive tumor in omentum none apparent in liver nor over peritoneal surfaces gut present?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 175.6
+    },
+    {
+      "index": 253,
+      "question": "where is this area in the body?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "abdomen",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 175.6
+    },
+    {
+      "index": 254,
+      "question": "what is present?",
+      "gold_answer": "acute peritonitis",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 175.6
+    },
+    {
+      "index": 255,
+      "question": "what does this image show?",
+      "gold_answer": "malignant cells mixed mesodermal tumor of uterus",
+      "predicted_answer": "cervix",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 175.6
+    },
+    {
+      "index": 256,
+      "question": "does this image show malignant cells mixed mesodermal tumor of uterus?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.3
+    },
+    {
+      "index": 257,
+      "question": "does situs inversus show malignant cells mixed mesodermal tumor of uterus?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.3
+    },
+    {
+      "index": 258,
+      "question": "are the left ventricle and left atrium shown on the right in this four-chamber view of the heart?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.3
+    },
+    {
+      "index": 259,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 173.3
+    },
+    {
+      "index": 260,
+      "question": "is abdomen present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 182.3
+    },
+    {
+      "index": 261,
+      "question": "is slices of liver and spleen typical tuberculous exudate is present on capsule of liver and spleen present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 182.3
+    },
+    {
+      "index": 262,
+      "question": "what is present?",
+      "gold_answer": "peritoneal fluid",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 182.3
+    },
+    {
+      "index": 263,
+      "question": "is peritoneal fluid present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 182.3
+    },
+    {
+      "index": 264,
+      "question": "what is present?",
+      "gold_answer": "carcinoma",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.6
+    },
+    {
+      "index": 265,
+      "question": "is carcinoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 177.6
+    },
+    {
+      "index": 266,
+      "question": "is leiomyosarcoma present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 177.6
+    },
+    {
+      "index": 267,
+      "question": "what is present?",
+      "gold_answer": "abdomen",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.6
+    },
+    {
+      "index": 268,
+      "question": "what is present?",
+      "gold_answer": "peritoneal fluid",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 193.5
+    },
+    {
+      "index": 269,
+      "question": "are this degree of external dysmorphogenesis left atrium shown on the right in this four-chamber view of the heart?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 193.5
+    },
+    {
+      "index": 270,
+      "question": "what is present?",
+      "gold_answer": "carcinoma",
+      "predicted_answer": "gastrointestinal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 193.5
+    },
+    {
+      "index": 271,
+      "question": "why does this image show gram negative septicemia?",
+      "gold_answer": "due to scalp electrode in a neonate",
+      "predicted_answer": "due to head trauma",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 193.5
+    },
+    {
+      "index": 272,
+      "question": "what does this image show?",
+      "gold_answer": "gram negative septicemia due to scalp electrode in a neonate",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 323.8
+    },
+    {
+      "index": 273,
+      "question": "does this image show gram negative septicemia due to scalp electrode in a neonate?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 323.8
+    },
+    {
+      "index": 274,
+      "question": "does acid show gram negative septicemia due to scalp electrode in a neonate?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 323.8
+    },
+    {
+      "index": 275,
+      "question": "why does this image show gram negative septicemia?",
+      "gold_answer": "due to scalp electrode in a neonate",
+      "predicted_answer": "due to a ruptured aneurysm",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 323.8
+    },
+    {
+      "index": 276,
+      "question": "what does this image show?",
+      "gold_answer": "gram negative septicemia due to scalp electrode in a neonate",
+      "predicted_answer": "skin",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 186.6
+    },
+    {
+      "index": 277,
+      "question": "does this image show gram negative septicemia due to scalp electrode in a neonate?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 186.6
+    },
+    {
+      "index": 278,
+      "question": "does acute lymphocytic leukemia show gram negative septicemia due to scalp electrode in a neonate?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 186.6
+    },
+    {
+      "index": 279,
+      "question": "what does this image show?",
+      "gold_answer": "hand",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 186.6
+    },
+    {
+      "index": 280,
+      "question": "what is presented incidentally in the right ventricle?",
+      "gold_answer": "a pacemaker",
+      "predicted_answer": "a large, yellow, friable, and necrotic infarct",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 464.7
+    },
+    {
+      "index": 281,
+      "question": "does this image show hand, gunshot entrance wound, intermediate range, powder burns freckling?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 464.7
+    },
+    {
+      "index": 282,
+      "question": "does mesothelioma show hand, gunshot entrance wound, intermediate range, powder burns freckling?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 464.7
+    },
+    {
+      "index": 283,
+      "question": "what removed shows size of organs quite well and renal facies?",
+      "gold_answer": "opened dysmorphic body with all except kidneys",
+      "predicted_answer": "infant",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 464.7
+    },
+    {
+      "index": 284,
+      "question": "what is opened dysmorphic body with all organs except kidneys removed?",
+      "gold_answer": "shows size of quite well and renal facies",
+      "predicted_answer": "sacral region",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 196.4
+    },
+    {
+      "index": 285,
+      "question": "is opened dysmorphic body with all organs except kidneys removed shows size of organs quite well and renal facies?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 196.4
+    },
+    {
+      "index": 286,
+      "question": "does this image show opened dysmorphic body with all organs except kidneys removed shows size of organs quite well and renal facies?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 196.4
+    },
+    {
+      "index": 287,
+      "question": "what is present of kidneys?",
+      "gold_answer": "polycystic disease",
+      "predicted_answer": "abruption",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 196.4
+    },
+    {
+      "index": 288,
+      "question": "is polycystic disease of kidneys present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 236.3
+    },
+    {
+      "index": 289,
+      "question": "is retroperitoneal leiomyosarcoma of kidneys present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 236.3
+    },
+    {
+      "index": 290,
+      "question": "what removed shows size of organs quite well and renal facies?",
+      "gold_answer": "opened dysmorphic body with all except kidneys",
+      "predicted_answer": "infant",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 236.3
+    },
+    {
+      "index": 291,
+      "question": "where is the pacemaker?",
+      "gold_answer": "in the right ventricle",
+      "predicted_answer": "in the right atrium",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 236.3
+    },
+    {
+      "index": 292,
+      "question": "what appear too short has six digits?",
+      "gold_answer": "a barely seen vascular mass extruding from occipital region of skull arms and legs",
+      "predicted_answer": "the limbs",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.5
+    },
+    {
+      "index": 293,
+      "question": "how many digits do a barely seen vascular mass extruding from occipital region of skull arms and legs appear too short has?",
+      "gold_answer": "six",
+      "predicted_answer": "two",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.5
+    },
+    {
+      "index": 294,
+      "question": "what do a barely seen vascular mass extruding from occipital region of skull arms and legs appear?",
+      "gold_answer": "too short has six digits",
+      "predicted_answer": "to be fused",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.5
+    },
+    {
+      "index": 295,
+      "question": "do a barely seen vascular mass extruding from occipital region of skull arms and legs appear too short has six digits?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 172.5
+    },
+    {
+      "index": 296,
+      "question": "what does this image show?",
+      "gold_answer": "lateral view of body with renal facies no neck",
+      "predicted_answer": "infant with anencephaly",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 278.2
+    },
+    {
+      "index": 297,
+      "question": "does this image show lateral view of body with renal facies no neck?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 278.2
+    },
+    {
+      "index": 298,
+      "question": "does peritoneum show lateral view of body with renal facies no neck?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 278.2
+    },
+    {
+      "index": 299,
+      "question": "what is present of kidneys?",
+      "gold_answer": "polycystic disease",
+      "predicted_answer": "abruption",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 278.2
+    },
+    {
+      "index": 300,
+      "question": "is polycystic disease of kidneys present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 118.2
+    },
+    {
+      "index": 301,
+      "question": "is acid of kidneys present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 118.2
+    },
+    {
+      "index": 302,
+      "question": "is a pacemaker presented incidentally in the right ventricle?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 118.2
+    },
+    {
+      "index": 303,
+      "question": "what appear too short?",
+      "gold_answer": "no neck and a barely seen vascular mass extruding from occipital region of skull arms and legs",
+      "predicted_answer": "legs",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 118.2
+    },
+    {
+      "index": 304,
+      "question": "what has six digits?",
+      "gold_answer": "lateral view of body with renal facies no neck and a barely seen vascular mass extruding from occipital region of skull arms and legs appear too short",
+      "predicted_answer": "the body of the fetus",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 278.6
+    },
+    {
+      "index": 305,
+      "question": "what does lateral view of body with renal facies no neck and a barely seen vascular mass extruding from occipital region of skull arms and legs appear too short have?",
+      "gold_answer": "six digits",
+      "predicted_answer": "to be a normal infant",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 278.6
+    },
+    {
+      "index": 306,
+      "question": "what does this image show?",
+      "gold_answer": "posterior view open cord",
+      "predicted_answer": "infant with anencephaly",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 278.6
+    },
+    {
+      "index": 307,
+      "question": "does this image show posterior view open cord?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 278.6
+    },
+    {
+      "index": 308,
+      "question": "does natural color show posterior view open cord?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 174.0
+    },
+    {
+      "index": 309,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 174.0
+    },
+    {
+      "index": 310,
+      "question": "is anencephaly present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 174.0
+    },
+    {
+      "index": 311,
+      "question": "is liver with tuberculoid granuloma in glissons present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 174.0
+    },
+    {
+      "index": 312,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 317.8
+    },
+    {
+      "index": 313,
+      "question": "is cohesive tumor in retina presented incidentally in the right ventricle?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 317.8
+    },
+    {
+      "index": 314,
+      "question": "what does this image show?",
+      "gold_answer": "posterior view of body lesions mostly in head neck and thorax",
+      "predicted_answer": "infant with congenital syringomyelia",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 317.8
+    },
+    {
+      "index": 315,
+      "question": "does this image show posterior view of body lesions mostly in head neck and thorax?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 317.8
+    },
+    {
+      "index": 316,
+      "question": "does mesothelioma show posterior view of body lesions mostly in head neck and thorax?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.8
+    },
+    {
+      "index": 317,
+      "question": "what is present?",
+      "gold_answer": "lymphangiomatosis",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 173.8
+    },
+    {
+      "index": 318,
+      "question": "is lymphangiomatosis present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 173.8
+    },
+    {
+      "index": 319,
+      "question": "is leiomyosarcoma present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 173.8
+    },
+    {
+      "index": 320,
+      "question": "what is present?",
+      "gold_answer": "lymphangiomatosis",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.4
+    },
+    {
+      "index": 321,
+      "question": "what is present?",
+      "gold_answer": "newborn cord around neck",
+      "predicted_answer": "skeletal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 177.4
+    },
+    {
+      "index": 322,
+      "question": "is newborn cord around neck present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 177.4
+    },
+    {
+      "index": 323,
+      "question": "is acute lymphocytic leukemia present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 177.4
+    },
+    {
+      "index": 324,
+      "question": "what are heaped up within the sinuses of valsalva?",
+      "gold_answer": "nodular masses of calcium",
+      "predicted_answer": "the tumour",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 176.0
+    },
+    {
+      "index": 325,
+      "question": "what is present?",
+      "gold_answer": "newborn cord around neck",
+      "predicted_answer": "skeletal",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 176.0
+    },
+    {
+      "index": 326,
+      "question": "what does this image show?",
+      "gold_answer": "view of face and chest anterior",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 176.0
+    },
+    {
+      "index": 327,
+      "question": "does this image show view of face and chest anterior?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 176.0
+    },
+    {
+      "index": 328,
+      "question": "does subdiaphragmatic abscess show view of face and chest anterior?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 128.2
+    },
+    {
+      "index": 329,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 128.2
+    },
+    {
+      "index": 330,
+      "question": "is anencephaly present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 128.2
+    },
+    {
+      "index": 331,
+      "question": "is skin over back a buttocks present?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 128.2
+    },
+    {
+      "index": 332,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 338.3
+    },
+    {
+      "index": 333,
+      "question": "what does this image show?",
+      "gold_answer": "body burns 24 hours prior now anasarca",
+      "predicted_answer": "extremities with large necrotic areas",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 338.3
+    },
+    {
+      "index": 334,
+      "question": "does this image show body burns 24 hours prior now anasarca?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 338.3
+    },
+    {
+      "index": 335,
+      "question": "do necrotic cells show preserved outlines with loss of nuclei, and an inflammatory infiltrate is present (difficult to discern at this magnification)?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 338.3
+    },
+    {
+      "index": 336,
+      "question": "what are nodular masses of calcium heaped up within?",
+      "gold_answer": "the sinuses valsalva",
+      "predicted_answer": "the cystic spaces",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 192.5
+    },
+    {
+      "index": 337,
+      "question": "does situs inversus show body burns 24 hours prior now anasarca?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 192.5
+    },
+    {
+      "index": 338,
+      "question": "what does this image show?",
+      "gold_answer": "close-up view of head anterior view",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 192.5
+    },
+    {
+      "index": 339,
+      "question": "does this image show close-up view of head anterior view?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 192.5
+    },
+    {
+      "index": 340,
+      "question": "what is present?",
+      "gold_answer": "conjoined twins cephalothoracopagus janiceps",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 327.0
+    },
+    {
+      "index": 341,
+      "question": "is conjoined twins cephalothoracopagus janiceps present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 327.0
+    },
+    {
+      "index": 342,
+      "question": "what is present?",
+      "gold_answer": "conjoined twins cephalothoracopagus janiceps",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 327.0
+    },
+    {
+      "index": 343,
+      "question": "what does this image show?",
+      "gold_answer": "conjoined twins at head and chest",
+      "predicted_answer": "infant with congenital syringomyelia",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 327.0
+    },
+    {
+      "index": 344,
+      "question": "does this image show conjoined twins at head and chest?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 218.4
+    },
+    {
+      "index": 345,
+      "question": "what is the best photo to illustrate this case externally?",
+      "gold_answer": "this",
+      "predicted_answer": "the head",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 218.4
+    },
+    {
+      "index": 346,
+      "question": "what is this to illustrate this case externally?",
+      "gold_answer": "the best photo",
+      "predicted_answer": "the typical appearance of this condition",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 218.4
+    },
+    {
+      "index": 347,
+      "question": "are nodular masses of calcium heaped up within the sinuses of valsalva?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 218.4
+    },
+    {
+      "index": 348,
+      "question": "is this the best photo to illustrate this case externally?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 149.0
+    },
+    {
+      "index": 349,
+      "question": "what is present?",
+      "gold_answer": "cephalothoracopagus janiceps",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.0
+    },
+    {
+      "index": 350,
+      "question": "is cephalothoracopagus janiceps present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 149.0
+    },
+    {
+      "index": 351,
+      "question": "what is the best photo to illustrate this case externally?",
+      "gold_answer": "this",
+      "predicted_answer": "the head",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.0
+    },
+    {
+      "index": 352,
+      "question": "what is this to illustrate this case externally?",
+      "gold_answer": "the best photo",
+      "predicted_answer": "the typical appearance of this condition",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 395.9
+    },
+    {
+      "index": 353,
+      "question": "what is present?",
+      "gold_answer": "cephalothoracopagus janiceps",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 395.9
+    },
+    {
+      "index": 354,
+      "question": "what does this image show?",
+      "gold_answer": "joined anterior chest and abdomen",
+      "predicted_answer": "close-up view of uterus and ovaries with multiple small tumors",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 395.9
+    },
+    {
+      "index": 355,
+      "question": "does this image show joined anterior chest and abdomen?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 395.9
+    },
+    {
+      "index": 356,
+      "question": "what is present?",
+      "gold_answer": "siamese twins",
+      "predicted_answer": "abruption",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 163.7
+    },
+    {
+      "index": 357,
+      "question": "is siamese twins present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 163.7
+    },
+    {
+      "index": 358,
+      "question": "are small nests of epithelial cells and myxoid stroma forming cartilage and bone heaped up within the sinuses of valsalva?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 163.7
+    },
+    {
+      "index": 359,
+      "question": "what is present?",
+      "gold_answer": "siamese twins",
+      "predicted_answer": "abruption",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 163.7
+    },
+    {
+      "index": 360,
+      "question": "what does this image show?",
+      "gold_answer": "lateral view of head typical example",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 124.5
+    },
+    {
+      "index": 361,
+      "question": "does this image show lateral view of head typical example?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 124.5
+    },
+    {
+      "index": 362,
+      "question": "does conjoined twins show lateral view of head typical example?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 124.5
+    },
+    {
+      "index": 363,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 124.5
+    },
+    {
+      "index": 364,
+      "question": "is anencephaly present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 185.5
+    },
+    {
+      "index": 365,
+      "question": "is tuberculous peritonitis present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 185.5
+    },
+    {
+      "index": 366,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 185.5
+    },
+    {
+      "index": 367,
+      "question": "what does this image show?",
+      "gold_answer": "view from back typical example",
+      "predicted_answer": "extremities",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 185.5
+    },
+    {
+      "index": 368,
+      "question": "does this image show view from back typical example?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 172.5
+    },
+    {
+      "index": 369,
+      "question": "what are not fused, as in rheumatic aortic valve stenosis?",
+      "gold_answer": "the commissures",
+      "predicted_answer": "the leaflets",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.5
+    },
+    {
+      "index": 370,
+      "question": "does retroperitoneum show view from back typical example?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 172.5
+    },
+    {
+      "index": 371,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "oral",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.5
+    },
+    {
+      "index": 372,
+      "question": "is anencephaly present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 289.2
+    },
+    {
+      "index": 373,
+      "question": "is slices of liver and spleen typical tuberculous exudate is present on capsule of liver and spleen present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 289.2
+    },
+    {
+      "index": 374,
+      "question": "what is present?",
+      "gold_answer": "anencephaly",
+      "predicted_answer": "oral",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 289.2
+    },
+    {
+      "index": 375,
+      "question": "what was taken?",
+      "gold_answer": "this section",
+      "predicted_answer": "from a patient with atherosclerosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 289.2
+    },
+    {
+      "index": 376,
+      "question": "was this section taken?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 181.9
+    },
+    {
+      "index": 377,
+      "question": "what does this image show?",
+      "gold_answer": "micro low mag h&e would have to get protocol to determine where section was taken",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 181.9
+    },
+    {
+      "index": 378,
+      "question": "does this image show micro low mag h&e would have to get protocol to determine where this section was taken?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 181.9
+    },
+    {
+      "index": 379,
+      "question": "what is present?",
+      "gold_answer": "notochord",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 181.9
+    },
+    {
+      "index": 380,
+      "question": "how are the commissures stenosis?",
+      "gold_answer": "not fused",
+      "predicted_answer": "severe",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 291.0
+    },
+    {
+      "index": 381,
+      "question": "is notochord present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 291.0
+    },
+    {
+      "index": 382,
+      "question": "is retroperitoneal liposarcoma present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 291.0
+    },
+    {
+      "index": 383,
+      "question": "what was taken?",
+      "gold_answer": "this section",
+      "predicted_answer": "from a patient with atherosclerosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 291.0
+    },
+    {
+      "index": 384,
+      "question": "what is present?",
+      "gold_answer": "notochord",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 174.1
+    },
+    {
+      "index": 385,
+      "question": "what is present?",
+      "gold_answer": "notochord",
+      "predicted_answer": "respiratory",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 174.1
+    },
+    {
+      "index": 386,
+      "question": "is notochord present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 174.1
+    },
+    {
+      "index": 387,
+      "question": "is liver present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 174.1
+    },
+    {
+      "index": 388,
+      "question": "what is present?",
+      "gold_answer": "notochord",
+      "predicted_answer": "respiratory",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 163.9
+    },
+    {
+      "index": 389,
+      "question": "what does this image show?",
+      "gold_answer": "epithelial component resembling endometrium",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 163.9
+    },
+    {
+      "index": 390,
+      "question": "does this image show epithelial component resembling endometrium?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 163.9
+    },
+    {
+      "index": 391,
+      "question": "are the commissures not fused, as in rheumatic aortic valve stenosis?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 163.9
+    },
+    {
+      "index": 392,
+      "question": "does newborn cord around neck show epithelial component resembling endometrium?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 127.1
+    },
+    {
+      "index": 393,
+      "question": "what is present?",
+      "gold_answer": "sacrococcygeal teratoma",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 127.1
+    },
+    {
+      "index": 394,
+      "question": "is sacrococcygeal teratoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 127.1
+    },
+    {
+      "index": 395,
+      "question": "is nodular tumor present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 127.1
+    },
+    {
+      "index": 396,
+      "question": "what is present?",
+      "gold_answer": "sacrococcygeal teratoma",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 196.4
+    },
+    {
+      "index": 397,
+      "question": "what does this image show?",
+      "gold_answer": "herpes zoster",
+      "predicted_answer": "skin",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 196.4
+    },
+    {
+      "index": 398,
+      "question": "does this image show herpes zoster?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 196.4
+    },
+    {
+      "index": 399,
+      "question": "does retroperitoneal leiomyosarcoma show herpes zoster?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 196.4
+    },
+    {
+      "index": 400,
+      "question": "what does this image show?",
+      "gold_answer": "hemolytic disease of newborn",
+      "predicted_answer": "opened abdomen with uterus and ovaries enlarged",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 283.5
+    },
+    {
+      "index": 401,
+      "question": "does this image show hemolytic disease of newborn?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 283.5
+    },
+    {
+      "index": 402,
+      "question": "are note bowing of legs as a consequence of the formation of poorly not fused, as in rheumatic aortic valve stenosis?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 283.5
+    },
+    {
+      "index": 403,
+      "question": "does sacrococcygeal teratoma show hemolytic disease of newborn?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 283.5
+    },
+    {
+      "index": 404,
+      "question": "what does this image show?",
+      "gold_answer": "skin",
+      "predicted_answer": "face and neck",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.1
+    },
+    {
+      "index": 405,
+      "question": "does this image show skin, kaposi 's sarcoma?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 172.1
+    },
+    {
+      "index": 406,
+      "question": "does fibrinous peritonitis show skin, kaposi 's sarcoma?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 172.1
+    },
+    {
+      "index": 407,
+      "question": "what does this image show?",
+      "gold_answer": "ulcerations",
+      "predicted_answer": "face",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.1
+    },
+    {
+      "index": 408,
+      "question": "does this image show ulcerations, herpes simplex?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 149.2
+    },
+    {
+      "index": 409,
+      "question": "does granulomata slide show ulcerations, herpes simplex?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 149.2
+    },
+    {
+      "index": 410,
+      "question": "how many nipples does this image show?",
+      "gold_answer": "two",
+      "predicted_answer": "2",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.2
+    },
+    {
+      "index": 411,
+      "question": "what does this image show?",
+      "gold_answer": "two nipples",
+      "predicted_answer": "breast",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.2
+    },
+    {
+      "index": 412,
+      "question": "does this image show two nipples?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 142.1
+    },
+    {
+      "index": 413,
+      "question": "one cusp has a partial fusion at whose center?",
+      "gold_answer": "its",
+      "predicted_answer": "the other",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 142.1
+    },
+    {
+      "index": 414,
+      "question": "does omentum show two nipples?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 142.1
+    },
+    {
+      "index": 415,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 142.1
+    },
+    {
+      "index": 416,
+      "question": "is breast present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 197.0
+    },
+    {
+      "index": 417,
+      "question": "is carcinoma present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 197.0
+    },
+    {
+      "index": 418,
+      "question": "what is present?",
+      "gold_answer": "nipple duplication",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 197.0
+    },
+    {
+      "index": 419,
+      "question": "is nipple duplication present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 197.0
+    },
+    {
+      "index": 420,
+      "question": "is stillborn macerated present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 148.8
+    },
+    {
+      "index": 421,
+      "question": "where is this area in the body?",
+      "gold_answer": "breast",
+      "predicted_answer": "breast",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 148.8
+    },
+    {
+      "index": 422,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 148.8
+    },
+    {
+      "index": 423,
+      "question": "what is present?",
+      "gold_answer": "nipple duplication",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 148.8
+    },
+    {
+      "index": 424,
+      "question": "one cusp has a partial fusion at whose center?",
+      "gold_answer": "its",
+      "predicted_answer": "the other cusp",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 185.4
+    },
+    {
+      "index": 425,
+      "question": "what does this image show?",
+      "gold_answer": "normal breast",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 185.4
+    },
+    {
+      "index": 426,
+      "question": "does this image show normal breast?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 185.4
+    },
+    {
+      "index": 427,
+      "question": "does lower chest and abdomen anterior show normal breast?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 185.4
+    },
+    {
+      "index": 428,
+      "question": "where is this area in the body?",
+      "gold_answer": "breast",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 195.1
+    },
+    {
+      "index": 429,
+      "question": "what does this image show?",
+      "gold_answer": "breast",
+      "predicted_answer": "hepatobiliary",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 195.1
+    },
+    {
+      "index": 430,
+      "question": "does this image show breast, fibroadenoma?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 195.1
+    },
+    {
+      "index": 431,
+      "question": "does liver show breast, fibroadenoma?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 195.1
+    },
+    {
+      "index": 432,
+      "question": "where is this area in the body?",
+      "gold_answer": "breast",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 215.9
+    },
+    {
+      "index": 433,
+      "question": "does this image appear benign?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 215.9
+    },
+    {
+      "index": 434,
+      "question": "does retroperitoneal liposarcoma appear benign?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 215.9
+    },
+    {
+      "index": 435,
+      "question": "what is dilated, reflecting long-standing valvular insufficiency and volume overload?",
+      "gold_answer": "the atrium",
+      "predicted_answer": "the left ventricle",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 215.9
+    },
+    {
+      "index": 436,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 157.6
+    },
+    {
+      "index": 437,
+      "question": "is breast present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 157.6
+    },
+    {
+      "index": 438,
+      "question": "is peritoneum present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 157.6
+    },
+    {
+      "index": 439,
+      "question": "what is present?",
+      "gold_answer": "intraductal papillomatosis with apocrine metaplasia",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 157.6
+    },
+    {
+      "index": 440,
+      "question": "is intraductal papillomatosis with apocrine metaplasia present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 172.4
+    },
+    {
+      "index": 441,
+      "question": "where is this area in the body?",
+      "gold_answer": "breast",
+      "predicted_answer": "female reproductive system",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.4
+    },
+    {
+      "index": 442,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.4
+    },
+    {
+      "index": 443,
+      "question": "what is present?",
+      "gold_answer": "intraductal papillomatosis with apocrine metaplasia",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 172.4
+    },
+    {
+      "index": 444,
+      "question": "how does this image appear?",
+      "gold_answer": "benign",
+      "predicted_answer": "as a series of small, uniform, oval, and round cells",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 401.4
+    },
+    {
+      "index": 445,
+      "question": "what does this image show?",
+      "gold_answer": "excellent invasive tumor with marked desmoplastic reaction",
+      "predicted_answer": "lung",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 401.4
+    },
+    {
+      "index": 446,
+      "question": "are the preserved outlines with loss of nuclei?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 401.4
+    },
+    {
+      "index": 447,
+      "question": "is the atrium dilated, reflecting long-standing valvular insufficiency and volume overload?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 401.4
+    },
+    {
+      "index": 448,
+      "question": "how does this image show excellent invasive tumor?",
+      "gold_answer": "with marked desmoplastic reaction",
+      "predicted_answer": "with necrosis",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 198.4
+    },
+    {
+      "index": 449,
+      "question": "does this image show excellent invasive tumor with marked desmoplastic reaction?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 198.4
+    },
+    {
+      "index": 450,
+      "question": "does leiomyosarcoma show excellent invasive tumor with marked desmoplastic reaction?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 198.4
+    },
+    {
+      "index": 451,
+      "question": "what are seen?",
+      "gold_answer": "intraductal lesions",
+      "predicted_answer": "tumour cells",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 198.4
+    },
+    {
+      "index": 452,
+      "question": "are intraductal lesions seen?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 148.8
+    },
+    {
+      "index": 453,
+      "question": "are opened abdominal cavity with massive tumor in omentum none apparent in liver nor over peritoneal surfaces gut seen?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 148.8
+    },
+    {
+      "index": 454,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 148.8
+    },
+    {
+      "index": 455,
+      "question": "is breast present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 148.8
+    },
+    {
+      "index": 456,
+      "question": "is very good example present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 143.7
+    },
+    {
+      "index": 457,
+      "question": "what is present?",
+      "gold_answer": "papillary intraductal adenocarcinoma",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 143.7
+    },
+    {
+      "index": 458,
+      "question": "is the surrounding lung dilated, reflecting long-standing valvular insufficiency and volume overload?",
+      "gold_answer": "no",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 143.7
+    },
+    {
+      "index": 459,
+      "question": "is papillary intraductal adenocarcinoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 143.7
+    },
+    {
+      "index": 460,
+      "question": "is an opened peritoneal cavity cause by fibrous band strangulation present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 197.7
+    },
+    {
+      "index": 461,
+      "question": "where is this area in the body?",
+      "gold_answer": "breast",
+      "predicted_answer": "oral",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 197.7
+    },
+    {
+      "index": 462,
+      "question": "what are seen?",
+      "gold_answer": "intraductal lesions",
+      "predicted_answer": "tumour cells",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 197.7
+    },
+    {
+      "index": 463,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 197.7
+    },
+    {
+      "index": 464,
+      "question": "what is present?",
+      "gold_answer": "papillary intraductal adenocarcinoma",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 256.3
+    },
+    {
+      "index": 465,
+      "question": "what does this image show?",
+      "gold_answer": "metastatic choriocarcinoma with extensive vascularization",
+      "predicted_answer": "pancreas",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 256.3
+    },
+    {
+      "index": 466,
+      "question": "how does this image show metastatic choriocarcinoma?",
+      "gold_answer": "with extensive vascularization",
+      "predicted_answer": "with necrosis and hemorrhage",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 256.3
+    },
+    {
+      "index": 467,
+      "question": "does this image show metastatic choriocarcinoma with extensive vascularization?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 256.3
+    },
+    {
+      "index": 468,
+      "question": "does natural color show metastatic choriocarcinoma with extensive vascularization?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 141.3
+    },
+    {
+      "index": 469,
+      "question": "what is prominent hooding with?",
+      "gold_answer": "prolapse of the posterior mitral leaflet into the left atrium",
+      "predicted_answer": "aorta",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 141.3
+    },
+    {
+      "index": 470,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 141.3
+    },
+    {
+      "index": 471,
+      "question": "is breast present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 141.3
+    },
+    {
+      "index": 472,
+      "question": "is opened muscle present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 152.5
+    },
+    {
+      "index": 473,
+      "question": "what is present?",
+      "gold_answer": "metastatic carcinoma",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 152.5
+    },
+    {
+      "index": 474,
+      "question": "is metastatic carcinoma present?",
+      "gold_answer": "yes",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": false,
+      "time_ms": 152.5
+    },
+    {
+      "index": 475,
+      "question": "is carcinomatosis endometrium primary present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 152.5
+    },
+    {
+      "index": 476,
+      "question": "where is this area in the body?",
+      "gold_answer": "breast",
+      "predicted_answer": "female reproductive",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.3
+    },
+    {
+      "index": 477,
+      "question": "what is present?",
+      "gold_answer": "breast",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.3
+    },
+    {
+      "index": 478,
+      "question": "what is present?",
+      "gold_answer": "metastatic carcinoma",
+      "predicted_answer": "endocrine",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.3
+    },
+    {
+      "index": 479,
+      "question": "what does this image show?",
+      "gold_answer": "coronary artery atherosclerosis diagram",
+      "predicted_answer": "heart",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 149.3
+    },
+    {
+      "index": 480,
+      "question": "what is there with prolapse of the posterior mitral leaflet into the left atrium?",
+      "gold_answer": "prominent hooding",
+      "predicted_answer": "the mitral valve",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 175.7
+    },
+    {
+      "index": 481,
+      "question": "does this image show coronary artery atherosclerosis diagram?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 175.7
+    },
+    {
+      "index": 482,
+      "question": "does atrophy show coronary artery atherosclerosis diagram?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 175.7
+    },
+    {
+      "index": 483,
+      "question": "what is present?",
+      "gold_answer": "cardiovascular",
+      "predicted_answer": "cardiovascular",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 175.7
+    },
+    {
+      "index": 484,
+      "question": "is cardiovascular present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 163.0
+    },
+    {
+      "index": 485,
+      "question": "is carcinomatosis endometrium primary present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 163.0
+    },
+    {
+      "index": 486,
+      "question": "where is this area in the body?",
+      "gold_answer": "heart",
+      "predicted_answer": "heart",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 163.0
+    },
+    {
+      "index": 487,
+      "question": "what is present?",
+      "gold_answer": "cardiovascular",
+      "predicted_answer": "cardiovascular",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 163.0
+    },
+    {
+      "index": 488,
+      "question": "what does this image show?",
+      "gold_answer": "coronary artery atherosclerosis diagram",
+      "predicted_answer": "heart",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 127.4
+    },
+    {
+      "index": 489,
+      "question": "does this image show coronary artery atherosclerosis diagram?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 127.4
+    },
+    {
+      "index": 490,
+      "question": "does slide show coronary artery atherosclerosis diagram?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 127.4
+    },
+    {
+      "index": 491,
+      "question": "is there prominent hooding with prolapse of the posterior mitral leaflet into the left atrium?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 127.4
+    },
+    {
+      "index": 492,
+      "question": "what is present?",
+      "gold_answer": "cardiovascular",
+      "predicted_answer": "cardiovascular",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 190.9
+    },
+    {
+      "index": 493,
+      "question": "is cardiovascular present?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 190.9
+    },
+    {
+      "index": 494,
+      "question": "is slide present?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 190.9
+    },
+    {
+      "index": 495,
+      "question": "where is this area in the body?",
+      "gold_answer": "heart",
+      "predicted_answer": "heart",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 190.9
+    },
+    {
+      "index": 496,
+      "question": "what is present?",
+      "gold_answer": "cardiovascular",
+      "predicted_answer": "cardiovascular",
+      "question_type": "open",
+      "correct": true,
+      "time_ms": 530.0
+    },
+    {
+      "index": 497,
+      "question": "what does this image show?",
+      "gold_answer": "amyloidosis",
+      "predicted_answer": "microscopic appearance of the myocardium in a patient with rheumatic heart disease",
+      "question_type": "open",
+      "correct": false,
+      "time_ms": 530.0
+    },
+    {
+      "index": 498,
+      "question": "does this image show amyloidosis?",
+      "gold_answer": "yes",
+      "predicted_answer": "yes",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 530.0
+    },
+    {
+      "index": 499,
+      "question": "does muscle atrophy show amyloidosis?",
+      "gold_answer": "no",
+      "predicted_answer": "no",
+      "question_type": "closed",
+      "correct": true,
+      "time_ms": 530.0
+    }
+  ]
+}
