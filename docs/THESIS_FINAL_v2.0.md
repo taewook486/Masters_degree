@@ -3,7 +3,7 @@
 <!-- pdf:strip-meta -->
 > 본문 버전: v2.0-draft (2026-07-31 시작, 2026-08-13 전체 초안 완성)
 > 기반 설계서: [THESIS_PROPOSAL_FINAL_v0.12.md](THESIS_PROPOSAL_FINAL_v0.12.md)
-> 진행 상태: **제1-5장 + 참고문헌 + 부록 A-D 전체 초안 완성.** 3단계 실험(Phase 1 제로샷 12조건 / Phase 2 QLoRA 75조건 / Phase 3 자율 HPO 610 trial) 모두 완료되어 실측값으로 작성됨. 2장 인용은 WebSearch 검증 완료(설계서의 Min-K% 인용 오류 NAACL→ICLR 발견·정정), 참고문헌 15건은 원문 대조 완료.
+> 진행 상태: **제1-5장 + 참고문헌 + 부록 A-B 전체 초안 완성.** 3단계 실험(Phase 1 제로샷 12조건 / Phase 2 QLoRA 75조건 / Phase 3 자율 HPO 610 trial) 모두 완료되어 실측값으로 작성됨. 2장 인용은 WebSearch 검증 완료(설계서의 Min-K% 인용 오류 NAACL→ICLR 발견·정정), 참고문헌 15건은 원문 대조 완료.
 > 남은 작업: 인용 표기 형식의 학과 지정 양식 통일, 지도교수 피드백 반영.
 <!-- /pdf:strip-meta -->
 
@@ -28,7 +28,7 @@
   - 4.4 종합 분석 및 논의 (4.4.6 선행 연구 간접 비교 포함)
 - 제5장. 결론 ✅ (5.1 요약 / 5.2 기여 / 5.3 한계점 / 5.4 향후 연구)
 - 참고문헌 ✅ (15건, 원문 대조 완료)
-- 부록 A~D ✅ (A 결과파일 경로 / B 에이전트 시스템 프롬프트 / C 재현 가이드 / D 제안 근거 로그)
+- 부록 A~B ✅ (A 에이전트 시스템 프롬프트 / B 제안 근거 로그) — 제출본에서 결과파일 경로·재현 가이드는 소스 제출 대상이 아니므로 제외함
 
 ---
 
@@ -56,7 +56,7 @@
 
 본 연구는 소비자 GPU 환경에서 경량 Vision-Language Model을 의료 영상 VQA(Visual Question Answering) 도메인에 적응시키는 전 과정을 실증적으로 검증하는 것을 목적으로 하며, 구체적으로 다음 세 가지를 달성하고자 한다.
 
-1. 16-24GB급 소비자 GPU 환경에서 경량 VLM의 의료 VQA 도메인 적응 가능성을 실증한다.
+1. 소비자급 GPU 환경(본 연구 실행 기준 24GB, 실측 VRAM 기준 16GB급 적용 가능)에서 경량 VLM의 의료 VQA 도메인 적응 가능성을 실증한다.
 2. QLoRA 파인튜닝의 주요 하이퍼파라미터(데이터 규모, LoRA rank, target module 범위)가 성능에 미치는 영향을 체계적으로 분석한다.
 3. autoresearch 스타일의 LLM 에이전트 기반 자율 하이퍼파라미터 탐색이 베이지안 최적화 대비 경쟁력 있는 성능과 해석 가능한 탐색 근거를 제공하는지 검증한다.
 
@@ -74,7 +74,7 @@ RQ1·RQ2·RQ3는 각각 제4장 4.1·4.2·4.3에서 실측 데이터로 검증�
 
 ### 1.3 연구 범위 및 제한
 
-본 연구의 실험 범위는 4개 경량 VLM(Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B)과 3개 공개 의료 VQA 데이터셋(PathVQA, SLAKE, VQA-RAD)으로 한정한다. 모델 선정은 16GB급 VRAM에서 QLoRA 파인튜닝이 가능하고 재배포가 자유로운 라이선스(Apache 2.0/MIT)를 갖춘 모델을 기준으로 했으며, 데이터셋은 공개적으로 접근 가능하고 임상 질문 유형이 라벨링된 벤치마크로 한정했다.
+본 연구의 실험 범위는 4개 경량 VLM(Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B)과 3개 공개 의료 VQA 데이터셋(PathVQA, SLAKE, VQA-RAD)으로 한정한다. 모델 선정은 16GB급 VRAM에서 QLoRA 파인튜닝이 가능할 것으로 예상되고(실측 결과 최대 14.4GB로 확인, 3.2.1) 재배포가 자유로운 라이선스(Apache 2.0/MIT)를 갖춘 모델을 기준으로 했으며, 데이터셋은 공개적으로 접근 가능하고 임상 질문 유형이 라벨링된 벤치마크로 한정했다.
 
 연구의 주요 제한점은 다음과 같으며, 상세한 근거와 완화 조치는 제5장 5.3에서 논의한다: (1) 대상 데이터셋이 모델의 사전훈련 시점 이전에 공개되어 사전훈련 데이터 오염 가능성이 존재하므로, 본 연구는 이를 Min-K% Probability 기법으로 능동 측정하고 결론의 강건성을 별도 검증한다(제4장 4.1.1 오염 강건성 검증 참조). (2) LLaVA-Med, Med-Flamingo 등 기존 의료 특화 VLM과의 직접 실험 비교는 본 연구 범위 밖이며 선행 연구 수치와의 간접 비교로 대체한다. (3) GPU 시간·비용 제약으로 QLoRA 학습에 `max_steps` 상한을 적용했으며, 이로 인해 데이터셋 크기에 따라 실효 학습량(epoch 환산)이 달라진다.
 
@@ -104,7 +104,7 @@ LoRA(Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", arXiv:2106
 
 #### 2.2.2 QLoRA (Quantized LoRA)
 
-QLoRA(Dettmers et al., "QLoRA: Efficient Finetuning of Quantized LLMs", arXiv:2305.14314, NeurIPS 2023)는 LoRA에 4-bit 양자화를 결합하여 VRAM 사용량을 추가로 절감한다. 핵심 구성 요소는 (1) 정규분포를 따르는 가중치에 최적화된 4-bit NormalFloat(NF4) 양자화, (2) 양자화 상수 자체를 다시 양자화하는 이중 양자화(double quantization), (3) GPU 메모리 스파이크를 CPU로 흘려보내는 paged optimizer이다. 기반 모델은 4-bit로 양자화된 상태로 고정하고 그 위에 LoRA 어댑터만 16-bit 정밀도로 학습하므로, 65B급 모델을 단일 48GB GPU에서 파인튜닝하면서도 완전 16-bit 파인튜닝에 근접한 성능을 유지함을 원 논문에서 보였다. 본 연구는 이 QLoRA 방식(NF4 양자화 + LoRA + paged AdamW 8bit)을 4개 경량 VLM 전체에 적용하여, 16GB급 소비자 GPU에서의 의료 도메인 파인튜닝 가능성을 검증한다(제3장 3.6).
+QLoRA(Dettmers et al., "QLoRA: Efficient Finetuning of Quantized LLMs", arXiv:2305.14314, NeurIPS 2023)는 LoRA에 4-bit 양자화를 결합하여 VRAM 사용량을 추가로 절감한다. 핵심 구성 요소는 (1) 정규분포를 따르는 가중치에 최적화된 4-bit NormalFloat(NF4) 양자화, (2) 양자화 상수 자체를 다시 양자화하는 이중 양자화(double quantization), (3) GPU 메모리 스파이크를 CPU로 흘려보내는 paged optimizer이다. 기반 모델은 4-bit로 양자화된 상태로 고정하고 그 위에 LoRA 어댑터만 16-bit 정밀도로 학습하므로, 65B급 모델을 단일 48GB GPU에서 파인튜닝하면서도 완전 16-bit 파인튜닝에 근접한 성능을 유지함을 원 논문에서 보였다. 본 연구는 이 QLoRA 방식(NF4 양자화 + LoRA + paged AdamW 8bit)을 4개 경량 VLM 전체에 적용하여, 소비자급 GPU에서의 의료 도메인 파인튜닝 가능성을 검증한다(제3장 3.6). 실행은 24GB 카드(RTX 4090·3090)에서 이루어졌으며, 16GB급 환경에서의 구동 가능 여부는 실측 Peak VRAM으로 판단한다(3.2.1).
 
 #### 2.2.3 기타 PEFT 기법 비교
 
@@ -154,7 +154,11 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 
 #### 3.2.1 하드웨어 사양
 
-Phase 1·2는 클라우드 GPU(RunPod, RTX 4090 24GB)를 주 실험 환경으로 사용했으며, 로컬 RTX 5060 Ti(16GB VRAM, Ryzen 5 5600X, RAM 32GB)에서 일부 조건을 재현하여 소비자 GPU(16GB) 환경에서의 재현 가능성을 함께 확인했다. Phase 3은 소속 기관의 비용 지원이 불가하고 클라우드 예산 확보가 어려워진 관계로 RunPod 사용을 중단하고, 로컬 RTX 5060 Ti(16GB) 단독 — 하드웨어 여건에 따라 4060(8GB)과의 듀얼 GPU 구성 — 환경으로 전환하여 진행한다. 이러한 환경 전환의 경위와 영향은 제5장 5.3 한계점에서 상세히 논의한다.
+본 연구에 보고된 모든 실험은 클라우드 GPU 서비스(RunPod)에서 수행했다. Phase 1·2는 RTX 4090(24GB VRAM), Phase 3은 RTX 3090(24GB VRAM) 인스턴스를 사용했다. Phase 3에서 GPU 종류가 바뀐 것은 실험 설계상의 선택이 아니라, 소속 기관의 비용 지원이 불가하여 예산 제약이 커진 상황에서 가용 인스턴스를 확보한 결과다. 두 GPU 모두 24GB VRAM의 소비자용 카드이며, Phase 3은 전 trial이 동일한 3090 인스턴스에서 실행되어 전략 간 비교의 하드웨어 조건은 통제되었다.
+
+로컬 워크스테이션(RTX 5060 Ti 16GB + RTX 4060 8GB, Ryzen 5 5600X, RAM 32GB)은 Phase 3의 실행 규모를 산정하기 위한 사전 스모크 테스트에만 사용했으며(3.7), **본 논문이 보고하는 수치는 어느 것도 로컬 환경에서 산출되지 않았다.**
+
+한편 본 연구가 목표로 한 16GB급 환경에서의 구동 가능성은 실기 실행이 아니라 **실측 VRAM 사용량으로부터 확인**했다. Phase 2 QLoRA 학습의 Peak VRAM은 4개 모델 최대 14,373MB(Gemma4-E2B)로 16GB 한계 이내였고, 나머지 세 모델은 4,015~7,943MB에 그쳤다. 다만 16GB 카드에서의 실제 실행으로 검증한 것은 아니므로 이 추론의 한계는 제5장 5.3(14)에서 논의한다.
 
 #### 3.2.2 소프트웨어 스택
 
@@ -171,7 +175,7 @@ Phase 1·2는 클라우드 GPU(RunPod, RTX 4090 24GB)를 주 실험 환경으로
 | SmolVLM2-2.2B | 2.2B | HuggingFace 경량 VLM | ~8-10 GB |
 | Gemma4-E2B | 2.3B(활성)/5.1B(전체) | PLE(Per-Layer Embeddings), Apache 2.0 | ~12-14 GB |
 
-선정 기준은 (1) 16GB VRAM에서 QLoRA 파인튜닝이 가능할 것, (2) Apache 2.0 또는 MIT 라이선스로 연구 활용이 자유로울 것, (3) 충분한 커뮤니티·프레임워크 지원을 갖출 것의 세 가지다. Gemma4-E2B는 Mixture-of-Experts 계열의 PLE 기술로 추론 시 2.3B 파라미터만 활성화되면서도 5.1B급 표현력을 제공한다는 점에서 포함했으며, 이 아키텍처 특성이 결과 해석에 미치는 영향은 제5장 5.3에서 별도로 논의한다.
+선정 기준은 (1) 16GB VRAM에서 QLoRA 파인튜닝이 가능할 것(사전 예상치이며, 실측 Peak VRAM으로 사후 확인함 — 3.2.1), (2) Apache 2.0 또는 MIT 라이선스로 연구 활용이 자유로울 것, (3) 충분한 커뮤니티·프레임워크 지원을 갖출 것의 세 가지다. Gemma4-E2B는 Mixture-of-Experts 계열의 PLE 기술로 추론 시 2.3B 파라미터만 활성화되면서도 5.1B급 표현력을 제공한다는 점에서 포함했으며, 이 아키텍처 특성이 결과 해석에 미치는 영향은 제5장 5.3에서 별도로 논의한다.
 
 ### 3.4 데이터셋 및 전처리
 
@@ -235,7 +239,7 @@ Phase 1·2는 클라우드 GPU(RunPod, RTX 4090 24GB)를 주 실험 환경으로
 
 **비교 대상 4개 전략**: Manual(연구자 기본값, 1회) / Random Search(무작위 샘플링) / Optuna·TPE(베이지안 최적화) / Autoresearch(LLM 에이전트 자율 탐색). Autoresearch는 (1) 이전 실험 결과(results.tsv)를 읽고 (2) 다음 설정을 자연어 근거와 함께 제안(config.yaml + rationale.md)한 뒤 (3) git commit, (4) 고정 학습 실행, (5) 검증셋 평가, (6) 성능 개선 시 유지·아니면 폐기하는 루프를 반복한다.
 
-전 trial 공통으로 동일 모델(Phase 2 최적 모델)·동일 데이터셋(PathVQA)·고정 `max_steps=200`(안전장치용 wall-clock 상한 `time_budget_min`은 실험 통제 변수가 아닌 이상 조합 방지용)을 사용해 학습량을 통제한다. 당초 설계는 Manual 10 + Random Search 400 + Optuna 400 + Autoresearch 400 = 총 1,210 trial(각 전략 40 trial × 10회 독립 반복)이었으나, 로컬 듀얼 GPU 스모크 테스트 실측 결과 학습(train)뿐 아니라 검증·최종 테스트 평가 시간까지 합산한 wall-clock 기준으로 GPU 2장 병렬 실행 시에도 원안 규모는 약 24~25일이 소요될 것으로 재추정되었다. 이에 통계 검정 단위인 반복 횟수(10회, run-level 검정력의 근거)는 그대로 유지하고, 대신 전략당 탐색 trial 수를 40에서 20으로 축소하여 총 소요 시간을 약 12.8일로 절반 단축했다. **최종 실행 규모는 Manual 10 + Random Search 200 + Optuna 200 + Autoresearch 200 = 총 610 trial(각 전략 20 trial × 10회 독립 반복)이다.** 이 축소는 전략당 탐색하는 하이퍼파라미터 조합의 다양성을 절반으로 낮추는 트레이드오프가 있으나, run-level 통계 검정(10회 독립 반복)의 타당성 자체에는 영향을 주지 않는다.
+전 trial 공통으로 동일 모델(Phase 2 최적 모델)·동일 데이터셋(PathVQA)·고정 `max_steps=200`(안전장치용 wall-clock 상한 `time_budget_min`은 실험 통제 변수가 아닌 이상 조합 방지용)을 사용해 학습량을 통제한다. 당초 설계는 Manual 10 + Random Search 400 + Optuna 400 + Autoresearch 400 = 총 1,210 trial(각 전략 40 trial × 10회 독립 반복)이었으나, **실행 규모 산정을 위한 사전 스모크 테스트**(로컬 듀얼 GPU 환경, 본 논문의 보고 대상이 아닌 소요 시간 측정 전용) 결과, 학습(train)뿐 아니라 검증·최종 테스트 평가 시간까지 합산한 wall-clock 기준으로 GPU 2장 병렬 실행 시에도 원안 규모는 약 24~25일이 소요될 것으로 재추정되었다. 이에 통계 검정 단위인 반복 횟수(10회, run-level 검정력의 근거)는 그대로 유지하고, 대신 전략당 탐색 trial 수를 40에서 20으로 축소하여 총 소요 시간을 약 12.8일로 절반 단축했다. **최종 실행 규모는 Manual 10 + Random Search 200 + Optuna 200 + Autoresearch 200 = 총 610 trial(각 전략 20 trial × 10회 독립 반복)이다.** 이 축소는 전략당 탐색하는 하이퍼파라미터 조합의 다양성을 절반으로 낮추는 트레이드오프가 있으나, run-level 통계 검정(10회 독립 반복)의 타당성 자체에는 영향을 주지 않는다.
 
 **통계 검증은 trial-level이 아닌 run-level에서만 수행**한다. Autoresearch와 Optuna는 순차 최적화 특성상 동일 run 내 trial 간 의존성이 있어(trial t의 결과가 t+1의 제안에 영향), 독립 관측치 가정이 위반되기 때문이다. 검정 단위는 각 전략의 10회 독립 반복에서 나온 10개 최종 성능값이며, Kruskal-Wallis test(4그룹 비교)와 Mann-Whitney U test(Autoresearch vs Optuna 쌍별), BCa Bootstrap 95% CI를 사용한다. Trial-level 데이터는 anytime performance curve 등 시각화에만 사용한다.
 
@@ -522,7 +526,7 @@ Random·Optuna는 10회 반복 전부에서 20개 trial이 모두 서로 다른 
 
 이 패턴은 개별 반복의 제안 궤적에서 더 분명하게 드러난다. 예컨대 반복 8에서 에이전트는 초반 6개 trial 동안 rank를 16→64→32→8→32→64로 바꾸며 탐색하다가, 7번째 trial 이후 `rank=64, alpha=256, lr=2.0e-4, batch=2, targets=full` 조합에 고착되어 이를 11회 연속 제안했다. 주목할 점은 **동일한 설정이 반복 실행되는 동안 val_accuracy가 0.388~0.444 범위에서 변동**했다는 것이다 — 이 변동은 설정 차이가 아니라 학습·평가 과정의 확률적 변동이며, 에이전트가 이 노이즈를 성능 신호로 해석했을 가능성을 시사한다. 이 반복에서 에이전트가 고착을 벗어나 batch_size를 4로 바꾼 것은 마지막 trial이었고, 그 설정이 해당 반복의 최고 성능(0.4640)을 기록했다.
 
-정리하면 Autoresearch의 낮은 성능은 제안하는 설정의 품질이 나빠서가 아니라(trial 평균은 오히려 가장 높다), **동일 설정의 반복 제안으로 실효 탐색 예산이 축소된 데 기인**하는 것으로 보인다. 다만 본 절은 결과 로그에 대한 사후 관찰이며, 에이전트의 내부 판단 근거를 직접 검증한 것은 아니다. 제안 근거(rationale) 원문은 부록 D에 수록한다.
+정리하면 Autoresearch의 낮은 성능은 제안하는 설정의 품질이 나빠서가 아니라(trial 평균은 오히려 가장 높다), **동일 설정의 반복 제안으로 실효 탐색 예산이 축소된 데 기인**하는 것으로 보인다. 다만 본 절은 결과 로그에 대한 사후 관찰이며, 에이전트의 내부 판단 근거를 직접 검증한 것은 아니다. 제안 근거(rationale) 원문은 부록 B에 수록한다.
 
 #### 4.3.5 종합
 
@@ -656,7 +660,7 @@ Phase 2와 Phase 3은 하이퍼파라미터 탐색을 서로 다른 방식으로
 **RQ3 — LLM 에이전트의 자율 탐색이 베이지안 최적화와 경쟁적 성능을 달성하며 해석 가능한 탐색 근거를 제공하는가?**
 귀무가설(Autoresearch = Optuna)은 기각되었으나, **그 방향은 가설이 기대한 것과 반대였다.** run-level 비교에서 Optuna(0.4490)가 Autoresearch(0.4184)보다 유의하게 우수했고(Mann-Whitney U = 16.00, p = .0112, r = -0.68), Autoresearch는 하한선 비교 대상인 Random Search(0.4186)와도 통계적으로 구분되지 않았다. 다만 세 자동 탐색 전략이 모두 수동 설정(0.3776)을 상회하여 자동 탐색 자체의 유효성은 확인되었다.
 
-RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 설계에서 충분히 검증되지 못했다.** 에이전트에게 주어진 시스템 프롬프트(부록 B)가 "설명이나 다른 텍스트 없이 JSON 객체만 응답하라"고 명시적으로 지시했기 때문에, 자연어 근거의 산출은 애초에 요구되지 않았다. 실제로 200개 trial 중 **147개(73.5%)는 하이퍼파라미터 JSON만을 반환했고, 자연어 서술이 포함된 것은 53개(26.5%)에 그쳤다.** 따라서 "LLM 에이전트가 해석 가능한 탐색 근거를 제공하는가"라는 질문에 대해 본 연구는 긍정도 부정도 할 수 없으며, 이는 결과가 아니라 **설계상의 결함**이다(5.3(8)).
+RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 설계에서 충분히 검증되지 못했다.** 에이전트에게 주어진 시스템 프롬프트(부록 A)가 "설명이나 다른 텍스트 없이 JSON 객체만 응답하라"고 명시적으로 지시했기 때문에, 자연어 근거의 산출은 애초에 요구되지 않았다. 실제로 200개 trial 중 **147개(73.5%)는 하이퍼파라미터 JSON만을 반환했고, 자연어 서술이 포함된 것은 53개(26.5%)에 그쳤다.** 따라서 "LLM 에이전트가 해석 가능한 탐색 근거를 제공하는가"라는 질문에 대해 본 연구는 긍정도 부정도 할 수 없으며, 이는 결과가 아니라 **설계상의 결함**이다(5.3(8)).
 
 한편 탐색 품질 자체는 저조했다. 에이전트는 20 trial 중 평균 12.5개의 고유 설정만 시도했고(Random·Optuna는 20/20), 동일 설정을 반복 제안하며 조기 고착하는 패턴이 10회 반복 전체에서 관측되었다(4.3.4).
 
@@ -690,9 +694,9 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 �
 
 **(8) 자율 에이전트 설정의 내적 불일치.** 본 연구가 사후에 확인한 가장 중대한 한계로, Autoresearch 조건은 다음 세 가지 설정 불일치를 포함한다. 이는 4.3의 부정적 결과를 "LLM 에이전트의 본질적 한계"로 일반화할 수 없게 만드는 요인이므로 명시한다.
 
-- **탐색 근거 산출을 프롬프트가 금지했다.** 시스템 프롬프트(부록 B)는 "설명·마크다운·기타 텍스트 없이 JSON 객체만 응답하라"고 지시한다. 그 결과 200 trial 중 73.5%가 JSON만 반환했다. RQ3가 요구한 "해석 가능한 탐색 근거"는 측정 대상이 되기 전에 설계에 의해 배제되었다.
+- **탐색 근거 산출을 프롬프트가 금지했다.** 시스템 프롬프트(부록 A)는 "설명·마크다운·기타 텍스트 없이 JSON 객체만 응답하라"고 지시한다. 그 결과 200 trial 중 73.5%가 JSON만 반환했다. RQ3가 요구한 "해석 가능한 탐색 근거"는 측정 대상이 되기 전에 설계에 의해 배제되었다.
 - **탐색 일정이 실제 예산과 어긋난다.** 프롬프트는 탐색 단계를 절대 trial 번호로 규정한다 — 초기 탐색 0~5, 중기 착취 5~20("최고 설정을 가져와 1~2개 파라미터만 변경"), 후기 정밀화 20+. 그러나 실제 예산은 반복당 20 trial이므로 **후기 정밀화 단계는 한 번도 발동하지 않았고, 예산의 약 75%가 "최고 설정 주변만 변형"하도록 지시된 구간에서 소비**되었다. 4.3.4가 관측한 중복 제안(고유 설정 12.5/20)은 에이전트의 판단 실패라기보다 이 지시를 충실히 따른 결과일 가능성이 있다. 코드 측 단계 전환 로직(`src/autoresearch/agent.py`)은 진행률 비율(0.25/0.75) 기준이어서 예산에 맞게 조정되나, 프롬프트 텍스트는 그렇지 않아 양자가 어긋난다.
-- **무효 파라미터를 탐색 대상으로 제시했다.** 프롬프트는 `epochs`를 탐색 공간에 포함하고 "데이터가 제한적일 때 더 많은 epoch(3-5)이 도움이 된다"는 지침까지 제공하지만, 구현(`src/autoresearch/agent.py`)은 제안된 `epochs`를 폐기하고 `max_steps=200`으로 고정한다. 실제 로그에서 에이전트가 "모든 trial이 200 step뿐이라 학습 부족으로 보인다", "epochs가 변경되지 않았다"고 진단하는 사례가 관측되는데(부록 D), 이는 정확한 진단이었으나 해당 조정 수단은 애초에 작동하지 않았다.
+- **무효 파라미터를 탐색 대상으로 제시했다.** 프롬프트는 `epochs`를 탐색 공간에 포함하고 "데이터가 제한적일 때 더 많은 epoch(3-5)이 도움이 된다"는 지침까지 제공하지만, 구현(`src/autoresearch/agent.py`)은 제안된 `epochs`를 폐기하고 `max_steps=200`으로 고정한다. 실제 로그에서 에이전트가 "모든 trial이 200 step뿐이라 학습 부족으로 보인다", "epochs가 변경되지 않았다"고 진단하는 사례가 관측되는데(부록 B), 이는 정확한 진단이었으나 해당 조정 수단은 애초에 작동하지 않았다.
 
 이 세 항목은 모두 Autoresearch 조건에만 적용되며 Random·Optuna 조건에는 해당하지 않는다. 따라서 4.3.1의 비교는 "동일 탐색 공간에서의 알고리즘 비교"라기보다 **"이 프롬프트 구성으로 운용된 에이전트와 기존 알고리즘의 비교"**로 한정해 해석해야 한다.
 
@@ -705,6 +709,8 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 �
 **(12) 학습 예산 상한(`max_steps` cap)의 구조적 제약.** Phase 2는 GPU 시간 제약으로 `max_steps=500` 상한을 적용했고(3.6), 이로 인해 **데이터셋 크기와 무관하게 학습량이 고정**된다. 결과적으로 소형 VQA-RAD는 약 2 epoch 이상 학습되는 반면 대형 PathVQA는 1 epoch에 미치지 못한다. 4.2와 4.4.6에서 관측된 데이터셋별 성능 격차에는 이 실효 학습량 차이가 일부 섞여 있을 수 있으며, 특히 4.4.6에서 PathVQA·VQA-RAD의 격차를 "과제 전문성"으로 해석한 부분은 학습 예산 차이라는 대안 설명을 배제하지 못한다. 데이터셋별 full-epoch 재학습은 후속 과제로 남긴다.
 
 **(13) Phase 3 탐색 예산 축소의 영향.** 3.7에서 기술한 대로 전략당 탐색 trial 수를 원안 40에서 20으로 축소했다. run-level 검정 단위인 반복 횟수(10회)는 유지했으므로 통계 검정의 타당성에는 영향이 없으나, **각 전략이 탐색할 수 있는 하이퍼파라미터 조합 수가 절반으로 줄어 도달 성능이 원안 대비 과소평가**되었을 수 있다. 이 영향은 순차 최적화 전략(Optuna·Autoresearch)에서 더 클 것으로 예상되며, 실제로 4.3.3에서 Autoresearch는 예산 소진 시점까지 개선 중이던 run이 상당수였다.
+
+**(14) 16GB 환경의 실기 검증 부재.** 본 연구는 "소비자급 GPU에서의 도메인 적응"을 목표로 내걸었으나, 실제 실행은 전부 24GB 카드(Phase 1·2 RTX 4090, Phase 3 RTX 3090)에서 이루어졌다(3.2.1). 16GB급 환경에서의 구동 가능성은 실측 Peak VRAM(Phase 2 학습 기준 최대 14,373MB)이 16GB 한계 이내라는 사실로부터 **추론**한 것이며, 16GB 카드에서 직접 실행해 검증한 것이 아니다. 실제 16GB 환경에서는 사용 가능한 VRAM이 OS·디스플레이 출력 등으로 공칭 용량보다 작고 단편화 여지도 달라, 특히 여유가 2GB 미만인 Gemma4-E2B는 OOM 위험을 배제할 수 없다. 나머지 세 모델(4,015~7,943MB)은 여유가 충분하다. 16GB 실기에서의 재현은 후속 과제로 남긴다.
 
 ### 5.4 향후 연구 방향
 
@@ -763,39 +769,7 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 �
 
 ## 부록
 
-### 부록 A. 실험 결과 파일 경로
-
-본 연구의 모든 수치는 아래 파일에서 산출되었다. 논문 본문의 표·검정 결과는 모두 이 파일들로 역추적할 수 있다.
-
-**Phase 1 — 제로샷 베이스라인**
-
-| 파일 | 내용 | 본문 위치 |
-|------|------|-----------|
-| `results/phase1_baseline/` | 12조건(4모델×3데이터셋, seed 42) 원본 결과 | Table 4.1 |
-| `results/phase1_baseline/phase1_robustness.md` | Min-K% 오염 강건성 재검정 | 4.1.1 |
-
-**Phase 2 — QLoRA 파인튜닝**
-
-| 파일 | 내용 | 본문 위치 |
-|------|------|-----------|
-| `results/phase2_finetune/phase2_summary.csv` | 75조건(Main 36 + Ablation 39) 요약 | Table 4.2, 4.2a, 4.2b, 4.2c |
-| `results/phase2_finetune/phase2_rq2_analysis.md` | RQ2 3중 검증 + Mixed-Effects Model | 4.2.1 |
-| `results/phase2_finetune/cross_dataset_cf_summary.md` | cross-dataset CF 72조건 | Table 4.2e |
-
-**Phase 3 — 자율 하이퍼파라미터 최적화**
-
-| 파일 | 내용 | 본문 위치 |
-|------|------|-----------|
-| `results/phase3_autoresearch/results.tsv` | 610 trial 전수 기록(하이퍼파라미터·성능·근거) | 4.3 전반 |
-| `results/phase3_autoresearch/phase3_rq3_analysis.md` / `.json` | run-level Kruskal-Wallis·Mann-Whitney·Bootstrap CI | Table 4.3, 4.3.1 |
-| `results/phase3_autoresearch/phase3_summary.txt` | 전략별 최고 trial 및 분포 통계 | Table 4.3a, 4.3c |
-| `results/phase3_autoresearch/phase3_anytime_curve.csv` | anytime 곡선 원본 수치(trial별 중앙값·IQR·n) | 4.3.3 |
-| `results/phase3_autoresearch/phase3_anytime_summary.md` | 최고 성능 도달 시점 요약 | Table 4.3b |
-| `results/phase3_autoresearch/phase3_anytime.png` / `.pdf` | anytime performance 곡선 그림 | 4.3.3 |
-
-> `results.tsv`의 `agent_reasoning` 컬럼은 줄바꿈이 포함된 인용 문자열을 담고 있어 행 단위 도구(`wc -l` 등)로는 정확히 집계되지 않는다. 집계·분석 시에는 `src/autoresearch/tracker.py`의 `ExperimentTracker`(csv 모듈 기반)를 사용해야 한다.
-
-### 부록 B. Autoresearch 에이전트 시스템 프롬프트
+### 부록 A. Autoresearch 에이전트 시스템 프롬프트
 
 아래는 `configs/autoresearch/program.md`의 전문이다. 5.3(8)에서 지적한 세 가지 설정 불일치의 근거이므로 원문 그대로 수록한다. **밑줄 친 부분이 문제가 된 지점이다.**
 
@@ -853,71 +827,7 @@ no other text.                                             ← (iii) 근거 산�
 
 **에이전트 실행 설정**: 모델 `claude-sonnet-4-6`, `max_tokens=512`, `temperature=0`(전 trial 기록으로 확인). 온도 고정과 10회 독립 반복으로 API 비결정성을 완화했다(5.3(4)).
 
-### 부록 C. 재현 가이드
-
-아래 명령은 본 연구가 실제로 실행한 것이며, 저장소의 스크립트 인자와 일치한다.
-
-**환경 준비**
-
-```bash
-uv sync --extra unsloth        # unsloth 백엔드 필수 (Qwen 계열 데이터 포맷)
-uv run python -c "import unsloth"   # 설치 확인
-export HF_HOME=/hf_cache                          # 캐시 분산 (디스크 quota 대비)
-export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
-export WANDB_API_KEY=...       # 학습 로깅
-export ANTHROPIC_API_KEY=...   # Phase 3 autoresearch 전략에만 필요
-```
-
-> `python3`가 시스템 파이썬을 가리켜 `ModuleNotFoundError`가 발생하는 사례가 반복 관측되었으므로, 모든 실행은 `uv run python` 형태로 통일한다.
-
-**Phase 1 — 제로샷 베이스라인**
-
-```bash
-bash scripts/runpod_phase1.sh    # 12조건(4모델 × 3데이터셋), seed 42
-```
-
-**Phase 2 — QLoRA 파인튜닝**
-
-```bash
-uv run python -u -m src.finetune.run_phase2 \
-  --config_dir configs/models \
-  --finetune_config configs/finetune/base_qlora.yaml \
-  --output_dir results/phase2_finetune \
-  --seeds 42 123 456 \
-  --data_dir data \
-  --max_eval_samples 500
-
-bash scripts/run_phase2_ablation.sh   # Ablation A/B/C (PathVQA, Qwen3-VL-2B 고정)
-```
-
-**Phase 3 — 자율 하이퍼파라미터 최적화**
-
-```bash
-uv run python -u -m src.autoresearch.run_phase3 \
-  --model_config configs/models/qwen3_vl_2b.yaml \
-  --finetune_config configs/finetune/base_qlora.yaml \
-  --output_dir results/phase3_autoresearch \
-  --strategies manual random optuna autoresearch \
-  --repeats 10 \
-  --trials_per_repeat 20 \
-  --seed 42 \
-  --data_dir data \
-  --time_budget_min 90 \
-  --max_test_samples 500 \
-  --max_parallel 2
-```
-
-> `--time_budget_min 90`은 실험 통제 변수가 아니라 이상 조합으로 인한 무한 학습을 막는 안전장치다. 학습량 통제는 `max_steps=200`(코드 상수)이 담당한다. `--max_parallel 2`는 GPU 2장에 (전략, 반복) 단위 작업을 배분한다.
-
-**분석 및 그림 생성**
-
-```bash
-uv run python scripts/analyze_phase3.py --results_dir results/phase3_autoresearch
-uv run python scripts/summarize_stage.py manual random optuna autoresearch
-uv run python scripts/plot_phase3_anytime.py --results_dir results/phase3_autoresearch
-```
-
-### 부록 D. Autoresearch 제안 근거 로그 발췌
+### 부록 B. Autoresearch 제안 근거 로그 발췌
 
 `results.tsv`의 `agent_reasoning` 컬럼 원문에서 발췌했다. 200개 완료 trial 중 **147개(73.5%)는 아래 (1)과 같이 JSON만 반환**했고, 자연어 서술이 포함된 것은 53개(26.5%)였다(5.1, 5.3(8)).
 

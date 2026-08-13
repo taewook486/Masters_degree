@@ -40,7 +40,7 @@ Applying a PEFT method such as QLoRA in practice, however, requires selecting a 
 
 This study aims to empirically verify the full process of adapting lightweight Vision-Language Models to the medical imaging VQA (Visual Question Answering) domain on consumer GPUs. Specifically, it pursues the following three objectives.
 
-1. Demonstrate the feasibility of medical VQA domain adaptation for lightweight VLMs on consumer GPUs in the 16-24GB class.
+1. Demonstrate the feasibility of medical VQA domain adaptation for lightweight VLMs on consumer-class GPUs (executed here on 24GB cards; applicable to the 16GB class on the basis of measured VRAM).
 2. Systematically analyse how the principal hyperparameters of QLoRA fine-tuning — data scale, LoRA rank, and the scope of target modules — affect performance.
 3. Verify whether autoresearch-style autonomous hyperparameter search driven by an LLM agent delivers performance competitive with Bayesian optimization while providing interpretable search rationales.
 
@@ -58,7 +58,7 @@ RQ1, RQ2, and RQ3 are verified against measured data in Sections 4.1, 4.2, and 4
 
 ### 1.3 Scope and Delimitations
 
-The experimental scope of this study is limited to four lightweight VLMs (Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B) and three public medical VQA datasets (PathVQA, SLAKE, VQA-RAD). Models were selected on the criteria that QLoRA fine-tuning is feasible within 16GB-class VRAM and that the license permits free redistribution (Apache 2.0 / MIT). Datasets were restricted to publicly accessible benchmarks in which clinical question types are labelled.
+The experimental scope of this study is limited to four lightweight VLMs (Qwen3-VL-2B, Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B) and three public medical VQA datasets (PathVQA, SLAKE, VQA-RAD). Models were selected on the criteria that QLoRA fine-tuning was expected to be feasible within 16GB-class VRAM (confirmed post hoc at a measured maximum of 14.4GB, Section 3.2.1) and that the license permits free redistribution (Apache 2.0 / MIT). Datasets were restricted to publicly accessible benchmarks in which clinical question types are labelled.
 
 The principal limitations of the study are as follows; detailed grounds and mitigations are discussed in Section 5.3 of Chapter V. (1) Because the target datasets were released before the pretraining cut-off of the models, contamination of pretraining data is possible; this study therefore actively measures such contamination using the Min-K% Probability technique and separately verifies the robustness of its conclusions (see the contamination-robustness verification in Section 4.1.1). (2) Direct experimental comparison with existing medical-specialized VLMs such as LLaVA-Med and Med-Flamingo lies outside the scope of this study and is replaced by indirect comparison with figures reported in prior work. (3) Owing to GPU time and cost constraints, a `max_steps` ceiling was applied to QLoRA training, so that the effective training volume (in epoch terms) varies with dataset size.
 
@@ -88,7 +88,7 @@ LoRA (Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", arXiv:210
 
 #### 2.2.2 QLoRA (Quantized LoRA)
 
-QLoRA (Dettmers et al., "QLoRA: Efficient Finetuning of Quantized LLMs", arXiv:2305.14314, NeurIPS 2023) combines LoRA with 4-bit quantization to reduce VRAM usage further. Its core components are (1) 4-bit NormalFloat (NF4) quantization optimized for normally distributed weights, (2) double quantization, which quantizes the quantization constants themselves, and (3) a paged optimizer that offloads GPU memory spikes to the CPU. The base model is held fixed in 4-bit quantized form and only the LoRA adapter above it is trained at 16-bit precision; the original paper showed that this allows fine-tuning of a 65B-class model on a single 48GB GPU while maintaining performance close to full 16-bit fine-tuning. This study applies the same QLoRA scheme (NF4 quantization + LoRA + paged AdamW 8-bit) to all four lightweight VLMs in order to verify the feasibility of medical-domain fine-tuning on 16GB-class consumer GPUs (Section 3.6).
+QLoRA (Dettmers et al., "QLoRA: Efficient Finetuning of Quantized LLMs", arXiv:2305.14314, NeurIPS 2023) combines LoRA with 4-bit quantization to reduce VRAM usage further. Its core components are (1) 4-bit NormalFloat (NF4) quantization optimized for normally distributed weights, (2) double quantization, which quantizes the quantization constants themselves, and (3) a paged optimizer that offloads GPU memory spikes to the CPU. The base model is held fixed in 4-bit quantized form and only the LoRA adapter above it is trained at 16-bit precision; the original paper showed that this allows fine-tuning of a 65B-class model on a single 48GB GPU while maintaining performance close to full 16-bit fine-tuning. This study applies the same QLoRA scheme (NF4 quantization + LoRA + paged AdamW 8-bit) to all four lightweight VLMs in order to verify the feasibility of medical-domain fine-tuning on consumer-class GPUs (Section 3.6). Execution took place on 24GB cards (RTX 4090 and 3090), and feasibility in the 16GB class is judged from measured peak VRAM (Section 3.2.1).
 
 #### 2.2.3 Comparison with Other PEFT Methods
 
@@ -138,7 +138,11 @@ This study is designed as empirical research that verifies medical VQA domain ad
 
 #### 3.2.1 Hardware Specification
 
-Phases 1 and 2 used a cloud GPU (RunPod, RTX 4090 24GB) as the primary experimental environment, and selected conditions were reproduced on a local RTX 5060 Ti (16GB VRAM, Ryzen 5 5600X, 32GB RAM) to confirm reproducibility on a consumer GPU with 16GB. For Phase 3, because institutional cost support was unavailable and securing a cloud budget became difficult, the use of RunPod was discontinued and the work moved to a local RTX 5060 Ti (16GB) alone — or, depending on hardware availability, a dual-GPU configuration with a 4060 (8GB). The circumstances and impact of this environmental transition are discussed in detail in Section 5.3 of Chapter V.
+All experiments reported in this study were conducted on a cloud GPU service (RunPod). Phases 1 and 2 used an RTX 4090 (24GB VRAM) instance and Phase 3 an RTX 3090 (24GB VRAM) instance. The change of GPU in Phase 3 was not a design choice but the result of securing whatever instance was available under tightened budget constraints after institutional cost support proved unavailable. Both are consumer-class cards with 24GB of VRAM, and every Phase 3 trial ran on the same 3090 instance, so the hardware conditions of the strategy comparison were controlled.
+
+A local workstation (RTX 5060 Ti 16GB + RTX 4060 8GB, Ryzen 5 5600X, 32GB RAM) was used only for a preliminary smoke test to size the Phase 3 execution (Section 3.7); **none of the figures reported in this thesis were produced in the local environment.**
+
+Feasibility in the 16GB-class environment targeted by this study was confirmed **from measured VRAM usage rather than by execution on such a card**. Peak VRAM during Phase 2 QLoRA training was at most 14,373MB across the four models (Gemma4-E2B), within the 16GB limit, while the other three models required only 4,015-7,943MB. Because this was not verified by actually running on a 16GB card, the limits of this inference are discussed in Section 5.3(14) of Chapter V.
 
 #### 3.2.2 Software Stack
 
@@ -155,7 +159,7 @@ Model loading and QLoRA fine-tuning used the HuggingFace `transformers` library 
 | SmolVLM2-2.2B | 2.2B | HuggingFace lightweight VLM | ~8-10 GB |
 | Gemma4-E2B | 2.3B (active) / 5.1B (total) | PLE (Per-Layer Embeddings), Apache 2.0 | ~12-14 GB |
 
-The selection criteria were threefold: (1) QLoRA fine-tuning must be feasible within 16GB of VRAM; (2) the license must be Apache 2.0 or MIT so that research use is unrestricted; and (3) the model must have sufficient community and framework support. Gemma4-E2B was included because its Mixture-of-Experts-family PLE technique activates only 2.3B parameters at inference while providing 5.1B-class expressive capacity; the influence of this architectural characteristic on the interpretation of results is discussed separately in Section 5.3 of Chapter V.
+The selection criteria were threefold: (1) QLoRA fine-tuning must be feasible within 16GB of VRAM (an a priori expectation, confirmed post hoc from measured peak VRAM - Section 3.2.1); (2) the license must be Apache 2.0 or MIT so that research use is unrestricted; and (3) the model must have sufficient community and framework support. Gemma4-E2B was included because its Mixture-of-Experts-family PLE technique activates only 2.3B parameters at inference while providing 5.1B-class expressive capacity; the influence of this architectural characteristic on the interpretation of results is discussed separately in Section 5.3 of Chapter V.
 
 ### 3.4 Datasets and Preprocessing
 
@@ -219,7 +223,7 @@ The training budget targeted 3 epochs, but a ceiling of `max_steps=500` (samples
 
 **Four strategies compared**: Manual (the researcher's default values, one run) / Random Search (random sampling) / Optuna TPE (Bayesian optimization) / Autoresearch (autonomous search by an LLM agent). Autoresearch repeats a loop that (1) reads the previous experimental results (results.tsv), (2) proposes the next configuration together with a natural-language rationale (config.yaml + rationale.md), (3) performs a git commit, (4) runs fixed training, (5) evaluates on the validation set, and (6) retains the configuration if performance improves and discards it otherwise.
 
-All trials share the same model (the best model from Phase 2), the same dataset (PathVQA), and a fixed `max_steps=200` in order to control training volume; the wall-clock ceiling `time_budget_min` serves as a safety device to prevent pathological combinations rather than as an experimental control variable. The original design called for Manual 10 + Random Search 400 + Optuna 400 + Autoresearch 400 = 1,210 trials in total (40 trials per strategy × 10 independent repeats). Measured results from a local dual-GPU smoke test, however, indicated on a wall-clock basis — counting not only training but also validation and final test evaluation time — that the original scale would require roughly 24-25 days even with two GPUs in parallel. The number of repeats (10), which is the unit of statistical testing and the basis of run-level statistical power, was therefore preserved, while the number of search trials per strategy was reduced from 40 to 20, halving the total time to approximately 12.8 days. **The final execution scale is Manual 10 + Random Search 200 + Optuna 200 + Autoresearch 200 = 610 trials in total (20 trials per strategy × 10 independent repeats).** This reduction carries the trade-off of halving the diversity of hyperparameter combinations explored per strategy, but it does not affect the validity of the run-level statistical tests based on 10 independent repeats.
+All trials share the same model (the best model from Phase 2), the same dataset (PathVQA), and a fixed `max_steps=200` in order to control training volume; the wall-clock ceiling `time_budget_min` serves as a safety device to prevent pathological combinations rather than as an experimental control variable. The original design called for Manual 10 + Random Search 400 + Optuna 400 + Autoresearch 400 = 1,210 trials in total (40 trials per strategy × 10 independent repeats). A **preliminary smoke test conducted solely to size the execution** (on the local dual-GPU workstation, for timing measurement only and not reported in this thesis), however, indicated on a wall-clock basis — counting not only training but also validation and final test evaluation time — that the original scale would require roughly 24-25 days even with two GPUs in parallel. The number of repeats (10), which is the unit of statistical testing and the basis of run-level statistical power, was therefore preserved, while the number of search trials per strategy was reduced from 40 to 20, halving the total time to approximately 12.8 days. **The final execution scale is Manual 10 + Random Search 200 + Optuna 200 + Autoresearch 200 = 610 trials in total (20 trials per strategy × 10 independent repeats).** This reduction carries the trade-off of halving the diversity of hyperparameter combinations explored per strategy, but it does not affect the validity of the run-level statistical tests based on 10 independent repeats.
 
 **Statistical verification is performed only at the run level, not at the trial level.** Because Autoresearch and Optuna are sequential optimizers, trials within the same run are dependent (the result of trial t influences the proposal at t+1), violating the assumption of independent observations. The unit of testing is the 10 final performance values obtained from the 10 independent repeats of each strategy, analysed with the Kruskal-Wallis test (four-group comparison), the Mann-Whitney U test (pairwise, Autoresearch vs Optuna), and BCa bootstrap 95% CIs. Trial-level data are used only for visualization such as anytime performance curves.
 
@@ -506,7 +510,7 @@ Random and Optuna produced 20 mutually distinct configurations in all 10 repeats
 
 The pattern emerges more clearly in the proposal trajectory of individual repeats. In repeat 8, for example, the agent explored by varying rank 16 → 64 → 32 → 8 → 32 → 64 over the first six trials, then became fixed after the seventh trial on the combination `rank=64, alpha=256, lr=2.0e-4, batch=2, targets=full`, proposing it 11 times consecutively. Notably, **val_accuracy fluctuated between 0.388 and 0.444 while the identical configuration was being re-run** — this variation reflects the stochastic behaviour of training and evaluation rather than any difference in configuration, suggesting that the agent may have interpreted this noise as a performance signal. In that repeat, the agent broke out of the fixation by changing batch_size to 4 only on the final trial, and that configuration recorded the repeat's best performance (0.4640).
 
-In summary, the low performance of Autoresearch appears to stem not from poor quality of the configurations it proposes — its trial-level mean is in fact the highest — but from **a reduced effective search budget caused by repeatedly proposing identical configurations**. This section is, however, a post-hoc observation of result logs and does not directly verify the agent's internal reasoning. The original rationale texts are reproduced in Appendix D.
+In summary, the low performance of Autoresearch appears to stem not from poor quality of the configurations it proposes — its trial-level mean is in fact the highest — but from **a reduced effective search budget caused by repeatedly proposing identical configurations**. This section is, however, a post-hoc observation of result logs and does not directly verify the agent's internal reasoning. The original rationale texts are reproduced in Appendix B.
 
 #### 4.3.5 Summary
 
@@ -640,7 +644,7 @@ Whether the null hypothesis was rejected **depended on the model.** Performance 
 **RQ3 — Does an LLM agent's autonomous search achieve performance competitive with Bayesian optimization while providing interpretable search rationales?**
 The null hypothesis (Autoresearch = Optuna) was rejected, but **in the direction opposite to the one the hypothesis anticipated.** In the run-level comparison, Optuna (0.4490) was significantly superior to Autoresearch (0.4184) (Mann-Whitney U = 16.00, p = .0112, r = -0.68), and Autoresearch was statistically indistinguishable even from Random Search (0.4186), its lower-bound reference. All three automated search strategies did, however, exceed the manual configuration (0.3776), confirming the validity of automated search itself.
 
-The second requirement of RQ3, **interpretable search rationales**, **was not adequately tested by this experimental design.** Because the system prompt given to the agent (Appendix B) explicitly instructed it to "respond with only a JSON object, without explanation or other text," the production of natural-language rationales was never required in the first place. In practice, **147 of 200 trials (73.5%) returned only the hyperparameter JSON, and only 53 (26.5%) included any natural-language narrative.** This study can therefore neither affirm nor deny the question of whether an LLM agent provides interpretable search rationales; this is **a design flaw rather than a result** (Section 5.3(8)).
+The second requirement of RQ3, **interpretable search rationales**, **was not adequately tested by this experimental design.** Because the system prompt given to the agent (Appendix A) explicitly instructed it to "respond with only a JSON object, without explanation or other text," the production of natural-language rationales was never required in the first place. In practice, **147 of 200 trials (73.5%) returned only the hyperparameter JSON, and only 53 (26.5%) included any natural-language narrative.** This study can therefore neither affirm nor deny the question of whether an LLM agent provides interpretable search rationales; this is **a design flaw rather than a result** (Section 5.3(8)).
 
 Search quality itself was meanwhile poor. The agent attempted on average only 12.5 unique configurations out of 20 trials (Random and Optuna both achieved 20/20), and a pattern of early fixation with repeated proposal of identical configurations was observed across all 10 repeats (Section 4.3.4).
 
@@ -674,9 +678,9 @@ The contributions of this study are fourfold.
 
 **(8) Internal inconsistencies in the autonomous agent's configuration.** The most serious limitation identified post hoc is that the Autoresearch condition contains the following three configuration inconsistencies. These are stated explicitly because they prevent the negative result of Section 4.3 from being generalized as an "intrinsic limitation of LLM agents."
 
-- **The prompt forbade the production of search rationales.** The system prompt (Appendix B) instructs the agent to "respond with only a JSON object, without explanation, markdown, or other text." As a result, 73.5% of the 200 trials returned only JSON. The "interpretable search rationale" required by RQ3 was excluded by design before it could become an object of measurement.
+- **The prompt forbade the production of search rationales.** The system prompt (Appendix A) instructs the agent to "respond with only a JSON object, without explanation, markdown, or other text." As a result, 73.5% of the 200 trials returned only JSON. The "interpretable search rationale" required by RQ3 was excluded by design before it could become an object of measurement.
 - **The search schedule conflicts with the actual budget.** The prompt defines search stages by absolute trial number — early exploration 0-5, mid exploitation 5-20 ("take the best configuration and change only 1-2 parameters"), late refinement 20+. The actual budget, however, is 20 trials per repeat, so **the late refinement stage never triggered and roughly 75% of the budget was spent in the interval instructed to "vary only around the best configuration."** The duplicate proposals observed in Section 4.3.4 (12.5 of 20 unique configurations) may therefore be the result of faithfully following this instruction rather than a failure of the agent's judgement. The stage-transition logic on the code side (`src/autoresearch/agent.py`) is based on progress ratios (0.25/0.75) and so adapts to the budget, but the prompt text does not, and the two diverge.
-- **Ineffective parameters were presented as search targets.** The prompt includes `epochs` in the search space and even offers the guidance that "more epochs (3-5) help when data are limited," yet the implementation (`src/autoresearch/agent.py`) discards the proposed `epochs` and fixes `max_steps=200`. Cases appear in the actual logs where the agent diagnoses that "all trials have only 200 steps, so this looks like undertraining" or that "epochs were not changed" (Appendix D); these were accurate diagnoses, but the corresponding adjustment lever never worked in the first place.
+- **Ineffective parameters were presented as search targets.** The prompt includes `epochs` in the search space and even offers the guidance that "more epochs (3-5) help when data are limited," yet the implementation (`src/autoresearch/agent.py`) discards the proposed `epochs` and fixes `max_steps=200`. Cases appear in the actual logs where the agent diagnoses that "all trials have only 200 steps, so this looks like undertraining" or that "epochs were not changed" (Appendix B); these were accurate diagnoses, but the corresponding adjustment lever never worked in the first place.
 
 All three items apply only to the Autoresearch condition and not to the Random or Optuna conditions. The comparison in Section 4.3.1 must therefore be interpreted narrowly as **"a comparison between an agent operated with this prompt configuration and existing algorithms"** rather than as "an algorithm comparison over an identical search space."
 
@@ -689,6 +693,8 @@ All three items apply only to the Autoresearch condition and not to the Random o
 **(12) Structural constraint of the training-budget ceiling (`max_steps` cap).** Phase 2 applied a ceiling of `max_steps=500` because of GPU time constraints (Section 3.6), which **fixes training volume regardless of dataset size**. Consequently the small VQA-RAD is trained for roughly 2 epochs or more while the large PathVQA does not reach 1 epoch. The dataset-level performance gaps observed in Sections 4.2 and 4.4.6 may therefore partly reflect this difference in effective training volume; in particular, the interpretation in Section 4.4.6 of the PathVQA and VQA-RAD gap in terms of "task specialization" cannot exclude the alternative explanation of differing training budgets. Full-epoch retraining per dataset is left as follow-up work.
 
 **(13) Impact of the reduced Phase 3 search budget.** As described in Section 3.7, the number of search trials per strategy was reduced from the original 40 to 20. Since the number of repeats (10), the unit of run-level testing, was preserved, the validity of the statistical tests is unaffected; however, **halving the number of hyperparameter combinations each strategy could explore may have led to an underestimate of attainable performance relative to the original design**. This impact is expected to be larger for sequential optimization strategies (Optuna, Autoresearch), and indeed a substantial number of Autoresearch runs were still improving when the budget was exhausted (Section 4.3.3).
+
+**(14) Absence of verification on actual 16GB hardware.** This study set out to demonstrate "domain adaptation on consumer-grade GPUs," yet all execution took place on 24GB cards (RTX 4090 for Phases 1-2, RTX 3090 for Phase 3; Section 3.2.1). Feasibility in the 16GB class was **inferred** from the fact that measured peak VRAM (at most 14,373MB during Phase 2 training) falls within the 16GB limit; it was not verified by running directly on a 16GB card. In a real 16GB environment, usable VRAM is smaller than the nominal capacity because of the OS and display output, and fragmentation behaves differently, so an out-of-memory risk cannot be excluded for Gemma4-E2B in particular, whose headroom is under 2GB. The other three models (4,015-7,943MB) have ample margin. Reproduction on actual 16GB hardware is left as follow-up work.
 
 ### 5.4 Directions for Future Research
 
@@ -747,39 +753,7 @@ This list contains only works actually cited in the text. The authors, venue, vo
 
 ## Appendix
 
-### Appendix A. Paths to Experimental Result Files
-
-Every figure in this study was derived from the files below. All tables and test results in the body of the thesis can be traced back to these files.
-
-**Phase 1 — Zero-shot baseline**
-
-| File | Content | Location in text |
-|------|------|-----------|
-| `results/phase1_baseline/` | Raw results for 12 conditions (4 models × 3 datasets, seed 42) | Table 4.1 |
-| `results/phase1_baseline/phase1_robustness.md` | Min-K% contamination robustness re-test | 4.1.1 |
-
-**Phase 2 — QLoRA fine-tuning**
-
-| File | Content | Location in text |
-|------|------|-----------|
-| `results/phase2_finetune/phase2_summary.csv` | Summary of 75 conditions (36 main + 39 ablation) | Tables 4.2, 4.2a, 4.2b, 4.2c |
-| `results/phase2_finetune/phase2_rq2_analysis.md` | RQ2 triple verification + Mixed-Effects Model | 4.2.1 |
-| `results/phase2_finetune/cross_dataset_cf_summary.md` | 72 cross-dataset CF conditions | Table 4.2e |
-
-**Phase 3 — Autonomous hyperparameter optimization**
-
-| File | Content | Location in text |
-|------|------|-----------|
-| `results/phase3_autoresearch/results.tsv` | Complete record of 610 trials (hyperparameters, performance, rationale) | Throughout 4.3 |
-| `results/phase3_autoresearch/phase3_rq3_analysis.md` / `.json` | Run-level Kruskal-Wallis, Mann-Whitney, bootstrap CI | Table 4.3, 4.3.1 |
-| `results/phase3_autoresearch/phase3_summary.txt` | Best trial and distribution statistics per strategy | Tables 4.3a, 4.3c |
-| `results/phase3_autoresearch/phase3_anytime_curve.csv` | Raw figures of the anytime curve (per-trial median, IQR, n) | 4.3.3 |
-| `results/phase3_autoresearch/phase3_anytime_summary.md` | Summary of when best performance was reached | Table 4.3b |
-| `results/phase3_autoresearch/phase3_anytime.png` / `.pdf` | Anytime performance curve figure | 4.3.3 |
-
-> The `agent_reasoning` column of `results.tsv` contains quoted strings with embedded newlines, so it cannot be counted accurately with line-based tools such as `wc -l`. Aggregation and analysis should use `ExperimentTracker` (based on the csv module) in `src/autoresearch/tracker.py`.
-
-### Appendix B. System Prompt of the Autoresearch Agent
+### Appendix A. System Prompt of the Autoresearch Agent
 
 The following is the full text of `configs/autoresearch/program.md`. It is reproduced verbatim because it is the evidence for the three configuration inconsistencies identified in Section 5.3(8). **The annotated points are where the problems arise.**
 
@@ -837,26 +811,7 @@ no other text.                                    <- (iii) rationale prohibited
 
 **Agent execution settings**: model `claude-sonnet-4-6`, `max_tokens=512`, `temperature=0` (verified in the records of all trials). Fixing the temperature and using 10 independent repeats mitigated API non-determinism (Section 5.3(4)).
 
-### Appendix C. Reproduction Guide
-
-The commands below are those actually executed in this study and match the script arguments in the repository.
-
-**Environment setup**
-
-```bash
-uv sync --extra unsloth        # unsloth backend required (Qwen-family data format)
-uv run python -c "import unsloth"   # verify installation
-export HF_HOME=/hf_cache                          # distribute cache (guard against disk quota)
-export MOAI_CHAT_CACHE_DIR=/workspace/hf_cache/chat_cache
-export WANDB_API_KEY=...       # training logging
-export ANTHROPIC_API_KEY=...   # required only for the Phase 3 autoresearch strategy
-```
-
-> Cases in which `python3` pointed to the system Python and raised `ModuleNotFoundError` were observed repeatedly, so all execution is unified under the form `uv run python`.
-
-The full reproduction procedure for each phase — dataset download, Phase 1 zero-shot evaluation, Phase 2 fine-tuning and ablations, and the Phase 3 search loop — is documented in Appendix C of the Korean edition and in `docs/RUNPOD_GUIDE.md`.
-
-### Appendix D. Excerpts from the Autoresearch Rationale Logs
+### Appendix B. Excerpts from the Autoresearch Rationale Logs
 
 Excerpted from the original text of the `agent_reasoning` column of `results.tsv`. Of the 200 completed trials, **147 (73.5%) returned only JSON as in (1) below**, while 53 (26.5%) included natural-language narrative (Sections 5.1, 5.3(8)).
 
@@ -868,11 +823,11 @@ Excerpted from the original text of the `agent_reasoning` column of `results.tsv
  "lora_targets": "full", "epochs": 3}
 ```
 
-Because the prompt prohibited explanation (Appendix B (iii)), this form is the response consistent with the instruction.
+Because the prompt prohibited explanation (Appendix A (iii)), this form is the response consistent with the instruction.
 
 **(2) A case including natural-language narrative — accurate diagnosis, but an inoperative lever**
 
-The agent diagnosed that "all trials have only 200 steps, so this looks like undertraining" and that "epochs were not changed." The diagnosis was accurate, but as noted in Appendix B (i) the `epochs` lever it proposed was discarded by the implementation and therefore never took effect.
+The agent diagnosed that "all trials have only 200 steps, so this looks like undertraining" and that "epochs were not changed." The diagnosis was accurate, but as noted in Appendix A (i) the `epochs` lever it proposed was discarded by the implementation and therefore never took effect.
 
 **(3) Repeated proposal of an identical configuration**
 
