@@ -256,22 +256,86 @@ def _split_bold(text: str) -> list[tuple[str, bool]]:
     return out
 
 
+_SCI_EXP = re.compile(r"(?<=\d)[eE][+\-]?\d+")  # 2e-4 의 지수부
+_NUMERIC_CELL = re.compile(
+    r"""
+    ^
+    [<>=≤≥~±+\-−]?\s*                                  # 선행 비교·부호 기호
+    (\d[\d,]*)?(\.\d+)?                                 # 정수부·소수부 (.001 허용)
+    \s*%?
+    (\s*[~/\-–—±,]\s*                                   # 구간·비율 반복부
+     [<>=≤≥+\-−]?\s*(\d[\d,]*)?(\.\d+)?\s*%?)*
+    $
+    """,
+    re.X,
+)
+
+
+def _is_numeric_cell(raw: str) -> bool:
+    """셀 값이 수치형인지 판정한다(오른쪽 정렬 대상).
+
+    'RQ2' · '7B' · '4위' · 'Phase 1' · '약 7,580 MB' 처럼 숫자를 품고 있어도
+    라벨·식별자·단위 표기면 텍스트로 본다. 지수 표기(2e-4)와 대괄호
+    구간([0.0, 0.1])은 수치로 본다.
+    """
+    s = raw.replace("**", "").replace("*", "").strip()
+    if not s or not re.search(r"\d", s):
+        return False
+    if s.startswith("[") and s.endswith("]"):  # 신뢰구간 [a, b]
+        s = s[1:-1].strip()
+    probe = _SCI_EXP.sub("", s)  # 지수부를 걷어낸 뒤 문자 유무를 본다
+    if re.search(r"[A-Za-z가-힣]", probe):
+        return False
+    return bool(_NUMERIC_CELL.match(probe))
+
+
+def _set_table_borders(t) -> None:
+    """표 안팎에 실선 테두리를 넣는다.
+
+    학교 배포 양식에는 'Table Grid' 스타일이 없어 스타일 지정만으로는
+    테두리가 생기지 않는다. tblPr에 tblBorders를 직접 넣어 보장한다.
+    OOXML 스키마상 tblBorders는 shd/tblLayout/tblCellMar/tblLook 앞에 와야 한다.
+    """
+    tbl_pr = t._tbl.tblPr
+    borders = tbl_pr.makeelement(qn("w:tblBorders"), {})
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        el = borders.makeelement(qn(f"w:{edge}"), {})
+        el.set(qn("w:val"), "single")
+        el.set(qn("w:sz"), "4")  # 4/8 pt = 0.5pt 실선
+        el.set(qn("w:space"), "0")
+        el.set(qn("w:color"), "000000")
+        borders.append(el)
+    tbl_pr.insert_element_before(
+        borders, "w:shd", "w:tblLayout", "w:tblCellMar",
+        "w:tblLook", "w:tblCaption", "w:tblDescription",
+    )
+
+
 def _add_table(doc, anchor, rows: list[list[str]]) -> None:
-    """마크다운 표를 Word 표로 삽입한다."""
+    """마크다운 표를 Word 표로 삽입한다.
+
+    정렬 규칙: 헤더행은 가운데, 본문은 수치형 오른쪽 / 그 외 왼쪽.
+    """
     ncols = max(len(r) for r in rows)
     t = doc.add_table(rows=len(rows), cols=ncols)
     try:
         t.style = doc.styles["Table Grid"]
     except KeyError:
-        pass
+        pass  # 양식에 없는 스타일 — 테두리는 _set_table_borders가 보장한다
+    _set_table_borders(t)
     for ri, row in enumerate(rows):
         for ci in range(ncols):
             cell = t.cell(ri, ci)
             cell.text = ""
             para = cell.paragraphs[0]
-            para.alignment = WD_ALIGN_PARAGRAPH.CENTER
-            para.paragraph_format.line_spacing = 1.0
             val = row[ci] if ci < len(row) else ""
+            if ri == 0:
+                para.alignment = WD_ALIGN_PARAGRAPH.CENTER
+            elif _is_numeric_cell(val):
+                para.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+            else:
+                para.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            para.paragraph_format.line_spacing = 1.0
             for chunk, is_bold in _split_bold(val):
                 r = para.add_run(chunk)
                 _style_run(r, 9, is_bold or ri == 0)
