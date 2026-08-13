@@ -3,6 +3,29 @@
 이 파일은 컴퓨터가 바뀌어도(로컬 `~/.claude` 메모리는 컴퓨터별로 따로 저장되어 동기화되지 않음)
 `git pull` 한 번이면 항상 최신 상태로 받아지도록, 다음에 할 일을 저장소에 직접 남겨둔 것입니다.
 
+## 📄 제출본 현황 (2026-08-13 생성)
+
+프로젝트 루트에 **제출용 산출물 4개**가 있다. 모두 `git`에 포함돼 있어 다른 컴퓨터에서도 `git pull`로 받아진다.
+
+| 파일 | 내용 |
+|------|------|
+| `석사학위논문_국문.docx` / `.pdf` | 국문본 71쪽 |
+| `석사학위논문_영문.docx` / `.pdf` | 영문본 85쪽 |
+
+- **원고 정본**: `docs/THESIS_FINAL_v2.0.md`(국문), `docs/THESIS_FINAL_v2.0_EN.md`(영문). 내용을 고치면 여기를 고친 뒤 아래 명령으로 재생성한다.
+- **재생성 방법** (2단계):
+  ```bash
+  ./.venv/Scripts/python.exe scripts/build_thesis_docx.py --lang ko
+  ./.venv/Scripts/python.exe scripts/build_thesis_docx.py --lang en --md docs/THESIS_FINAL_v2.0_EN.md
+  powershell -File scripts/word_to_pdf.ps1 -InPath "D:\project\Masters_degree\석사학위논문_국문.docx" -OutPath "D:\project\Masters_degree\석사학위논문_국문.pdf"
+  ```
+  `word_to_pdf.ps1`이 Word를 띄워 **목차 필드를 갱신한 뒤** PDF로 내보낸다(목차 페이지번호가 이 단계에서 채워짐).
+- **확정된 제출 정보**: 지도교수 민덕기(Prof. Min, Dugki) / 공학석사(Master of Engineering) / 학위수여 2027년 2월 / 청구 2026년 11월 / 인준 2026년 12월. 값 변경은 `scripts/build_thesis_docx.py`의 `parse_meta()` 한 곳만 고치면 된다.
+- **영문 소속 표기**는 영문 재학증명서(학적 기록) 기준: `Graduate School of Information & Communications` / `Department of Convergence Information Technology` / `Major in Artificial Intelligence` / `Hwang, Tae Wook`.
+  - ⚠️ 건국대 **영문 학사안내 페이지**는 대학원명을 `Graduate School of Information and Telecommunications`로 적고 있어 **증명서와 불일치**한다. 제출 전 대학원 행정실에 어느 표기를 쓰는지 한 번 확인할 것.
+- **청구·인준 월**은 매뉴얼 범위(전기 청구 10~11월 / 인준 11~12월)에서 임의 확정한 값이다. 학과 실제 일정과 다르면 고칠 것.
+- **dCollection 제출물은 PDF 2개**: ① 논문 원문 PDF(위 파일) ② **심사위원 날인이 들어간 인준지 PDF**(심사 후 서명받아 스캔, 아직 없음).
+
 ## ⚠️ 즉시 확인할 것 (2026-08-13)
 
 1. ~~**텔레그램 봇 토큰 revoke**~~ — ✅ **08-13 완료**. 유출됐던 토큰(커밋 `a715c3f`로 공개 저장소에 노출)은 BotFather `/revoke`로 폐기됨. git 히스토리에 남은 문자열은 이제 무효라 추가 조치 불필요. **단, 팟을 다시 켜서 알림을 쓸 때는 새 토큰을 코드에 넣지 말고** `/workspace/Masters_degree/.env`에 `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID`로 저장할 것(`.gitignore`가 `.env` 이미 차단, 스크립트는 없으면 즉시 exit 1).
@@ -10,6 +33,17 @@
 3. **지출 한도(spending limit) 설정** — RunPod 콘솔에서 월 상한 걸어두기로 함. **미설정 시 재발 위험**이므로 아직 안 했으면 지금 할 것.
 
 ## 현재 상태
+
+- **2026-08-13 (오후) — 학위논문 제출본(국·영문 docx/PDF) 생성 + 사실관계 정정**
+  - **공식 양식 채우기 자동화**: 학교 배포 양식(붙임4-5 국문 / 4-6 영문 Word)을 복사해 마크다운 원고를 채워 넣는 `scripts/build_thesis_docx.py` 신규. B5(182×257)·여백25·휴먼명조·장평97%·줄간격1.6 등 작성 매뉴얼 규정을 그대로 승계한다. 목차·표목차는 Word 필드로 삽입하고 `settings.xml`에 `updateFields`를 넣어 열 때 자동 갱신되게 했다(요소 순서 규칙이 있어 `hdrShapeDefaults` 앞에 넣어야 함).
+  - **`.hwp` 직접 생성은 불가로 확인**: `master-of-hwp-studio` 0.8.1과 `hwp-mcp` 0.3.0 모두 **읽기는 되나 쓰기는 `.hwpx`만** 지원(`Hwp5FormatError: In-place resize required`). 한글 COM은 연결은 되지만 파일 열기에서 보안 대화상자로 멈춘다(보안모듈 DLL 미등록). **제출물이 PDF라 docx→PDF 경로로 우회**했다.
+  - **PDF 변환**: `scripts/word_to_pdf.ps1`(Word COM 후기 바인딩). 초기 바인딩은 `TYPE_E_CANTLOADLIBRARY`로 실패하고, PowerShell이 함수 반환 COM 컬렉션을 펼쳐 `Documents`가 null이 되는 함정이 있어 `-NoEnumerate`가 필요했다. 목차는 갱신·재페이지네이션을 **2회** 돌려야 페이지번호가 확정된다.
+  - **초록 신규 작성**: 규정 필수인데 논문에 아예 없었다. 국문초록·ABSTRACT를 새로 쓰고 주제어 6개씩 붙였다. 자기점검표가 요구하는 **영문초록의 제목·성명·학과·전공·대학원명**도 처음엔 누락돼 있어 보완했다.
+  - **[중요] 실험 환경 서술 정정(사용자 지적)**: 기존 §3.2.1은 "로컬 5060 Ti에서 일부 조건 재현", "Phase 3은 로컬로 전환"이라 적고 있었으나 **사실과 달랐다.** 결과 JSON의 GPU 기록은 전부 RTX 3090(RunPod)이고 5060 Ti·4060은 0건, 논문이 인용하는 폴더도 `phase1_baseline`·`phase2_finetune`·`phase3_autoresearch` 셋뿐이며 `phase3_local_smoke_*`는 **인용 0건**이었다. → **보고된 수치는 전부 RunPod 산출**(Phase1·2 4090 / Phase3 3090)로 정정하고, 로컬은 실행 규모 산정용 스모크 전용임을 명시했다.
+  - **덤으로 발견**: "16GB 소비자 GPU에서 검증" 주장이 여러 곳에 있었으나 실제 실행은 24GB 카드뿐. 실측 학습 Peak VRAM 최대 14,373MB(Gemma4-E2B)로 16GB 이내라 **"실측 VRAM 기반 추론"으로 표현을 바꾸고 한계점 5.3(14)를 신설**했다.
+  - **부록 정리**: 결과파일 경로·재현 가이드는 소스 제출 대상이 아니라 제외, 시스템 프롬프트·근거 로그는 5.3(8) 한계점의 근거라 유지하고 A/B로 재번호.
+  - **[교훈] 파이썬으로 파일 일괄수정 시 줄바꿈 주의**: Windows 파이썬의 `io.open(...,'w')`가 LF를 CRLF로 바꿔 전체 1,860줄이 변경된 것처럼 보였다. `newline='\n'`을 지정하거나 바이너리로 쓸 것.
+  - **[교훈] 영문 표기는 추정 금지**: 지도교수 성함을 `Dugki Min`으로 추정했으나 학과 공식 표기는 `Min, Dugki`였고, 대학원 영문명도 홈페이지와 재학증명서가 서로 달랐다. **학적 기록(증명서)이 가장 확실한 근거**다.
 
 - **2026-08-13 — Phase3 결과 잔여분 백업 + 팟 유휴 과금 사고 + 토큰 유출 조치**
   - **팟 유휴 과금 $25 발생**: 실험은 08-12 11:45 UTC에 끝났는데 팟을 끄지 않아 **하루 반 동안 GPU 0%로 방치**되며 과금됨. 텔레그램 완료 알림은 갔지만 "끄라"는 행동 지시가 없어 종료로 이어지지 않았음.
