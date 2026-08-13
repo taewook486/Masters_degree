@@ -367,6 +367,13 @@ def fill_front_matter(doc, meta: dict[str, str]) -> None:
     for row in (4, 5):
         for p in approval.cell(row, 0).paragraphs:
             _set_para_text(p, "")
+    # 양식이 곳곳에 남긴 글자크기 안내문구((14pt) 등)를 지운다.
+    for table in doc.tables:
+        for trow in table.rows:
+            for cell in trow.cells:
+                for p in cell.paragraphs:
+                    if re.fullmatch(r"\(\d+pt\)?", p.text.strip()):
+                        _set_para_text(p, "")
 
     # 목차 → 자동 목차 필드
     cell = toc.cell(0, 0)
@@ -411,6 +418,9 @@ def fill_front_matter_en(doc, meta: dict[str, str]) -> None:
                     key = p.text.strip()
                     if key in repl:
                         _set_para_text(p, repl[key])
+                    elif re.fullmatch(r"\(\d+pt\)?", key):
+                        # 양식이 남긴 글자크기 안내문구 제거
+                        _set_para_text(p, "")
 
 
 def _enable_field_update(doc) -> None:
