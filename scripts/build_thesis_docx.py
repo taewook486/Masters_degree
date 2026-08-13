@@ -22,6 +22,7 @@ import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml.ns import qn
 from docx.shared import Pt
+from docx.text.paragraph import Paragraph
 
 # --- 규정값 (학위논문 작성 매뉴얼 2025.09.23, pp.2) --------------------------
 FONT_KO = "휴먼명조"
@@ -74,11 +75,8 @@ def parse_meta(md_path: Path) -> dict[str, str]:
         "author_en": "Hwang, Taewook",
         "dept_en": "Department of Convergence Information Technology",
         "major_en": "Major in Artificial Intelligence",
-        "grad_school_en": (
-            "Graduate School of Information & Telecommunications,\n"
-            "Konkuk University"
-        ),
-        "grad_school_en_line": "Graduate School of Information & Telecommunications",
+        # 건국대 공식 영문 학사안내(academics)의 대학원 목록 표기.
+        "grad_school_en_line": "Graduate School of Information and Telecommunications",
         # 2027년 2월(전기) 학위수여 기준. 매뉴얼상 청구는 전기 10~11월,
         # 인준은 전기 11~12월이므로 그 범위에서 확정했다.
         "advisor": "민덕기",
@@ -413,6 +411,9 @@ def fill_front_matter_en(doc, meta: dict[str, str]) -> None:
         "Department of [xxx] (16pt)": dept_en,
         "Graduate School of Konkuk University(16pt)": meta["grad_school_en_line"],
         "submitted to the Department of [xxx]": f"submitted to the {dept_en}",
+        # 특수대학원은 본인 소속대학원명을 기입한다(매뉴얼 II-2 ⓒ).
+        "and the Graduate School of Konkuk University":
+            f"and the {meta['grad_school_en_line']}, Konkuk University",
         "[Master of Art / Master of xxx].(14pt)": f"{meta['degree_en']}.",
         "April or May, 2025(16pt)": meta["date_submit_en"],
         "[Author Name] is approved.(18pt)": f"{meta['author_en']} is approved.",
@@ -519,6 +520,10 @@ def build(lang: str, md_path: Path, out_path: Path) -> None:
 
     children = list(body.iterchildren())
     anchor_front = children[front_start]  # 섹션 경계 문단
+    # 경계 문단은 sectPr을 품고 있어 지울 수 없지만, 양식이 그 안에 남긴
+    # 안내문구(예: "Keyword(9pt) : within 6 word...")는 지워야 한다.
+    for run in list(Paragraph(anchor_front, doc).runs):
+        run._element.getparent().remove(run._element)
 
     # --- 앞부속: (영문은 목차 포함) 표목차 + 초록 -------------------------
     if lang == "en":
@@ -540,6 +545,7 @@ def build(lang: str, md_path: Path, out_path: Path) -> None:
         _add_para(doc, anchor_front, ABSTRACT_HEADING[lang], SZ_SECTION, True,
                   WD_ALIGN_PARAGRAPH.LEFT, indent=False)
         _add_para(doc, anchor_front, "", SZ_BODY, indent=False)
+        _emit_abstract_header(doc, anchor_front, ABSTRACT_HEADING[lang], meta)
         _emit(doc, anchor_front, abstract_blocks, skip_heading=True)
 
     # --- 본문 이후 전부 교체 ---------------------------------------------
@@ -552,7 +558,7 @@ def build(lang: str, md_path: Path, out_path: Path) -> None:
     anchor_tail = list(body.iterchildren())[-1]  # final sectPr
 
     main_blocks = [b for b in blocks if b not in abstract_blocks]
-    _emit(doc, anchor_tail, main_blocks)
+    _emit(doc, anchor_tail, main_blocks, meta=meta)
 
     doc.save(str(out_path))
 
@@ -571,7 +577,26 @@ def _slice(blocks: list[Block], heading: str) -> list[Block]:
     return out
 
 
-def _emit(doc, anchor, blocks: list[Block], skip_heading: bool = False) -> None:
+def _emit_abstract_header(doc, anchor, kind: str, meta: dict[str, str]) -> None:
+    """초록 제목부를 넣는다 (매뉴얼 II-5 서식).
+
+    국문초록은 제목만, 영문초록(ABSTRACT)은 제목·성명·학과·전공·대학원명까지
+    표기해야 한다(자기점검표 '영문초록의 학과명 및 대학원명' 항목).
+    """
+    center = WD_ALIGN_PARAGRAPH.CENTER
+    if kind == "국문초록":
+        _add_para(doc, anchor, meta["title_ko"], SZ_CHAPTER, True, center, indent=False)
+    else:
+        _add_para(doc, anchor, meta["title_en"], SZ_CHAPTER, True, center, indent=False)
+        _add_para(doc, anchor, "", SZ_BODY, indent=False)
+        for line in (meta["author_en"], meta["dept_en"], meta["major_en"],
+                     f"{meta['grad_school_en_line']}, Konkuk University"):
+            _add_para(doc, anchor, line, SZ_BODY, False, center, indent=False)
+    _add_para(doc, anchor, "", SZ_BODY, indent=False)
+
+
+def _emit(doc, anchor, blocks: list[Block], skip_heading: bool = False,
+          meta: dict[str, str] | None = None) -> None:
     for b in blocks:
         if b.kind == "h":
             if skip_heading and b.level == 1:
@@ -581,6 +606,9 @@ def _emit(doc, anchor, blocks: list[Block], skip_heading: bool = False) -> None:
                 _add_para(doc, anchor, b.text, SZ_CHAPTER, True,
                           WD_ALIGN_PARAGRAPH.CENTER, outline=0, indent=False)
                 _add_para(doc, anchor, "", SZ_BODY, indent=False)
+                # 국문 논문 말미의 영문초록에도 제목·소속 표기가 필요하다.
+                if meta is not None and b.text.strip() == "ABSTRACT":
+                    _emit_abstract_header(doc, anchor, "ABSTRACT", meta)
             elif b.level == 2:
                 _add_para(doc, anchor, b.text, SZ_SECTION, True,
                           WD_ALIGN_PARAGRAPH.LEFT, outline=1, indent=False)
