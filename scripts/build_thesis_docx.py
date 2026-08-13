@@ -72,11 +72,13 @@ def parse_meta(md_path: Path) -> dict[str, str]:
         "grad_school": "건국대학교 정보통신대학원",
         "dept": "융합정보기술학과 인공지능전공",
         "author": "황태욱",
-        "author_en": "Hwang, Taewook",
+        "author_en": "Hwang, Tae Wook",
         "dept_en": "Department of Convergence Information Technology",
         "major_en": "Major in Artificial Intelligence",
-        # 건국대 공식 영문 학사안내(academics)의 대학원 목록 표기.
-        "grad_school_en_line": "Graduate School of Information and Telecommunications",
+        # 영문 재학증명서(학사시스템 공식 기록, 2026-08-13 발급)의 표기를 따른다.
+        # 영문 학사안내 페이지는 "...and Telecommunications"로 달리 적고 있으나,
+        # 학적 기록인 증명서를 우선한다.
+        "grad_school_en_line": "Graduate School of Information & Communications",
         # 2027년 2월(전기) 학위수여 기준. 매뉴얼상 청구는 전기 10~11월,
         # 인준은 전기 11~12월이므로 그 범위에서 확정했다.
         "advisor": "민덕기",
