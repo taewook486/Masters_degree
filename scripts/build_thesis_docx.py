@@ -82,7 +82,8 @@ def parse_meta(md_path: Path) -> dict[str, str]:
         # 2027년 2월(전기) 학위수여 기준. 매뉴얼상 청구는 전기 10~11월,
         # 인준은 전기 11~12월이므로 그 범위에서 확정했다.
         "advisor": "민덕기",
-        "advisor_en": "Dugki Min",
+        # 건국대 공식 표기(학과 교수 소개)를 따른다. 저자 표기와 같은 "성, 이름" 형식.
+        "advisor_en": "Min, Dugki",
         "degree": "공학",
         "degree_en": "Master of Engineering",
         "date_award": "2027년 2월",
