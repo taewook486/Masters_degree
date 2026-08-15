@@ -90,21 +90,21 @@ RQ1·RQ2·RQ3는 각각 제4장 4.1·4.2·4.3에서 실측 데이터로 검증�
 
 #### 2.1.1 멀티모달 학습의 발전
 
-Vision-Language Model(VLM)은 이미지 인코더와 대규모 언어모델(LLM)을 결합하여 시각 정보와 언어 정보를 함께 이해·생성하는 모델이다. 초기 멀티모달 학습은 이미지-텍스트 쌍에 대한 대조 학습(contrastive learning)으로 공유 임베딩 공간을 학습하는 방식이 중심이었다. 이후 LLM의 instruction-following 능력이 발전하면서 이미지 특징을 LLM의 입력 토큰 공간에 투영(projection)하고 instruction-tuning으로 시각 질의응답·설명 생성 능력을 학습시키는 방식이 주류가 되었다. Liu 등의 LLaVA(Visual Instruction Tuning, arXiv:2304.08485)는 GPT-4로 생성한 시각 instruction 데이터로 오픈소스 LLM을 파인튜닝해 상용 모델에 근접한 시각 대화 능력을 보인 대표적 사례로, 이후 다수의 VLM 연구가 이 instruction-tuning 패러다임을 계승했다. GPT-4V, Gemini 등 상용 대규모 VLM은 방대한 파라미터와 학습 데이터로 범용 시각 이해 성능을 확보했으나 동시에 추론 비용과 배포 제약이 커 소비자급 하드웨어에서 활용하기 어렵다는 한계가 있다.
+Vision-Language Model(VLM)은 이미지 인코더와 대규모 언어모델(LLM)을 결합하여 시각 정보와 언어 정보를 함께 이해·생성하는 모델이다. 초기 멀티모달 학습은 이미지-텍스트 쌍에 대한 대조 학습(contrastive learning)으로 공유 임베딩 공간을 학습하는 방식이 중심이었다. 이후 LLM의 instruction-following 능력이 발전하면서 이미지 특징을 LLM의 입력 토큰 공간에 투영(projection)하고 instruction-tuning으로 시각 질의응답·설명 생성 능력을 학습시키는 방식이 주류가 되었다. Liu 등의 LLaVA [1]는 GPT-4로 생성한 시각 instruction 데이터로 오픈소스 LLM을 파인튜닝해 상용 모델에 근접한 시각 대화 능력을 보인 대표적 사례로, 이후 다수의 VLM 연구가 이 instruction-tuning 패러다임을 계승했다. GPT-4V, Gemini 등 상용 대규모 VLM은 방대한 파라미터와 학습 데이터로 범용 시각 이해 성능을 확보했으나 동시에 추론 비용과 배포 제약이 커 소비자급 하드웨어에서 활용하기 어렵다는 한계가 있다.
 
 #### 2.1.2 경량 VLM 아키텍처
 
-본 연구가 대상으로 삼는 4개 모델은 모두 2025-2026년에 공개된 2-3B급 경량 VLM으로, 각기 다른 방식으로 파라미터 효율성을 추구한다. Qwen2.5-VL(Qwen Team, Alibaba, Technical Report arXiv:2502.13923)은 이미지 크기에 따라 시각 토큰 수를 동적으로 조절하는 dynamic resolution 처리와 시간 정보를 절대 시간으로 정렬하는 MRoPE 확장을 특징으로 한다. 문서 파싱과 다국어 OCR에 강점을 보인다. 후속 모델인 Qwen3-VL은 dense(2B/4B/8B/32B)와 Mixture-of-Experts(30B-A3B/235B-A22B) 계열로 확장되었고 "thinking mode"와 DeepStack 방식의 다단계 시각 특징 결합을 도입했다. SmolVLM2(HuggingFace, "SmolVLM: Redefining small and efficient multimodal models", arXiv:2504.05299)는 온디바이스를 지향하는 아키텍처로, SigLIP 이미지 인코더와 SmolLM2 언어모델을 결합해 극단적으로 낮은 메모리 사용량(2.2B 모델 기준 영상 추론 시 5.2GB)을 달성하는 데 초점을 맞춘다. Gemma4-E2B(Google)는 Per-Layer Embeddings(PLE) 기법으로 추론 시 2.3B 파라미터만 활성화하면서 5.1B급 총 파라미터의 표현력을 활용하는 Mixture-of-Experts 계열 구조다. 활성 파라미터 기준으로는 경량이나 저장 파라미터 규모는 다른 세 모델보다 크다는 아키텍처적 차이가 있다(이 차이가 결과 해석에 갖는 함의는 제5장 5.3에서 논의한다).
+본 연구가 대상으로 삼는 4개 모델은 모두 2025-2026년에 공개된 2-3B급 경량 VLM으로, 각기 다른 방식으로 파라미터 효율성을 추구한다. Qwen2.5-VL [2]은 이미지 크기에 따라 시각 토큰 수를 동적으로 조절하는 dynamic resolution 처리와 시간 정보를 절대 시간으로 정렬하는 MRoPE 확장을 특징으로 한다. 문서 파싱과 다국어 OCR에 강점을 보인다. 후속 모델인 Qwen3-VL은 dense(2B/4B/8B/32B)와 Mixture-of-Experts(30B-A3B/235B-A22B) 계열로 확장되었고 "thinking mode"와 DeepStack 방식의 다단계 시각 특징 결합을 도입했다. SmolVLM2 [3]는 온디바이스를 지향하는 아키텍처로, SigLIP 이미지 인코더와 SmolLM2 언어모델을 결합해 극단적으로 낮은 메모리 사용량(2.2B 모델 기준 영상 추론 시 5.2GB)을 달성하는 데 초점을 맞춘다. Gemma4-E2B(Google)는 Per-Layer Embeddings(PLE) 기법으로 추론 시 2.3B 파라미터만 활성화하면서 5.1B급 총 파라미터의 표현력을 활용하는 Mixture-of-Experts 계열 구조다. 활성 파라미터 기준으로는 경량이나 저장 파라미터 규모는 다른 세 모델보다 크다는 아키텍처적 차이가 있다(이 차이가 결과 해석에 갖는 함의는 제5장 5.3에서 논의한다).
 
 ### 2.2 Parameter-Efficient Fine-Tuning
 
 #### 2.2.1 LoRA (Low-Rank Adaptation)
 
-LoRA(Hu et al., "LoRA: Low-Rank Adaptation of Large Language Models", arXiv:2106.09685, ICLR 2022)는 사전학습된 가중치 행렬 $W_0$을 고정한 채, 그 변화량 $\Delta W$를 두 개의 저랭크(low-rank) 행렬 $A \in \mathbb{R}^{r \times k}$, $B \in \mathbb{R}^{d \times r}$의 곱 $BA$($r \ll \min(d,k)$)로 근사하여 학습하는 기법이다. 순전파는 $h = W_0 x + BAx$로 계산된다. 학습 대상은 $A$, $B$뿐이므로 전체 파라미터 대비 학습 파라미터 비율을 극적으로 낮출 수 있다(본 연구의 Ablation B에서 rank=64 기준 학습 파라미터 비율은 전체의 약 0.2-1.6% 수준, 제4장 4.2.3 참조). rank $r$은 표현력과 파라미터 효율성 사이의 트레이드오프를 결정하는 핵심 하이퍼파라미터이며, alpha는 $\Delta W$의 스케일을 조정하는 계수다($BAx$에 $\alpha/r$을 곱함).
+LoRA [4]는 사전학습된 가중치 행렬 $W_0$을 고정한 채, 그 변화량 $\Delta W$를 두 개의 저랭크(low-rank) 행렬 $A \in \mathbb{R}^{r \times k}$, $B \in \mathbb{R}^{d \times r}$의 곱 $BA$($r \ll \min(d,k)$)로 근사하여 학습하는 기법이다. 순전파는 $h = W_0 x + BAx$로 계산된다. 학습 대상은 $A$, $B$뿐이므로 전체 파라미터 대비 학습 파라미터 비율을 극적으로 낮출 수 있다(본 연구의 Ablation B에서 rank=64 기준 학습 파라미터 비율은 전체의 약 0.2-1.6% 수준, 제4장 4.2.3 참조). rank $r$은 표현력과 파라미터 효율성 사이의 트레이드오프를 결정하는 핵심 하이퍼파라미터이며, alpha는 $\Delta W$의 스케일을 조정하는 계수다($BAx$에 $\alpha/r$을 곱함).
 
 #### 2.2.2 QLoRA (Quantized LoRA)
 
-QLoRA(Dettmers et al., "QLoRA: Efficient Finetuning of Quantized LLMs", arXiv:2305.14314, NeurIPS 2023)는 LoRA에 4-bit 양자화를 결합하여 VRAM 사용량을 추가로 절감한다. 핵심 구성 요소는 (1) 정규분포를 따르는 가중치에 최적화된 4-bit NormalFloat(NF4) 양자화, (2) 양자화 상수 자체를 다시 양자화하는 이중 양자화(double quantization), (3) GPU 메모리 스파이크를 CPU로 흘려보내는 paged optimizer이다. 기반 모델은 4-bit로 양자화된 상태로 고정하고 그 위에 LoRA 어댑터만 16-bit 정밀도로 학습하므로, 65B급 모델을 단일 48GB GPU에서 파인튜닝하면서도 완전 16-bit 파인튜닝에 근접한 성능을 유지함을 원 논문에서 보였다. 본 연구는 이 QLoRA 방식(NF4 양자화 + LoRA + paged AdamW 8bit)을 4개 경량 VLM 전체에 적용하여 소비자급 GPU에서 의료 도메인 파인튜닝이 가능한지 검증한다(제3장 3.6). 실행은 24GB 카드(RTX 4090·3090)에서 이루어졌다. 16GB급 환경에서의 구동 가능 여부는 실측 Peak VRAM으로 판단한다(3.2.1).
+QLoRA [5]는 LoRA에 4-bit 양자화를 결합하여 VRAM 사용량을 추가로 절감한다. 핵심 구성 요소는 (1) 정규분포를 따르는 가중치에 최적화된 4-bit NormalFloat(NF4) 양자화, (2) 양자화 상수 자체를 다시 양자화하는 이중 양자화(double quantization), (3) GPU 메모리 스파이크를 CPU로 흘려보내는 paged optimizer이다. 기반 모델은 4-bit로 양자화된 상태로 고정하고 그 위에 LoRA 어댑터만 16-bit 정밀도로 학습하므로, 65B급 모델을 단일 48GB GPU에서 파인튜닝하면서도 완전 16-bit 파인튜닝에 근접한 성능을 유지함을 원 논문에서 보였다. 본 연구는 이 QLoRA 방식(NF4 양자화 + LoRA + paged AdamW 8bit)을 4개 경량 VLM 전체에 적용하여 소비자급 GPU에서 의료 도메인 파인튜닝이 가능한지 검증한다(제3장 3.6). 실행은 24GB 카드(RTX 4090·3090)에서 이루어졌다. 16GB급 환경에서의 구동 가능 여부는 실측 Peak VRAM으로 판단한다(3.2.1).
 
 #### 2.2.3 기타 PEFT 기법 비교
 
@@ -118,11 +118,11 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 
 #### 2.3.2 주요 벤치마크 데이터셋
 
-본 연구가 사용하는 세 데이터셋은 각기 다른 의료 영상 하위 도메인을 대표한다. PathVQA(He et al., "PathVQA: 30000+ Questions for Medical Visual Question Answering", arXiv:2003.10286, 2020)는 병리학 교과서와 PEIR 디지털 라이브러리에서 추출한 4,998개 병리 조직 영상에 대해 32,799개의 질문-답변 쌍을 제공한다. 미국병리위원회(ABP) 전문의 자격시험 형식을 참고해 7개 질문 유형으로 구성했다. SLAKE(Liu et al., "SLAKE: A Semantically-Labeled Knowledge-Enhanced Dataset for Medical Visual Question Answering", ISBI 2021)는 642개 방사선/CT 영상에 대한 14,028개의 영어-중국어 이중언어 질문-답변 쌍과 의학 지식 그래프(5,232개 지식 triplet)를 결합한 데이터셋이다. VQA-RAD(Lau et al., "A dataset of clinically generated visual questions and answers about radiology images", Scientific Data 5, 2018)는 임상의가 실제로 방사선 영상(CT/MRI/X-ray)을 보고 자연스럽게 제기한 질문을 수집한 최초의 데이터셋으로, 315개 영상에 대해 약 3,500여 개의 질문-답변 쌍을 담고 있다.
+본 연구가 사용하는 세 데이터셋은 각기 다른 의료 영상 하위 도메인을 대표한다. PathVQA [6]는 병리학 교과서와 PEIR 디지털 라이브러리에서 추출한 4,998개 병리 조직 영상에 대해 32,799개의 질문-답변 쌍을 제공한다. 미국병리위원회(ABP) 전문의 자격시험 형식을 참고해 7개 질문 유형으로 구성했다. SLAKE [7]는 642개 방사선/CT 영상에 대한 14,028개의 영어-중국어 이중언어 질문-답변 쌍과 의학 지식 그래프(5,232개 지식 triplet)를 결합한 데이터셋이다. VQA-RAD [8]는 임상의가 실제로 방사선 영상(CT/MRI/X-ray)을 보고 자연스럽게 제기한 질문을 수집한 최초의 데이터셋으로, 315개 영상에 대해 약 3,500여 개의 질문-답변 쌍을 담고 있다.
 
 #### 2.3.3 기존 연구 성과
 
-범용 VLM을 의료 도메인에 특화시키려는 시도는 크게 대규모 재학습형과 어댑테이션형으로 나뉜다. LLaVA-Med(Li et al., "LLaVA-Med: Training a Large Language-and-Vision Assistant for Biomedicine in One Day", arXiv:2306.00890, NeurIPS 2023 Datasets and Benchmarks Track)는 PubMed Central의 대규모 의생명 그림-캡션 데이터로 GPT-4 기반 instruction 데이터를 생성하고, 커리큘럼 학습으로 범용 LLaVA를 의생명 도메인에 적응시켰다. Med-Flamingo(Moor et al., "Med-Flamingo: a Multimodal Medical Few-shot Learner", arXiv:2307.15189, 2023)는 OpenFlamingo-9B를 기반으로 의학 논문·교과서의 이미지-텍스트 데이터로 계속 사전학습(continued pretraining)하여, 소수 예시(few-shot)만으로 의료 VQA에 적응하는 능력을 확보했다. CheXagent(Chen et al., "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation", arXiv:2401.12208, 2024)는 흉부 X-ray 판독에 특화된 임상 LLM·시각 인코더·교차 모달 브리지 네트워크로 구성된 foundation model로, 특정 영상 하위 도메인(흉부 X-ray)에 깊이 특화된 접근을 대표한다.
+범용 VLM을 의료 도메인에 특화시키려는 시도는 크게 대규모 재학습형과 어댑테이션형으로 나뉜다. LLaVA-Med [9]는 PubMed Central의 대규모 의생명 그림-캡션 데이터로 GPT-4 기반 instruction 데이터를 생성하고, 커리큘럼 학습으로 범용 LLaVA를 의생명 도메인에 적응시켰다. Med-Flamingo [10]는 OpenFlamingo-9B를 기반으로 의학 논문·교과서의 이미지-텍스트 데이터로 계속 사전학습(continued pretraining)하여, 소수 예시(few-shot)만으로 의료 VQA에 적응하는 능력을 확보했다. CheXagent [11]는 흉부 X-ray 판독에 특화된 임상 LLM·시각 인코더·교차 모달 브리지 네트워크로 구성된 foundation model로, 특정 영상 하위 도메인(흉부 X-ray)에 깊이 특화된 접근을 대표한다.
 
 이들 선행 연구는 공통적으로 수십억~수백억 파라미터 규모의 모델을 대상으로 하며, 대규모 의생명 코퍼스에 대한 계속 사전학습이나 대규모 instruction 데이터 생성을 전제로 한다. 이와 달리 본 연구는 2-3B급 경량 모델에 QLoRA로 소규모 도메인 데이터(수천-수만 샘플)만을 사용해 파인튜닝하는, 계산 자원이 제한된 환경에서의 실용적 적응 가능성에 초점을 둔다는 점에서 접근 방식이 다르다. 이들 선행 연구와의 직접적인 실험 비교는 본 연구 범위 밖이다. 다만 LLaVA-Med는 본 연구와 동일한 세 데이터셋의 표준 test split에 대해 수치를 보고하므로, 채점 기준이 일치하는 closed-ended 지표에 한정해 제4장 4.4.6(Table 4.4)에서 간접 비교한다. Open-ended 지표는 양측의 채점 방식이 근본적으로 달라 비교 대상에서 제외한다. 그 근거와 남은 제약은 제5장 5.3(2)에서 논의한다.
 
@@ -130,9 +130,9 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 
 #### 2.4.1 전통적 HPO (Grid, Random, Bayesian)
 
-하이퍼파라미터 최적화(HPO)의 가장 단순한 방법은 사전에 정의한 격자(grid) 위의 모든 조합을 평가하는 grid search이나 탐색 공간의 차원이 늘어날수록 필요한 평가 횟수가 지수적으로 증가한다. Bergstra와 Bengio("Random Search for Hyper-Parameter Optimization", JMLR 13, 2012)는 무작위로 조합을 샘플링하는 random search가 동일한 계산 예산 내에서 grid search보다 실질적으로 더 나은(또는 동등한) 성능을 낼 수 있음을 이론적·경험적으로 보였다. 이는 실제로 성능에 영향을 미치는 하이퍼파라미터의 유효 차원(effective dimensionality)이 낮은 경우가 많기 때문이다. 베이지안 최적화는 이전 평가 결과로 목적함수의 확률적 대리 모델(surrogate model)을 구성하고, 이를 바탕으로 다음 평가 지점을 선택함으로써 grid/random search보다 적은 평가 횟수로 더 나은 해를 찾는 것을 목표로 한다. 본 연구가 대조군으로 사용하는 Optuna(Akiba et al., "Optuna: A Next-generation Hyperparameter Optimization Framework", KDD 2019)는 Tree-structured Parzen Estimator(TPE) 알고리즘을 채택한 베이지안 최적화 프레임워크로, 탐색 공간을 실행 중 동적으로 정의할 수 있는 define-by-run API와 효율적인 pruning(조기 중단) 전략을 제공한다.
+하이퍼파라미터 최적화(HPO)의 가장 단순한 방법은 사전에 정의한 격자(grid) 위의 모든 조합을 평가하는 grid search이나 탐색 공간의 차원이 늘어날수록 필요한 평가 횟수가 지수적으로 증가한다. Bergstra와 Bengio [12]는 무작위로 조합을 샘플링하는 random search가 동일한 계산 예산 내에서 grid search보다 실질적으로 더 나은(또는 동등한) 성능을 낼 수 있음을 이론적·경험적으로 보였다. 이는 실제로 성능에 영향을 미치는 하이퍼파라미터의 유효 차원(effective dimensionality)이 낮은 경우가 많기 때문이다. 베이지안 최적화는 이전 평가 결과로 목적함수의 확률적 대리 모델(surrogate model)을 구성하고, 이를 바탕으로 다음 평가 지점을 선택함으로써 grid/random search보다 적은 평가 횟수로 더 나은 해를 찾는 것을 목표로 한다. 본 연구가 대조군으로 사용하는 Optuna [13]는 Tree-structured Parzen Estimator(TPE) 알고리즘을 채택한 베이지안 최적화 프레임워크로, 탐색 공간을 실행 중 동적으로 정의할 수 있는 define-by-run API와 효율적인 pruning(조기 중단) 전략을 제공한다.
 
-조기 중단 기반 방법 중 Hyperband(Li et al., "Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization", JMLR 18, 2018)는 successive halving을 반복 적용해, 유망하지 않은 설정에는 적은 자원(학습 스텝 등)만 할당하고 유망한 설정에는 점진적으로 더 많은 자원을 배분하는 순수 탐색형 밴딧(bandit) 문제로 HPO를 정식화한다. 이 방법이 성립하려면 조기 학습 곡선(초반 몇 스텝의 성능)과 최종 수렴 성능 사이에 유의한 순위 상관관계가 있어야 하는데, 본 연구의 Phase 2 Ablation A(데이터 비율별 학습 곡선, 제4장 4.2.2)는 이와 유사한 조기 신호-최종 성능 관계를 자체 실험 맥락에서 관찰할 수 있는 근거를 제공한다.
+조기 중단 기반 방법 중 Hyperband [14]는 successive halving을 반복 적용해, 유망하지 않은 설정에는 적은 자원(학습 스텝 등)만 할당하고 유망한 설정에는 점진적으로 더 많은 자원을 배분하는 순수 탐색형 밴딧(bandit) 문제로 HPO를 정식화한다. 이 방법이 성립하려면 조기 학습 곡선(초반 몇 스텝의 성능)과 최종 수렴 성능 사이에 유의한 순위 상관관계가 있어야 하는데, 본 연구의 Phase 2 Ablation A(데이터 비율별 학습 곡선, 제4장 4.2.2)는 이와 유사한 조기 신호-최종 성능 관계를 자체 실험 맥락에서 관찰할 수 있는 근거를 제공한다.
 
 #### 2.4.2 LLM 에이전트 기반 최적화 (autoresearch)
 
@@ -189,7 +189,7 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 
 각 데이터셋은 공식 train/val/test split을 그대로 사용했다.
 
-**데이터 오염 통제**: PathVQA(2018)·SLAKE(2021)·VQA-RAD(2018)는 모두 대상 모델들의 사전훈련 시점(2025-2026) 이전에 공개되어 사전훈련 데이터 오염(pretraining data contamination) 가능성을 배제할 수 없다. 본 연구는 Min-K% Probability Attack(Shi et al., "Detecting Pretraining Data from Large Language Models", arXiv:2310.16789, ICLR 2024)으로 이를 능동 측정한다. 각 샘플 정답 텍스트의 token-level log-probability 하위 K%(K=20) 평균을 contamination indicator로 사용한다(사전훈련에 노출된 샘플일수록 평균 확률이 높다는 이론에 기반). 데이터셋 내 상위 5% 이상치를 오염 의심 샘플로 분류한 뒤 이를 제거한 축소 샘플셋으로 주요 결론(RQ1)을 재검증한다(제4장 4.1.1 오염 강건성 검증). 절차 및 해석 기준(원본-축소 결과 차이 1%p 미만은 강건, 1-5%p는 한계점 명시, 5%p 초과는 결론 재검토)은 `scripts/measure_contamination.py`로 구현했다.
+**데이터 오염 통제**: PathVQA(2018)·SLAKE(2021)·VQA-RAD(2018)는 모두 대상 모델들의 사전훈련 시점(2025-2026) 이전에 공개되어 사전훈련 데이터 오염(pretraining data contamination) 가능성을 배제할 수 없다. 본 연구는 Min-K% Probability Attack [15]으로 이를 능동 측정한다. 각 샘플 정답 텍스트의 token-level log-probability 하위 K%(K=20) 평균을 contamination indicator로 사용한다(사전훈련에 노출된 샘플일수록 평균 확률이 높다는 이론에 기반). 데이터셋 내 상위 5% 이상치를 오염 의심 샘플로 분류한 뒤 이를 제거한 축소 샘플셋으로 주요 결론(RQ1)을 재검증한다(제4장 4.1.1 오염 강건성 검증). 절차 및 해석 기준(원본-축소 결과 차이 1%p 미만은 강건, 1-5%p는 한계점 명시, 5%p 초과는 결론 재검토)은 `scripts/measure_contamination.py`로 구현했다.
 
 ### 3.5 실험 1: 제로샷 베이스라인 평가 (Phase 1)
 
@@ -261,7 +261,7 @@ Open-ended 응답은 Exact Match와 BERTScore F1을 함께 보고한다. 범용 
 
 가중치는 임상 중요도에 따라 diagnosis=1.0(진단 오류는 치료 방향에 직접 영향) > location=0.8 > measurement=0.7 > description=0.6 > temporal=yes_no=0.5(정보량이 제한적인 이진 판단) 순으로 부여했다. 다만 이 가중치는 외부 임상 문헌이나 Delphi 합의 없이 연구자가 임의로 설정한 것으로, 절대적 임상 중요도의 척도로 해석할 수 없으며 primary 지표(정확도·BERTScore)를 보완하는 참고용 보조 지표로만 제한적으로 사용한다.
 
-Expected Calibration Error(ECE, Guo et al., ICML 2017)는 모델의 예측 확신도(confidence)가 실제 정확도와 얼마나 일치하는지를 측정하는 지표로 함께 제시할 계획이었으나, 현재 평가 파이프라인이 per-sample confidence를 저장하지 않아 산출하지 못했다(제5장 5.3 한계점).
+Expected Calibration Error(ECE) [16]는 모델의 예측 확신도(confidence)가 실제 정확도와 얼마나 일치하는지를 측정하는 지표로 함께 제시할 계획이었으나, 현재 평가 파이프라인이 per-sample confidence를 저장하지 않아 산출하지 못했다(제5장 5.3 한계점).
 
 #### 3.8.4 Robust 통계 (Bootstrap + Mixed-Effects)
 
@@ -612,7 +612,7 @@ Phase 2와 Phase 3은 하이퍼파라미터 탐색을 서로 다른 방식으로
 
 #### 4.4.6 선행 연구와의 간접 비교
 
-본 연구는 의료 특화 VLM과의 직접 실험 비교를 수행하지 않았다(2.5). 다만 LLaVA-Med(Li et al., NeurIPS 2023 D&B)는 본 연구와 **동일한 세 데이터셋의 표준 test split**에 대해 수치를 보고하므로, 그 범위에서 간접 비교가 가능하다. 비교에 앞서 **어느 축이 비교 가능하고 어느 축이 불가능한지**를 먼저 규정한다.
+본 연구는 의료 특화 VLM과의 직접 실험 비교를 수행하지 않았다(2.5). 다만 LLaVA-Med [9]는 본 연구와 **동일한 세 데이터셋의 표준 test split**에 대해 수치를 보고하므로, 그 범위에서 간접 비교가 가능하다. 비교에 앞서 **어느 축이 비교 가능하고 어느 축이 불가능한지**를 먼저 규정한다.
 
 - **Closed-ended는 비교 가능하다.** 양측 모두 정답 문자열 일치 기반의 단순 정확도를 보고하며, 평가 표본도 SLAKE 1,061문항·VQA-RAD 451문항으로 동일하다(PathVQA만 6,761 vs 6,719로 42문항 차이).
 - **Open-ended는 비교할 수 없다.** LLaVA-Med는 *"생성된 응답에 정답 토큰이 포함된 비율(recall)"* 을 open 지표로 사용하는 반면, 본 연구는 *BERTScore F1 ≥ 0.7 임계값 통과 여부*를 사용한다(3.8.1). 전자가 구조적으로 훨씬 관대한 척도이므로 두 수치를 나란히 두는 것 자체가 오도의 소지가 있다. 아래 표에는 참고를 위해 병기하되 **비교 대상이 아님을 명시**한다.
@@ -678,7 +678,7 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 �
 
 ### 5.3 한계점
 
-**(1) 데이터 오염 통제의 한계.** 대상 데이터셋은 모델의 사전훈련 시점 이전에 공개되었으므로 사전훈련 데이터 오염 가능성이 존재한다. 본 연구는 Min-K% Probability(Shi et al., ICLR 2024)로 노출 의심 샘플을 식별하고 이를 제거한 축소셋에서 결론의 강건성을 확인했으나(4.1.1), Min-K%는 어디까지나 간접 지표이며 오염의 완전한 통제나 정확한 정량화는 불가능하다.
+**(1) 데이터 오염 통제의 한계.** 대상 데이터셋은 모델의 사전훈련 시점 이전에 공개되었으므로 사전훈련 데이터 오염 가능성이 존재한다. 본 연구는 Min-K% Probability [15]로 노출 의심 샘플을 식별하고 이를 제거한 축소셋에서 결론의 강건성을 확인했으나(4.1.1), Min-K%는 어디까지나 간접 지표이며 오염의 완전한 통제나 정확한 정량화는 불가능하다.
 
 **(2) 의료 특화 VLM과의 직접 비교 부재.** LLaVA-Med, Med-Flamingo, CheXagent 등 의료 특화 VLM을 본 연구의 환경에서 직접 재현해 비교하지는 않았다(2.5). 4.4.6의 Table 4.4는 LLaVA-Med가 **동일한 세 데이터셋의 표준 test split**에 대해 보고한 수치를 인용한 간접 비교이며 다음 세 가지 제약을 안는다. 첫째, **채점 기준이 일치하는 closed-ended 지표로만 비교가 성립**한다 — open-ended는 LLaVA-Med가 정답 토큰 포함 비율(recall)을, 본 연구는 BERTScore F1 임계값을 쓰므로 척도가 근본적으로 다르다. 둘째, 본 연구 수치는 3시드 평균이나 인용한 수치는 단일 실행 보고값이며 학습 예산도 크게 다르다. 셋째, 동일 코드·환경에서 재현한 것이 아니므로 전처리·프롬프트 등 보고되지 않은 차이가 남아 있다. Med-Flamingo·CheXagent는 이 세 데이터셋에 대해 동일 프로토콜의 수치를 제공하지 않아 표에서 제외했다. 동일 프로토콜 하의 직접 재현 비교는 향후 과제로 남는다.
 
@@ -728,42 +728,41 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **본 실험 �
 
 ## 참고문헌
 
-본 목록은 본문에 실제로 인용된 문헌만 수록한다. 각 항목의 저자·게재처·권호·페이지·DOI는 2026년 8월 원문(arXiv 초록 페이지, 출판사 공식 페이지, PubMed 서지 레코드)을 직접 대조해 확인했다.
+본 목록은 본문에 실제로 인용된 문헌만 수록하며, 표기는 IEEE Style을 따른다. 본문의 대괄호 번호는 이 목록의 항목 번호와 일치하고, 번호는 본문에서 처음 인용된 순서로 부여했다. 각 항목의 저자·게재처·권호·페이지·DOI는 2026년 8월 원문(arXiv 초록 페이지, 출판사 공식 페이지, PubMed 서지 레코드, JMLR 공식 페이지)을 직접 대조해 확인했다.
 
-**Parameter-Efficient Fine-Tuning**
+[1] H. Liu, C. Li, Q. Wu, and Y. J. Lee, "Visual instruction tuning," in *Advances in Neural Information Processing Systems (NeurIPS)*, 2023, arXiv:2304.08485.
 
-1. Hu, E. J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., & Chen, W. "LoRA: Low-Rank Adaptation of Large Language Models." *International Conference on Learning Representations (ICLR)*, 2022. arXiv:2106.09685. (OpenReview: nZeVKeeFYf9)
-2. Dettmers, T., Pagnoni, A., Holtzman, A., & Zettlemoyer, L. "QLoRA: Efficient Finetuning of Quantized LLMs." *Advances in Neural Information Processing Systems (NeurIPS)*, 2023 (Oral). arXiv:2305.14314.
+[2] S. Bai et al., "Qwen2.5-VL technical report," arXiv:2502.13923, 2025.
 
-**Vision-Language Model**
+[3] A. Marafioti et al., "SmolVLM: Redefining small and efficient multimodal models," arXiv:2504.05299, 2025.
 
-3. Liu, H., Li, C., Wu, Q., & Lee, Y. J. "Visual Instruction Tuning." *Advances in Neural Information Processing Systems (NeurIPS)*, 2023 (Oral). arXiv:2304.08485.
-4. Bai, S., Chen, K., et al. (Qwen Team, Alibaba Group). "Qwen2.5-VL Technical Report." arXiv:2502.13923, 2025. (총 27인 공저, 기술 보고서 — 학술대회 게재본 없음)
-5. Marafioti, A., Zohar, O., Farré, M., Noyan, M., Bakouch, E., et al. "SmolVLM: Redefining small and efficient multimodal models." arXiv:2504.05299, 2025. (총 17인 공저, 프리프린트)
+[4] E. J. Hu et al., "LoRA: Low-rank adaptation of large language models," in *Proc. Int. Conf. Learning Representations (ICLR)*, 2022, arXiv:2106.09685.
 
-**의료 특화 VLM**
+[5] T. Dettmers, A. Pagnoni, A. Holtzman, and L. Zettlemoyer, "QLoRA: Efficient finetuning of quantized LLMs," in *Advances in Neural Information Processing Systems (NeurIPS)*, 2023, arXiv:2305.14314.
 
-6. Li, C., Wong, C., Zhang, S., Usuyama, N., Liu, H., Yang, J., Naumann, T., Poon, H., & Gao, J. "LLaVA-Med: Training a Large Language-and-Vision Assistant for Biomedicine in One Day." *NeurIPS 2023 Datasets and Benchmarks Track*, 2023 (Spotlight). arXiv:2306.00890.
-7. Moor, M., Huang, Q., Wu, S., Yasunaga, M., Dalmia, Y., Leskovec, J., Zakka, C., Reis, E. P., & Rajpurkar, P. "Med-Flamingo: a Multimodal Medical Few-shot Learner." *Proceedings of the 3rd Machine Learning for Health Symposium (ML4H)*, PMLR 225:353-367, 2023. arXiv:2307.15189.
-8. Chen, Z., Varma, M., Xu, J., Paschali, M., Van Veen, D., et al. "A Vision-Language Foundation Model to Enhance Efficiency of Chest X-ray Interpretation." arXiv:2401.12208, 2024. (총 23인 공저. 초판 제목은 "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation"이었으나 2024년 12월 개정판에서 현재 제목으로 변경됨. 본문 2.5의 CheXagent가 이 문헌이다.)
+[6] X. He, Y. Zhang, L. Mou, E. Xing, and P. Xie, "PathVQA: 30000+ questions for medical visual question answering," arXiv:2003.10286, 2020.
 
-**의료 VQA 데이터셋**
+[7] B. Liu, L.-M. Zhan, L. Xu, L. Ma, Y. Yang, and X.-M. Wu, "SLAKE: A semantically-labeled knowledge-enhanced dataset for medical visual question answering," in *Proc. IEEE 18th Int. Symp. Biomedical Imaging (ISBI)*, 2021, pp. 1650-1654, doi: 10.1109/ISBI48211.2021.9434010.
 
-9. He, X., Zhang, Y., Mou, L., Xing, E., & Xie, P. "PathVQA: 30000+ Questions for Medical Visual Question Answering." arXiv:2003.10286, 2020. (프리프린트 — 학술대회 게재본 없음)
-10. Liu, B., Zhan, L.-M., Xu, L., Ma, L., Yang, Y., & Wu, X.-M. "SLAKE: A Semantically-Labeled Knowledge-Enhanced Dataset for Medical Visual Question Answering." *2021 IEEE 18th International Symposium on Biomedical Imaging (ISBI)*, pp. 1650-1654, 2021. DOI: 10.1109/ISBI48211.2021.9434010.
-11. Lau, J. J., Gayen, S., Ben Abacha, A., & Demner-Fushman, D. "A dataset of clinically generated visual questions and answers about radiology images." *Scientific Data*, 5, 180251, 2018. DOI: 10.1038/sdata.2018.251.
+[8] J. J. Lau, S. Gayen, A. Ben Abacha, and D. Demner-Fushman, "A dataset of clinically generated visual questions and answers about radiology images," *Scientific Data*, vol. 5, art. no. 180251, 2018, doi: 10.1038/sdata.2018.251.
 
-**하이퍼파라미터 최적화**
+[9] C. Li et al., "LLaVA-Med: Training a large language-and-vision assistant for biomedicine in one day," in *Advances in Neural Information Processing Systems (NeurIPS) Datasets and Benchmarks Track*, 2023, arXiv:2306.00890.
 
-12. Akiba, T., Sano, S., Yanase, T., Ohta, T., & Koyama, M. "Optuna: A Next-generation Hyperparameter Optimization Framework." *Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD)*, pp. 2623-2631, 2019. DOI: 10.1145/3292500.3330701.
-13. Li, L., Jamieson, K., DeSalvo, G., Rostamizadeh, A., & Talwalkar, A. "Hyperband: A Novel Bandit-Based Approach to Hyperparameter Optimization." *Journal of Machine Learning Research*, 18(185), pp. 1-52, 2018.
+[10] M. Moor et al., "Med-Flamingo: A multimodal medical few-shot learner," in *Proc. 3rd Machine Learning for Health Symp. (ML4H)*, PMLR, vol. 225, pp. 353-367, 2023, arXiv:2307.15189.
 
-**평가 방법론**
+[11] Z. Chen et al., "A vision-language foundation model to enhance efficiency of chest X-ray interpretation," arXiv:2401.12208, 2024.
 
-14. Shi, W., Ajith, A., Xia, M., Huang, Y., Liu, D., Blevins, T., Chen, D., & Zettlemoyer, L. "Detecting Pretraining Data from Large Language Models." *The Twelfth International Conference on Learning Representations (ICLR)*, 2024. arXiv:2310.16789. (OpenReview: zWqr3MQuNs. 본문의 Min-K% Probability 기법)
-15. Guo, C., Pleiss, G., Sun, Y., & Weinberger, K. Q. "On Calibration of Modern Neural Networks." *Proceedings of the 34th International Conference on Machine Learning (ICML)*, PMLR 70, pp. 1321-1330, 2017.
+[12] J. Bergstra and Y. Bengio, "Random search for hyper-parameter optimization," *Journal of Machine Learning Research*, vol. 13, no. 10, pp. 281-305, 2012.
 
-> **표기 원칙**: 저자가 20인을 초과하는 문헌(4·5·8번)은 제1저자부터 5인까지 기재하고 총 인원을 병기했다. 3·7·10·11·12·13·15번은 원문에 표시된 전체 공저자를 모두 기재했다. 1·2·6·14번은 arXiv 및 출판사 페이지에서 확인한 공저자 목록을 기재했다.
+[13] T. Akiba, S. Sano, T. Yanase, T. Ohta, and M. Koyama, "Optuna: A next-generation hyperparameter optimization framework," in *Proc. 25th ACM SIGKDD Int. Conf. Knowledge Discovery & Data Mining (KDD)*, 2019, pp. 2623-2631, doi: 10.1145/3292500.3330701.
+
+[14] L. Li, K. Jamieson, G. DeSalvo, A. Rostamizadeh, and A. Talwalkar, "Hyperband: A novel bandit-based approach to hyperparameter optimization," *Journal of Machine Learning Research*, vol. 18, no. 185, pp. 1-52, 2018.
+
+[15] W. Shi et al., "Detecting pretraining data from large language models," in *Proc. 12th Int. Conf. Learning Representations (ICLR)*, 2024, arXiv:2310.16789.
+
+[16] C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, "On calibration of modern neural networks," in *Proc. 34th Int. Conf. Machine Learning (ICML)*, PMLR, vol. 70, pp. 1321-1330, 2017.
+
+> **표기 주석**: 저자가 6인을 넘는 [2]·[3]·[4]·[9]·[10]·[11]·[15]는 IEEE 규정에 따라 제1저자만 적고 "et al."로 줄였다(전체 공저자 목록은 각 문헌 원문에서 확인할 수 있다). [2]·[3]·[6]·[11]은 학술대회 게재본이 없는 기술 보고서 또는 프리프린트다. [11]의 초판 제목은 "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation"이었으나 2024년 12월 개정판에서 현재 제목으로 변경되었다. 본문 2.5의 CheXagent가 이 문헌이다.
 
 ---
 

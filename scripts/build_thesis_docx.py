@@ -192,10 +192,12 @@ def parse_markdown(md_path: Path, lang: str = "ko") -> list[Block]:
 
 
 # --- docx 조립 도우미 -------------------------------------------------------
-def _style_run(run, size: float, bold: bool = False, font: str = FONT_KO) -> None:
+def _style_run(run, size: float, bold: bool = False, font: str = FONT_KO,
+               italic: bool = False) -> None:
     """규정 서식(폰트·크기·장평 97%)을 run에 적용한다."""
     run.font.size = Pt(size)
     run.bold = bold
+    run.italic = italic
     rpr = run._element.get_or_add_rPr()
     fonts = rpr.find(qn("w:rFonts"))
     if fonts is None:
@@ -212,7 +214,8 @@ def _style_run(run, size: float, bold: bool = False, font: str = FONT_KO) -> Non
 
 def _add_para(doc, anchor, text: str, size: float = SZ_BODY, bold: bool = False,
               align=WD_ALIGN_PARAGRAPH.JUSTIFY, outline: int | None = None,
-              style_name: str | None = None, font: str = FONT_KO, indent: bool = True):
+              style_name: str | None = None, font: str = FONT_KO, indent: bool = True,
+              hanging: bool = False):
     """anchor 앞에 문단을 삽입한다. **굵게** 구간은 굵은 run으로 분리한다."""
     p = doc.add_paragraph()
     anchor.addprevious(p._p)
@@ -225,7 +228,12 @@ def _add_para(doc, anchor, text: str, size: float = SZ_BODY, bold: bool = False,
     pf = p.paragraph_format
     pf.line_spacing = LINE_SPACING
     pf.space_after = Pt(0)
-    if indent and align == WD_ALIGN_PARAGRAPH.JUSTIFY:
+    if hanging:
+        # 참고문헌 내어쓰기: 작성 매뉴얼 「7. 참고문헌 체제」 5)는 Style과 무관하게
+        # 자료가 두 줄 이상이면 둘째 줄부터 들여쓰도록 규정한다.
+        pf.left_indent = Pt(size * 2)
+        pf.first_line_indent = Pt(-size * 2)
+    elif indent and align == WD_ALIGN_PARAGRAPH.JUSTIFY:
         pf.first_line_indent = Pt(size)
 
     if outline is not None:
@@ -234,25 +242,31 @@ def _add_para(doc, anchor, text: str, size: float = SZ_BODY, bold: bool = False,
         lvl.set(qn("w:val"), str(outline))
         ppr.append(lvl)
 
-    for chunk, is_bold in _split_bold(text):
+    for chunk, is_bold, is_italic in _split_marks(text):
         if not chunk:
             continue
         r = p.add_run(chunk)
-        _style_run(r, size, bold or is_bold, font)
+        _style_run(r, size, bold or is_bold, font, is_italic)
     if not p.runs:  # 빈 문단도 서식은 유지
         _style_run(p.add_run(""), size, bold, font)
     return p
 
 
-def _split_bold(text: str) -> list[tuple[str, bool]]:
-    """`**굵게**`와 백틱 코드를 정리해 (텍스트, 굵음) 목록으로 만든다."""
+def _split_marks(text: str) -> list[tuple[str, bool, bool]]:
+    """`**굵게**`·`*기울임*`과 백틱 코드를 (텍스트, 굵음, 기울임)으로 분리한다.
+
+    IEEE 참고문헌은 게재처명을 이탤릭으로 적으므로 단일 별표도 처리해야 한다.
+    처리하지 않으면 별표가 본문에 그대로 찍힌다.
+    """
     text = text.replace("`", "")
-    out: list[tuple[str, bool]] = []
-    for part in re.split(r"(\*\*[^*]+\*\*)", text):
+    out: list[tuple[str, bool, bool]] = []
+    for part in re.split(r"(\*\*[^*]+\*\*|\*[^*]+\*)", text):
         if part.startswith("**") and part.endswith("**") and len(part) > 4:
-            out.append((part[2:-2], True))
+            out.append((part[2:-2], True, False))
+        elif part.startswith("*") and part.endswith("*") and len(part) > 2:
+            out.append((part[1:-1], False, True))
         elif part:
-            out.append((part, False))
+            out.append((part, False, False))
     return out
 
 
@@ -336,9 +350,9 @@ def _add_table(doc, anchor, rows: list[list[str]]) -> None:
             else:
                 para.alignment = WD_ALIGN_PARAGRAPH.LEFT
             para.paragraph_format.line_spacing = 1.0
-            for chunk, is_bold in _split_bold(val):
+            for chunk, is_bold, is_italic in _split_marks(val):
                 r = para.add_run(chunk)
-                _style_run(r, 9, is_bold or ri == 0)
+                _style_run(r, 9, is_bold or ri == 0, FONT_KO, is_italic)
     anchor.addprevious(t._tbl)
 
 
@@ -698,6 +712,9 @@ def _emit(doc, anchor, blocks: list[Block], skip_heading: bool = False,
             for it in b.items:
                 _add_para(doc, anchor, f"· {it}", SZ_BODY, False,
                           WD_ALIGN_PARAGRAPH.JUSTIFY, indent=False)
+        elif re.match(r"^\[\d+\]\s", b.text):
+            # IEEE 참고문헌 항목은 내어쓰기로 렌더링한다.
+            _add_para(doc, anchor, b.text, SZ_BODY, hanging=True)
         else:
             _add_para(doc, anchor, b.text, SZ_BODY)
 
