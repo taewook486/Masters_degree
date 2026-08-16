@@ -1,8 +1,45 @@
 # 다음 세션 시작점 (마지막 갱신: 2026-08-16)
 
+## 🔴 2026-08-16 (3차) — v2 재실험 **본실행 가동 중** (완료 예상 8/21 전후)
+
+**세션을 이어받으면 먼저 이 절을 읽을 것.** RunPod에서 `autoresearch_v2` 200 trial이 돌고 있다.
+
+- **접속**: `ssh -i <키> -p 40065 root@213.192.2.86` — 팟 재시작 시 **포트가 바뀐다**(콘솔에서 재확인). `.pem`이 `/mnt/d`에 있으면 `chmod`가 안 먹으니 `/tmp`로 복사 후 `chmod 600`.
+- **tmux 세션 `phase3v2`**: 창0=본실행 / 창1=감시기 / 창2=여분 셸. 붙기: `ssh -i <키> -p 40065 root@213.192.2.86 -t tmux attach -t phase3v2`. 떼기: `Ctrl+B` → `D`. **창0에는 입력하지 말 것.**
+- **실행 명령**(13:50 재시작. 캐시를 컨테이너 로컬로 돌린 판본):
+  ```bash
+  set -a; . ./.env; set +a
+  export MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache
+  export HF_DATASETS_CACHE=/hf_cache/datasets
+  .venv/bin/python -u -m src.autoresearch.run_phase3 \
+    --model_config configs/models/qwen3_vl_2b.yaml \
+    --finetune_config configs/finetune/base_qlora.yaml \
+    --output_dir results/phase3_autoresearch_v2 \
+    --strategies autoresearch_v2 --repeats 10 --trials_per_repeat 20 \
+    --seed 42 --data_dir data --time_budget_min 90 --max_test_samples 500 \
+    --max_parallel 1 \
+    2>&1 | tee results/phase3_autoresearch_v2/run.log
+  ```
+- **일정**: 13:50 기동 → **chat-cache 빌드 약 6.5시간(20시경까지)** → 이후 200 trial × 약 30분 = 약 101시간. GPU 1장이라 2장 때(50시간)의 두 배다. **완료 8/21 전후.**
+- **⚠️ 실행 중 팟을 Stop하지 말 것** — 캐시가 컨테이너 저장소(`/hf_cache`)에 있어 재생성되면 **6.5시간을 다시 낸다.** 이번에 실제로 그렇게 날아갔다.
+- **trial 번호는 630부터** (원본이 0~629). `results/phase3_autoresearch_v2/results.tsv.counter`에 630을 심어 충돌을 막았다.
+- **디스크**: 정리 후 볼륨 35GB 사용(여유 65GB). 어댑터가 약 40GB 쌓일 예정이라 딱 맞는다. autoresearch 원본 어댑터 40.4GB는 **삭제했다**(gitignore 대상, 지표는 results.tsv·JSON에 보존. 08-11에 random·optuna를 지운 것과 같은 처리).
+- **감시기**(pod 로컬, 저장소 밖이라 팟 재생성 시 소멸): `/workspace/notify_v2.sh` + `/workspace/count_v2.py`. 텔레그램으로 ①완료 ②중단(프로세스 소멸) ③완료 후 1시간 간격 팟 Stop 독촉을 보낸다. 재가동: `tmux new-window -d -t phase3v2 -n watch "/workspace/notify_v2.sh 2>&1 | tee -a /workspace/notify_v2.log"`.
+- **텔레그램 토큰은 8/16에 재발급했다**(이전 것은 08-13 revoke분이라 `Unauthorized`였음). 팟 `.env`에 `ANTHROPIC_API_KEY`·`TELEGRAM_BOT_TOKEN`·`TELEGRAM_CHAT_ID` 3개가 들어 있고 `chmod 600`·gitignore 적용됨. **코드가 `.env`를 자동 로드하지 않으므로 실행 셸에서 `set -a; . ./.env; set +a`가 필수.**
+- **상태 확인 명령**:
+  ```bash
+  # 진행 trial 수
+  .venv/bin/python /workspace/count_v2.py
+  # 캐시 빌드 진행(빌드 단계일 때)
+  find /hf_cache/datasets -name "*.arrow" -printf "%10s %p\n"
+  # 프로세스 생존 + GPU
+  pgrep -f "[r]un_phase3.*autoresearch_v2" && nvidia-smi --query-gpu=utilization.gpu,memory.used --format=csv,noheader
+  ```
+- **완료 후 할 일**: ① `scripts/analyze_phase3.py:40`과 `scripts/plot_phase3_anytime.py:43`의 하드코딩 전략 목록에 `autoresearch_v2` 추가(+ Mann-Whitney 쌍에 `autoresearch_v2 vs optuna`) ② 두 결과 디렉터리의 tsv를 합쳐 5조건 분석 ③ **검증 포인트: repeat당 고유 조합이 12.5/20에서 20/20 쪽으로 올랐는가** — 안 올랐으면 중복의 원인이 지시 충돌이 아니라는 뜻이므로 그 자체가 결과다 ④ 논문 §4.3·§5.3(8)·§5.4 갱신.
+
 ## 2026-08-16 (2차) 세션 — Autoresearch 재실험 A안 준비 완료 (코드/프롬프트, 실행 전)
 
-- **배경**: §5.3(8)의 "Autoresearch 설계 불일치"를 지도교수 상의 전에 재실험 가능한 상태로 만들어 둠. RunPod 팟을 terminate하지 않아 재활용 가능하다는 사용자 확인에 따라 착수. **아직 실행하지 않았음 — 코드·프롬프트 준비까지만 완료.**
+- **배경**: §5.3(8)의 "Autoresearch 설계 불일치"를 지도교수 상의 전에 재실험 가능한 상태로 만들어 둠. RunPod 팟을 terminate하지 않아 재활용 가능하다는 사용자 확인에 따라 착수. *(이 절은 준비 단계 기록이다. **실행은 같은 날 개시했다 — 위 3차 절 참고.**)*
 - **[중요] 불일치는 3건이 아니라 5건이었다.** 논문 §5.3(8)에 적힌 3건 외에 코드를 직접 대조하다 2건을 더 찾음:
   4. **중복 금지를 프롬프트가 말하지 않는다** — `strategies.py`의 `_is_duplicate`가 중복 설정을 거부하고 최대 3회 재제안을 요구(히스토리에 "suggest a DIFFERENT configuration" 경고까지 덧붙임)하는데, 시스템 프롬프트는 같은 구간에서 "최고 설정에서 1~2개만 바꿔라"라고 지시한다. 3회를 다 쓰면 **루프가 그냥 끝나며 중복을 그대로 채택**한다(폴백 없음). 고유 조합 12.5/20은 이 상반된 두 지시의 균형점에 가깝다.
   5. **실제 예산이 에이전트에 전달되지 않았다** — `run_phase3.py`·`run_one_repeat.py`가 `get_strategy()`를 인자 없이 호출해 `total_trials`가 기본값 **40**으로 남았다. 실제 예산은 20이었다.
@@ -42,8 +79,11 @@
   1. **SSH 엔드포인트가 바뀐다** — 정지된 팟을 재시작하면 host/port가 재할당되므로 기록된 `-p 40127 root@213.192.2.86`은 그대로 못 쓴다. 콘솔에서 새 값 확인. `.pem`이 `/mnt/d`에 있으면 `chmod`가 안 먹으니 `/tmp` 복사 후 `chmod 600`.
   2. **`ANTHROPIC_API_KEY` 생존 여부** — 2026-07-27 유출 건이 무효화 확인 없이 이월돼 있다. 에이전트 호출이 이 키로 나가므로 revoke됐다면 첫 trial부터 실패한다.
   3. **디스크** — 어댑터 가중치가 **약 40GB** 쌓인다(autoresearch 200 trial 실적 40.4GB. 앞서 적었던 20GB는 random 13GB·optuna 21GB 기준의 과소 추정이었다). `du -sh /workspace/*`와 `/workspace/.cache`를 **각각** 볼 것 — `du -sh --one-file-system /workspace`는 별도 마운트인 `.cache`를 빼고 세어 과소 보고한다(실측: 73G로 보였으나 실제 82G).
-  4. **chat-cache가 살아있는지** — `data/_chat_cache`(또는 `MOAI_CHAT_CACHE_DIR` 지정 위치)에 `qwen_pathvqa_train`이 없으면 첫 trial이 **캐시를 처음부터 다시 만든다**(단일 스레드, 원본 실적 약 10분·2026-08-16 재빌드는 그보다 오래 걸림). 정지처럼 보이지만 정상이며, 진행 여부는 `/workspace/.cache/huggingface/datasets/generator/*/*.incomplete/*.arrow` 파일 크기 증가로 확인한다. **1회성 비용이고 이후 전 trial이 재사용한다.**
-     - ⚠️ `scripts/run_phase3.sh:43`은 `MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache`를 거는데, **`/hf_cache`는 컨테이너 저장소라 팟 재생성 시 소멸한다**(이번에 실제로 사라짐). 환경변수를 걸지 않으면 기본값 `data/_chat_cache`, 즉 `/workspace` 안에 만들어져 **볼륨에 영구 보존**된다. 재실행 시에는 환경변수를 거는 대신 기본값을 쓰는 편이 낫다.
+  4. **chat-cache가 살아있는지** — `MOAI_CHAT_CACHE_DIR` 지정 위치(또는 기본값 `data/_chat_cache`)에 `qwen_pathvqa_train`이 없으면 첫 trial이 **캐시를 처음부터 다시 만든다. 이 비용이 약 6.5시간이다.** 정지처럼 보이지만 정상이다.
+     - **왜 느린가**: `prepare_data.py`의 `Dataset.from_generator`가 이미지를 통째로 arrow에 직렬화한다(행당 약 1.2MB). 이미지당 약 1.2초 × 19,654장 ≈ 6.5시간. **CPU 단일 스레드 병목이며 저장소 속도와 무관하다**(컨테이너 로컬 2.2GB/s vs 볼륨 445MB/s로 옮겨도 속도 동일함을 실측). 메모리 보호를 위해 스트리밍 생성을 쓰는 의도된 설계라 병렬화하려면 생성 함수를 샤드 단위로 고쳐야 한다.
+     - **원본도 같은 비용을 냈다** — 08-05 로그가 08:15 시작 → `14:17:29 [chat-cache] saved`. 2026-08-02의 "PathVQA 캐시 극도로 느림(6h+)" 기록과도 일치한다. *(2026-08-16 1차 기록의 "원본 실적 약 10분"은 오류였다. 1,766바이트짜리 로그 파일명에서 잘못 유추한 값이다.)*
+     - **진행 확인법**: 진행 표시(`Generating train split: N examples`)는 1,000개 단위 flush 중에 멈춰 보인다. 실제 진행은 `<캐시>/generator/*/*.incomplete/*.arrow` 크기 증가로 본다. CPU는 `/proc/<pid>/stat`의 14·15번 필드 증가로 확인할 것 — **`top -b -n 1`은 첫 샘플이라 0.0%로 나오므로 정지 판정 근거로 쓰면 안 된다**(이번에 오진했음).
+     - **위치 선택**: `scripts/run_phase3.sh:43`의 `MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache`는 컨테이너 저장소라 **팟 재생성 시 소멸**한다(이번에 실제로 사라짐). 반대로 기본값 `data/_chat_cache`는 볼륨이라 보존되지만 **약 24GB를 잡아먹어 어댑터 40GB와 함께 100GB 쿼터를 넘긴다.** 볼륨을 늘리지 않는 한 컨테이너 저장소(`/hf_cache`)를 쓰고, **실행 중 팟을 Stop하지 않는 것**이 현재 선택이다.
 - **이월(결과가 나온 뒤 할 일)**: `scripts/analyze_phase3.py:40`과 `scripts/plot_phase3_anytime.py:43`이 전략 4개를 하드코딩하고 있다. **지금 v2를 추가하면 기존 결과 분석이 "missing_strategies: autoresearch_v2"를 뱉으므로 일부러 손대지 않았다.** v2 결과가 나온 뒤 추가하고, Mann-Whitney 쌍도 `autoresearch_v2 vs optuna`를 함께 넣을 것. 두 결과 디렉터리의 tsv를 합쳐 분석하면 5조건 비교가 된다.
 - **🚨 [별건, 논문 서술 오류 발견] §3.2.1의 "보고 수치는 전부 RunPod 산출"이 manual 조건에서 사실과 다르다.** GPU 장수를 확인하다 결과 JSON의 `metadata.environment.gpu_name`을 전수 조사한 결과: 3090 604건 외에 **RTX 4060 3건 + RTX 5060 Ti 3건**이 나왔다. 해당 6건은 `manual_repeat0~5`의 `trial_0000~0005`이고 **전부 `status=completed`**, val_accuracy 0.374~0.384로 **run-level n=10에 실제로 들어가는 값**이다(나머지 repeat6~9는 trial 26~29로 3090). 타임스탬프는 2026-08-02로, RunPod 3090 본실행(08-05~) 이전의 로컬 듀얼 GPU 시기 산출물이다.
   - **08-13에 §3.2.1을 정정할 때 "5060 Ti·4060은 0건"으로 확인했던 것이 틀렸다** — 당시 조사가 이 6건을 놓쳤다. 원인은 확인 못 했으나(글롭 패턴 차이로 추정) 결과는 명확하다.
