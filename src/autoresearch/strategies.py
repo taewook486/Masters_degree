@@ -248,9 +248,11 @@ class AutoresearchStrategy(HPOStrategy):
         self,
         program_md_path: str = "configs/autoresearch/program.md",
         total_trials: int = 40,
+        max_tokens: int = 512,
     ):
         self.program_md_path = program_md_path
         self.total_trials = total_trials
+        self.max_tokens = max_tokens
         self._program: str | None = None
 
     def _load_program(self) -> str:
@@ -342,6 +344,7 @@ class AutoresearchStrategy(HPOStrategy):
                     history_text,
                     trial_number=trial_number,
                     total_trials=self.total_trials,
+                    max_tokens=self.max_tokens,
                 )
                 if not self._is_duplicate(config, history):
                     break
@@ -363,6 +366,44 @@ class AutoresearchStrategy(HPOStrategy):
             return RandomSearchStrategy().suggest(history)
 
 
+class AutoresearchV2Strategy(AutoresearchStrategy):
+    """설정 불일치를 제거한 autoresearch 재실험 조건.
+
+    원본 AutoresearchStrategy는 최초 실행 결과의 재현을 위해 그대로 두고,
+    프롬프트와 코드가 어긋나 있던 지점만 맞춘 별도 조건으로 분리한다.
+    탐색 공간 자체는 원본과 동일하므로 random/optuna와의 비교는 유지된다.
+
+    원본 대비 차이 5건:
+      1. epochs 제거 — agent.py가 config.pop("epochs")로 값을 버리고
+         max_steps를 PHASE3_FIXED_MAX_STEPS(200)로 고정하므로 무효였다.
+      2. 단계 일정을 절대 trial 번호에서 예산 비율로 변경 — agent.py의
+         _build_user_message가 주입하는 힌트가 비율 기준이라 충돌했다.
+      3. 근거 산출 허용 — 원본의 "JSON only" 제약이 RQ3의 둘째 요건인
+         해석 가능한 탐색 근거를 측정 이전에 배제했다.
+      4. 중복 금지 명시 — _is_duplicate가 중복을 거부하고 재제안을
+         요구하는데 원본 프롬프트는 이를 알리지 않고 중복을 유도했다.
+      5. total_trials를 실제 예산으로 주입 — 호출부가 넘기지 않아 기본값
+         40이 쓰였고, 예산 20에서는 단계·온도 일정이 절반에서 멈췄다.
+         (주입은 run_phase3.py / run_one_repeat.py 호출부에서 수행)
+
+    max_tokens는 근거 산문이 앞에 붙어도 JSON이 잘리지 않도록 올린다.
+    """
+
+    name = "autoresearch_v2"
+
+    def __init__(
+        self,
+        program_md_path: str = "configs/autoresearch/program_v2.md",
+        total_trials: int = 40,
+        max_tokens: int = 1024,
+    ):
+        super().__init__(
+            program_md_path=program_md_path,
+            total_trials=total_trials,
+            max_tokens=max_tokens,
+        )
+
+
 # ---------------------------------------------------------------------------
 # Factory
 # ---------------------------------------------------------------------------
@@ -372,6 +413,7 @@ STRATEGIES: dict[str, type[HPOStrategy]] = {
     "random": RandomSearchStrategy,
     "optuna": OptunaTPEStrategy,
     "autoresearch": AutoresearchStrategy,
+    "autoresearch_v2": AutoresearchV2Strategy,
 }
 
 

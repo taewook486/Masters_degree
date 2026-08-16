@@ -50,7 +50,14 @@ def main() -> int:
     )
 
     tracker = ExperimentTracker(output_path / "results.tsv")
-    strategy = get_strategy(args.strategy_name)
+    # autoresearch_v2만 실제 예산을 받는다. 다른 전략 생성자는 인자를
+    # 받지 않고, 원본 autoresearch는 기존 동작을 보존한다.
+    extra = (
+        {"total_trials": args.max_trials}
+        if args.strategy_name == "autoresearch_v2"
+        else {}
+    )
+    strategy = get_strategy(args.strategy_name, **extra)
 
     run_hpo_loop(
         strategy=strategy,

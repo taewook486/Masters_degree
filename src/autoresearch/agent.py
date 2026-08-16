@@ -34,6 +34,7 @@ def ask_agent_for_config(
     history_text: str,
     trial_number: int = 0,
     total_trials: int = 40,
+    max_tokens: int = 512,
 ) -> tuple[dict, str]:
     """Ask the LLM agent to suggest the next hyperparameter config.
 
@@ -42,6 +43,9 @@ def ask_agent_for_config(
         history_text: Human-readable summary of past trials.
         trial_number: Current trial index (0-based), used for temp scheduling.
         total_trials: Total planned trials, used for temp scheduling.
+        max_tokens: Response token cap. 512 for the original condition
+            (JSON-only replies); raise it when the prompt also asks for
+            a written rationale, or the JSON gets truncated away.
 
     Returns:
         Tuple of (validated hyperparameters dict, raw agent response text).
@@ -78,7 +82,7 @@ def ask_agent_for_config(
         try:
             response = client.messages.create(
                 model="claude-sonnet-4-6",
-                max_tokens=512,
+                max_tokens=max_tokens,
                 system=program,
                 messages=[{"role": "user", "content": user_message}],
                 temperature=temperature,

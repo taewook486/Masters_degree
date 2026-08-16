@@ -1,5 +1,41 @@
 # 다음 세션 시작점 (마지막 갱신: 2026-08-16)
 
+## 2026-08-16 (2차) 세션 — Autoresearch 재실험 A안 준비 완료 (코드/프롬프트, 실행 전)
+
+- **배경**: §5.3(8)의 "Autoresearch 설계 불일치"를 지도교수 상의 전에 재실험 가능한 상태로 만들어 둠. RunPod 팟을 terminate하지 않아 재활용 가능하다는 사용자 확인에 따라 착수. **아직 실행하지 않았음 — 코드·프롬프트 준비까지만 완료.**
+- **[중요] 불일치는 3건이 아니라 5건이었다.** 논문 §5.3(8)에 적힌 3건 외에 코드를 직접 대조하다 2건을 더 찾음:
+  4. **중복 금지를 프롬프트가 말하지 않는다** — `strategies.py`의 `_is_duplicate`가 중복 설정을 거부하고 최대 3회 재제안을 요구(히스토리에 "suggest a DIFFERENT configuration" 경고까지 덧붙임)하는데, 시스템 프롬프트는 같은 구간에서 "최고 설정에서 1~2개만 바꿔라"라고 지시한다. 3회를 다 쓰면 **루프가 그냥 끝나며 중복을 그대로 채택**한다(폴백 없음). 고유 조합 12.5/20은 이 상반된 두 지시의 균형점에 가깝다.
+  5. **실제 예산이 에이전트에 전달되지 않았다** — `run_phase3.py`·`run_one_repeat.py`가 `get_strategy()`를 인자 없이 호출해 `total_trials`가 기본값 **40**으로 남았다. 실제 예산은 20이었다.
+- **[정정] 이전 기록·설명의 오류 2건** (5번 불일치 때문에 생긴 것):
+  - temperature는 후반에 0.30까지 떨어지지 **않았다**. `1.0 − 0.7 × (trial/39)`이라 마지막 trial에서도 **0.66**이다.
+  - 에이전트는 EXPLOITATION 단계에 **한 번도 진입하지 않았다**. 주입 힌트가 `trial/40` 기준이라 최대 0.475에서 멈춘다(trial 0~9 EXPLORATION, 10~19 TRANSITION). 즉 예산 뒷절반 내내 주입 힌트는 "미탐색 조합을 계속 시도하라"고, 시스템 프롬프트는 "최고 설정에서 1~2개만 바꿔라"고 서로 반대로 지시했다.
+  - `results.tsv`의 `phase`·`temperature` 컬럼은 **기록되지 않았다**(전부 빈 값·0.0). 실행 당시 값은 코드로만 확인 가능하다.
+- **A안 = 탐색 공간은 그대로 두고 불일치 5건만 제거**. 탐색 공간을 안 건드리므로 **random·optuna 기존 결과를 비교 대상으로 그대로 쓸 수 있어** 재실행이 autoresearch 한 조건으로 한정된다. (`epochs`를 실제로 작동시키는 B안은 autoresearch만 학습량을 조절하게 되어 공정 비교가 깨지고, 세 전략을 전부 재실행해야 한다 → 294.6 GPU-시간.)
+- **결정사항 3건(사용자 승인)**: ① 근거 산출은 **산문 먼저, JSON 나중**(max_tokens 512→1024) ② 결과는 기존 autoresearch를 대체하지 않고 **다섯 번째 조건으로 추가** ③ 중복 금지 명시(4번)도 **포함**.
+- **변경 파일 5개** (원본 조건은 전부 보존 — 기본값 무변경, 재현 가능):
+  - `configs/autoresearch/program_v2.md` **신규** — `epochs` 제거 / 단계를 예산 비율로 서술 / 중복 금지 명시 / 산문+JSON 응답 형식. **원본 `program.md`는 그대로 둠**(부록 B가 인용, 원 조건 재현용). ⚠️ `_load_program()`이 파일 전체를 시스템 프롬프트로 넘기므로 **이 파일에 실험 설계 주석을 쓰면 에이전트가 읽는다** — 사유는 코드 docstring에만 적었다.
+  - `src/autoresearch/strategies.py` — `AutoresearchV2Strategy` 신설(`name="autoresearch_v2"`, 사유 5건 docstring), 레지스트리 등록, `max_tokens` 생성자 인자 추가(기본 512).
+  - `src/autoresearch/agent.py` — `ask_agent_for_config(max_tokens=512)` 인자화. 하드코딩 512 제거.
+  - `src/autoresearch/run_phase3.py` / `run_one_repeat.py` — `--strategies` choices에 추가 + **`autoresearch_v2`일 때만** 실제 예산을 `total_trials`로 주입(다른 전략 생성자는 인자를 받지 않으므로 무조건 넘기면 TypeError).
+- **검증 완료**: 레지스트리 5개 등록 / 원본 기본값 불변(program.md·40·512) / v2 로딩(program_v2.md·20·1024) / **단계 힌트가 예산 끝까지 도달**(수정 전 trial 19 = TRANSITION·temp 0.66 → 수정 후 EXPLOITATION·temp 0.30) / 산문+JSON 파싱 성공(`_parse_config`의 3단 폴백이 이미 처리 — 파서 수정 불필요) / ruff 신규 오류 0건(strategies.py 20건은 HEAD와 동일한 기존 부채).
+- **실행 절차** (팟에서 `git pull` 후):
+  ```bash
+  mkdir -p results/phase3_autoresearch_v2
+  echo 630 > results/phase3_autoresearch_v2/results.tsv.counter   # trial_id 충돌 방지(원본 0~629)
+  python -m src.autoresearch.run_phase3 \
+    --strategies autoresearch_v2 --repeats 10 --trials_per_repeat 20 \
+    --output_dir results/phase3_autoresearch_v2 --max_parallel 2
+  ```
+  ⚠️ `--trials_per_repeat` 기본값이 아직 **40**이라 20을 반드시 명시할 것(안 그러면 예산 2배 + 비교 불가). ⚠️ `--output_dir`을 기존 `results/phase3_autoresearch`로 주면 `skip_existing` 사전 패스가 **전부 건너뛴다**.
+- **실측 비용**(trial 원본 JSON의 `metadata.timestamp` 간격 중앙값 기준, 평가·에이전트 호출 포함): autoresearch **30.3분/trial → 200 trial = 101.0 GPU-시간**. 3090 2장 병렬이면 경과 약 50시간(2.1일). 참고로 random 25.8분(86.0h), optuna 32.3분(107.6h). 학습시간만(`train_time_min`) 보면 autoresearch 90.8h라 **평가·호출 오버헤드가 약 11%**.
+  - 논문의 "실측 279 GPU-시간"도 이 과정에서 검증됨: tsv 전체 합은 292.2h이고 `status=completed`만 더하면 **정확히 16,724분 = 278.7h**(차이 13.4h는 manual 실패 trial 10건). 논문 수치는 성공 trial 기준으로 맞다.
+- **재실험 전 팟 쪽 확인 3건**:
+  1. **SSH 엔드포인트가 바뀐다** — 정지된 팟을 재시작하면 host/port가 재할당되므로 기록된 `-p 40127 root@213.192.2.86`은 그대로 못 쓴다. 콘솔에서 새 값 확인. `.pem`이 `/mnt/d`에 있으면 `chmod`가 안 먹으니 `/tmp` 복사 후 `chmod 600`.
+  2. **`ANTHROPIC_API_KEY` 생존 여부** — 2026-07-27 유출 건이 무효화 확인 없이 이월돼 있다. 에이전트 호출이 이 키로 나가므로 revoke됐다면 첫 trial부터 실패한다.
+  3. **디스크** — 어댑터 가중치가 20GB쯤 새로 쌓인다(random 13GB·optuna 21GB 실적). `df -h /workspace`로 볼륨을 따로 확인할 것(컨테이너 루트 `df -h /`만 보면 과소평가).
+- **이월(결과가 나온 뒤 할 일)**: `scripts/analyze_phase3.py:40`과 `scripts/plot_phase3_anytime.py:43`이 전략 4개를 하드코딩하고 있다. **지금 v2를 추가하면 기존 결과 분석이 "missing_strategies: autoresearch_v2"를 뱉으므로 일부러 손대지 않았다.** v2 결과가 나온 뒤 추가하고, Mann-Whitney 쌍도 `autoresearch_v2 vs optuna`를 함께 넣을 것. 두 결과 디렉터리의 tsv를 합쳐 분석하면 5조건 비교가 된다.
+- **심사 대비 예측(사전 등록 성격)**: 이 수정이 유효하다면 **repeat당 고유 조합이 12.5/20에서 20/20 쪽으로 올라가야 한다**. 안 오르면 중복의 원인이 지시 충돌이 아니라 다른 데 있다는 뜻이므로, 그 자체가 정보가 된다.
+
 ## 2026-08-16 세션 — 장 페이지 나누기 + 제출본 육안 확인 + 커밋 우회법 정정
 
 - **참고문헌 IEEE 전환 결과를 처음으로 육안 확인했다**(그동안 `poppler-utils` 미설치로 XML 검증만 했던 것). `uv pip install pymupdf`로 렌더링해서 확인 — **`uv.lock`·`pyproject.toml`은 안 건드림**(`uv pip install`은 lock을 수정하지 않는다). 결과 3항목 전부 정상: ① 본문 인용 `[1]`~`[16]`이 **첫 등장 순서 그대로 오름차순**(IEEE 인용순 정렬 충족, 누락 0건) ② 두 줄 이상 항목 내어쓰기 정상 ③ 게재처명 이탤릭 정상, **별표 노출 0건**(08-15에 고친 `_split_marks` 버그가 실제로 잡혔음 확인).

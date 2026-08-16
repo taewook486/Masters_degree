@@ -158,7 +158,14 @@ def run_phase3(
         # Byte-identical to the pre-parallel behavior: in-process, sequential.
         for job in jobs:
             logger.info(f"\n{'#'*60}\n{job['log_label']}\n{'#'*60}")
-            strategy = get_strategy(job["strategy_name"])
+            # autoresearch_v2만 실제 예산을 받는다. 다른 전략 생성자는
+            # 인자를 받지 않고, 원본 autoresearch는 기존 동작을 보존한다.
+            extra = (
+                {"total_trials": job["expected"]}
+                if job["strategy_name"] == "autoresearch_v2"
+                else {}
+            )
+            strategy = get_strategy(job["strategy_name"], **extra)
             run_hpo_loop(
                 strategy=strategy,
                 model_config_path=model_config_path,
@@ -291,7 +298,7 @@ def main() -> None:
     parser.add_argument(
         "--strategies", nargs="+",
         default=["manual", "random", "optuna", "autoresearch"],
-        choices=["manual", "random", "optuna", "autoresearch"],
+        choices=["manual", "random", "optuna", "autoresearch", "autoresearch_v2"],
     )
     parser.add_argument("--repeats", type=int, default=10)
     parser.add_argument("--trials_per_repeat", type=int, default=40)
