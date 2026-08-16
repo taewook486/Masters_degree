@@ -215,7 +215,7 @@ def _style_run(run, size: float, bold: bool = False, font: str = FONT_KO,
 def _add_para(doc, anchor, text: str, size: float = SZ_BODY, bold: bool = False,
               align=WD_ALIGN_PARAGRAPH.JUSTIFY, outline: int | None = None,
               style_name: str | None = None, font: str = FONT_KO, indent: bool = True,
-              hanging: bool = False):
+              hanging: bool = False, page_break: bool = False):
     """anchor 앞에 문단을 삽입한다. **굵게** 구간은 굵은 run으로 분리한다."""
     p = doc.add_paragraph()
     anchor.addprevious(p._p)
@@ -228,6 +228,8 @@ def _add_para(doc, anchor, text: str, size: float = SZ_BODY, bold: bool = False,
     pf = p.paragraph_format
     pf.line_spacing = LINE_SPACING
     pf.space_after = Pt(0)
+    if page_break:
+        pf.page_break_before = True
     if hanging:
         # 참고문헌 내어쓰기: 작성 매뉴얼 「7. 참고문헌 체제」 5)는 Style과 무관하게
         # 자료가 두 줄 이상이면 둘째 줄부터 들여쓰도록 규정한다.
@@ -677,12 +679,17 @@ def _emit_abstract_header(doc, anchor, kind: str, meta: dict[str, str]) -> None:
 
 def _emit(doc, anchor, blocks: list[Block], skip_heading: bool = False,
           meta: dict[str, str] | None = None) -> None:
+    first_h1 = True
     for b in blocks:
         if b.kind == "h":
             if skip_heading and b.level == 1:
                 continue
             if b.level == 1:  # 제1장 / 참고문헌 / 부록 / ABSTRACT
-                _add_para(doc, anchor, "", SZ_BODY, indent=False)
+                # 장·참고문헌·부록은 새 페이지에서 시작한다. 첫 장은 앞부속과의
+                # 섹션 경계가 이미 페이지를 넘기므로 제외한다(넣으면 빈 페이지가 생김).
+                _add_para(doc, anchor, "", SZ_BODY, indent=False,
+                          page_break=not first_h1)
+                first_h1 = False
                 _add_para(doc, anchor, b.text, SZ_CHAPTER, True,
                           WD_ALIGN_PARAGRAPH.CENTER, outline=0, indent=False)
                 _add_para(doc, anchor, "", SZ_BODY, indent=False)
