@@ -22,10 +22,17 @@
   ```bash
   mkdir -p results/phase3_autoresearch_v2
   echo 630 > results/phase3_autoresearch_v2/results.tsv.counter   # trial_id 충돌 방지(원본 0~629)
-  python -m src.autoresearch.run_phase3 \
+  set -a; . ./.env; set +a          # ANTHROPIC_API_KEY 필수(코드가 .env를 자동 로드하지 않음)
+  .venv/bin/python -u -m src.autoresearch.run_phase3 \
+    --model_config configs/models/qwen3_vl_2b.yaml \
+    --finetune_config configs/finetune/base_qlora.yaml \
+    --output_dir results/phase3_autoresearch_v2 \
     --strategies autoresearch_v2 --repeats 10 --trials_per_repeat 20 \
-    --output_dir results/phase3_autoresearch_v2 --max_parallel 1
+    --seed 42 --data_dir data --time_budget_min 90 --max_test_samples 500 \
+    --max_parallel 1 \
+    2>&1 | tee results/phase3_autoresearch_v2/run.log
   ```
+  ⚠️ **플래그는 `scripts/run_phase3.sh`의 정식 호출과 맞출 것.** `--model_config`은 필수 인자라 빠뜨리면 즉시 실패한다(그건 차라리 낫다). 진짜 위험한 건 **`--max_test_samples 500`** — 기본값이 `None`(전체 평가)이라 누락하면 조용히 원본과 다른 평가 기준으로 돌아 비교가 깨진다. `--time_budget_min 90`은 기본값과 같아 생략해도 무방하다.
   ⚠️ `--trials_per_repeat` 기본값이 아직 **40**이라 20을 반드시 명시할 것(안 그러면 예산 2배 + 비교 불가). ⚠️ `--output_dir`을 기존 `results/phase3_autoresearch`로 주면 `skip_existing` 사전 패스가 **전부 건너뛴다**.
   ⚠️ **`--max_parallel`은 GPU 장수와 반드시 일치시킬 것.** `run_phase3.py`가 배치 내 인덱스를 그대로 `CUDA_VISIBLE_DEVICES`로 쓰므로(`gpu_slot=slot`, `enumerate(batch)`), 1장짜리 팟에서 2를 주면 두 번째 작업이 존재하지 않는 GPU 1을 잡는다. **1장이면 `--max_parallel 1`** — 이때는 subprocess가 아닌 in-process 순차 경로를 타며, 부수적으로 과거 manual 실패의 원인이던 `/hf_cache` 슬롯별 캐시 충돌도 발생하지 않는다.
 - **실측 비용**(trial 원본 JSON의 `metadata.timestamp` 간격 중앙값 기준, 평가·에이전트 호출 포함): autoresearch **30.3분/trial → 200 trial = 101.0 GPU-시간**. GPU-시간은 장수와 무관하고 **경과 시간만 달라진다** — 2장 병렬 약 50시간(2.1일), **1장이면 약 101시간(4.2일)**. 1장으로 돌릴 경우 팟 유휴 과금 노출 창도 그만큼 길어지므로(2026-08-13 $25 사고) `scripts/notify_optuna_done.sh`의 완료 후 1시간 간격 재알림이 켜져 있는지 확인할 것.
@@ -34,7 +41,9 @@
 - **재실험 전 팟 쪽 확인 3건**:
   1. **SSH 엔드포인트가 바뀐다** — 정지된 팟을 재시작하면 host/port가 재할당되므로 기록된 `-p 40127 root@213.192.2.86`은 그대로 못 쓴다. 콘솔에서 새 값 확인. `.pem`이 `/mnt/d`에 있으면 `chmod`가 안 먹으니 `/tmp` 복사 후 `chmod 600`.
   2. **`ANTHROPIC_API_KEY` 생존 여부** — 2026-07-27 유출 건이 무효화 확인 없이 이월돼 있다. 에이전트 호출이 이 키로 나가므로 revoke됐다면 첫 trial부터 실패한다.
-  3. **디스크** — 어댑터 가중치가 20GB쯤 새로 쌓인다(random 13GB·optuna 21GB 실적). `df -h /workspace`로 볼륨을 따로 확인할 것(컨테이너 루트 `df -h /`만 보면 과소평가).
+  3. **디스크** — 어댑터 가중치가 **약 40GB** 쌓인다(autoresearch 200 trial 실적 40.4GB. 앞서 적었던 20GB는 random 13GB·optuna 21GB 기준의 과소 추정이었다). `du -sh /workspace/*`와 `/workspace/.cache`를 **각각** 볼 것 — `du -sh --one-file-system /workspace`는 별도 마운트인 `.cache`를 빼고 세어 과소 보고한다(실측: 73G로 보였으나 실제 82G).
+  4. **chat-cache가 살아있는지** — `data/_chat_cache`(또는 `MOAI_CHAT_CACHE_DIR` 지정 위치)에 `qwen_pathvqa_train`이 없으면 첫 trial이 **캐시를 처음부터 다시 만든다**(단일 스레드, 원본 실적 약 10분·2026-08-16 재빌드는 그보다 오래 걸림). 정지처럼 보이지만 정상이며, 진행 여부는 `/workspace/.cache/huggingface/datasets/generator/*/*.incomplete/*.arrow` 파일 크기 증가로 확인한다. **1회성 비용이고 이후 전 trial이 재사용한다.**
+     - ⚠️ `scripts/run_phase3.sh:43`은 `MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache`를 거는데, **`/hf_cache`는 컨테이너 저장소라 팟 재생성 시 소멸한다**(이번에 실제로 사라짐). 환경변수를 걸지 않으면 기본값 `data/_chat_cache`, 즉 `/workspace` 안에 만들어져 **볼륨에 영구 보존**된다. 재실행 시에는 환경변수를 거는 대신 기본값을 쓰는 편이 낫다.
 - **이월(결과가 나온 뒤 할 일)**: `scripts/analyze_phase3.py:40`과 `scripts/plot_phase3_anytime.py:43`이 전략 4개를 하드코딩하고 있다. **지금 v2를 추가하면 기존 결과 분석이 "missing_strategies: autoresearch_v2"를 뱉으므로 일부러 손대지 않았다.** v2 결과가 나온 뒤 추가하고, Mann-Whitney 쌍도 `autoresearch_v2 vs optuna`를 함께 넣을 것. 두 결과 디렉터리의 tsv를 합쳐 분석하면 5조건 비교가 된다.
 - **🚨 [별건, 논문 서술 오류 발견] §3.2.1의 "보고 수치는 전부 RunPod 산출"이 manual 조건에서 사실과 다르다.** GPU 장수를 확인하다 결과 JSON의 `metadata.environment.gpu_name`을 전수 조사한 결과: 3090 604건 외에 **RTX 4060 3건 + RTX 5060 Ti 3건**이 나왔다. 해당 6건은 `manual_repeat0~5`의 `trial_0000~0005`이고 **전부 `status=completed`**, val_accuracy 0.374~0.384로 **run-level n=10에 실제로 들어가는 값**이다(나머지 repeat6~9는 trial 26~29로 3090). 타임스탬프는 2026-08-02로, RunPod 3090 본실행(08-05~) 이전의 로컬 듀얼 GPU 시기 산출물이다.
   - **08-13에 §3.2.1을 정정할 때 "5060 Ti·4060은 0건"으로 확인했던 것이 틀렸다** — 당시 조사가 이 6건을 놓쳤다. 원인은 확인 못 했으나(글롭 패턴 차이로 추정) 결과는 명확하다.
