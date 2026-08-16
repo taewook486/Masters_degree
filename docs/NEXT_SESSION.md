@@ -24,16 +24,22 @@
   echo 630 > results/phase3_autoresearch_v2/results.tsv.counter   # trial_id 충돌 방지(원본 0~629)
   python -m src.autoresearch.run_phase3 \
     --strategies autoresearch_v2 --repeats 10 --trials_per_repeat 20 \
-    --output_dir results/phase3_autoresearch_v2 --max_parallel 2
+    --output_dir results/phase3_autoresearch_v2 --max_parallel 1
   ```
   ⚠️ `--trials_per_repeat` 기본값이 아직 **40**이라 20을 반드시 명시할 것(안 그러면 예산 2배 + 비교 불가). ⚠️ `--output_dir`을 기존 `results/phase3_autoresearch`로 주면 `skip_existing` 사전 패스가 **전부 건너뛴다**.
-- **실측 비용**(trial 원본 JSON의 `metadata.timestamp` 간격 중앙값 기준, 평가·에이전트 호출 포함): autoresearch **30.3분/trial → 200 trial = 101.0 GPU-시간**. 3090 2장 병렬이면 경과 약 50시간(2.1일). 참고로 random 25.8분(86.0h), optuna 32.3분(107.6h). 학습시간만(`train_time_min`) 보면 autoresearch 90.8h라 **평가·호출 오버헤드가 약 11%**.
+  ⚠️ **`--max_parallel`은 GPU 장수와 반드시 일치시킬 것.** `run_phase3.py`가 배치 내 인덱스를 그대로 `CUDA_VISIBLE_DEVICES`로 쓰므로(`gpu_slot=slot`, `enumerate(batch)`), 1장짜리 팟에서 2를 주면 두 번째 작업이 존재하지 않는 GPU 1을 잡는다. **1장이면 `--max_parallel 1`** — 이때는 subprocess가 아닌 in-process 순차 경로를 타며, 부수적으로 과거 manual 실패의 원인이던 `/hf_cache` 슬롯별 캐시 충돌도 발생하지 않는다.
+- **실측 비용**(trial 원본 JSON의 `metadata.timestamp` 간격 중앙값 기준, 평가·에이전트 호출 포함): autoresearch **30.3분/trial → 200 trial = 101.0 GPU-시간**. GPU-시간은 장수와 무관하고 **경과 시간만 달라진다** — 2장 병렬 약 50시간(2.1일), **1장이면 약 101시간(4.2일)**. 1장으로 돌릴 경우 팟 유휴 과금 노출 창도 그만큼 길어지므로(2026-08-13 $25 사고) `scripts/notify_optuna_done.sh`의 완료 후 1시간 간격 재알림이 켜져 있는지 확인할 것.
+  - **VRAM 하한**: 관측된 평가 peak 최대 14,744 MB(학습 peak 최대 14,373 MB). **16GB 미만 카드는 고rank·full target 설정에서 OOM → 실패 trial이 늘어 탐색 자체가 왜곡**되므로 3090(24GB)급을 유지할 것. 카드 종류가 바뀌면 비교 대상인 random·optuna(전부 3090)와 하드웨어가 어긋난다. 참고로 random 25.8분(86.0h), optuna 32.3분(107.6h). 학습시간만(`train_time_min`) 보면 autoresearch 90.8h라 **평가·호출 오버헤드가 약 11%**.
   - 논문의 "실측 279 GPU-시간"도 이 과정에서 검증됨: tsv 전체 합은 292.2h이고 `status=completed`만 더하면 **정확히 16,724분 = 278.7h**(차이 13.4h는 manual 실패 trial 10건). 논문 수치는 성공 trial 기준으로 맞다.
 - **재실험 전 팟 쪽 확인 3건**:
   1. **SSH 엔드포인트가 바뀐다** — 정지된 팟을 재시작하면 host/port가 재할당되므로 기록된 `-p 40127 root@213.192.2.86`은 그대로 못 쓴다. 콘솔에서 새 값 확인. `.pem`이 `/mnt/d`에 있으면 `chmod`가 안 먹으니 `/tmp` 복사 후 `chmod 600`.
   2. **`ANTHROPIC_API_KEY` 생존 여부** — 2026-07-27 유출 건이 무효화 확인 없이 이월돼 있다. 에이전트 호출이 이 키로 나가므로 revoke됐다면 첫 trial부터 실패한다.
   3. **디스크** — 어댑터 가중치가 20GB쯤 새로 쌓인다(random 13GB·optuna 21GB 실적). `df -h /workspace`로 볼륨을 따로 확인할 것(컨테이너 루트 `df -h /`만 보면 과소평가).
 - **이월(결과가 나온 뒤 할 일)**: `scripts/analyze_phase3.py:40`과 `scripts/plot_phase3_anytime.py:43`이 전략 4개를 하드코딩하고 있다. **지금 v2를 추가하면 기존 결과 분석이 "missing_strategies: autoresearch_v2"를 뱉으므로 일부러 손대지 않았다.** v2 결과가 나온 뒤 추가하고, Mann-Whitney 쌍도 `autoresearch_v2 vs optuna`를 함께 넣을 것. 두 결과 디렉터리의 tsv를 합쳐 분석하면 5조건 비교가 된다.
+- **🚨 [별건, 논문 서술 오류 발견] §3.2.1의 "보고 수치는 전부 RunPod 산출"이 manual 조건에서 사실과 다르다.** GPU 장수를 확인하다 결과 JSON의 `metadata.environment.gpu_name`을 전수 조사한 결과: 3090 604건 외에 **RTX 4060 3건 + RTX 5060 Ti 3건**이 나왔다. 해당 6건은 `manual_repeat0~5`의 `trial_0000~0005`이고 **전부 `status=completed`**, val_accuracy 0.374~0.384로 **run-level n=10에 실제로 들어가는 값**이다(나머지 repeat6~9는 trial 26~29로 3090). 타임스탬프는 2026-08-02로, RunPod 3090 본실행(08-05~) 이전의 로컬 듀얼 GPU 시기 산출물이다.
+  - **08-13에 §3.2.1을 정정할 때 "5060 Ti·4060은 0건"으로 확인했던 것이 틀렸다** — 당시 조사가 이 6건을 놓쳤다. 원인은 확인 못 했으나(글롭 패턴 차이로 추정) 결과는 명확하다.
+  - **과학적 영향은 미미하다**: manual은 고정 설정 조건이고, 로컬 6건(0.38/0.38/0.384/0.378/0.378/0.374)과 3090 4건(0.374/0.376/0.376/0.376)의 분포가 사실상 겹쳐 하드웨어 효과가 보이지 않는다. **다만 제출본에 적힌 문장이 사실과 다르다는 점은 그대로 남는다** — 심사위원이 커밋된 raw JSON을 열면 바로 보인다.
+  - **수정 범위**: §3.2.1 한 문장(예: manual 조건 repeat0~5는 로컬 GPU 산출임을 명시). ⚠️ 정본 md를 고치면 docx 재빌드가 필요한데 **docx는 Word 편집본이라 재빌드 시 표 정렬 편집이 소실**된다(위 08-16 항목 참고). 재빌드 전 Word 편집분을 정본에 먼저 반영하거나, 문장이 짧으므로 Word에서 직접 고치고 정본 md도 같이 맞추는 편이 안전하다.
 - **심사 대비 예측(사전 등록 성격)**: 이 수정이 유효하다면 **repeat당 고유 조합이 12.5/20에서 20/20 쪽으로 올라가야 한다**. 안 오르면 중복의 원인이 지시 충돌이 아니라 다른 데 있다는 뜻이므로, 그 자체가 정보가 된다.
 
 ## 2026-08-16 세션 — 장 페이지 나누기 + 제출본 육안 확인 + 커밋 우회법 정정
