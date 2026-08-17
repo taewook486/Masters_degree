@@ -1,6 +1,83 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-08-16)
+# 다음 세션 시작점 (마지막 갱신: 2026-08-17)
 
-## 🔴 2026-08-16 (3차) — v2 재실험 **본실행 가동 중** (완료 예상 8/21 전후)
+## 🔴 2026-08-17 — v2 재실험 **전멸 → 원인 규명 후 재가동** (완료 예상 8/21 오전 UTC)
+
+**세션을 이어받으면 이 절만 읽으면 된다. 아래 08-16 (3차) 절의 실행 명령은 그대로 쓰면 안 된다(같은 이유로 다시 죽는다).**
+
+### 무슨 일이 있었나 — 200 trial 전부 실패, 완료 0건
+
+8/16 13:50 기동분이 8/16 22:12에 죽어 있었다. `run.log` 실측 타임라인:
+
+| 시각(8/16) | 사건 |
+|---|---|
+| 13:50 | 기동 → chat-cache 빌드 시작 |
+| 21:21 | 캐시 빌드 완료(7.5시간). trial 630이 학습 진입 직후 **wandb 오류로 사망** |
+| 21:21~21:26 | trial 631~638도 같은 오류로 30초씩 연속 실패 (총 9건) |
+| 21:26~22:12 | trial 639~829 전부 **GPU 메모리 부족**으로 로드 단계 즉사 (191건) |
+| 22:12 | 200 trial 소진 → `No completed trials found` → 종료 |
+
+**GPU 학습은 단 1스텝도 돌지 않았다.**
+
+- **진짜 원인 = wandb 인증 없음.** `train_qlora.py:255`·`:513`의 `report_to="wandb"`가 하드코딩인데 팟에 `~/.netrc`도 `WANDB_API_KEY`도 없다(`.env`에는 ANTHROPIC/TELEGRAM 3개뿐). 트레이스백이 `WandbCallback` → `wandb.init()` → `_find_or_prompt_for_key` → `UsageError`로 정확히 이 경로다. 원본 630 trial 때는 팟에 wandb 로그인이 살아 있었고, 컨테이너가 갈아엎히며 사라졌다.
+- **2차 증상 = 실패 trial의 VRAM 누수.** wandb 오류는 모델을 GPU에 다 올린 뒤 터진다. 예외 경로의 `gc.collect()`+`empty_cache()`로 회수가 안 돼 9번 만에 24GB가 찼고, 이후 4bit 로더가 "GPU에 안 들어간다"며 `ValueError: Some modules are dispatched on the CPU or the disk`를 뱉었다. **이 오류 메시지는 원인이 아니라 결과다 — 여기서 GPU 용량이나 설정을 의심하면 헛다리다.**
+- 원본 실행이 manual 실패 10건을 겪고도 멀쩡했던 이유는 `--max_parallel 2`라 **repeat마다 별도 프로세스**였기 때문. 이번엔 `--max_parallel 1`이라 200 trial이 한 프로세스를 공유해 누수가 끝까지 누적됐다.
+
+### 재가동 조치 3건 (8/17 02:00 UTC)
+
+1. **wandb 무력화** — `export WANDB_MODE=disabled`. 팟에서 실제 검증함(`wandb 0.25.1`, 키 없이 통과). 지표 전송용이라 실험 결과·비교 가능성에 영향 없음.
+2. **실패 행 200개 격리** — `loop.py:266`이 `history = tracker.load_by_strategy(...)`로 **실패 trial까지 에이전트에게 넘긴다**(주석: "pass full history so agent sees failed trials"). 그대로 두면 에이전트가 val_acc=0인 20건을 이전 이력으로 읽어 원본과 다른 실험이 된다. `results.tsv`는 헤더만 남기고 실패분은 `results_failed_20260816.tsv`로 옮겼다. **counter는 830 그대로 둬서 ID 충돌을 막았다**(신규 trial은 830~1029). `skip_existing`은 completed만 세므로 10 repeat 전부 다시 돈다. checkpoints 디렉터리는 없어 재개 오염 없음.
+3. **repeat별 프로세스 격리** — 코드 수정 없이 `run_one_repeat.py`를 10번 순차 호출한다. 출력 경로(`{strategy}_repeat{id}`)·시드(`42 + repeat*1000`)·`total_trials` 주입까지 `run_phase3.py` in-process 경로와 동일한 걸 코드로 대조 확인했다. 진짜 OOM이 나도 그 repeat 하나만 손해 본다.
+
+### 현재 실행 절차 (이게 정본이다)
+
+러너: **`/workspace/run_v2_restart.sh`** (팟의 `/workspace`에 있음, 저장소 밖 → 네트워크 볼륨이라 팟 재시작에도 생존)
+
+```bash
+tmux new-window -d -t phase3v2 -n run2 \
+  "/workspace/run_v2_restart.sh 2>&1 | tee -a /workspace/Masters_degree/results/phase3_autoresearch_v2/run2.log"
+```
+
+스크립트 내용 요지: `.env` 로드 → `WANDB_MODE=disabled` / `MOAI_CHAT_CACHE_DIR=/hf_cache/chat_cache` / `HF_DATASETS_CACHE=/hf_cache/datasets` → `for r in 0..9`로 `run_one_repeat` (`--max_trials 20 --seed $((42+r*1000)) --max_test_samples 500 --time_budget_min 90`).
+
+- 로그: `results/phase3_autoresearch_v2/run2.log` (구 `run.log`는 죽은 실행분)
+- tmux `phase3v2`: 0=셸 / **1=`run2` 본실행** / 2=셸 / **3=`watch` 감시기**. 창1엔 입력하지 말 것.
+- 접속: `ssh -i <키> -p 40065 root@213.192.2.86 -t tmux attach -t phase3v2` (**팟 재시작 시 포트가 바뀐다**. `.pem`이 `/mnt/d`에 있으면 `chmod`가 안 먹으니 `/tmp` 복사 후 `chmod 600`)
+
+### 감시기 패턴을 고쳤다 (그냥 켜면 오탐)
+
+`notify_v2.sh`의 `running()`이 `pgrep -f "[r]un_phase3.*autoresearch_v2"`였는데 재시작판은 `run_one_repeat`으로 돈다 — 그대로 켜면 60초 뒤 "실행 프로세스가 사라졌습니다"를 쏘고 스스로 종료한다. 래퍼를 먼저 보도록 교체했다(repeat 교체 구간의 오탐도 같이 막힌다):
+
+```bash
+running() {
+  pgrep -f "[r]un_v2_restart.sh" >/dev/null && return 0
+  pgrep -f "[r]un_one_repeat.*autoresearch_v2" >/dev/null && return 0
+  return 1
+}
+```
+
+원본은 `/workspace/notify_v2.sh.bak-20260817`. 알림 문구의 로그 경로도 `run2.log`로 바꿨다. 재가동: 위 tmux 명령의 `run2`를 `watch`/`notify_v2.sh`로 바꿔 쓰면 된다. 참고로 8/16 22:18에 중단 알림은 **정상 발송됐었다** — 감시기는 제 할 일을 하고 설계대로 종료된 것이었다.
+
+### 디스크 — 이상 없음, 31G 회수는 **하지 않기로 결정**
+
+컨테이너 디스크 65G/80G(81%, 여유 16G)에서 **고정**이다. 실행이 컨테이너 디스크를 더 쓰지 않는 걸 확인했다:
+
+- 어댑터·체크포인트·로그는 전부 `/workspace`(네트워크 볼륨, 261TB 여유)로 나간다 — 결과 디렉터리 마운트를 `df`로 직접 확인
+- HF datasets `.map()` 부산물(`cache-*.arrow`) **0개** — trial마다 캐시가 불어나는 함정 없음
+- 최근 신규 대용량 파일은 모델 blob 2.4G 하나(1회성)
+
+`/hf_cache/datasets/generator` 31G는 chat_cache를 만들 때 나온 **중간물**이고 런타임에 아무도 안 읽는다(실행 중 프로세스의 `/proc/PID/maps`에 mmap된 건 `chat_cache` 51+17 shard뿐, generator 0건. 코드상으로도 `prepare_data.py:136-141`·`205-210`이 캐시가 있으면 `load_from_disk`로 즉시 반환하고 `from_generator`까지 안 간다). 지우면 46G 여유가 되지만, **여유가 충분하고 chat_cache 유실 시 재빌드를 건너뛰는 보험은 되므로 사용자 판단으로 남겨두기로 했다.**
+
+### ⚠️ 절대 하지 말 것
+
+**실행 중 팟을 Stop하지 말 것.** `/hf_cache` 62G(chat_cache 31G + generator 31G)가 컨테이너 저장소에 있어 Stop하면 사라지고, chat-cache 재빌드에 **7.5시간**을 다시 낸다. 이번에 실제로 그렇게 날렸다.
+
+### 일정·완료 후 할 일
+
+200 trial × 30.3분 = **약 101시간 → 8/21 오전(UTC) 완료 예상**. 완료 후 작업은 아래 08-16 (3차) 절 마지막 항목(분석 스크립트 전략 목록 추가 / 5조건 통합 분석 / **고유 조합 12.5→20 검증** / 논문 §4.3·§5.3(8)·§5.4 갱신) 그대로다.
+
+## ~~2026-08-16 (3차)~~ — v2 재실험 본실행 가동 (⚠️ 이 실행분은 전멸했다. 위 08-17 절 참조)
+
+> **이 절의 실행 명령·일정은 무효다.** 여기 적힌 `run_phase3 --max_parallel 1` 형태로 재실행하면 wandb 오류로 같은 전멸이 재현된다. 정본은 위 08-17 절. 접속 정보·캐시 주의사항·완료 후 할 일은 여전히 유효하다.
 
 **세션을 이어받으면 먼저 이 절을 읽을 것.** RunPod에서 `autoresearch_v2` 200 trial이 돌고 있다.
 
