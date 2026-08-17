@@ -243,8 +243,14 @@ def _build_trainer_unsloth(
         bf16=DTYPE_MAP.get(model_config.torch_dtype, torch.float16) == torch.bfloat16,
         logging_steps=t.get("logging_steps", 10),
         save_strategy=save_eval_strategy,
-        eval_strategy=save_eval_strategy,
-        # max_steps 사용 시 끝에서 1회만 eval/save (미지정 시 매 logging_steps=10마다 eval → 낭비).
+        # eval_loss는 어디에서도 소비되지 않는다 — results.tsv 컬럼에도, TrialResult
+        # 필드에도, 논문에도 없고 HPO 에이전트도 보지 않는다. 그런데 검증셋 6,259건
+        # 전량을 도느라 trial당 약 11.6분이 든다(실측 647~718초, 하이퍼파라미터와
+        # 무관한 고정 비용으로 train_runtime의 41.8%). save_strategy와 변수를
+        # 공유하던 것을 분리해 평가만 끈다. 가중치와 val_accuracy에는 영향이 없다
+        # (정확도는 학습 후 별도 500샘플 평가에서 산출).
+        eval_strategy="no",
+        # max_steps 사용 시 끝에서 1회만 save (미지정 시 logging_steps=10마다 → 낭비).
         # epoch 전략일 땐 무시됨.
         save_steps=max_steps_val if max_steps_val > 0 else 500,
         eval_steps=max_steps_val if max_steps_val > 0 else 500,
@@ -501,8 +507,14 @@ def _build_trainer_standard(
         bf16=DTYPE_MAP.get(model_config.torch_dtype, torch.float16) == torch.bfloat16,
         logging_steps=t.get("logging_steps", 10),
         save_strategy=save_eval_strategy,
-        eval_strategy=save_eval_strategy,
-        # max_steps 사용 시 끝에서 1회만 eval/save (미지정 시 매 logging_steps=10마다 eval → 낭비).
+        # eval_loss는 어디에서도 소비되지 않는다 — results.tsv 컬럼에도, TrialResult
+        # 필드에도, 논문에도 없고 HPO 에이전트도 보지 않는다. 그런데 검증셋 6,259건
+        # 전량을 도느라 trial당 약 11.6분이 든다(실측 647~718초, 하이퍼파라미터와
+        # 무관한 고정 비용으로 train_runtime의 41.8%). save_strategy와 변수를
+        # 공유하던 것을 분리해 평가만 끈다. 가중치와 val_accuracy에는 영향이 없다
+        # (정확도는 학습 후 별도 500샘플 평가에서 산출).
+        eval_strategy="no",
+        # max_steps 사용 시 끝에서 1회만 save (미지정 시 logging_steps=10마다 → 낭비).
         # epoch 전략일 땐 무시됨.
         save_steps=max_steps_val if max_steps_val > 0 else 500,
         eval_steps=max_steps_val if max_steps_val > 0 else 500,
