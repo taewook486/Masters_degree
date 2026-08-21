@@ -1,4 +1,93 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-08-20)
+# 다음 세션 시작점 (마지막 갱신: 2026-08-21)
+
+## 🟢 2026-08-21 — v2 200/200 완료 + 백업·검증 완료 + 논문 §4.3.5 신설
+
+**세션을 이어받으면 이 절만 읽으면 된다. 팟에서 할 일은 끝났다.**
+
+### 실험은 끝났고 결과는 로컬에 있다
+
+| 항목 | 값 |
+|---|---|
+| completed | **200 / 200** (repeat 0~9 전부 20/20) |
+| 실패 | 8건 → 재실행 전량 성공, 최종 집계는 completed 200 기준 |
+| 전체 최고 | **0.4780** (trial 1030, repeat9) — 5조건 통틀어 1위 |
+| 팟 상태 | **Stopped** (터미네이트 안 함, 볼륨 보존) |
+
+**백업 2종을 받아 바이트 단위로 검증했다.** 둘 다 `results_pod_backup/phase3_autoresearch_v2/`에 있다(`.gitignore` 대상이라 커밋되지 않는다).
+
+| 파일 | 크기 | 내용 | 검증 |
+|---|---|---|---|
+| `phase3_v2_backup_20260821.tar.gz` | 573M | results.tsv + 로그 19개 + 어댑터 2개(trial 1030·880) | 39개 파일 / 811,252,809 B 일치 |
+| `phase3_v2_trialmeta_20260821.tar.gz` | 4.5M | 200 trial 전부의 평가 json·train_result·config | 813개 파일 / 38,443,630 B 일치 |
+
+매니페스트는 `MANIFEST_source.tsv` / `MANIFEST_backup.tsv`(+ `_trialmeta_` 쌍)로 남겼다. `results.tsv`와 로그, trial 메타는 압축을 풀어둬서 바로 분석할 수 있다.
+
+**평가 json에 `per_sample` 500건 + `summary`(closed/open, BERTScore)가 들어 있다.** §4.3 유형별 분해나 오답 분석은 이제 로컬에서 전부 된다.
+
+### 핵심 결과 — 두 지표가 다른 이야기를 한다
+
+| 전략 | run-level 평균 | 단일 최고 |
+|---|---|---|
+| manual | 0.3776 | 0.3840 |
+| random | 0.4186 | 0.4440 |
+| autoresearch(원본) | 0.4184 | 0.4640 |
+| **autoresearch_v2** | **0.4292** | **0.4780** |
+| optuna | **0.4490** | 0.4700 |
+
+| 쌍별 비교 | p | r | 판정 |
+|---|---|---|---|
+| 원본 vs optuna | .0112 | −0.68 | 유의하게 열세 |
+| **v2 vs optuna** | .1726 | −0.37 | 유의하지 않음 |
+| v2 vs 원본 | .2387 | +0.32 | 유의하지 않음 |
+
+**정직한 서술은 "optuna 대비 유의한 열세를 해소했으나, 원본 대비 개선은 입증하지 못했다"이다.** 단일 최고치만 인용하면 과장이고, 열세 해소만 빼면 성과를 지운다. n=10이라 r=+0.32 크기는 잡히지 않는다.
+
+개입 자체는 명확히 작동했다 — 고유 조합 12.5 → **18.90/20**, 온도 하한 0.66 → **0.30**, exploitation **0회 → 103회**, 근거 산출 26.5% → **100%**. 근거 판정 기준은 원본 147건(73.5%)을 그대로 재현해 동일 기준임을 확인했다.
+
+### 논문 반영 완료 (커밋 c1b415f)
+
+국·영문 양쪽에 반영했고 수치 교차검증도 마쳤다.
+
+- **§4.3.5 신설** — 설정 정합성 재실험. 기존 종합은 §4.3.6으로 이동
+- §4.3.6 / §4.4.4 / §4.4.5 / §5.1 RQ3 — 결론을 조건부로 재서술
+- §5.3(8) 검증 결과 추가, **§5.3(15) 신설** — 외부 서비스 장애와 재실행
+- §5.4 둘째를 검증 결과 기반으로 교체 + 근거 질적 평가 과제 추가
+- Phase 3 규모 610 → **810 trial**
+
+분석 스크립트도 5조건을 다루도록 고쳤다(`scripts/analyze_phase3.py`). `--extra_results`로 v2 tsv를 합쳐 읽고 `--output_suffix`로 출력이 갈린다. **인자 없이 돌리면 기존 4조건 그대로 나온다**(H=27.9161 유지 확인).
+
+```bash
+# 4조건 (논문 §4.3.1 근거)
+PYTHONPATH=. python3 scripts/analyze_phase3.py --results_dir results/phase3_autoresearch
+# 5조건 (논문 §4.3.5 근거)
+PYTHONPATH=. python3 scripts/analyze_phase3.py --results_dir results/phase3_autoresearch \
+  --extra_results results_pod_backup/phase3_autoresearch_v2/results.tsv --output_suffix _5cond
+```
+
+### 남은 작업
+
+1. **`phase`·`temperature` 코드 결함 수정** — `results.tsv`의 두 컬럼이 여전히 죽어 있다(전 행 NaN / 0.0). 이미 끝난 실험 데이터는 못 살리지만(로그 실측으로 대체했다) 코드 공개 시 같은 함정을 남기지 않으려면 고쳐야 한다. 설계안은 아래 08-18 절 「3의 설계」 그대로.
+2. **유형별 분해 분석** — 평가 json의 `per_sample`로 §4.4.4의 "정확도 향상이 임상 가치 낮은 유형에 편중됐을 가능성"을 실제로 검증할 수 있게 됐다. 현재 논문은 미검증 해석으로 남겨둔 상태다.
+3. **제출본 재생성 판단** — docx/PDF는 8/15 이후 Word에서 직접 편집한 이력이 있어 재빌드하면 편집분이 날아간다. 반영 방법을 정하고 진행할 것.
+4. **팟 Terminate** — 논문이 확정되면 정리한다. 지금은 Stopped로 볼륨만 유지 중이며 보관 비용이 계속 나간다.
+
+### 팟 접속 정보 (재시작 시 포트가 또 바뀐다)
+
+8/21 접속은 **40088**이었다(8/20의 40065는 죽어 있었다). 팟 재시작마다 바뀌므로 콘솔 Connect에서 확인할 것. 키는 `/mnt/d`에서 `chmod`가 안 먹으니 `/tmp`로 복사 후 `chmod 600`.
+
+```bash
+cp runpod_openssh.pem /tmp/rp.pem && chmod 600 /tmp/rp.pem
+ssh -i /tmp/rp.pem -p <포트> root@213.192.2.86
+```
+
+재시작하면 tmux 세션과 감시기(`notify_v3.sh`)는 사라진다 — 8/21 실제로 그랬다. 컨테이너 디스크도 초기화된다(`/workspace` 볼륨은 유지).
+
+### 부수 — RunPod 플러그인 설치
+
+`claude plugin marketplace add runpod/runpod-plugins-official` + `claude plugin install runpod@runpod`로 설치해 `enabled` 상태다(v1.2.0). **다만 `/reload-plugins` → `/mcp` → runpod OAuth 로그인은 아직 안 했다.** 승인하면 Claude가 팟 조회뿐 아니라 Stop·Terminate까지 할 수 있게 되니, 결과 백업이 끝난 지금은 위험이 줄었지만 권한 범위는 알고 승인할 것.
+
+---
+
 
 ## 🟢 2026-08-20 — v2 본실행 종료(최고 0.478 갱신) + 실패 8건 보충 실행 + 감시기 교체
 
