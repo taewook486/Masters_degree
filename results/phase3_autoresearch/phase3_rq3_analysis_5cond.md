@@ -3,9 +3,7 @@
 - 분석 단위: run-level (전략 x 독립 반복 -> 반복별 최고 val_accuracy)
 - trial-level 데이터는 탐색 궤적 시각화 전용이며 본 비교 검정에는 사용하지 않음 (설계서 §4.5 v0.5 변경 — sequential optimization의 trial 간 의존성)
 
-- 데이터 소스: results/phase3_autoresearch/results.tsv
-
-> **주의**: 완료 데이터가 없는 전략: autoresearch_v2
+- 데이터 소스: results/phase3_autoresearch/results.tsv, results_pod_backup/phase3_autoresearch_v2/results.tsv
 
 ## 전략별 run-level 성능 (Bootstrap 95% CI)
 
@@ -15,15 +13,18 @@
 | random | 10 | 0.4186 | [0.4106, 0.4274] |
 | optuna | 10 | 0.4490 | [0.4368, 0.4594] |
 | autoresearch | 10 | 0.4184 | [0.4064, 0.4328] |
+| autoresearch_v2 | 10 | 0.4292 | [0.4124, 0.4478] |
 
 ## Kruskal-Wallis (전략 간 비교)
 
-- H = 27.9161, p = 3.782e-06 -> 유의함 (p < 0.05)
+- H = 29.7215, p = 5.577e-06 -> 유의함 (p < 0.05)
 
 ## Mann-Whitney U — 쌍별 비교 (RQ3)
 
 | 비교 (기준 vs 대상) | U | p | rank-biserial r | 판정 |
 |---|:-:|:-:|:-:|:-:|
 | autoresearch vs optuna | 16.0000 | 0.01115 | -0.6800 | 유의함 |
+| autoresearch_v2 vs optuna | 31.5000 | 0.1726 | -0.3700 | 유의하지 않음 |
+| autoresearch_v2 vs autoresearch | 66.0000 | 0.2387 | 0.3200 | 유의하지 않음 |
 
 - r > 0: 기준 전략이 대상보다 확률적으로 우세하는 경향 (부호 규약: `src/evaluate/statistics.py` run_mann_whitney 참조)

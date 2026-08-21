@@ -1,17 +1,16 @@
 {
   "sources": [
-    "results/phase3_autoresearch/results.tsv"
+    "results/phase3_autoresearch/results.tsv",
+    "results_pod_backup/phase3_autoresearch_v2/results.tsv"
   ],
   "n_repeats": {
     "manual": 10,
     "random": 10,
     "optuna": 10,
     "autoresearch": 10,
-    "autoresearch_v2": 0
+    "autoresearch_v2": 10
   },
-  "missing_strategies": [
-    "autoresearch_v2"
-  ],
+  "missing_strategies": [],
   "bootstrap_ci": {
     "manual": {
       "mean": 0.3776,
@@ -36,11 +35,17 @@
       "ci_low": 0.4064,
       "ci_high": 0.4328,
       "n": 10
+    },
+    "autoresearch_v2": {
+      "mean": 0.4292,
+      "ci_low": 0.4124,
+      "ci_high": 0.4478,
+      "n": 10
     }
   },
   "kruskal_wallis": {
-    "h_stat": 27.916117802032378,
-    "p_value": 3.782297995614247e-06,
+    "h_stat": 29.721458503925632,
+    "p_value": 5.576868966139824e-06,
     "significant": true
   },
   "mann_whitney_autoresearch_vs_optuna": {
@@ -59,6 +64,22 @@
       "n2": 10,
       "rank_biserial_r": -0.6799999999999999,
       "significant": true
+    },
+    "autoresearch_v2_vs_optuna": {
+      "u_stat": 31.5,
+      "p_value": 0.17264572274699674,
+      "n1": 10,
+      "n2": 10,
+      "rank_biserial_r": -0.37,
+      "significant": false
+    },
+    "autoresearch_v2_vs_autoresearch": {
+      "u_stat": 66.0,
+      "p_value": 0.2386556838735907,
+      "n1": 10,
+      "n2": 10,
+      "rank_biserial_r": 0.32000000000000006,
+      "significant": false
     }
   },
   "run_level_values": {
@@ -110,6 +131,17 @@
       0.464,
       0.436
     ],
-    "autoresearch_v2": []
+    "autoresearch_v2": [
+      0.406,
+      0.404,
+      0.474,
+      0.454,
+      0.408,
+      0.41,
+      0.404,
+      0.41,
+      0.444,
+      0.478
+    ]
   }
 }
