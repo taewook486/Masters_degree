@@ -74,10 +74,43 @@ PYTHONPATH=. python3 scripts/build_thesis_docx.py --lang en
 
 **결과: 국문 82쪽 / 영문 99쪽** (직전 72 / 87쪽 — §4.3.5와 §4.4.4가 한꺼번에 들어갔다). 목차 항목 96 / 97개 펼침, 플레이스홀더 잔존 0건.
 
+### `phase`·`temperature` 기록 결함 수정 완료 (커밋 `be2d074`)
+
+08-18에 설계해 둔 대로 적용했다. **실행 동작은 건드리지 않았다** — `schedule_for`가 기존 인라인 공식과 418건 전 구간 일치함을 대조로 확인했다.
+
+- **`agent.py`** — `schedule_for(trial_number, total_trials)` 신설(공식의 단일 정의 지점). `ask_agent_for_config`가 `(config, raw_text, schedule)` 3-tuple 반환
+- **`strategies.py`** — `last_phase` / `last_temperature` 슬롯. 성공 경로에서 채우고 **random 폴백에서는 `None`으로 비운다**
+- **`loop.py`** — `is not None` 가드로 전달 (truthiness 가드면 온도 0.0이 falsy라 재발한다)
+
+검증: `0.0 / ''` → `1.0 / 'exploration'`이 tsv까지 도달하는 것을 end-to-end로 확인했다.
+
+**회귀 테스트 `tests/test_schedule_recording.py` 9건 신설.** 이 결함이 조용했던 이유가 "틀린 값"이 아니라 "일관된 기본값"이었으므로 그 지점을 겨냥했다 — 특히 **tsv 왕복 테스트**(쓰기도 기본값, 되읽기도 같은 기본값이라 에러 없이 성립하던 침묵의 원인)와 **온도 0.0의 falsy 성질을 명시 단언하는 테스트**(누가 truthiness 가드로 바꾸면 깨진다).
+
+### 함께 고친 것 — 선존재 테스트 실패 4건
+
+`max_steps`가 v0.11에서 탐색 대상에서 빠지고 `PHASE3_FIXED_MAX_STEPS`(200) 고정이 된 변경이 테스트에 반영돼 있지 않았다. 단언을 지우지 않고 **새 계약(고정된다)을 검증하도록** 전환했다.
+
+수정 중 **회귀 1건을 스스로 만들었다가 잡았다** — `test_loop.py`의 `MagicMock` 전략이 `last_temperature`에 mock 객체를 돌려줘 tsv 기록이 `float()` 변환에서 깨졌다. `HPOStrategy`의 `None` 계약을 mock에 명시해 해결. **기존 `last_reasoning`도 같은 함정을 안고 있었지만 문자열이라 조용히 통과하고 있었다.**
+
+테스트 총계: HEAD 18 failed → **14 failed, 회귀 0건**, 신규 9건 통과. 잔존 14건은 HEAD와 동일한 선존재 실패이고 전부 `scipy`·`torch`·`transformers`·`PIL` 미설치 때문이다(이 WSL에 ML 의존성이 없다 — 실험은 pod에서 돌았다).
+
+### ⚠️ 미해결 (별건) — phase 공식이 두 벌이다
+
+수정 중 발견했고 **의도적으로 손대지 않았다.**
+
+| 위치 | progress 공식 | 쓰임 |
+|---|---|---|
+| `schedule_for` (구 `ask_agent_for_config` 인라인) | `trial_number / (total_trials − 1)` | 로깅·tsv 기록되는 phase |
+| `_build_user_message` | `trial_number / total_trials` | **프롬프트로 주입되는 phase 힌트** |
+
+에이전트가 프롬프트로 받는 단계와 기록되는 단계가 경계 근처에서 어긋난다. **이건 기록 결함이 아니라 실행 조건 문제다.** v2의 「설정 불일치 5건」 2번 항목이 이 지점인데, 코드를 보면 v2는 `program_v2.md` 프롬프트로 대응했을 뿐 **코드 공식은 원본과 동일**하다.
+
+통일하면 이미 종료된 810 trial의 실행 조건과 공개 코드가 달라지므로, 논문 §5.3에 "공개 코드는 실험 당시와 공식이 다르다"는 재현성 서술을 넣어야 한다. **논문을 건드리는 일이라 별도 판단 사항으로 남긴다.**
+
 ### 남은 작업
 
 1. **제출본 육안 확인** — 쪽수가 10쪽 이상 늘었으므로 장 시작 페이지 나누기, 표가 페이지 경계에 걸리는지, 목차 페이지 번호를 한 번 훑을 것.
-2. **`phase`·`temperature` 코드 결함 수정** — `results.tsv` 두 컬럼이 여전히 전 행 NaN / 0.0. 논문 수치는 로그 실측으로 대체돼 있어 영향 없고, **코드 공개 시 같은 함정을 안 남기려는 정리**다. 설계안은 아래 08-18 절 「3의 설계」 그대로.
+2. **phase 공식 이중화 판단** — 아래 「⚠️ 미해결」 절 참조. 통일할지, 논문에 재현성 서술만 남길지 결정할 것.
 3. **팟 Terminate** — 논문이 확정되면. 지금 Stopped로 볼륨만 유지 중이며 보관 비용이 계속 나간다. **Terminate하면 `/workspace` 45G가 사라진다**(백업은 이미 받아 검증 완료).
 4. **Stopped 보관 요율 확정** — 8/22가 온전히 지났으므로 이제 확정치가 나온다. `get-billing`, scope=pods, bucketSize=day.
 
