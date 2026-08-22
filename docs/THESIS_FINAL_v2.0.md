@@ -166,6 +166,8 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 
 ### 3.3 대상 모델 및 선정 기준
 
+본 연구가 대상으로 삼은 4개 모델과 그 선정 근거는 Table 3.1과 같다.
+
 **Table 3.1. 대상 모델**
 
 | 모델 | 파라미터 | 아키텍처 특징 | 예상 QLoRA VRAM |
@@ -178,6 +180,8 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 선정 기준은 (1) 16GB VRAM에서 QLoRA 파인튜닝이 가능할 것(사전 예상치이며, 실측 Peak VRAM으로 사후 확인함 — 3.2.1), (2) Apache 2.0 또는 MIT 라이선스로 연구 활용이 자유로울 것, (3) 충분한 커뮤니티·프레임워크 지원을 갖출 것의 세 가지다. Gemma4-E2B는 Mixture-of-Experts 계열의 PLE 기술로 추론 시 2.3B 파라미터만 활성화되면서도 5.1B급 표현력을 제공한다는 점에서 포함했다. 이 아키텍처 특성이 결과 해석에 미치는 영향은 제5장 5.3에서 별도로 논의한다.
 
 ### 3.4 데이터셋 및 전처리
+
+실험에 사용한 3개 공개 의료 VQA 데이터셋의 구성은 Table 3.2와 같다.
 
 **Table 3.2. 대상 데이터셋**
 
@@ -198,6 +202,8 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 측정 지표는 Closed-ended accuracy(선택형), Open-ended accuracy(정답 토큰 매칭) 및 BERTScore F1(roberta-large), 각 정확도의 부트스트랩 95% CI, 응답 시간(ms/문항), Peak VRAM(MB)이다.
 
 ### 3.6 실험 2: QLoRA 파인튜닝 (Phase 2)
+
+Phase 2의 전 조건에 공통으로 적용한 기본 QLoRA 설정은 Table 3.3과 같다.
 
 **Table 3.3. 기본 QLoRA 설정**
 
@@ -223,6 +229,8 @@ Medical VQA는 의료 영상(병리 조직 슬라이드, 방사선 영상 등)�
 **Catastrophic Forgetting 측정**은 두 가지로 이중 측정한다. (A) 범용 능력 변화: VQAv2 validation subset(2,000샘플)에서 파인튜닝 전/후 정확도 감소율을 12개 조건 전체에서 측정. (B) 의료 도메인 내 cross-dataset 일반화: 훈련 데이터셋과 다른 데이터셋으로 평가(예: PathVQA 학습 → SLAKE/VQA-RAD 평가)하여 12개 조건 × 2개 cross-dataset = 24회 추가 평가를 수행한다. PathVQA(병리)와 SLAKE/VQA-RAD(방사선)는 이미지 도메인 자체가 다르므로 (B)의 결과는 엄밀한 CF보다는 도메인 일반화 격차로 해석한다(제4장 4.2.5).
 
 ### 3.7 실험 3: 자율 하이퍼파라미터 최적화 (Phase 3)
+
+Phase 3에서 네 전략이 공유한 하이퍼파라미터 탐색 공간은 Table 3.4와 같다.
 
 **Table 3.4. Phase 3 탐색 공간**
 
@@ -302,7 +310,7 @@ Phase 1은 파인튜닝 이전 4개 경량 VLM(Gemma4-E2B, Qwen2.5-VL-3B, Qwen3-
 
 > Overall Acc = Closed(객관식형)과 Open(주관식형) 문항을 합산한 정확도. Open 문항은 BERTScore(roberta-large 기반, 임계값 방식) 채점, Closed 문항은 정답 문자열 일치 채점(설계서 §4.3 참조).
 
-전체 데이터셋을 합산(pooled)한 정확도 기준으로 4개 모델의 성능은 다음과 같다(n=8,231, 3개 데이터셋 합산 문항 수).
+전체 데이터셋을 합산(pooled)한 정확도 기준으로 4개 모델의 성능은 Table 4.1a와 같다(n=8,231, 3개 데이터셋 합산 문항 수).
 
 **Table 4.1a. Pooled 정확도 및 통계 검정**
 
@@ -357,6 +365,8 @@ Phase 2는 4개 모델을 3개 데이터셋에 대해 QLoRA(rank=64, alpha=128, 
 
 #### 4.2.1 Base vs Fine-tuned 성능 향상
 
+모델별 파인튜닝 전후 성능과 대응표본 검정 결과는 Table 4.2와 같다.
+
 **Table 4.2. 모델별 파인튜닝 효과 (paired, n=9 = 3데이터셋×3시드)**
 
 | 모델 | Base Acc | FT Acc | Cohen's d | d 95% CI (BCa) | paired t-test p | Wilcoxon p |
@@ -371,6 +381,8 @@ Phase 2는 4개 모델을 3개 데이터셋에 대해 QLoRA(rank=64, alpha=128, 
 4개 모델을 구분하지 않고 합쳐 추정한 Mixed-Effects Model(`accuracy ~ condition + dataset`, group=seed)은 고정효과가 유의하지 않았다(계수 = 0.0268, p = .3629, ICC(seed) = 0.0, n = 72). 이는 계산 오류가 아니라 **모델 간 이질적 효과가 pooled 평균에서 상쇄**되기 때문이다 — 위 모델별 3중 검증 결과를 RQ2의 1차 근거로 삼고 MEM pooled 결과는 "모델 구분 없는 전체 효과는 이질성으로 인해 유의하지 않다"는 보조 설명으로만 인용한다(설계서 §5.3 한계점 반영).
 
 #### 4.2.2 데이터 크기 영향 (Ablation A)
+
+학습 데이터 비율을 달리했을 때의 성능 변화는 Table 4.2a와 같다.
 
 **Table 4.2a. 학습 데이터 비율별 성능 (Qwen3-VL-2B, PathVQA, 3시드 평균)**
 
@@ -388,6 +400,8 @@ Phase 2는 4개 모델을 3개 데이터셋에 대해 QLoRA(rank=64, alpha=128, 
 
 #### 4.2.3 LoRA Rank 영향 (Ablation B)
 
+LoRA rank를 달리했을 때의 성능 변화는 Table 4.2b와 같다.
+
 **Table 4.2b. LoRA rank별 성능 (Qwen3-VL-2B, PathVQA, 3시드 평균)**
 
 | LoRA Rank | Peak VRAM (MB) | Overall Acc (평균) |
@@ -401,6 +415,8 @@ Phase 2는 4개 모델을 3개 데이터셋에 대해 QLoRA(rank=64, alpha=128, 
 Rank가 클수록 성능이 단조 증가하나 32→64 구간에서 증가폭이 둔화되고(16→32구간 +0.0152 대비 32→64구간 +0.0038), VRAM 증가는 rank 4→64 전 구간에서 1.3%(3,870.6→3,918.8MB) 수준으로 미미하다. VRAM 비용 대비 성능 이득이 여전히 양(+)이므로 **rank=64를 채택**한다(Phase 2 main 실험에 반영된 설정).
 
 #### 4.2.4 Target Module 영향 (Ablation C)
+
+target module 적용 범위를 달리했을 때의 성능 변화는 Table 4.2c와 같다.
 
 **Table 4.2c. Target module 범위별 성능 (Qwen3-VL-2B, PathVQA, 3시드 평균)**
 
@@ -416,6 +432,8 @@ Target module 범위가 넓을수록(더 많은 linear layer에 LoRA 적용) 성
 
 **(A) 범용 능력 상실 — VQAv2 validation subset(2,000샘플) 기준**
 
+모델별 VQAv2 성능 저하율은 Table 4.2d와 같다.
+
 **Table 4.2d. 모델별 VQAv2 성능 저하율 (n=9 = 3데이터셋×3시드 평균)**
 
 | 모델 | 평균 저하율(%) | 표준편차 | 범위 |
@@ -428,6 +446,8 @@ Target module 범위가 넓을수록(더 많은 linear layer에 LoRA 적용) 성
 VQAv2 기준 일반 능력 상실 정도는 모델별로 극명하게 갈린다. **Gemma4-E2B는 파인튜닝 후 VQAv2 성능이 평균 51.5% 하락**하여 뚜렷한 catastrophic forgetting을 보이는 반면, **SmolVLM2-2.2B는 사실상 저하가 없다(평균 0.49%)**. 흥미롭게도 이 순서는 4.2.1의 도메인 성능 향상 순위와 정반대 방향으로 겹친다 — 도메인 향상이 가장 컸던 Qwen 계열은 일반 능력도 어느 정도(4~7%) 내어주는 반면, Gemma4-E2B는 도메인 성능(4.2.1, 유의한 향상 없음)도 일반 능력(51.5% 손실)도 모두 잃는 이중 손실을 보인다. SmolVLM2-2.2B는 일반 능력은 지키지만 도메인 성능이 유의하게 악화된다. 이 상관관계는 관측된 패턴이다. 본 연구가 인과관계를 별도로 검증한 것은 아니다.
 
 **(B) Cross-dataset 일반화 격차 — 학습 도메인과 다른 데이터셋 평가 시 변화율**
+
+학습 도메인과 다른 데이터셋에서 관측된 성능 변화율은 Table 4.2e와 같다.
 
 **Table 4.2e. 모델별 cross-dataset 성능 변화율 (n=18 = 2평가셋×3학습셋×3시드)**
 
@@ -471,6 +491,8 @@ RQ3의 핵심 쌍별 비교인 **Autoresearch vs Optuna**의 Mann-Whitney U 검�
 
 #### 4.3.2 전략별 탐색 결과 하이퍼파라미터
 
+각 전략이 도달한 최고 성능 trial의 하이퍼파라미터 구성은 Table 4.3a와 같다.
+
 **Table 4.3a. 전략별 최고 성능 trial의 하이퍼파라미터 구성**
 
 | 전략 | rank | alpha | learning_rate | batch | grad_accum | warmup | weight_decay | targets | val_acc | closed | open |
@@ -488,6 +510,8 @@ RQ3의 핵심 쌍별 비교인 **Autoresearch vs Optuna**의 Mann-Whitney U 검�
 
 #### 4.3.3 탐색 궤적 분석 (trial-level, 기술적 묘사 전용)
 
+전략별로 최고 성능에 도달한 시점은 Table 4.3b와 같다.
+
 **Table 4.3b. 전략별 최고 성능 도달 시점 (10회 반복 기준)**
 
 | 전략 | 최종 최고(중앙값) | 최고 도달 trial(중앙값) | 도달 trial IQR |
@@ -498,6 +522,8 @@ RQ3의 핵심 쌍별 비교인 **Autoresearch vs Optuna**의 Mann-Whitney U 검�
 | Autoresearch | 0.4060 | 17.5 | [11.5, 20.0] |
 
 Autoresearch는 최고 성능 도달 trial의 중앙값이 17.5로 가장 늦고, **IQR 상한이 탐색 예산의 한계값인 20.0에 걸쳐 있다.** 이는 절반 가까운 run이 예산이 소진되는 시점까지도 여전히 성능을 개선하는 중이었음을 의미하며, 20 trial이라는 예산이 이 전략에는 부족했을 가능성을 시사한다(§3.7의 40→20 축소와 직결되며 5.3에서 한계점으로 논의한다). 이는 관측된 정황이다. 예산을 늘렸을 때 실제로 Optuna를 따라잡는지는 본 연구가 검증하지 않았다.
+
+전략별 trial-level 성능 분포는 Table 4.3c와 같다.
 
 **Table 4.3c. 전략별 trial-level 성능 분포 (200 trial 전수, 기술 통계)**
 
@@ -514,7 +540,7 @@ anytime performance 곡선(trial 진행에 따른 누적 최고 성능의 중앙
 
 #### 4.3.4 Autoresearch 에이전트의 탐색 행태
 
-4.3.3에서 관측된 낮은 분산의 원인을 확인하기 위해, 각 반복에서 에이전트가 제안한 **고유 하이퍼파라미터 조합의 수**를 세었다.
+4.3.3에서 관측된 낮은 분산의 원인을 확인하기 위해, 각 반복에서 에이전트가 제안한 **고유 하이퍼파라미터 조합의 수**를 세었다. 결과는 Table 4.3d와 같다.
 
 **Table 4.3d. 반복당 고유 하이퍼파라미터 조합 수 (20 trial 중)**
 
@@ -542,7 +568,7 @@ Random·Optuna는 10회 반복 전부에서 20개 trial이 모두 서로 다른 
 4. 중복 제안 금지를 프롬프트에 명시 — 코드는 중복을 거부하는데 프롬프트가 이를 알리지 않았다.
 5. 실제 예산(`total_trials=20`)을 호출부에서 주입 — 기본값 40이 쓰여 온도·단계 일정이 절반에서 절단되어 있었다.
 
-**개입은 의도대로 작동했다.** 실행 로그 전수 집계에서 절단이 해소된 것이 확인된다.
+**개입은 의도대로 작동했다.** 실행 로그 전수 집계에서 절단이 해소된 것이 확인된다(Table 4.3e).
 
 **Table 4.3e. 설정 정합성 회복의 효과 (실행 로그 실측)**
 
@@ -559,6 +585,8 @@ Random·Optuna는 10회 반복 전부에서 20개 trial이 모두 서로 다른 
 
 또한 "JSON only" 제약을 해제하자 **모든 응답이 자연어 근거를 동반했다**(200/200, 평균 620자). 5.1이 "설계상의 결함으로 긍정도 부정도 할 수 없다"고 유보했던 RQ3의 두 번째 요건 — 해석 가능한 탐색 근거의 제공 — 은 이로써 **산출 여부 자체는 확인되었다.** 다만 본 절이 확인한 것은 근거가 **산출되었다**는 사실까지이며, 그 근거가 실제 제안과 인과적으로 부합하는지 또는 전문가가 판단 근거로 수용할 만한 품질인지는 별도의 평가 설계를 요구한다. 본 연구는 그 질적 평가를 수행하지 않았다(5.4).
 
+재실험 조건의 run-level 성능은 Table 4.3f와 같다.
+
 **Table 4.3f. Autoresearch-v2의 run-level 성능 (n=10)**
 
 | 조건 | n | 평균 val_accuracy | 95% CI (Bootstrap) | 단일 최고 |
@@ -566,6 +594,8 @@ Random·Optuna는 10회 반복 전부에서 20개 trial이 모두 서로 다른 
 | Optuna (TPE) | 10 | 0.4490 | [0.4368, 0.4594] | 0.4700 |
 | **Autoresearch-v2** | 10 | **0.4292** | [0.4124, 0.4478] | **0.4780** |
 | Autoresearch (원본) | 10 | 0.4184 | [0.4064, 0.4328] | 0.4640 |
+
+쌍별 비교의 검정 결과는 Table 4.3g와 같다.
 
 **Table 4.3g. 쌍별 Mann-Whitney U 검정**
 

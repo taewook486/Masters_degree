@@ -150,6 +150,8 @@ Model loading and QLoRA fine-tuning used the HuggingFace `transformers` library 
 
 ### 3.3 Target Models and Selection Criteria
 
+The four models examined in this study and the grounds for their selection are given in Table 3.1.
+
 **Table 3.1. Target models**
 
 | Model | Parameters | Architectural features | Expected QLoRA VRAM |
@@ -162,6 +164,8 @@ Model loading and QLoRA fine-tuning used the HuggingFace `transformers` library 
 The selection criteria were threefold: (1) QLoRA fine-tuning must be feasible within 16GB of VRAM (an a priori expectation, confirmed post hoc from measured peak VRAM - Section 3.2.1); (2) the license must be Apache 2.0 or MIT so that research use is unrestricted; and (3) the model must have sufficient community and framework support. Gemma4-E2B was included because its Mixture-of-Experts-family PLE technique activates only 2.3B parameters at inference while providing 5.1B-class expressive capacity; the influence of this architectural characteristic on the interpretation of results is discussed separately in Section 5.3 of Chapter V.
 
 ### 3.4 Datasets and Preprocessing
+
+The three public medical VQA datasets used in the experiments are summarized in Table 3.2.
 
 **Table 3.2. Target datasets**
 
@@ -182,6 +186,8 @@ Zero-shot performance before fine-tuning was measured for 4 models × 3 datasets
 The measured metrics are closed-ended accuracy (multiple choice), open-ended accuracy (gold-token matching) together with BERTScore F1 (roberta-large), bootstrap 95% CIs for each accuracy, response time (ms per item), and peak VRAM (MB).
 
 ### 3.6 Experiment 2: QLoRA Fine-Tuning (Phase 2)
+
+The base QLoRA configuration applied to every Phase 2 condition is given in Table 3.3.
 
 **Table 3.3. Base QLoRA configuration**
 
@@ -207,6 +213,8 @@ The training budget targeted 3 epochs, but a ceiling of `max_steps=500` (samples
 **Catastrophic forgetting** is measured in two ways. (A) Change in general capability: the rate of accuracy decrease before and after fine-tuning is measured on a VQAv2 validation subset (2,000 samples) across all 12 conditions. (B) Cross-dataset generalization within the medical domain: evaluation on a dataset other than the training dataset (for example, train on PathVQA → evaluate on SLAKE/VQA-RAD), giving 12 conditions × 2 cross-datasets = 24 additional evaluations. Because PathVQA (pathology) and SLAKE/VQA-RAD (radiology) differ in image domain itself, the results of (B) are interpreted as a domain-generalization gap rather than as catastrophic forgetting in the strict sense (Section 4.2.5).
 
 ### 3.7 Experiment 3: Autonomous Hyperparameter Optimization (Phase 3)
+
+The hyperparameter search space shared by the four strategies in Phase 3 is given in Table 3.4.
 
 **Table 3.4. Phase 3 search space**
 
@@ -286,7 +294,7 @@ Phase 1 measured the zero-shot performance of four lightweight VLMs (Gemma4-E2B,
 
 > Overall Acc denotes accuracy computed over closed-ended and open-ended items combined. Open items are scored by BERTScore (roberta-large backbone, threshold method) and closed items by exact string match against the gold answer.
 
-On pooled accuracy across all datasets, the performance of the four models is as follows (n = 8,231, the total number of items across the three datasets).
+On pooled accuracy across all datasets, the performance of the four models is given in Table 4.1a (n = 8,231, the total number of items across the three datasets).
 
 **Table 4.1a. Pooled accuracy and statistical tests**
 
@@ -341,6 +349,8 @@ Phase 2 fine-tuned each of the four models on each of the three datasets with QL
 
 #### 4.2.1 Base vs Fine-Tuned Performance
 
+Per-model performance before and after fine-tuning, together with the paired tests, is given in Table 4.2.
+
 **Table 4.2. Fine-tuning effect by model (paired, n = 9 = 3 datasets × 3 seeds)**
 
 | Model | Base Acc | FT Acc | Cohen's d | d 95% CI (BCa) | paired t-test p | Wilcoxon p |
@@ -355,6 +365,8 @@ The effect of fine-tuning is heterogeneous across models. **Qwen2.5-VL-3B and Qw
 A Mixed-Effects Model estimated by pooling the four models without distinguishing them (`accuracy ~ condition + dataset`, group = seed) found no significant fixed effect (coefficient = 0.0268, p = .3629, ICC(seed) = 0.0, n = 72). This is not a computational error but a consequence of **heterogeneous effects across models cancelling in the pooled mean**. The per-model triple verification above is therefore taken as the primary evidence for RQ2, and the pooled MEM result is cited only as supporting explanation that "the overall effect without distinguishing models is not significant because of heterogeneity."
 
 #### 4.2.2 Effect of Data Size (Ablation A)
+
+Performance across training-data ratios is given in Table 4.2a.
 
 **Table 4.2a. Performance by training-data ratio (Qwen3-VL-2B, PathVQA, mean of 3 seeds)**
 
@@ -372,6 +384,8 @@ Accuracy increases monotonically with the training-data ratio, with no sign of r
 
 #### 4.2.3 Effect of LoRA Rank (Ablation B)
 
+Performance across LoRA ranks is given in Table 4.2b.
+
 **Table 4.2b. Performance by LoRA rank (Qwen3-VL-2B, PathVQA, mean of 3 seeds)**
 
 | LoRA rank | Peak VRAM (MB) | Overall Acc (mean) |
@@ -385,6 +399,8 @@ Accuracy increases monotonically with the training-data ratio, with no sign of r
 Performance increases monotonically with rank, though the gain flattens between 32 and 64 (+0.0038 from 32 to 64 versus +0.0152 from 16 to 32), while the VRAM increase across the whole range from rank 4 to 64 is a negligible 1.3% (3,870.6 → 3,918.8 MB). Since the performance gain relative to VRAM cost remains positive, **rank = 64 was adopted** (the setting used in the Phase 2 main experiment).
 
 #### 4.2.4 Effect of Target Modules (Ablation C)
+
+Performance across target-module scopes is given in Table 4.2c.
 
 **Table 4.2c. Performance by target-module scope (Qwen3-VL-2B, PathVQA, mean of 3 seeds)**
 
@@ -400,6 +416,8 @@ Performance increases monotonically as the target-module scope widens (LoRA appl
 
 **(A) Loss of general capability — measured on a VQAv2 validation subset (2,000 samples)**
 
+The VQAv2 performance degradation rate by model is given in Table 4.2d.
+
 **Table 4.2d. VQAv2 performance degradation rate by model (n = 9 = mean over 3 datasets × 3 seeds)**
 
 | Model | Mean degradation (%) | SD | Range |
@@ -412,6 +430,8 @@ Performance increases monotonically as the target-module scope widens (LoRA appl
 The degree of general-capability loss measured on VQAv2 diverges sharply across models. **Gemma4-E2B loses on average 51.5% of its VQAv2 performance after fine-tuning**, exhibiting clear catastrophic forgetting, whereas **SmolVLM2-2.2B shows essentially no degradation (mean 0.49%)**. Interestingly, this ordering runs opposite to the ranking of domain-performance improvement in Section 4.2.1: the Qwen family, which gained most in the domain, gives up some general capability (4-7%), while Gemma4-E2B suffers a double loss — neither significant domain improvement (Section 4.2.1) nor retention of general capability (51.5% loss) — and SmolVLM2-2.2B preserves general capability but significantly deteriorates in the domain. This correlation is an observed pattern; the present study did not separately verify a causal relationship.
 
 **(B) Cross-dataset generalization gap — rate of change when evaluated on a dataset other than the training domain**
+
+The rate of performance change observed on datasets other than the training domain is given in Table 4.2e.
 
 **Table 4.2e. Cross-dataset performance change rate by model (n = 18 = 2 eval sets × 3 training sets × 3 seeds)**
 
@@ -455,6 +475,8 @@ In sum, the ordering among strategies under these experimental conditions is **O
 
 #### 4.3.2 Hyperparameters Found by Each Strategy
 
+The hyperparameter configuration of the best-performing trial reached by each strategy is given in Table 4.3a.
+
 **Table 4.3a. Hyperparameter configuration of the best-performing trial per strategy**
 
 | Strategy | rank | alpha | learning_rate | batch | grad_accum | warmup | weight_decay | targets | val_acc | closed | open |
@@ -472,6 +494,8 @@ The three strategies that explored the search space freely (Random, Optuna, Auto
 
 #### 4.3.3 Search Trajectory Analysis (trial level, descriptive only)
 
+The trial at which each strategy reached its best performance is given in Table 4.3b.
+
 **Table 4.3b. Trial at which the best performance was reached, by strategy (over 10 repeats)**
 
 | Strategy | Final best (median) | Trial of best (median) | IQR of that trial |
@@ -482,6 +506,8 @@ The three strategies that explored the search space freely (Random, Optuna, Auto
 | Autoresearch | 0.4060 | 17.5 | [11.5, 20.0] |
 
 Autoresearch reaches its best performance latest, with a median trial of 17.5, and **the upper bound of its IQR touches 20.0, the ceiling of the search budget**. This means that nearly half of the runs were still improving at the point the budget was exhausted, suggesting that a budget of 20 trials may have been insufficient for this strategy — a point directly connected to the reduction from 40 to 20 described in Section 3.7 and discussed as a limitation in Section 5.3. This is, however, observed circumstantial evidence; whether the strategy would actually catch up with Optuna under a larger budget was not verified in this study.
+
+The trial-level performance distribution by strategy is given in Table 4.3c.
 
 **Table 4.3c. Trial-level performance distribution by strategy (all 200 trials, descriptive statistics)**
 
@@ -498,7 +524,7 @@ The anytime performance curve (median and IQR of cumulative best performance as 
 
 #### 4.3.4 Search Behaviour of the Autoresearch Agent
 
-To identify the cause of the low variance observed in Section 4.3.3, the number of **unique hyperparameter combinations** proposed by the agent in each repeat was counted.
+To identify the cause of the low variance observed in Section 4.3.3, the number of **unique hyperparameter combinations** proposed by the agent in each repeat was counted; the results are given in Table 4.3d.
 
 **Table 4.3d. Unique hyperparameter combinations per repeat (out of 20 trials)**
 
@@ -526,7 +552,7 @@ The original condition (`AutoresearchStrategy`) was left untouched to preserve r
 4. Stated the prohibition on duplicate proposals in the prompt — the code rejected duplicates, but the prompt never said so.
 5. Injected the actual budget (`total_trials=20`) at the call site — the default of 40 had truncated both the temperature and the phase schedule at their midpoints.
 
-**The intervention worked as intended.** An exhaustive tally of the execution logs confirms that the truncation was resolved.
+**The intervention worked as intended.** An exhaustive tally of the execution logs confirms that the truncation was resolved (Table 4.3e).
 
 **Table 4.3e. Effect of restoring configuration consistency (measured from execution logs)**
 
@@ -543,6 +569,8 @@ Unique configurations rose from 12.5 to 18.90, approaching the 20.0 of Random an
 
 Lifting the "JSON only" constraint also caused **every response to carry a natural-language rationale** (200/200, mean length 620 characters). The second requirement of RQ3 — the provision of an interpretable search rationale — which Section 5.1 had left unresolved as "a design flaw that permits neither a positive nor a negative answer", is thereby **confirmed at least as to whether rationales are produced at all**. What this section establishes, however, stops at the fact that rationales *were produced*; whether they correspond causally to the actual proposals, or meet a quality an expert would accept as grounds for a decision, requires a separate evaluation design that this study did not undertake (Section 5.4).
 
+The run-level performance of the re-experiment condition is given in Table 4.3f.
+
 **Table 4.3f. Run-level performance of Autoresearch-v2 (n=10)**
 
 | Condition | n | Mean val_accuracy | 95% CI (Bootstrap) | Best single |
@@ -550,6 +578,8 @@ Lifting the "JSON only" constraint also caused **every response to carry a natur
 | Optuna (TPE) | 10 | 0.4490 | [0.4368, 0.4594] | 0.4700 |
 | **Autoresearch-v2** | 10 | **0.4292** | [0.4124, 0.4478] | **0.4780** |
 | Autoresearch (original) | 10 | 0.4184 | [0.4064, 0.4328] | 0.4640 |
+
+The results of the pairwise tests are given in Table 4.3g.
 
 **Table 4.3g. Pairwise Mann-Whitney U tests**
 
