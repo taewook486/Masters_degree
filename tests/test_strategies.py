@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.autoresearch.strategies import (
+    PHASE3_FIXED_MAX_STEPS,
     SEARCH_SPACE,
     STRATEGIES,
     AutoresearchStrategy,
@@ -45,7 +46,8 @@ def test_manual_strategy_returns_fixed_config():
     assert config["lora_alpha"] == 32
     assert config["learning_rate"] == 2e-4
     assert config["lora_targets"] == "minimal"
-    assert config["max_steps"] == 400
+    # max_steps는 탐색 대상이 아니라 전 trial 공통 고정값이다 (v0.11)
+    assert config["max_steps"] == PHASE3_FIXED_MAX_STEPS
 
 
 def test_manual_strategy_name():
@@ -62,7 +64,9 @@ def test_random_strategy_returns_valid_config():
     assert config["batch_size"] in SEARCH_SPACE["batch_size"]
     assert config["grad_accum_steps"] in SEARCH_SPACE["grad_accum_steps"]
     assert config["lora_targets"] in SEARCH_SPACE["lora_targets"]
-    assert config["max_steps"] in SEARCH_SPACE["max_steps"]
+    # max_steps는 SEARCH_SPACE에서 빠졌고 전 trial 고정값으로 주어진다
+    assert "max_steps" not in SEARCH_SPACE
+    assert config["max_steps"] == PHASE3_FIXED_MAX_STEPS
 
     lr_lo, lr_hi = SEARCH_SPACE["learning_rate"]
     assert lr_lo <= config["learning_rate"] <= lr_hi
@@ -256,7 +260,11 @@ def test_optuna_tpe_ensure_study_skips_failed():
 
 
 def test_optuna_tpe_distributions_returns_dict():
-    """_distributions()가 9개 키를 가진 dict를 반환한다 (lines 190-207)."""
+    """_distributions()가 탐색 대상 8개 키만 반환한다 (lines 190-207).
+
+    max_steps는 v0.11에서 탐색 공간에서 빠졌으므로 분포에도 없어야 한다.
+    남아 있으면 Optuna만 다른 탐색 공간을 갖게 되어 전략 간 비교가 깨진다.
+    """
     mock_optuna, _, _ = _make_mock_optuna()
 
     with patch.dict(sys.modules, {"optuna": mock_optuna}):
@@ -266,9 +274,10 @@ def test_optuna_tpe_distributions_returns_dict():
     expected_keys = {
         "lora_rank", "lora_alpha_ratio", "log_learning_rate",
         "batch_size", "grad_accum_steps", "warmup_ratio",
-        "weight_decay", "lora_targets", "max_steps",
+        "weight_decay", "lora_targets",
     }
     assert expected_keys == set(dists.keys())
+    assert "max_steps" not in dists
 
 
 def test_get_strategy_optuna():

@@ -19,6 +19,7 @@ from src.autoresearch.agent import (
     _validate_config,
     ask_agent_for_config,
 )
+from src.autoresearch.strategies import PHASE3_FIXED_MAX_STEPS
 
 # --- _parse_config 테스트 ---
 
@@ -54,7 +55,11 @@ def test_parse_config_invalid_raises():
 
 
 def test_validate_config_valid_passthrough():
-    """유효한 설정은 그대로 통과한다."""
+    """유효한 설정은 그대로 통과하되, max_steps는 고정값으로 강제된다.
+
+    v0.11에서 max_steps는 탐색 대상이 아니라 전 trial 공통 고정값이 됐다
+    (설계서 §4.5 학습량 통제). LLM이 무엇을 제안하든 무시된다.
+    """
     config = {
         "lora_rank": 16, "lora_alpha": 32, "learning_rate": 2e-4,
         "batch_size": 1, "grad_accum_steps": 8, "warmup_ratio": 0.03,
@@ -62,7 +67,8 @@ def test_validate_config_valid_passthrough():
     }
     result = _validate_config(config)
     assert result["lora_rank"] == 16
-    assert result["max_steps"] == 400
+    # LLM 제안 400은 버려지고 고정값이 쓰인다
+    assert result["max_steps"] == PHASE3_FIXED_MAX_STEPS
 
 
 def test_validate_config_clamps_rank():
@@ -199,13 +205,15 @@ def test_ask_agent_success_path():
 
     with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}):
         with patch.dict(sys.modules, {"anthropic": mock_anthropic}):
-            config, raw = ask_agent_for_config(
+            config, raw, schedule = ask_agent_for_config(
                 "system prompt", "no history",
                 trial_number=0, total_trials=10,
             )
 
     assert config["lora_rank"] == 16
     assert "lora_rank" in raw
+    # 실제 사용한 탐색 일정을 함께 돌려준다 (REQ-RI-006 기록 경로)
+    assert schedule == {"temperature": 1.0, "phase": "exploration"}
 
 
 def test_ask_agent_retry_exhaustion():
@@ -235,7 +243,7 @@ def test_ask_agent_exploration_phase_log():
 
     with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}):
         with patch.dict(sys.modules, {"anthropic": mock_anthropic}):
-            config, _ = ask_agent_for_config(
+            config, _, _ = ask_agent_for_config(
                 "system", "no history",
                 trial_number=0, total_trials=40,
             )
@@ -256,7 +264,7 @@ def test_ask_agent_exploitation_phase():
 
     with patch.dict(os.environ, {"ANTHROPIC_API_KEY": "test-key"}):
         with patch.dict(sys.modules, {"anthropic": mock_anthropic}):
-            config, _ = ask_agent_for_config(
+            config, _, _ = ask_agent_for_config(
                 "system", "long history",
                 trial_number=35, total_trials=40,
             )

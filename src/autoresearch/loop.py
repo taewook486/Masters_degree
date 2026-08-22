@@ -295,6 +295,16 @@ def run_hpo_loop(
             trial.agent_reasoning = strategy.last_reasoning
             strategy.last_reasoning = ""
 
+        # REQ-RI-006: 에이전트가 실제로 쓴 탐색 일정을 기록한다.
+        # truthiness 가드를 쓰면 안 된다 — 온도 0.0이 falsy라 누락된다.
+        # 미기록(None)과 기록된 값을 구별하는 것이 이 가드의 존재 이유다.
+        if strategy.last_temperature is not None:
+            trial.temperature = strategy.last_temperature
+            strategy.last_temperature = None
+        if strategy.last_phase is not None:
+            trial.phase = strategy.last_phase
+            strategy.last_phase = None
+
         tracker.append(trial)
         results.append(trial)
 

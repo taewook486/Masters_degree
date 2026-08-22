@@ -68,6 +68,11 @@ class HPOStrategy(ABC):
 
     name: str
     last_reasoning: str = ""  # Raw LLM reasoning (autoresearch only)
+    # 에이전트가 실제로 쓴 탐색 일정 (autoresearch 계열만). None은
+    # "에이전트 호출이 없었음"을 뜻하며 기록된 값과 구별된다 — 이 구별이
+    # 없던 것이 phase·temperature 열이 전 행 기본값으로 죽어 있던 원인이다.
+    last_phase: str | None = None
+    last_temperature: float | None = None
 
     @abstractmethod
     def suggest(self, history: list[TrialResult]) -> dict:
@@ -339,7 +344,7 @@ class AutoresearchStrategy(HPOStrategy):
         try:
             config = None
             for attempt in range(_MAX_DUPLICATE_RETRIES):
-                config, reasoning = ask_agent_for_config(
+                config, reasoning, schedule = ask_agent_for_config(
                     program,
                     history_text,
                     trial_number=trial_number,
@@ -358,11 +363,18 @@ class AutoresearchStrategy(HPOStrategy):
                     f"Please suggest a DIFFERENT configuration."
                 )
             self.last_reasoning = reasoning
+            self.last_temperature = schedule["temperature"]
+            self.last_phase = schedule["phase"]
             logger.info(f"[Autoresearch] Agent suggested: {config}")
             return config
         except Exception as e:
             logger.warning(f"[Autoresearch] Agent failed ({e}), falling back to random")
             self.last_reasoning = ""
+            # 에이전트 호출이 성립하지 않았으므로 일정을 비운다. 여기서
+            # schedule_for를 다시 계산해 넣으면 "온도 T로 호출됨"이라는
+            # 거짓 기록이 된다.
+            self.last_temperature = None
+            self.last_phase = None
             return RandomSearchStrategy().suggest(history)
 
 

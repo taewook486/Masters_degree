@@ -29,13 +29,38 @@ _VALID_GRAD_ACCUM = {4, 8, 16}
 _VALID_TARGETS = {"minimal", "medium", "full"}
 
 
+def schedule_for(trial_number: int, total_trials: int) -> tuple[float, str]:
+    """탐색 온도와 단계 라벨을 계산한다 (REQ-RI-006).
+
+    온도·단계 공식의 단일 정의 지점이다. 호출 시 실제로 쓴 값을 그대로
+    기록에 남기기 위해 계산을 분리했다 — 기록 측에서 같은 공식을 다시
+    계산하면 두 공식이 조용히 갈라질 수 있다.
+
+    Args:
+        trial_number: 현재 trial 인덱스 (0-based).
+        total_trials: 계획된 전체 trial 수.
+
+    Returns:
+        (temperature, phase_label) 튜플.
+    """
+    progress = trial_number / max(total_trials - 1, 1)
+    temperature = round(1.0 - 0.7 * progress, 2)
+    if progress < 0.25:
+        phase_label = "exploration"
+    elif progress < 0.75:
+        phase_label = "transition"
+    else:
+        phase_label = "exploitation"
+    return temperature, phase_label
+
+
 def ask_agent_for_config(
     program: str,
     history_text: str,
     trial_number: int = 0,
     total_trials: int = 40,
     max_tokens: int = 512,
-) -> tuple[dict, str]:
+) -> tuple[dict, str, dict]:
     """Ask the LLM agent to suggest the next hyperparameter config.
 
     Args:
@@ -48,7 +73,8 @@ def ask_agent_for_config(
             a written rationale, or the JSON gets truncated away.
 
     Returns:
-        Tuple of (validated hyperparameters dict, raw agent response text).
+        Tuple of (validated hyperparameters dict, raw agent response text,
+        schedule dict with the "temperature" and "phase" actually used).
 
     Raises:
         RuntimeError: If API call fails after all retries.
@@ -71,8 +97,7 @@ def ask_agent_for_config(
     client = anthropic.Anthropic(api_key=api_key)
 
     # Temperature scheduling: explore early (1.0), exploit later (0.3)
-    progress = trial_number / max(total_trials - 1, 1)
-    temperature = round(1.0 - 0.7 * progress, 2)
+    temperature, phase_label = schedule_for(trial_number, total_trials)
 
     user_message = _build_user_message(history_text, trial_number, total_trials)
 
@@ -91,17 +116,13 @@ def ask_agent_for_config(
             config = _parse_config(raw_text)
             config = _validate_config(config)
             # REQ-RI-006: 탐색/활용 전환 구조화 로깅
-            if progress < 0.25:
-                phase_label = "exploration"
-            elif progress < 0.75:
-                phase_label = "transition"
-            else:
-                phase_label = "exploitation"
             logger.info(
                 f"[HPO] Trial {trial_number}/{total_trials} | "
                 f"phase={phase_label} | temp={temperature} | config={config}"
             )
-            return config, raw_text
+            # 로그뿐 아니라 호출자에게도 실제 사용값을 넘긴다. 호출자가
+            # 공식을 다시 계산하지 않아야 기록과 실행이 갈라지지 않는다.
+            return config, raw_text, {"temperature": temperature, "phase": phase_label}
         except Exception as e:
             last_error = e
             if attempt < _MAX_RETRIES - 1:

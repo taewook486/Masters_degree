@@ -177,6 +177,11 @@ def test_run_hpo_loop_resumes_from_existing_trials():
         mock_strategy = MagicMock()
         mock_strategy.name = "manual"
         mock_strategy.last_reasoning = ""
+        # HPOStrategy의 실제 기본값. MagicMock은 미설정 속성에 또 다른
+        # MagicMock을 돌려주므로, None 계약을 명시하지 않으면 loop가
+        # "기록된 값"으로 오인해 tsv에 mock 객체를 써 넣는다.
+        mock_strategy.last_temperature = None
+        mock_strategy.last_phase = None
 
         # manual은 max_trials=1로 강제되므로, 이미 1개 이상 완료면 0번 실행
         with patch.object(_MODULE, "run_single_trial") as mock_run:
@@ -206,6 +211,10 @@ def test_run_hpo_loop_saves_checkpoint_on_completed():
         mock_strategy = MagicMock()
         mock_strategy.name = "random"
         mock_strategy.last_reasoning = ""
+        # 위와 같은 이유로 None 계약을 명시한다 (random은 에이전트 호출이
+        # 없으므로 일정이 기록되지 않는 것이 정상 동작이다).
+        mock_strategy.last_temperature = None
+        mock_strategy.last_phase = None
         mock_strategy.suggest.return_value = {
             "lora_rank": 16, "lora_alpha": 32, "learning_rate": 2e-4,
             "batch_size": 1, "grad_accum_steps": 8, "warmup_ratio": 0.03,
