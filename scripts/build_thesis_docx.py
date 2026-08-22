@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
 from dataclasses import dataclass, field
@@ -34,12 +35,23 @@ SZ_BODY = 11
 SZ_KEYWORD = 9
 SZ_NOTE = 10  # 표 아래 주석/인용
 
-TEMPLATE_DIR = Path(r"C:\Users\taewo\Downloads\붙임4_학위별학위논문작성양석(hwp,word)")
+# 학교 공식 양식 폴더. WSL 등 Windows 밖에서 빌드할 때는
+# THESIS_TEMPLATE_DIR 환경변수로 마운트 경로를 지정한다.
+TEMPLATE_DIR = Path(
+    os.environ.get(
+        "THESIS_TEMPLATE_DIR",
+        r"C:\Users\taewo\Downloads\붙임4_학위별학위논문작성양석(hwp,word)",
+    )
+)
 TEMPLATES = {
     "ko": TEMPLATE_DIR / "4-5_Degree Paper Writing Form(Korean)_Master & Doctor.docx",
     "en": TEMPLATE_DIR / "4-6_Degree Paper Writing Form (English_Word)_Master.docx",
 }
 OUT_NAMES = {"ko": "석사학위논문_국문.docx", "en": "석사학위논문_영문.docx"}
+DEFAULT_MD = {
+    "ko": "docs/THESIS_FINAL_v2.0.md",
+    "en": "docs/THESIS_FINAL_v2.0_EN.md",
+}
 
 W = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
 
@@ -729,11 +741,13 @@ def _emit(doc, anchor, blocks: list[Block], skip_heading: bool = False,
 def main() -> None:
     ap = argparse.ArgumentParser(description="학위논문 마크다운 → 공식 양식 docx")
     ap.add_argument("--lang", choices=["ko", "en"], default="ko")
-    ap.add_argument("--md", default="docs/THESIS_FINAL_v2.0.md")
+    # 기본 md는 --lang에 따라 정한다. 고정 기본값을 두면 `--lang en`만 준
+    # 호출이 국문 정본을 영문 파서로 읽어 본문이 통째로 누락된다.
+    ap.add_argument("--md", default=None)
     ap.add_argument("--out", default=None)
     args = ap.parse_args()
 
-    md_path = Path(args.md)
+    md_path = Path(args.md) if args.md else Path(DEFAULT_MD[args.lang])
     out_path = Path(args.out) if args.out else Path(OUT_NAMES[args.lang])
     build(args.lang, md_path, out_path)
     print(f"생성 완료: {out_path}")

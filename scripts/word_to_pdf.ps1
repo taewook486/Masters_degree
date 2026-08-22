@@ -10,7 +10,10 @@
 #   powershell -File scripts/word_to_pdf.ps1 -InPath D:\...\a.docx -OutPath D:\...\a.pdf
 param(
     [Parameter(Mandatory = $true)][string]$InPath,
-    [Parameter(Mandatory = $true)][string]$OutPath
+    [Parameter(Mandatory = $true)][string]$OutPath,
+    # 갱신된 목차를 docx에도 남긴다. 붙이지 않으면 종전대로 docx는
+    # 건드리지 않고 PDF만 내보낸다.
+    [switch]$SaveDocx
 )
 
 $ErrorActionPreference = 'Stop'
@@ -63,6 +66,11 @@ try {
     $pages = Invoke-Member2 $doc 'ComputeStatistics' @(2)
     # ExportAsFixedFormat(OutputFileName, ExportFormat) / 17 = wdExportFormatPDF
     Invoke-Member2 $doc 'ExportAsFixedFormat' @($OutPath, 17) | Out-Null
+
+    if ($SaveDocx) {
+        Invoke-Member2 $doc 'Save' @() | Out-Null
+        Write-Output 'STEP: docx saved with updated TOC'
+    }
 
     Write-Output ("TOC_COUNT=" + $tocCount)
     Write-Output ("PAGES=" + $pages)
