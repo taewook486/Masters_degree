@@ -21,6 +21,7 @@ from pathlib import Path
 
 import docx
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Pt
 from docx.text.paragraph import Paragraph
@@ -227,7 +228,8 @@ def _style_run(run, size: float, bold: bool = False, font: str = FONT_KO,
 def _add_para(doc, anchor, text: str, size: float = SZ_BODY, bold: bool = False,
               align=WD_ALIGN_PARAGRAPH.JUSTIFY, outline: int | None = None,
               style_name: str | None = None, font: str = FONT_KO, indent: bool = True,
-              hanging: bool = False, page_break: bool = False):
+              hanging: bool = False, page_break: bool = False,
+              keep_with_next: bool = False, keep_together: bool = False):
     """anchor 앞에 문단을 삽입한다. **굵게** 구간은 굵은 run으로 분리한다."""
     p = doc.add_paragraph()
     anchor.addprevious(p._p)
@@ -242,6 +244,13 @@ def _add_para(doc, anchor, text: str, size: float = SZ_BODY, bold: bool = False,
     pf.space_after = Pt(0)
     if page_break:
         pf.page_break_before = True
+    if keep_with_next:
+        pf.keep_with_next = True
+    if keep_together:
+        # 문단 자체가 페이지에 걸쳐 쪼개지지 않게 한다. keep_with_next는
+        # 문단 "사이"만 묶으므로, 두 줄짜리 캡션은 이것이 없으면 첫 줄만
+        # 페이지 끝에 남는다.
+        pf.keep_together = True
     if hanging:
         # 참고문헌 내어쓰기: 작성 매뉴얼 「7. 참고문헌 체제」 5)는 Style과 무관하게
         # 자료가 두 줄 이상이면 둘째 줄부터 들여쓰도록 규정한다.
@@ -364,9 +373,17 @@ def _add_table(doc, anchor, rows: list[list[str]]) -> None:
             else:
                 para.alignment = WD_ALIGN_PARAGRAPH.LEFT
             para.paragraph_format.line_spacing = 1.0
+            # 마지막 행을 뺀 모든 행을 다음 행과 묶어 표가 페이지 경계에서
+            # 갈라지지 않게 한다. 마지막 행까지 묶으면 표 아래 주석 문단까지
+            # 끌어올려 여백이 과해진다.
+            if ri < len(rows) - 1:
+                para.paragraph_format.keep_with_next = True
             for chunk, is_bold, is_italic in _split_marks(val):
                 r = para.add_run(chunk)
                 _style_run(r, 9, is_bold or ri == 0, FONT_KO, is_italic)
+        # 행 자체가 페이지에 걸쳐 쪼개지는 것도 막는다
+        trPr = t.rows[ri]._tr.get_or_add_trPr()
+        trPr.append(OxmlElement("w:cantSplit"))
     anchor.addprevious(t._tbl)
 
 
@@ -636,8 +653,12 @@ def build(lang: str, md_path: Path, out_path: Path) -> None:
 
     abstract_blocks = _slice(blocks, ABSTRACT_HEADING[lang])
     if abstract_blocks:
+        # 초록은 앞부속의 독립 항목이므로 항상 새 페이지에서 시작한다.
+        # page_break 없이 두면 앞선 표 목차의 길이에 따라 초록이 목차
+        # 페이지에 딸려 붙는다 — 표가 한 줄 늘어난 것만으로 실제로 그렇게
+        # 됐다(8/16판은 우연히 경계가 맞아 정상으로 보였을 뿐이다).
         _add_para(doc, anchor_front, ABSTRACT_HEADING[lang], SZ_SECTION, True,
-                  WD_ALIGN_PARAGRAPH.LEFT, indent=False)
+                  WD_ALIGN_PARAGRAPH.LEFT, indent=False, page_break=True)
         _add_para(doc, anchor_front, "", SZ_BODY, indent=False)
         _emit_abstract_header(doc, anchor_front, ABSTRACT_HEADING[lang], meta)
         _emit(doc, anchor_front, abstract_blocks, skip_heading=True)
@@ -715,8 +736,11 @@ def _emit(doc, anchor, blocks: list[Block], skip_heading: bool = False,
                 _add_para(doc, anchor, b.text, SZ_BODY, True,
                           WD_ALIGN_PARAGRAPH.LEFT, outline=2, indent=False)
         elif b.kind == "caption":
+            # 캡션은 뒤따르는 표와 반드시 같은 페이지에 둔다. 이것이 없으면
+            # 캡션만 페이지 끝에 남고 표가 다음 쪽으로 넘어간다.
             _add_para(doc, anchor, b.text, SZ_BODY, True,
-                      WD_ALIGN_PARAGRAPH.CENTER, style_name="표캡션", indent=False)
+                      WD_ALIGN_PARAGRAPH.CENTER, style_name="표캡션",
+                      indent=False, keep_with_next=True, keep_together=True)
         elif b.kind == "table":
             _add_table(doc, anchor, b.rows)
             _add_para(doc, anchor, "", SZ_BODY, indent=False)
