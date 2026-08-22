@@ -443,6 +443,51 @@ def _add_toc_field(doc, anchor, instr: str) -> None:
     _fill_toc_paragraph(p, instr)
 
 
+# 표지 세로 배치 보정값.
+#
+# 양식 템플릿은 표지 세로 간격을 빈 문단과 행 최소 높이(w:trHeight)로
+# 잡는데, 이 논문 제목이 길어 여러 줄로 접히는 탓에 기본값 그대로면
+# 표지 마지막 줄이 다음 쪽으로 밀린다. 국문은 저자 이름이, 영문은
+# February~Graduate School 세 줄이 넘어갔다.
+#
+# Word로 쪽 배치를 실측해 정한 값이다(2026-08-22).
+#   국문: 개행 9 → 8 (빈 문단 하나만 줄이면 해결)
+#   영문: 개행 10 → 2 이면서 제목 행 최소 높이 6337 → 5000 twips.
+#         개행만 줄이면 5개 아래에서 최소 높이가 바닥이 되어 더는
+#         안 줄고, 높이만 줄이면 내용이 그 위로 삐져나온다.
+#         마지막 줄이 밀리는 임계는 5600 부근이라 5000으로 여유를 뒀다.
+COVER_BLANKS_KO = 8
+COVER_BLANKS_EN = 2
+COVER_TITLE_ROW_HEIGHT_EN = 5000
+
+
+def _trim_cell_blank_lines(cell, target_newlines: int) -> None:
+    """표지 셀의 빈 문단을 지워 개행 수를 target에 맞춘다.
+
+    빈 문단만 지우므로 제목·성명 같은 내용 문단은 건드리지 않는다.
+    이미 target 이하이면 아무것도 하지 않는다.
+    """
+    while cell.text.count("\n") > target_newlines:
+        blanks = [p for p in cell.paragraphs if not p.text.strip()]
+        if not blanks:
+            break
+        blanks[0]._element.getparent().remove(blanks[0]._element)
+
+
+def _set_row_min_height(row, twips: int) -> None:
+    """행의 최소 높이(w:trHeight)를 지정한다."""
+    tr = row._tr
+    trPr = tr.find(qn("w:trPr"))
+    if trPr is None:
+        trPr = tr.makeelement(qn("w:trPr"), {})
+        tr.insert(0, trPr)
+    trh = trPr.find(qn("w:trHeight"))
+    if trh is None:
+        trh = trPr.makeelement(qn("w:trHeight"), {})
+        trPr.append(trh)
+    trh.set(qn("w:val"), str(twips))
+
+
 def fill_front_matter(doc, meta: dict[str, str]) -> None:
     """속표지·청구지(T000), 인준지(T001), 목차(T002)를 채운다."""
     cover, approval, toc = doc.tables[0], doc.tables[1], doc.tables[2]
@@ -455,6 +500,8 @@ def fill_front_matter(doc, meta: dict[str, str]) -> None:
     _set_para_text(c.paragraphs[0], meta["title_ko"], 20, True)
     _set_para_text(c.paragraphs[1], "", 16)
     _set_para_text(c.paragraphs[9], meta["date_award"], 14)
+    # 채운 뒤에 줄인다 — 먼저 줄이면 위 paragraphs[9] 인덱스가 사라진다.
+    _trim_cell_blank_lines(c, COVER_BLANKS_KO)
     c = cover.cell(2, 0)
     _set_para_text(c.paragraphs[0], meta["grad_school"], 18)
     _set_para_text(c.paragraphs[1], meta["dept"], 16)
@@ -541,6 +588,37 @@ def fill_front_matter_en(doc, meta: dict[str, str]) -> None:
                     elif re.fullmatch(r"\(\d+pt\)?", key):
                         # 양식이 남긴 글자크기 안내문구 제거
                         _set_para_text(p, "")
+
+    _fit_cover_to_one_page_en(doc, meta)
+
+
+def _fit_cover_to_one_page_en(doc, meta: dict[str, str]) -> None:
+    """영문 표지를 한 쪽에 맞춘다.
+
+    빈 문단과 제목 행 최소 높이를 함께 줄여야 한다. 근거는
+    COVER_BLANKS_EN 주석 참조.
+    """
+    cover = doc.tables[0]
+    title_cell = None
+    for row in cover.rows:
+        for cell in row.cells:
+            if meta["title_en"] in cell.text and "Submitted by" in cell.text:
+                title_cell = cell
+                break
+        if title_cell is not None:
+            break
+    if title_cell is None:
+        # 양식이 바뀌어 표지 셀을 못 찾은 경우. 빌드는 계속하되
+        # 표지가 두 쪽으로 갈라질 수 있으므로 반드시 알린다.
+        print("경고: 영문 표지 제목 셀을 찾지 못해 세로 배치를 보정하지 못했다. "
+              "표지가 두 쪽으로 갈라졌는지 확인할 것.")
+        return
+
+    _trim_cell_blank_lines(title_cell, COVER_BLANKS_EN)
+    for row in cover.rows:
+        if title_cell._element in [c._element for c in row.cells]:
+            _set_row_min_height(row, COVER_TITLE_ROW_HEIGHT_EN)
+            break
 
 
 def _enable_field_update(doc) -> None:
