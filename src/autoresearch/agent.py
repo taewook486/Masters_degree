@@ -29,6 +29,26 @@ _VALID_GRAD_ACCUM = {4, 8, 16}
 _VALID_TARGETS = {"minimal", "medium", "full"}
 
 
+# 단계별 프롬프트 힌트. schedule_for가 돌려주는 라벨로 인덱싱한다.
+_PHASE_HINTS: dict[str, str] = {
+    "exploration": (
+        "EXPLORATION PHASE: Prioritize diverse configurations. "
+        "Try varied rank, learning rate, and target module combinations "
+        "to map the search space broadly."
+    ),
+    "transition": (
+        "TRANSITION PHASE: Balance exploration with exploitation. "
+        "Focus on promising regions from top results, "
+        "but still test unexplored parameter combinations."
+    ),
+    "exploitation": (
+        "EXPLOITATION PHASE: Fine-tune around the best configurations. "
+        "Make small adjustments to top-performing hyperparameters "
+        "to maximize accuracy."
+    ),
+}
+
+
 def schedule_for(trial_number: int, total_trials: int) -> tuple[float, str]:
     """탐색 온도와 단계 라벨을 계산한다 (REQ-RI-006).
 
@@ -141,27 +161,15 @@ def ask_agent_for_config(
 def _build_user_message(
     history_text: str, trial_number: int, total_trials: int
 ) -> str:
-    """Build structured user message with analysis guidance."""
-    progress = trial_number / max(total_trials, 1)
+    """Build structured user message with analysis guidance.
 
-    if progress < 0.25:
-        phase_hint = (
-            "EXPLORATION PHASE: Prioritize diverse configurations. "
-            "Try varied rank, learning rate, and target module combinations "
-            "to map the search space broadly."
-        )
-    elif progress < 0.75:
-        phase_hint = (
-            "TRANSITION PHASE: Balance exploration with exploitation. "
-            "Focus on promising regions from top results, "
-            "but still test unexplored parameter combinations."
-        )
-    else:
-        phase_hint = (
-            "EXPLOITATION PHASE: Fine-tune around the best configurations. "
-            "Make small adjustments to top-performing hyperparameters "
-            "to maximize accuracy."
-        )
+    단계 판정은 schedule_for에 위임한다. 예전에는 이 함수가 자체 공식
+    (trial_number / total_trials)을 써서, 온도·기록이 쓰는 공식
+    (trial_number / (total_trials - 1))과 갈라져 있었다. 프롬프트가
+    알려주는 단계와 tsv에 기록되는 단계가 어긋날 수 있었다는 뜻이다.
+    """
+    _, phase_label = schedule_for(trial_number, total_trials)
+    phase_hint = _PHASE_HINTS[phase_label]
 
     return (
         f"## Experiment Status\n"

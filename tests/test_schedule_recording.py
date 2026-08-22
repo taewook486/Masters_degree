@@ -18,7 +18,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.autoresearch.agent import schedule_for
+from src.autoresearch.agent import _build_user_message, schedule_for
 from src.autoresearch.strategies import AutoresearchStrategy
 from src.autoresearch.tracker import TrialResult
 
@@ -62,6 +62,48 @@ def test_schedule_for_matches_recorded_schedule(
     temperature, phase = schedule_for(trial_number, total_trials)
     assert temperature == pytest.approx(expected_temp)
     assert phase == expected_phase
+
+
+# --- 프롬프트와 기록이 같은 단계를 가리키는가 --------------------------------
+
+
+@pytest.mark.parametrize("total_trials", [5, 10, 20, 30, 40, 50, 100, 200])
+def test_prompt_phase_matches_recorded_phase(total_trials):
+    """프롬프트에 주입되는 단계와 기록되는 단계가 일치한다.
+
+    예전에는 _build_user_message가 자체 공식(trial_number / total_trials)을
+    써서 schedule_for(trial_number / (total_trials - 1))와 갈라져 있었다.
+    에이전트가 "탐색 단계"라고 들으면서 기록은 "전환 단계"로 남는 상황이
+    가능했다.
+    """
+    for n in range(total_trials):
+        _, phase = schedule_for(n, total_trials)
+        message = _build_user_message("HISTORY", n, total_trials)
+        assert phase.upper() in message, (
+            f"trial {n}/{total_trials}: 기록 단계 {phase}가 프롬프트에 없다"
+        )
+
+
+@pytest.mark.parametrize("total_trials", [20, 40])
+def test_prompt_unchanged_for_budgets_actually_used(total_trials):
+    """공식 통일이 실제 사용 예산의 프롬프트를 바꾸지 않았다.
+
+    Phase 3은 예산 20(v2 주입)과 40(원본 기본값)으로 실행됐다. 두 공식이
+    이 두 예산에서는 같은 경계를 내므로 통일이 실행 조건을 바꾸지 않는다 —
+    종료된 810 trial과 공개 코드가 어긋나지 않는다는 근거다.
+
+    아래 기대 라벨은 통일 이전 _build_user_message가 내던 값을 그대로
+    적은 것이다(고정 기대값이라 통일 후 코드로 재계산하지 않는다).
+    """
+    for n in range(total_trials):
+        legacy_progress = n / total_trials
+        if legacy_progress < 0.25:
+            legacy_phase = "EXPLORATION"
+        elif legacy_progress < 0.75:
+            legacy_phase = "TRANSITION"
+        else:
+            legacy_phase = "EXPLOITATION"
+        assert legacy_phase in _build_user_message("HISTORY", n, total_trials)
 
 
 # --- (1) 에이전트 경로: 실제 호출값이 기록되는가 ----------------------------
