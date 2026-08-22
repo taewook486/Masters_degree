@@ -2,7 +2,6 @@
 # MoAI-ADK Package Distribution .gitignore
 # ============================================
 # Version: 0.33.0
-# Updated: 2026-01-10
 # Purpose: Essential patterns for user projects
 # ============================================
 
@@ -157,33 +156,6 @@ secret-*.*
 .aws/config
 .aws/credentials
 
-# SSH keys and PuTTY session data (RunPod access, etc.)
-*.ppk
-*.reg
-*.reg.txt
-
-# ===========================================
-# Local Datasets (large, per-machine — not tracked in git)
-# ===========================================
-/data/
-
-# ===========================================
-# Model checkpoints / adapter weights (large, per-machine — not tracked in git)
-# Kept ignored permanently (not added ad hoc mid-session) so a future
-# `git reset --hard` + `git clean -fd` cannot delete untracked weight files.
-# ===========================================
-/results_pod_backup/
-**/adapter_model.safetensors
-**/adapter_model.bin
-**/optimizer.pt
-**/checkpoint-*/
-**/adapter/tokenizer.json
-
-# ===========================================
-# Scratch/local notes (per-machine, not project deliverables)
-# ===========================================
-/list.txt
-
 # MoAI git-credential runtime files (defense-in-depth). The reconfigure wizard
 # delegates git provider credentials to the gh/glab CLI and never writes an
 # access token to a tracked config; these patterns ensure that if a
@@ -266,13 +238,31 @@ dist-ssr/
 # ===========================================
 .vercel/
 .netlify/
+.firebase/
+
+# User Custom Patterns (preserved by moai update)
+*.ppk
+*.reg
+*.reg.txt
+/data/
+/results_pod_backup/
+**/adapter_model.safetensors
+**/adapter_model.bin
+**/optimizer.pt
+**/checkpoint-*/
+**/adapter/tokenizer.json
+/list.txt
 .firebase/.moai/logs/
 .moai/lessons-inbox.jsonl
 .moai/harness/
 unsloth_compiled_cache/
-
 .moai/logs/
 .moai/lessons-inbox.jsonl
 .moai/harness/
 unsloth_compiled_cache/
 _workspace/
+
+# Word 임시 잠금 파일 (문서를 열어둔 동안 생성)
+~$*
+# 세션별 리포트 (재현 불가·일회성)
+.moai/reports/session-*.md
