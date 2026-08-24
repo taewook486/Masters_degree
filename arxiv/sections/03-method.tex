@@ -1,0 +1,325 @@
+\section{Method}
+\label{sec:method}
+
+\subsection{Overview of the research design}
+\label{sec:design}
+
+The study is designed as empirical research that verifies medical VQA domain
+adaptation of lightweight VLMs sequentially through a three-phase experiment.
+Phase~1 measures the zero-shot performance of the four models before fine-tuning
+in order to answer RQ1 (differences across models). Phase~2 applies QLoRA
+fine-tuning to verify RQ2 (the effect of fine-tuning) while simultaneously
+exploring the optimal QLoRA configuration (data scale, LoRA rank, target modules)
+through ablation studies. Phase~3 takes the optimal configuration identified in
+Phase~2 as its starting point and compares four HPO strategies --- Manual, Random
+Search, Optuna (TPE), and Autoresearch --- to verify RQ3 (the competitiveness of
+autonomous search). Each phase has a sequential structure in which the results of
+the preceding phase (best model, optimal QLoRA configuration) become fixed
+conditions for the next.
+
+\subsection{Experimental environment}
+\label{sec:hardware}
+
+All experiments reported here were conducted on a cloud GPU service (RunPod).
+Phases~1 and 2 used an RTX 4090 (24\,GB VRAM) instance and Phase~3 an RTX 3090
+(24\,GB VRAM) instance. The change of GPU in Phase~3 was not a design choice but
+the result of securing whatever instance was available under tightened budget
+constraints. Both are consumer-class cards with 24\,GB of VRAM, and every Phase~3
+trial ran on the same 3090 instance, so the hardware conditions of the strategy
+comparison were controlled. A local workstation (RTX 5060 Ti 16\,GB $+$ RTX 4060
+8\,GB, Ryzen 5 5600X, 32\,GB RAM) was used only for a preliminary smoke test to
+size the Phase~3 execution; none of the figures reported in this paper were
+produced in the local environment.
+
+Feasibility in the 16\,GB-class environment targeted by this work was confirmed
+\emph{from measured VRAM usage rather than by execution on such a card}. Peak
+VRAM during Phase~2 QLoRA training was at most 14,373\,MB across the four models
+(Gemma4-E2B), within the 16\,GB limit, while the other three models required only
+4,015--7,943\,MB.
+
+Model loading and QLoRA fine-tuning used the HuggingFace \texttt{transformers}
+library together with the \texttt{unsloth} backend for accelerated 4-bit
+quantized training, with LoRA adapters configured through the \texttt{peft}
+library. The Bayesian optimization control in Phase~3 used \texttt{Optuna} (TPE
+sampler), and experiment management and logging used \texttt{wandb}. BERTScore
+computation for scoring open-ended responses used the \texttt{bert-score} library
+(roberta-large / BioBERT backbones), and statistical analysis used \texttt{scipy}
+and \texttt{statsmodels} (mixed-effects model). The LLM agent of the Autoresearch
+strategy calls the Anthropic Claude API.
+
+\subsection{Target models and datasets}
+\label{sec:models}
+
+The four models examined and the grounds for their selection are given in
+Table~\ref{tab:models}. The selection criteria were threefold: (1) QLoRA
+fine-tuning must be feasible within 16\,GB of VRAM (an \emph{a priori}
+expectation, confirmed \emph{post hoc} from measured peak VRAM,
+Section~\ref{sec:hardware}); (2) the license must be Apache 2.0 or MIT so that
+research use is unrestricted; and (3) the model must have sufficient community and
+framework support. Gemma4-E2B was included because its mixture-of-experts-family
+PLE technique activates only 2.3B parameters at inference while providing
+5.1B-class expressive capacity.
+
+\begin{table}[t]
+\centering
+\caption{Target models.}
+\label{tab:models}
+\small
+\begin{tabular}{@{}llll@{}}
+\toprule
+Model & Parameters & Architectural features & Expected QLoRA VRAM \\
+\midrule
+Qwen3-VL-2B    & 2B   & Thinking mode, DeepStack             & $\sim$8--10\,GB \\
+Qwen2.5-VL-3B  & 3B   & Dynamic resolution, OCR in 19 languages & $\sim$8--10\,GB \\
+SmolVLM2-2.2B  & 2.2B & HuggingFace lightweight VLM          & $\sim$8--10\,GB \\
+Gemma4-E2B     & 2.3B (active) / 5.1B (total) & PLE (per-layer embeddings), Apache 2.0 & $\sim$12--14\,GB \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The three public medical VQA datasets are summarized in
+Table~\ref{tab:datasets}. Each dataset was used with its official
+train/val/test split unchanged, and all reported accuracies are computed on the
+\emph{test} split only. Because the size of a distributed copy can differ from
+the figure reported in the dataset's original paper, Table~\ref{tab:datasets}
+separates the three quantities that are easy to conflate: the size reported by
+the source publication, the size of the copy we actually obtained, and the
+number of items each model was actually evaluated on.
+
+\begin{table}[t]
+\centering
+\caption{Target datasets. ``Published'' is the QA-pair count reported by the
+dataset's own paper; ``Obtained'' is the total size of the distributed copy used
+here; ``Evaluated'' is the test-split size on which every reported accuracy is
+computed. No subsampling was applied --- the evaluated counts are the full test
+splits.}
+\label{tab:datasets}
+\small
+\begin{tabular}{@{}llrrrl@{}}
+\toprule
+Dataset & Source distribution & Images & Published & Obtained & Evaluated \\
+\midrule
+PathVQA & \texttt{flaviagiammarino/path-vqa}      & 4,998 & 32,799 & 32,632 & 6,719 \\
+SLAKE   & \texttt{mdwiratathya/SLAKE-vqa-english} & 642   & 14,028 & 7,033  & 1,061 \\
+VQA-RAD & \texttt{flaviagiammarino/vqa-rad}       & 315   & 2,248  & 2,244  & 451 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+PathVQA covers pathology tissue images with seven question types; SLAKE and
+VQA-RAD cover radiology and CT/MRI/X-ray images. All three mix open-ended and
+closed-ended questions. Note that the SLAKE distribution used here is the
+English-only release: the 14,028 figure published for SLAKE counts its bilingual
+English--Chinese pairs, whereas the copy obtained for these experiments contains
+the English half alone.
+
+\paragraph{Contamination control.}
+PathVQA (2018), SLAKE (2021), and VQA-RAD (2018) were all released before the
+pretraining cut-off of the target models (2025--2026), so the possibility of
+pretraining data contamination cannot be excluded. We measure such contamination
+actively using the Min-$K$\% Probability attack \citep{shi2024minkprob}. The mean
+token-level log-probability of the lowest $K$\% ($K = 20$) of tokens in each
+sample's gold answer text is used as the contamination indicator --- on the
+theory that samples exposed during pretraining exhibit higher mean probability
+--- and samples in the top 5\% within a dataset are classified as suspected
+contamination, after which the principal conclusion (RQ1) is re-verified on the
+reduced sample set with those samples removed. The interpretation criteria are
+that a difference of less than 1\,\%p between original and reduced results is
+deemed robust, 1--5\,\%p is stated as a limitation, and more than 5\,\%p requires
+reconsideration of the conclusion.
+
+\subsection{Phase 1: zero-shot baseline evaluation}
+\label{sec:phase1}
+
+Zero-shot performance before fine-tuning was measured for $4$ models $\times$ $3$
+datasets $=$ 12 conditions. Because evaluation uses greedy decoding it is
+deterministic: changing the seed does not change the result, so repeated trials
+are meaningless. Evaluation therefore used a single seed (42), and uncertainty is
+reported as a bootstrap 95\% confidence interval over the per-sample
+correct/incorrect decisions of each condition. Since the four models are
+evaluated on an identical test set, comparison across models has a paired
+structure; accordingly, Cochran's $Q$ test (binary correctness on a shared test
+set, $H_0$: equal accuracy) and pairwise McNemar post-hoc tests with Bonferroni
+correction were used instead of ANOVA, which assumes independent samples. The
+measured metrics are closed-ended accuracy (multiple choice), open-ended accuracy
+(gold-token matching) together with BERTScore F1 (roberta-large), bootstrap 95\%
+CIs for each accuracy, response time (ms per item), and peak VRAM (MB).
+
+\subsection{Phase 2: QLoRA fine-tuning}
+\label{sec:phase2}
+
+The base QLoRA configuration applied to every Phase~2 condition is given in
+Table~\ref{tab:qlora}. The training budget targeted 3 epochs, but a ceiling of
+\texttt{max\_steps}~$=500$ (samples\_seen fixed at 4,000 per condition) was
+imposed because of cloud GPU time and cost constraints. Since the training volume
+is fixed regardless of dataset size, the small VQA-RAD receives roughly 2 epochs
+or more while the medium SLAKE and large PathVQA receive less than 1 epoch; this
+asymmetry is a stated limitation of the study and is carried into the
+interpretation of the results.
+
+\begin{table}[t]
+\centering
+\caption{Base QLoRA configuration (Phase 2).}
+\label{tab:qlora}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Parameter & Value \\
+\midrule
+Quantization    & NF4 (4-bit NormalFloat) \\
+LoRA rank       & 64 (determined by Ablation B) \\
+LoRA alpha      & 128 \\
+LoRA dropout    & 0.05 \\
+Target modules  & all-linear (determined by Ablation C) \\
+Learning rate   & 2e-4 \\
+Batch size      & 1 (gradient accumulation 8, effective batch $=$ 8) \\
+Optimizer       & paged\_adamw\_8bit \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The experimental conditions are $4$ models $\times$ $3$ datasets $=$ 12
+conditions, each repeated 3 times (seeds 42/123/456). The values LoRA rank $=64$
+and target $=$ all-linear were fixed on the basis of three ablation studies, each
+with PathVQA and Qwen3-VL-2B held fixed: Ablation~A (effect of data size) varies
+the training-data ratio over 5/10/25/50/100\%; Ablation~B (effect of LoRA rank)
+varies rank $\in \{4, 8, 16, 32, 64\}$; and Ablation~C (effect of target modules)
+compares $\{$q/v\_proj$\}$ versus $\{$q/k/v/o\_proj$\}$ versus
+$\{$all-linear$\}$.
+
+Catastrophic forgetting is measured in two ways. (A) Change in general
+capability: the rate of accuracy decrease before and after fine-tuning is
+measured on a VQAv2 validation subset (2,000 samples) across all 12 conditions.
+(B) Cross-dataset generalization within the medical domain: evaluation on a
+dataset other than the training dataset (for example, train on PathVQA $\to$
+evaluate on SLAKE/VQA-RAD), giving $12$ conditions $\times$ $2$ cross-datasets
+$=$ 24 additional evaluations. Because PathVQA (pathology) and SLAKE/VQA-RAD
+(radiology) differ in image domain itself, the results of (B) are interpreted as
+a domain-generalization gap rather than as catastrophic forgetting in the strict
+sense.
+
+\subsection{Phase 3: autonomous hyperparameter optimization}
+\label{sec:phase3}
+
+The hyperparameter search space shared by the four strategies is given in
+Table~\ref{tab:searchspace}. The four strategies compared are Manual (the
+researcher's default values, one run), Random Search (random sampling), Optuna
+TPE (Bayesian optimization), and Autoresearch (autonomous search by an LLM
+agent). Autoresearch repeats a loop that (1) reads the previous experimental
+results (\texttt{results.tsv}), (2) proposes the next configuration together with
+a natural-language rationale (\texttt{config.yaml} $+$ \texttt{rationale.md}),
+(3) performs a git commit, (4) runs fixed training, (5) evaluates on the
+validation set, and (6) retains the configuration if performance improves and
+discards it otherwise.
+
+\begin{table}[t]
+\centering
+\caption{Phase 3 hyperparameter search space.}
+\label{tab:searchspace}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+Parameter & Search range & Type \\
+\midrule
+lora\_rank        & $\{4, 8, 16, 32, 64\}$        & Discrete \\
+lora\_alpha       & rank $\times \{1, 2, 4\}$     & Discrete \\
+learning\_rate    & $[1\mathrm{e}{-5},\ 5\mathrm{e}{-4}]$ & Continuous (log scale) \\
+batch\_size       & $\{1, 2, 4\}$                 & Discrete \\
+grad\_accum\_steps & $\{4, 8, 16\}$               & Discrete \\
+warmup\_ratio     & $[0.0,\ 0.1]$                 & Continuous \\
+weight\_decay     & $[0.0,\ 0.1]$                 & Continuous \\
+lora\_targets     & $\{$minimal, medium, full$\}$ & Categorical \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All trials share the same model (the best model from Phase~2), the same dataset
+(PathVQA), and a fixed \texttt{max\_steps}~$=200$ in order to control training
+volume; the wall-clock ceiling \texttt{time\_budget\_min} serves as a safety
+device to prevent pathological combinations rather than as an experimental
+control variable. The original design called for Manual 10 $+$ Random Search 400
+$+$ Optuna 400 $+$ Autoresearch 400 $=$ 1,210 trials in total (40 trials per
+strategy $\times$ 10 independent repeats). A preliminary smoke test conducted
+solely to size the execution indicated on a wall-clock basis --- counting not
+only training but also validation and final test evaluation time --- that the
+original scale would require roughly 24--25 days even with two GPUs in parallel.
+The number of repeats (10), which is the unit of statistical testing and the
+basis of run-level statistical power, was therefore preserved, while the number
+of search trials per strategy was reduced from 40 to 20, halving the total time
+to approximately 12.8 days. The execution scale of the four-strategy comparison
+is thus Manual 10 $+$ Random Search 200 $+$ Optuna 200 $+$ Autoresearch 200 $=$
+610 trials in total (20 trials per strategy $\times$ 10 independent repeats).
+This reduction carries the trade-off of halving the diversity of hyperparameter
+combinations explored per strategy, but it does not affect the validity of the
+run-level statistical tests based on 10 independent repeats.
+
+In addition, a 200-trial configuration-consistency re-experiment
+(Autoresearch-v2) was conducted separately. This is not part of the four-strategy
+same-condition comparison but a follow-up intervention designed to test whether
+the duplicate-proposal phenomenon dissolves once the prompt--implementation
+inconsistencies are removed. The search space, model, dataset,
+\texttt{max\_steps}, and repetition count were held identical to the original,
+and only the five configuration inconsistencies were corrected; the original
+condition was preserved intact for reproducibility. The total execution scale of
+Phase~3 is 810 trials.
+
+Statistical verification is performed only at the run level, not at the trial
+level. Because Autoresearch and Optuna are sequential optimizers, trials within
+the same run are dependent (the result of trial $t$ influences the proposal at
+$t+1$), violating the assumption of independent observations. The unit of testing
+is the 10 final performance values obtained from the 10 independent repeats of
+each strategy, analysed with the Kruskal--Wallis test (four-group comparison),
+the Mann--Whitney $U$ test (pairwise, Autoresearch vs.\ Optuna), and BCa
+bootstrap 95\% CIs. Trial-level data are used only for visualization such as
+anytime performance curves.
+
+\subsection{Evaluation metrics and statistical analysis}
+\label{sec:stats}
+
+\paragraph{Dual reporting of BERTScore.}
+Open-ended responses are reported with both exact match and BERTScore F1. The
+general-purpose criterion (roberta-large, threshold $\geq 0.7$) is the sole
+decision metric (primary) for accuracy and statistical testing, while the
+medical-specialized criterion (BioBERT, \texttt{dmis-lab/biobert-v1.1}) is
+reported alongside as a secondary metric only; no dual gating (requiring both
+metrics to pass before an answer is judged correct) is applied.
+
+\paragraph{Dual measurement of catastrophic forgetting.}
+Both (A) the change in general capability measured on VQAv2 and (B) the
+cross-dataset generalization gap described in Section~\ref{sec:phase2} are
+reported, so that side effects of fine-tuning that a single metric cannot capture
+are measured from multiple angles.
+
+\paragraph{Clinical significance analysis (WCA $+$ ECE).}
+Motivated by the concern that plain accuracy does not fully capture the clinical
+value of medical AI, weighted clinical accuracy (WCA) is computed using the
+labels of the seven PathVQA question types (diagnosis, location, measurement,
+description, temporal, yes\_no, unknown):
+\[
+\mathrm{WCA} = \frac{\sum (\text{accuracy per type} \times \text{weight})}{\sum \text{weights}} .
+\]
+Weights were assigned by clinical importance in the order diagnosis $=1.0$ (a
+diagnostic error directly affects the direction of treatment) $>$ location $=0.8$
+$>$ measurement $=0.7$ $>$ description $=0.6$ $>$ temporal $=$ yes\_no $=0.5$
+(binary judgements with limited information content). These weights were set
+arbitrarily by the researcher without external clinical literature or Delphi
+consensus; they cannot be interpreted as an absolute scale of clinical importance
+and are used only in a limited way as a supplementary reference metric
+complementing the primary metrics (accuracy and BERTScore). Expected calibration
+error (ECE) \citep{guo2017calibration}, a metric measuring how well a model's
+predicted confidence matches its actual accuracy, was planned for inclusion but
+could not be computed because the evaluation pipeline does not store per-sample
+confidence.
+
+\paragraph{Robust statistics (bootstrap $+$ mixed effects).}
+Given the sample-size limitation of $n = 9$ (3 datasets $\times$ 3 seeds), the
+test of the fine-tuning effect in Phase~2 uses three methods in parallel: (1) a
+paired $t$-test with Cohen's $d$ (the conventional comparison), (2) a 95\% CI for
+Cohen's $d$ obtained by BCa bootstrap with 10,000 resamples (robust estimation),
+and (3) the Wilcoxon signed-rank test (non-parametric). A mixed-effects model
+pooling the four models (\texttt{accuracy $\sim$ condition $+$ dataset}, group
+$=$ seed) is additionally applied as a supplement; however, because heterogeneous
+effects across models may cancel in a pooled estimate, the triple verification
+performed per model is treated as the primary evidence and the mixed-effects
+result is used only as supporting explanation --- a phenomenon actually observed
+in Section~4.2.1.

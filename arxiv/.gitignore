@@ -1,0 +1,14 @@
+# 빌드 산출물 — `tectonic -X compile main.tex`로 언제든 재생성됨
+main.pdf
+main.aux
+main.bbl
+main.out
+main.log
+
+# 제출 패키지 — 아래 명령으로 재생성
+#   tar czf arxiv-submission.tar.gz main.tex main.bbl sections/*.tex figures/phase3_anytime.pdf
+arxiv-submission.tar.gz
+
+# 이 디렉터리에서 명령을 실행할 때 생기는 런타임 부산물
+.moai/
+.claude/

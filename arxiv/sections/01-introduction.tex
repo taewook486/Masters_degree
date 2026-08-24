@@ -1,0 +1,94 @@
+\section{Introduction}
+\label{sec:intro}
+
+Driven by the success of large language models (LLMs), vision--language models
+(VLMs) that jointly understand images and text have advanced rapidly, led by
+systems such as GPT-4V and Gemini. These general-purpose VLMs perform well on
+question answering over natural images, but their performance tends to be limited
+in domains requiring specialist knowledge, such as medical imaging, because they
+lack an adequate grasp of medical terminology and of pathological and
+radiological findings. At the same time, retraining large models from scratch is
+not realistic in research and clinical environments with constrained GPU
+resources. Parameter-efficient fine-tuning (PEFT) methods such as QLoRA
+(quantized low-rank adaptation) \citep{dettmers2023qlora} have therefore
+attracted attention as an alternative that makes domain-specific fine-tuning
+feasible even on consumer-grade GPUs with 16--24\,GB of VRAM.
+
+Applying a PEFT method such as QLoRA in practice, however, requires selecting a
+number of hyperparameters --- LoRA rank, target modules, learning rate, and
+others --- and the influence of these choices on final performance often remains
+unexamined in a systematic way. Automating hyperparameter optimization (HPO) was
+identified as an open problem for VLM PEFT in a 2024 NeurIPS survey. Beyond
+traditional grid and random search \citep{bergstra2012random} or Bayesian
+optimization (Optuna TPE) \citep{akiba2019optuna}, an autonomous search paradigm
+has been proposed in which an LLM agent interprets prior experimental results on
+its own and proposes the next configuration.
+
+This paper empirically verifies the full process of adapting lightweight VLMs to
+the medical imaging VQA (visual question answering) domain on consumer GPUs. We
+demonstrate the feasibility of medical VQA domain adaptation for lightweight VLMs
+on consumer-class GPUs (executed here on 24\,GB cards; applicable to the 16\,GB
+class on the basis of measured VRAM); we systematically analyse how the principal
+hyperparameters of QLoRA fine-tuning --- data scale, LoRA rank, and the scope of
+target modules --- affect performance; and we verify whether autoresearch-style
+autonomous hyperparameter search driven by an LLM agent delivers performance
+competitive with Bayesian optimization while providing interpretable search
+rationales. These aims are formalized as the three research questions in
+Table~\ref{tab:rqs}.
+
+\begin{table}[t]
+\centering
+\caption{Research questions and null hypotheses.}
+\label{tab:rqs}
+\small
+\begin{tabular}{@{}p{0.05\textwidth}p{0.55\textwidth}p{0.30\textwidth}@{}}
+\toprule
+\# & Research question & Null hypothesis \\
+\midrule
+RQ1 & Do lightweight VLMs (2--3B) differ significantly across models in
+zero-shot medical VQA performance? & $H_0$: no difference in VQA accuracy across
+models \\
+RQ2 & Does QLoRA fine-tuning significantly improve medical VQA performance? &
+$H_0$: base $=$ fine-tuned performance \\
+RQ3 & Does LLM-agent-based autonomous hyperparameter search achieve performance
+competitive with Bayesian optimization (Optuna TPE) while providing interpretable
+search rationales? & $H_0$: autoresearch $=$ Optuna (TPE) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The null hypothesis for RQ3 was set against Optuna (TPE) rather than plain random
+search because the justification for adopting LLM-based HPO --- natural-language
+explanation of search rationale, use of prior knowledge to understand the
+structure of the search space, and traceability of the reasons for configuration
+changes --- holds only if such a method can compete with Bayesian optimization,
+which is already established as a practical standard, rather than merely being
+``better than random.'' Random search is retained solely as a lower-bound
+reference. RQ1, RQ2, and RQ3 are verified against measured data in
+Sections~4.1, 4.2, and 4.3 respectively, and the discussion cutting across all
+three results is consolidated in Section~4.4.
+
+The experimental scope is limited to four lightweight VLMs (Qwen3-VL-2B,
+Qwen2.5-VL-3B, SmolVLM2-2.2B, Gemma4-E2B) and three public medical VQA datasets
+(PathVQA, SLAKE, VQA-RAD). Models were selected on the criteria that QLoRA
+fine-tuning was expected to be feasible within 16\,GB-class VRAM (confirmed
+\emph{post hoc} at a measured maximum of 14.4\,GB, Section~\ref{sec:hardware})
+and that the license permits free redistribution (Apache 2.0 / MIT). Datasets
+were restricted to publicly accessible benchmarks in which clinical question
+types are labelled.
+
+\paragraph{Contributions.} This paper makes three contributions.
+\begin{itemize}
+\itemsep2pt
+\item It provides three-stage empirical evidence on medical-domain adaptation of
+lightweight VLMs under a single protocol, showing that performance and resource
+consumption are not monotonically related and thereby offering a concrete basis
+for model selection under resource constraints.
+\item It quantifies the model-level heterogeneity of fine-tuning effects and
+demonstrates how pooled analysis conceals opposing effects.
+\item It reports a negative result for LLM-based autonomous optimization together
+with a verification of its failure mechanism. Notably, the variation observed
+when repeating an identical configuration (0.056) exceeded the mean difference
+between strategies (0.031), constituting a quantitative counterexample to the
+practice of comparing methods from single runs.
+\end{itemize}

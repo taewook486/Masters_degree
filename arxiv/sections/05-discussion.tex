@@ -1,0 +1,172 @@
+\section{Discussion}
+\label{sec:discussion}
+
+\paragraph{Comparability across phases.}
+The three phases differ in evaluation conditions --- Phase~1 is zero-shot on the
+full test split (8,231 items), Phase~2 trains to \texttt{max\_steps}~$=500$ and
+evaluates on three datasets $\times$ 3 seeds over the full test split, and
+Phase~3 trains to \texttt{max\_steps}~$=200$ and evaluates on the PathVQA
+validation split, up to 500 samples. Direct comparison of absolute accuracy
+across phases is therefore invalid: the difference between the fine-tuned
+accuracy in Phase~2 (Qwen3-VL-2B, 0.5845) and the best \texttt{val\_accuracy} in
+Phase~3 (0.4700) does not represent a performance drop. The discussion below
+cross-references only rankings, patterns, and directions of gaps observed within
+each phase.
+
+\paragraph{Resource consumption and performance are not monotonically related.}
+The best-performing model on pooled zero-shot accuracy, Qwen3-VL-2B (0.3843,
+2B active / 2B total), simultaneously uses the least memory ($\sim$4,500\,MB) and
+responds fastest, while Gemma4-E2B (0.1708, 2.3B active / 5.1B total), which uses
+the most memory ($\sim$13,930\,MB), ranks last with a statistically pronounced gap
+from the other three. At this scale, architecture and pretraining configuration
+dominate medical VQA performance more than active parameter count or memory
+consumption, and a choice satisfying both performance and efficiency exists for
+resource-constrained environments. The axis of interpretation must, however, be
+made explicit: only Gemma4-E2B has a mixture-of-experts structure in which active
+parameters differ from stored parameters, and our selection criterion for
+``lightweight'' took active parameters as its basis. Measured by stored
+parameters Gemma4-E2B is the largest model, so its last place may equally be read
+as ``the model with the largest stored scale ranked last'' rather than ``a small
+model beat a large one.'' The claim concerns performance relative to
+inference-time resource consumption and must not be extended to a general
+relationship between parameter scale as such and performance. Because the ranking
+survived removal of samples suspected of pretraining exposure, it is also not
+explained by data contamination.
+
+\paragraph{Heterogeneity of fine-tuning effects, and the primacy of model
+selection.}
+The proposition that fine-tuning improves performance does not hold independently
+of the model, and its direction coincides with the zero-shot ranking: the models
+ranked first and second zero-shot improved significantly ($d = +1.620$ and
+$+2.646$), whereas the third and fourth either deteriorated significantly
+($d = -2.284$) or failed to improve ($d = -0.652$, n.s.). Fine-tuning did not
+function as a means of lifting a weak base model, which suggests in practical
+terms that base-model selection is a decision preceding fine-tuning design; with
+only four models covered, whether this correspondence is a general law remains
+unconfirmed. Overlaying the forgetting analysis reveals a trade-off: the Qwen
+family gave up 4--7\% of general capability on VQAv2, SmolVLM2-2.2B almost
+entirely preserved general capability while deteriorating in the domain, and
+Gemma4-E2B suffered a double loss, losing 51.5\% of general capability without
+any domain gain. Domain specialization and preservation of general capability
+were not achieved simultaneously within the scope of this experiment. This is an
+observed correlation; no causal relationship was verified.
+
+\paragraph{The closed--open gap is unresolved across all three phases.}
+In Phase~1, PathVQA open accuracy was 0.027--0.061 across all models against
+closed accuracy of 0.45--0.79, with all four models scoring 0.0000 on the
+diagnosis and temporal types. In Phase~3, even the best configuration among 810
+trials reached only \texttt{val\_open\_acc} 0.1562 against
+\texttt{val\_closed\_acc} 0.8156 (the best configuration of the four-strategy
+comparison gives 0.8115 / 0.1445). Absolute values across phases are not
+comparable, yet the ratio relationship --- open below 20\% of closed --- holds in
+every phase (about 9.5\% for Qwen3-VL-2B on PathVQA in Phase~1, about
+17.8--19.2\% for the best Phase~3 configurations). That the ratio persisted even
+in the re-experiment reinforces that this gap is not resolvable at the level of
+hyperparameter search. It matters because the clinically important question types
+are concentrated in the open-ended category. A type-level paired decomposition on
+an identical 500-item sample (Appendix~\ref{app:tables},
+Table~\ref{tab:appgain}) confirms the concentration: the two lowest-weighted
+types, yes\_no (0.5) and description (0.6), account for 84.6\% of the total gain
+and make up 91\% of the evaluation sample. Three qualifications must be read
+alongside it. The sample sizes of the highest-weighted types fall short of what a
+judgement requires --- of the 500 items, diagnosis has 3, measurement has 4, and
+temporal none --- so their zero contribution means less that they failed to
+improve than that the sample cannot decide whether they did. The per-type gain is
+in fact largest among the higher-weighted types: location, weighted 0.8, rose
+from 0.2381 to 0.7143, the largest gain of any type, its 15.4\% share reflecting
+its 21-item sample rather than its performance. And weighting by clinical
+importance does not cancel the gain: WCA rose from 0.1527 zero-shot to 0.2627
+under the best configuration ($+0.1099$), comparable to the overall accuracy
+increase ($+0.1260$). The concentration is real, but its cause lies in the type
+composition of the evaluation sample rather than in per-type learning difficulty
+--- diagnosis accounts for just 23 of all 6,719 PathVQA test items (0.34\%) ---
+which is a dataset-level constraint rather than a defect of this evaluation
+design.
+
+\paragraph{What automated search reached, and the limits of autonomous agents.}
+Phase~2's fixed-axis ablation and Phase~3's free search arrived independently at
+the same region (\texttt{lora\_targets=full}, rank in 32--64), which raises
+confidence in the Phase~2 conclusion and partially compensates for the ablation's
+inability to validate the three optima in combination. There was, however, a
+clear boundary to the level of automation: automation of the search algorithm
+surpassed manual configuration by a wide margin (0.4490 vs.\ 0.3776), yet the LLM
+agent's autonomous judgement fell significantly short of that algorithm. The
+cause was not an absence of predictive ability --- the trial-level mean quality of
+the agent's proposals was in fact the highest (0.3980) --- but a search-behaviour
+problem, and that problem proved correctable: removing the configuration
+inconsistencies restored unique combinations to 18.90 / 20 and eliminated the
+significant deficit against Optuna. Restored diversity did not, however,
+translate into performance; the run-level mean of 0.4292 still trailed Optuna
+(0.4490), and only 2 of 10 repetitions reached the upper band. The remaining gap
+therefore resembles a problem of judgement --- identifying promising regions and
+allocating budget toward them --- rather than the procedural defect of repeating
+the same configuration. Within the scope of this study, automation of search is
+mature and the agent's procedural defects proved correctable, but whether
+autonomous research judgement can replace existing optimization algorithms remains
+unconfirmed.
+
+\paragraph{The unit of aggregation changes the conclusion.}
+On two separate occasions the choice of aggregation unit reversed the conclusion
+itself. Pooling the four models, the mixed-effects model reported the fine-tuning
+effect as not significant ($p = .3629$) --- not because there was no effect but
+because effects in opposite directions cancelled in the pooled mean; decomposed
+by model, three of the four show significant effects, two of them negative.
+Treating trials as independent observations would likewise have reversed RQ3: the
+trial-level mean is higher for Autoresearch (0.3980) than for Optuna (0.3905),
+yet the run-level best is significantly higher for Optuna (0.4490) than for
+Autoresearch (0.4184). The observation that re-running an identical configuration
+produced \texttt{val\_accuracy} between 0.388 and 0.444 --- a range of about
+0.056, larger than the mean difference between strategies detected here
+($0.4490 - 0.4184 = 0.031$) --- makes the point quantitative: judging the relative
+merit of strategies from a single trial result is impossible in principle, and a
+design using 10 independent repeats as the unit of testing is the minimum
+requirement given the scale of this noise.
+
+\paragraph{Indirect comparison with prior work.}
+We did not reproduce medical-specialized VLMs in our environment. LLaVA-Med
+\citep{li2023llavamed} does report figures on the standard test splits of the same
+three datasets, permitting an indirect comparison on closed-ended accuracy only
+(Appendix~\ref{app:tables}, Table~\ref{tab:appllavamed}); open-ended figures are
+not comparable, because LLaVA-Med scores open items by the proportion of
+generated responses containing the gold token while we use a BERTScore F1
+threshold; the former is structurally a far more lenient measure, so placing the
+two figures side by side would itself be misleading. On SLAKE closed accuracy a 2B
+model fine-tuned only with QLoRA reached practically the same level as the 7B
+medical-specialized model (85.26 vs.\ 85.34), and since all of these greatly
+exceed general-purpose LLaVA without domain training (63.22), this suggests that
+for tasks at the level of SLAKE the advantage of large-scale domain pretraining
+can be substantially offset by QLoRA adaptation alone. On PathVQA (83.12 vs.\
+91.21) and VQA-RAD (72.91 vs.\ 84.19) a gap of 8--11\,\%p remains, so that
+advantage remains clearly visible in proportion to the specialization of the task.
+The comparison carries three constraints: our figures are means over three seeds
+against a single-run report, the training budgets differ greatly, and the figures
+are quoted from a published paper rather than reproduced with identical code in
+an identical environment.
+
+\paragraph{Limitations.}
+Beyond those already stated, five constrain the results most directly. Phase~3
+fixed \texttt{max\_steps}~$=200$ but not the number of samples actually seen:
+because the search space includes \texttt{batch\_size} and
+\texttt{grad\_accum\_steps}, effective training volume ranged from 800 to 12,800
+samples, a factor of about 16, so the strategy comparison mixes training volume
+with hyperparameter quality --- though the best configurations of Optuna and
+Autoresearch were both batch 4 $\times$ grad\_accum 16 (12,800 samples), so the
+comparison central to RQ3 is not explained by this confound. The agent was
+non-deterministic: we originally stated that temperature was fixed at 0, and
+post-hoc verification established that it was not; the implementation applies a
+schedule and an exhaustive tally of 432 API calls shows the temperature actually
+used ranged from 1.0 down to 0.66, with the 0 recorded in the results table being
+an unpopulated default. Statistical power is limited ($n = 9$ in Phase~2, $n = 10$
+per strategy in Phase~3), leaving effect-size intervals wide, and no
+multiple-comparison correction was applied across the pipeline --- Bonferroni was
+applied only to the Phase~1 McNemar post-hoc tests --- though the principal
+conclusions rest on triple verification or non-overlapping confidence intervals
+rather than single $p$-values. The ablations were conducted under the single
+condition of PathVQA and Qwen3-VL-2B, and the planned supplementary rank
+verification on SLAKE could not be carried out because of GPU time constraints.
+Finally, feasibility on 16\,GB-class hardware was inferred from measured peak
+VRAM (at most 14,373\,MB) rather than verified by execution on such a card; in a
+real 16\,GB environment usable VRAM is smaller than nominal capacity and
+fragmentation behaves differently, so an out-of-memory risk cannot be excluded
+for Gemma4-E2B in particular, whose headroom is under 2\,GB, while the other
+three models (4,015--7,943\,MB) have ample margin.

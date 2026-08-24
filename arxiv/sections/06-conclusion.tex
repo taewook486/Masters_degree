@@ -1,0 +1,79 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper verified, through a three-stage experiment on four lightweight VLMs
+and three public medical VQA datasets, the full process of adapting 2--3B-class
+vision--language models to the medical imaging VQA domain on consumer-grade GPUs:
+zero-shot baselines (Phase~1), 75 QLoRA fine-tuning conditions (Phase~2), and an
+810-trial programme comparing hyperparameter search strategies and re-testing
+configuration consistency (Phase~3).
+
+For RQ1 the null hypothesis was rejected: the correctness patterns of the four
+models differed significantly both on a pooled basis ($n = 8{,}231$; Cochran's
+$Q = 1904.28$, $df = 3$, $p < .001$) and on all three datasets individually.
+Qwen3-VL-2B achieved the highest pooled accuracy at 0.3843, though close enough
+to Qwen2.5-VL-3B to be statistically indistinguishable on some datasets, while
+Gemma4-E2B was significantly below all three other models; the ranking was
+preserved after removing samples suspected of pretraining exposure. For RQ2,
+whether the null hypothesis was rejected depended on the model: performance
+improved significantly for Qwen2.5-VL-3B ($d = +2.646$) and Qwen3-VL-2B
+($d = +1.620$), whereas SmolVLM2-2.2B significantly deteriorated ($d = -2.284$)
+and Gemma4-E2B was not significant ($d = -0.652$), and the pooled mixed-effects
+estimate of no significant effect ($p = .3629$) reflects the cancellation of
+opposing model-level effects rather than the absence of an effect. For RQ3 the
+null hypothesis was rejected in the direction opposite to the one it anticipated:
+Optuna (0.4490) was significantly superior to Autoresearch (0.4184)
+($U = 16.00$, $p = .0112$, $r = -0.68$), and Autoresearch was statistically
+indistinguishable even from Random Search (0.4186), its lower-bound reference,
+while all three automated strategies exceeded the manual configuration (0.3776).
+The second requirement of RQ3, interpretable search rationales, was not tested by
+the four-strategy comparison, because the system prompt instructed the agent to
+respond with JSON only; 147 of 200 trials (73.5\%) returned only the
+hyperparameter JSON. In the corrected re-experiment all 200 responses carried a
+natural-language rationale (100\%, mean length 620 characters), so that rationales
+can be produced at all is confirmed, but no qualitative evaluation of their
+interpretability was performed. Search quality was meanwhile poor: 12.5 unique
+configurations out of 20 trials on average, recovering to 18.90 / 20 once the
+configuration inconsistencies were removed, which eliminated the significant
+deficit against Optuna ($p = .0112 \rightarrow .1726$) --- the run-level mean
+nevertheless still trailed Optuna (0.4292 vs.\ 0.4490) and improvement over the
+original was not established ($p = .2387$), so the negative answer to the first
+requirement of RQ3 stands.
+
+The contributions are three. First, three-stage empirical data on medical-domain
+adaptation of lightweight VLMs under a single evaluation protocol, including the
+finding that performance and resource consumption are not monotonically related
+and the indirect result that on SLAKE closed-ended accuracy a QLoRA-adapted 2B
+model can reach parity with a 7B medical-specialized model (85.26 vs.\ 85.34)
+while a gap of 8--11\,\%p remains on PathVQA and VQA-RAD. Second, a
+quantification of the model-level heterogeneity of fine-tuning effects, showing
+that an identical procedure can simultaneously produce large improvement and
+significant deterioration depending on the model and that estimating these
+together leads to the misreading of ``no effect.'' Third, a negative result for
+LLM-based autonomous HPO reported together with a verification of its failure
+mechanism and an experimental settlement of the question of correctability: the
+duplicate proposals were empirically shown to be a product of prompt--
+implementation configuration inconsistency rather than an intrinsic limitation of
+the agent, which indicates that future work on LLM-based HPO must treat
+prompt--implementation consistency as a controlled variable. Alongside these, we
+record two cases in which the choice of aggregation unit reversed the conclusion,
+and the quantitative counterexample that the variation observed when repeating an
+identical configuration (about 0.056) exceeds the mean difference between
+strategies detected here (0.031).
+
+Four directions follow. Autonomous HPO should be re-verified with an expanded
+search budget, since for Autoresearch --- in the original condition and in v2
+alike --- the upper bound of the IQR for the trial of best performance touches the
+budget ceiling of 20; and the consistency-restored condition in particular needs
+both a larger sample (an effect of magnitude $r = +0.32$ is not detectable at
+$n = 10$) and a search policy that reliably converts secured diversity into
+high-performance attainment, together with a decision criterion distinguishing
+stochastic variation across re-runs from genuine improvement. A qualitative
+evaluation framework for search rationales is needed, measuring causal
+correspondence between a rationale and the actual proposal, post-hoc
+rationalization, and expert acceptability. Improving open-ended response
+performance is the most urgent task, and building an evaluation set that
+deliberately oversamples the clinically important types is a prerequisite for
+judging it. Finally, a re-experiment controlling effective training volume, and
+comparison with medical-specialized VLMs under an identical protocol together
+with a clinically validated evaluation scheme, remain to be done.

@@ -1,0 +1,191 @@
+\section{System prompt of the Autoresearch agent}
+\label{app:prompt}
+
+The following is the full text of the agent's program file. It is reproduced
+verbatim because it is the evidence for the three prompt-side configuration
+inconsistencies discussed in Section~\ref{sec:res-v2}; the remaining item, the
+un-injected \texttt{total\_trials}, is a defect in the calling code and therefore
+does not appear in this text. The annotated points are where the problems arise.
+
+\begin{quote}
+\footnotesize
+\begin{verbatim}
+# Autonomous HPO Agent - System Prompt
+
+You are an autonomous hyperparameter optimization agent for medical VQA
+fine-tuning research.
+
+## Task
+Given the history of previous QLoRA fine-tuning experiments, suggest the NEXT
+hyperparameter configuration that is most likely to improve validation accuracy
+on the PathVQA medical VQA dataset.
+
+## Search Space
+| Parameter        | Range                       | Type                     |
+|------------------|-----------------------------|--------------------------|
+| lora_rank        | {4, 8, 16, 32, 64}          | discrete                 |
+| lora_alpha       | rank x {1, 2, 4}            | discrete                 |
+| learning_rate    | [1e-5, 5e-4]                | continuous (log-scale)   |
+| batch_size       | {1, 2, 4}                   | discrete                 |
+| grad_accum_steps | {4, 8, 16}                  | discrete                 |
+| warmup_ratio     | [0.0, 0.1]                  | continuous               |
+| weight_decay     | [0.0, 0.1]                  | continuous               |
+| lora_targets     | {"minimal","medium","full"} | categorical              |
+| epochs           | {1, 2, 3, 5}                | discrete   <- (i) inert  |
+
+Where: minimal = [q_proj, v_proj] / medium = [q_proj, k_proj, v_proj, o_proj]
+       full = all linear layers
+
+## Strategy Guidelines
+1. Early exploration (trials 0-5): Try diverse configurations to map the
+   landscape. Vary multiple parameters at once.
+2. Mid exploitation (trials 5-20): Focus on promising regions. Take the best
+   configuration and vary 1-2 parameters at a time.     <- (ii) budget mismatch
+3. Late refinement (trials 20+): Fine-tune around the best configuration with
+   small perturbations.                                 <- (ii) never triggered
+
+## Key Insights for Medical VQA
+- Medical images benefit from higher LoRA ranks (16-64).
+- Learning rate is often the most sensitive parameter.
+- `medium` or `full` target modules often outperform `minimal`.
+- Effective batch size = batch_size x grad_accum_steps. Keep in 4-16 range.
+- More epochs (3-5) help when training data is limited.  <- (i) inert parameter
+- Warmup ratio 0.03-0.06 is generally safe.
+
+## Response Format
+Respond with ONLY a valid JSON object. No explanation, no markdown fences,
+no other text.                                    <- (iii) rationale prohibited
+\end{verbatim}
+\end{quote}
+
+\noindent
+\textbf{(i) Inert parameter}: \texttt{epochs} appears in both the search space and
+the guidance, yet the implementation discards the proposed value and fixes
+\texttt{max\_steps}~$=200$.
+\textbf{(ii) Budget mismatch}: the actual budget is 20 trials per repeat, so
+``Late refinement (trials 20+)'' never triggers, and about 75\% of the budget
+falls in the interval instructing the agent to take the best configuration and
+vary 1--2 parameters.
+\textbf{(iii) Rationale prohibited}: the prompt explicitly excludes the
+interpretable search rationale required by RQ3.
+
+\paragraph{Agent execution settings.}
+Model \texttt{claude-sonnet-4-6}, \texttt{max\_tokens=512}. The temperature was
+not a fixed value but a schedule that decreases with progress; an exhaustive tally
+of the execution logs (432 calls) shows it ranged from 1.0 down to 0.66. The 0
+recorded in the \texttt{temperature} column of the results table is an unpopulated
+default and not the value actually passed to the API. Mitigation of API
+non-determinism rests on the 10 independent repeats.
+
+\section{Excerpts from the Autoresearch rationale logs}
+\label{app:rationale}
+
+Excerpted from the original text of the \texttt{agent\_reasoning} column of the
+results table. Of the 200 completed trials, 147 (73.5\%) returned only JSON as in
+(1) below, while 53 (26.5\%) included natural-language narrative.
+
+\paragraph{(1) Typical response --- configuration only, no rationale (73.5\% of
+the total).}
+
+\begin{quote}
+\footnotesize
+\begin{verbatim}
+{"lora_rank": 64, "lora_alpha": 256, "learning_rate": 2.0e-4, "batch_size": 2,
+ "grad_accum_steps": 8, "warmup_ratio": 0.05, "weight_decay": 0.01,
+ "lora_targets": "full", "epochs": 3}
+\end{verbatim}
+\end{quote}
+
+\noindent
+Because the prompt prohibited explanation (Appendix~\ref{app:prompt}, item (iii)),
+this form is the response consistent with the instruction.
+
+\paragraph{(2) A case including natural-language narrative --- accurate diagnosis,
+but an inoperative lever.}
+The agent diagnosed that all trials have only 200 steps, so this looks like
+undertraining, and that epochs were not changed. The diagnosis was accurate, but
+as noted in item (i) above the \texttt{epochs} lever it proposed was discarded by
+the implementation and therefore never took effect.
+
+\paragraph{(3) Repeated proposal of an identical configuration.}
+In repeat 8, from trial 602 onward the agent proposed the identical configuration
+11 times in succession, while the measured \texttt{val\_accuracy} varied between
+0.388 and 0.444. This variation reflects the stochastic behaviour of training and
+evaluation rather than any difference in configuration
+(Sections~\ref{sec:res-behaviour}, \ref{sec:discussion}).
+
+\section{Supplementary tables}
+\label{app:tables}
+
+\begin{table}[h]
+\centering
+\caption{PathVQA accuracy by clinical question type (zero-shot, seed 42).}
+\label{tab:apptypes}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+Type & Samples & Gemma4-E2B & Qwen2.5-VL-3B & Qwen3-VL-2B & SmolVLM2-2.2B \\
+\midrule
+diagnosis   & 23    & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\
+location    & 433   & 0.0647 & 0.1062 & 0.1478 & 0.0762 \\
+measurement & 33    & 0.2121 & 0.0909 & 0.1515 & 0.0909 \\
+description & 2,729 & 0.0425 & 0.0224 & 0.0447 & 0.0198 \\
+temporal    & 9     & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\
+yes\_no     & 3,362 & 0.1633 & 0.6130 & 0.6336 & 0.5892 \\
+unknown     & 130   & 0.0692 & 0.0692 & 0.0923 & 0.0154 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Decomposition of the accuracy gain by clinical question type
+(Qwen3-VL-2B, PathVQA, 500 evaluation items). The best configuration is the best
+trial of Autoresearch-v2. Share of gain is (type $n \div 500$) $\times$ per-type
+gain, divided by the sum of positive contributions; the per-type contributions sum
+to the overall gain of $+0.1260$. The same pattern appears under the best
+configuration of the four-strategy comparison (yes\_no accounting for
+53.4--63.2\% of the gain) and persists in the mean over the top ten trials of each
+condition.}
+\label{tab:appgain}
+\small
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Type & WCA weight & $n$ & Zero-shot & Best config & Gain & Share of gain \\
+\midrule
+diagnosis   & 1.0 & 3   & 0.0000 & 0.0000 & $+0.0000$ & 0.0\% \\
+location    & 0.8 & 21  & 0.2381 & 0.7143 & $+0.4762$ & 15.4\% \\
+measurement & 0.7 & 4   & 0.0000 & 0.0000 & $+0.0000$ & 0.0\% \\
+description & 0.6 & 211 & 0.0190 & 0.1137 & $+0.0948$ & 30.8\% \\
+temporal    & 0.5 & 0   & ---    & ---    & ---       & --- \\
+yes\_no     & 0.5 & 244 & 0.6721 & 0.8156 & $+0.1434$ & 53.8\% \\
+unknown     & 0.5 & 17  & 0.1765 & 0.0588 & $-0.1176$ & $-3.1$\% \\
+\midrule
+Overall     & --- & 500 & 0.3520 & 0.4780 & $+0.1260$ & 100\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\caption{Indirect comparison with figures reported in prior work (closed-ended
+basis). The LLaVA and LLaVA-Med figures are quoted from the original paper; the
+figures for this study are \texttt{closed\_acc} for the Phase~2 main conditions
+(mean of 3 seeds). The evaluation samples are identical at 1,061 items for SLAKE
+and 451 for VQA-RAD; only PathVQA differs, 6,761 versus 6,719, a gap of 42 items.
+Open-ended figures are excluded because the measures differ --- for reference,
+LLaVA-Med's open figures are PathVQA 37.95 / SLAKE 83.08 / VQA-RAD 61.52 on a
+token-recall basis, while ours are 17.15 / 66.95 / 26.00 on a
+BERTScore-threshold basis.}
+\label{tab:appllavamed}
+\small
+\begin{tabular}{@{}llrrr@{}}
+\toprule
+Model & Scale \& training approach & PathVQA & SLAKE & VQA-RAD \\
+\midrule
+LLaVA (general) \citep{liu2023llava} & 7B, no domain training & 63.20 & 63.22 & 65.07 \\
+LLaVA-Med \citep{li2023llavamed} & 7B, biomedical pretraining $+$ per-dataset FT & 91.21 & 85.34 & 84.19 \\
+This paper (Qwen3-VL-2B) & 2B, QLoRA fine-tuning only & 83.12 & 85.26 & 72.91 \\
+\bottomrule
+\end{tabular}
+\end{table}

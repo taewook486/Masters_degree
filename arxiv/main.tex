@@ -1,0 +1,74 @@
+% =====================================================================
+%  arXiv preprint — condensed from the master's thesis
+%  Build:  tectonic -X compile main.tex
+%  Self-contained: uses only standard TeX Live packages (no custom .sty),
+%  which keeps the arXiv source package minimal.
+% =====================================================================
+\documentclass[11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{microtype}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,allcolors=blue!60!black,breaklinks=true]{hyperref}
+\usepackage{url}
+
+% --- light preprint styling (replaces a non-standard arxiv.sty) -------
+\usepackage{titlesec}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.6em}{}
+\captionsetup{font=small,labelfont=bf,skip=6pt}
+\setlength{\parskip}{0pt}
+\renewcommand{\arraystretch}{1.12}
+
+\newcommand{\ie}{i.e.\ }
+\newcommand{\eg}{e.g.\ }
+
+% =====================================================================
+\title{\bfseries Domain Adaptation of Lightweight Vision--Language Models\\
+for Medical Visual Question Answering:\\
+QLoRA Fine-Tuning with Autonomous Hyperparameter Optimization}
+
+% TODO(author): confirm romanized name spellings against passport / prior publications.
+%   "Dugki Min" is the given-family byline order; the university's own directory
+%   lists the surname first as "Min, Dugki". Confirm which form the advisor uses
+%   on his own publications before submitting -- a v1 cannot be withdrawn.
+\author{%
+  Taewook Hwang \qquad Dugki Min\\[2pt]
+  Department of Convergence Information Technology, Major in Artificial Intelligence\\
+  Graduate School of Information \& Telecommunications, Konkuk University\\
+  Seoul, Republic of Korea\\[2pt]
+  \texttt{taewook486@konkuk.ac.kr}
+}
+\date{}
+
+% =====================================================================
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{sections/00-abstract}
+\end{abstract}
+
+\input{sections/01-introduction}
+\input{sections/02-related-work}
+\input{sections/03-method}
+\input{sections/04-results}
+\input{sections/05-discussion}
+\input{sections/06-conclusion}
+
+\bibliographystyle{IEEEtranN}
+\bibliography{refs}
+
+\appendix
+\input{sections/A-appendix}
+
+\end{document}
