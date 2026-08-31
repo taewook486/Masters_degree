@@ -1,0 +1,41 @@
+{
+  "condition": "autoresearch_v2",
+  "overall_delta": 0.126,
+  "schemes": [
+    {
+      "scheme": "현행",
+      "zeroshot": 0.1527,
+      "best": 0.2627,
+      "delta": 0.1099,
+      "ratio_to_overall": 0.872
+    },
+    {
+      "scheme": "균등",
+      "zeroshot": 0.1843,
+      "best": 0.2837,
+      "delta": 0.0995,
+      "ratio_to_overall": 0.789
+    },
+    {
+      "scheme": "강한대비",
+      "zeroshot": 0.1119,
+      "best": 0.2466,
+      "delta": 0.1348,
+      "ratio_to_overall": 1.069
+    },
+    {
+      "scheme": "약한대비",
+      "zeroshot": 0.1738,
+      "best": 0.2783,
+      "delta": 0.1045,
+      "ratio_to_overall": 0.829
+    },
+    {
+      "scheme": "역순",
+      "zeroshot": 0.2166,
+      "best": 0.2915,
+      "delta": 0.0749,
+      "ratio_to_overall": 0.594
+    }
+  ]
+}

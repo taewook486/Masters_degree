@@ -1,0 +1,117 @@
+{
+  "per_run": [
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_pathvqa_seed42/qwen3-vl-2b_pathvqa_seed42.json",
+      "n_open": 3357,
+      "llavamed_recall": 19.99,
+      "open_accuracy": 17.16,
+      "closed_accuracy": 83.16,
+      "dataset": "pathvqa",
+      "seed": 42
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_pathvqa_seed123/qwen3-vl-2b_pathvqa_seed123.json",
+      "n_open": 3357,
+      "llavamed_recall": 19.85,
+      "open_accuracy": 17.04,
+      "closed_accuracy": 83.16,
+      "dataset": "pathvqa",
+      "seed": 123
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_pathvqa_seed456/qwen3-vl-2b_pathvqa_seed456.json",
+      "n_open": 3357,
+      "llavamed_recall": 20.06,
+      "open_accuracy": 17.25,
+      "closed_accuracy": 83.05,
+      "dataset": "pathvqa",
+      "seed": 456
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_slake_seed42/qwen3-vl-2b_slake_seed42.json",
+      "n_open": 706,
+      "llavamed_recall": 73.17,
+      "open_accuracy": 67.28,
+      "closed_accuracy": 84.79,
+      "dataset": "slake",
+      "seed": 42
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_slake_seed123/qwen3-vl-2b_slake_seed123.json",
+      "n_open": 706,
+      "llavamed_recall": 72.56,
+      "open_accuracy": 66.43,
+      "closed_accuracy": 85.35,
+      "dataset": "slake",
+      "seed": 123
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_slake_seed456/qwen3-vl-2b_slake_seed456.json",
+      "n_open": 706,
+      "llavamed_recall": 72.87,
+      "open_accuracy": 67.14,
+      "closed_accuracy": 85.63,
+      "dataset": "slake",
+      "seed": 456
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_vqa_rad_seed42/qwen3-vl-2b_vqa_rad_seed42.json",
+      "n_open": 200,
+      "llavamed_recall": 34.51,
+      "open_accuracy": 26.0,
+      "closed_accuracy": 73.31,
+      "dataset": "vqa_rad",
+      "seed": 42
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_vqa_rad_seed123/qwen3-vl-2b_vqa_rad_seed123.json",
+      "n_open": 200,
+      "llavamed_recall": 34.53,
+      "open_accuracy": 26.0,
+      "closed_accuracy": 72.11,
+      "dataset": "vqa_rad",
+      "seed": 123
+    },
+    {
+      "path": "results/phase2_finetune/qwen3-vl-2b_vqa_rad_seed456/qwen3-vl-2b_vqa_rad_seed456.json",
+      "n_open": 200,
+      "llavamed_recall": 33.93,
+      "open_accuracy": 26.0,
+      "closed_accuracy": 73.31,
+      "dataset": "vqa_rad",
+      "seed": 456
+    }
+  ],
+  "aggregated": {
+    "pathvqa": {
+      "n_seeds": 3,
+      "n_open": 3357,
+      "recall_mean": 19.97,
+      "recall_sd": 0.11,
+      "open_accuracy_mean": 17.15,
+      "closed_accuracy_mean": 83.12,
+      "llavamed_open_reported": 37.95,
+      "llavamed_closed_reported": 91.21
+    },
+    "slake": {
+      "n_seeds": 3,
+      "n_open": 706,
+      "recall_mean": 72.87,
+      "recall_sd": 0.31,
+      "open_accuracy_mean": 66.95,
+      "closed_accuracy_mean": 85.26,
+      "llavamed_open_reported": 83.08,
+      "llavamed_closed_reported": 85.34
+    },
+    "vqa_rad": {
+      "n_seeds": 3,
+      "n_open": 200,
+      "recall_mean": 34.32,
+      "recall_sd": 0.34,
+      "open_accuracy_mean": 26.0,
+      "closed_accuracy_mean": 72.91,
+      "llavamed_open_reported": 61.52,
+      "llavamed_closed_reported": 84.19
+    }
+  }
+}

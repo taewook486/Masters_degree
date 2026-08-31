@@ -108,7 +108,7 @@ The three datasets used in this study each represent a different sub-domain of m
 
 Attempts to specialize general-purpose VLMs for the medical domain divide broadly into large-scale retraining and adaptation approaches. LLaVA-Med [9] generated GPT-4-based instruction data from large-scale biomedical figure-caption data in PubMed Central and adapted general-purpose LLaVA to the biomedical domain through curriculum learning. Med-Flamingo [10] performed continued pretraining of OpenFlamingo-9B on image-text data from medical papers and textbooks, acquiring the ability to adapt to medical VQA from only a few examples. CheXagent [11] is a foundation model composed of a clinical LLM, a visual encoder, and a cross-modal bridge network specialized for chest X-ray interpretation, representing an approach deeply specialized to one imaging sub-domain.
 
-These prior studies commonly target models on the scale of billions to hundreds of billions of parameters and presuppose either continued pretraining on large biomedical corpora or the generation of large-scale instruction data. By contrast, this study fine-tunes 2-3B-class lightweight models with QLoRA using only small domain datasets (thousands to tens of thousands of samples), focusing on practical adaptability under constrained computational resources; the approach therefore differs in kind. Direct experimental comparison with these prior studies lies outside the present scope. However, since LLaVA-Med reports figures on the standard test splits of the same three datasets used here, an indirect comparison restricted to closed-ended metrics — where the scoring criteria coincide — is presented in Section 4.4.6 (Table 4.4a) of Chapter IV. Open-ended metrics are excluded from comparison because the two scoring schemes differ fundamentally; the grounds and the remaining constraints are discussed in Section 5.3(2) of Chapter V.
+These prior studies commonly target models on the scale of billions to hundreds of billions of parameters and presuppose either continued pretraining on large biomedical corpora or the generation of large-scale instruction data. By contrast, this study fine-tunes 2-3B-class lightweight models with QLoRA using only small domain datasets (thousands to tens of thousands of samples), focusing on practical adaptability under constrained computational resources; the approach therefore differs in kind. Direct experimental comparison with these prior studies lies outside the present scope. However, since LLaVA-Med reports figures on the standard test splits of the same three datasets used here, an indirect comparison is presented in Section 4.4.6 (Table 4.4b) of Chapter IV. Closed-ended items compare directly, the scoring criteria coinciding on both sides; for open-ended items, LLaVA-Med's scoring function was reproduced and this study's responses re-scored on the same basis (Appendix C). The grounds and the remaining constraints are discussed in Section 5.3(2) of Chapter V.
 
 ### 2.4 Autonomous Hyperparameter Optimization
 
@@ -124,7 +124,32 @@ In contrast to Bayesian optimization, which relies on a numerical surrogate mode
 
 ### 2.5 Summary of Prior Work and the Distinctiveness of This Study
 
-Taken together, the prior work reviewed above shows that research on medical-specialized VLMs (2.3.3) generally presupposes large models and large domain datasets; research on PEFT methodology (2.2) concentrates on verifying parameter efficiency in general domains; and research on HPO automation (2.4) has rarely compared LLM-agent-based methods directly against established Bayesian optimization on the same task. This study is distinguished from prior work in that, at the intersection of these three currents — **consumer GPU environment, lightweight VLMs, QLoRA domain adaptation, and LLM-based autonomous HPO** — it (1) verifies the zero-shot and fine-tuned medical VQA performance of lightweight VLMs with statistical rigour (RQ1, RQ2), and (2) validates the practical value of autoresearch-style autonomous search by comparing it directly against the industry-standard Optuna (TPE) (RQ3).
+The three currents reviewed above are restated here in the terms that matter for this study.
+
+**Research on medical-specialized VLMs (2.3.3) presupposes large models and large domain datasets.** LLaVA-Med [9], Med-Flamingo [10], and CheXagent [11] all combine models of billions of parameters or more with continued pretraining on large biomedical corpora or the generation of large-scale instruction data. This line raised the performance ceiling of medical VQA, but it is not an approach reproducible on a single consumer-grade GPU.
+
+**Work adapting lightweight models through PEFT followed.** Shourya et al. [18] applied LoRA to the attention heads of both the vision tower and the language model of the 3B-class PaliGemma-mix-448 and trained it in two stages on SLAKE, PMC-VQA, ROCO v2.0, and MedPix 2.0, showing that with appropriately curated data a small model can reach robust performance on both open- and closed-ended items. Ma et al. [19] distilled the chain of thought of a 235B teacher model into a 2B student through LoRA, reaching 64.9% on PMC-VQA. Rezaei et al. [20] applied LoRA and AdaLoRA comparatively across a 7B–11B model family, attaining 90–93% on VQA-RAD and SLAKE and reporting deployability at 15 GB of VRAM. These studies share this work's concern with resource constraints. Their hyperparameters, however, are **generally fixed by hand or by small comparisons; the search strategy itself is not the object of study.**
+
+**Research on LLM-agent-based HPO (2.4.2) is growing quickly but has not converged.** AgentHPO [21] reports that across 12 representative machine-learning tasks an LLM agent exceeded random search and, on many tasks, surpassed the best human trials. LLAMBO [22] replaced the components of Bayesian optimization — warm start, surrogate model, candidate sampling — with LLMs and showed gains early in the search, where observations are sparse. Ferreira et al. [23], by contrast, report that in tuning a small language model under a fixed compute budget, classical optimizers such as CMA-ES and TPE outperformed pure LLM methods and a hybrid combining classical optimization with LLM guidance performed best, concluding that LLMs are most effective as a complement to classical optimizers rather than a replacement. **This current has therefore not reached consensus, and comparisons under identical conditions on a concrete task such as medical-domain VLM tuning remain rare.**
+
+**Table 2.1. Position of this study relative to prior work**
+
+| Study | Model scale | Domain adaptation | Evaluation datasets | How hyperparameters are set |
+|---|---|---|---|---|
+| LLaVA-Med [9] | 7B | Instruction tuning on a biomedical corpus | PathVQA, SLAKE, VQA-RAD | Manual |
+| Med-Flamingo [10] | OpenFlamingo-9B based | Continued pretraining + few-shot | Medical VQA (few-shot setting) | Manual |
+| CheXagent [11] | Foundation model | Chest X-ray specialized pretraining | Chest X-ray | Manual |
+| Shourya et al. [18] | 3B | Two-stage LoRA fine-tuning | SLAKE, PMC-VQA, ROCO v2.0, MedPix 2.0 | Manual |
+| Ma et al. [19] | 2B (235B teacher) | LoRA chain-of-thought distillation | PMC-VQA | Manual |
+| Rezaei et al. [20] | 7B–11B | LoRA / AdaLoRA | VQA-RAD, SLAKE | Small-scale rank comparison |
+| AgentHPO [21] | Not applicable (HPO study) | Not applicable | 12 general ML tasks | LLM agent vs random and human |
+| LLAMBO [22] | Not applicable (HPO study) | Not applicable | General-domain HPO | LLM-enhanced Bayesian optimization |
+| Ferreira et al. [23] | Small language model | Not applicable | Small-LM tuning | Classical (CMA-ES, TPE) vs LLM vs hybrid |
+| **This study** | **Four 2–3B-class models** | **QLoRA** | **PathVQA, SLAKE, VQA-RAD** | **LLM agent vs Optuna, random, manual (direct comparison at equal budget)** |
+
+As Table 2.1 makes visible, prior work concentrates on either **model adaptation** or **search strategy**. The lightweight-VLM line treats adaptation methods while fixing hyperparameters by hand; the HPO line treats search strategies while targeting general-domain tasks. This study sits where the two axes meet — **consumer GPU environment, lightweight VLMs, QLoRA domain adaptation, and LLM-based autonomous HPO** — and is distinguished on three counts.
+
+First, where prior lightweight-VLM work generally treats a single model, this study **compares four 2–3B-class open models across three datasets under one protocol** and tests the fine-tuning effect with mixed-effects models and bootstrap (RQ1, RQ2). Second, it **treats the search strategy itself as an experimental variable**, comparing autoresearch-style autonomous search directly against Optuna (TPE), random search, and manual settings at equal budget (RQ3). Third, it independently tests whether the advantage of classical optimization that Ferreira et al. [23] observed for general-domain small language models **also reproduces in QLoRA tuning of a medical VLM**. The results in Section 4.3 are this study's answer, and Section 5.2 sets them against the conclusion of [23].
 
 ---
 
@@ -183,7 +208,7 @@ Each dataset was used with its official train/val/test split unchanged. The QA-p
 
 Zero-shot performance before fine-tuning was measured for 4 models × 3 datasets = 12 conditions. Because evaluation uses greedy decoding, it is deterministic: changing the seed does not change the result, so repeated trials are meaningless. Evaluation therefore used a single seed (42), and uncertainty is reported as a bootstrap 95% confidence interval over the per-sample correct/incorrect decisions of each condition. Since the four models are evaluated on an identical test set, comparison across models has a paired structure; accordingly, Cochran's Q test (binary correctness on a shared test set, H0: equal accuracy) and pairwise McNemar post-hoc tests with Bonferroni correction were used instead of ANOVA, which assumes independent samples.
 
-The measured metrics are closed-ended accuracy (multiple choice), open-ended accuracy (gold-token matching) together with BERTScore F1 (roberta-large), bootstrap 95% CIs for each accuracy, response time (ms per item), and peak VRAM (MB).
+The measured metrics are closed-ended accuracy (multiple choice), open-ended accuracy (exact match after normalization, or containment of the gold answer string) together with the companion metric BERTScore F1 (roberta-large), bootstrap 95% CIs for each accuracy, response time (ms per item), and peak VRAM (MB).
 
 ### 3.6 Experiment 2: QLoRA Fine-Tuning (Phase 2)
 
@@ -239,9 +264,11 @@ In addition, a **200-trial configuration-consistency re-experiment (Autoresearch
 
 ### 3.8 Evaluation Metrics and Statistical Analysis
 
-#### 3.8.1 Dual Reporting of BERTScore
+#### 3.8.1 Open-Ended Scoring Criterion and Dual Reporting of BERTScore
 
-Open-ended responses are reported with both exact match and BERTScore F1. The general-purpose criterion (roberta-large, threshold ≥ 0.7) is the sole decision metric (primary) for accuracy and statistical testing, while the medical-specialized criterion (BioBERT, dmis-lab/biobert-v1.1) is reported alongside as a secondary metric only; no dual gating (requiring both metrics to pass before an answer is judged correct) is applied.
+Correctness for open-ended responses is decided by **exact match after normalization, or containment of the gold answer string** (`compute_open_accuracy` in `src/evaluate/metrics.py`). The open-ended accuracy reported in Chapter IV, the overall accuracy that incorporates it, and every statistical test built on top of them all follow this criterion.
+
+BERTScore F1 is a **companion metric** that takes no part in deciding correctness. The general-purpose criterion (roberta-large, threshold ≥ 0.7) is reported as primary and the medical-specialized criterion (BioBERT, dmis-lab/biobert-v1.1) as secondary; no dual gating (requiring both metrics to pass before an answer is judged correct) is applied. roberta-large is lenient towards short medical answers, however, and its threshold pass rate saturates at 99.91% or above across all 36 Phase 2 main conditions (100% in 34 of them), leaving the metric with no discriminative power between models or conditions. That is why correctness is decided by the match-or-containment criterion above rather than by whether BERTScore passes its threshold.
 
 #### 3.8.2 Dual Measurement of Catastrophic Forgetting
 
@@ -253,7 +280,11 @@ Motivated by the concern that plain accuracy does not fully capture the clinical
 
 `WCA = Σ(accuracy per type × weight) / Σweights`
 
-Weights were assigned by clinical importance in the order diagnosis = 1.0 (a diagnostic error directly affects the direction of treatment) > location = 0.8 > measurement = 0.7 > description = 0.6 > temporal = yes_no = 0.5 (binary judgements with limited information content). These weights, however, were set arbitrarily by the researcher without external clinical literature or Delphi consensus; they cannot be interpreted as an absolute scale of clinical importance and are used only in a limited way as a supplementary reference metric complementing the primary metrics (accuracy and BERTScore).
+Weights were assigned by clinical importance in the order diagnosis = 1.0 (a diagnostic error directly affects the direction of treatment) > location = 0.8 > measurement = 0.7 > description = 0.6 > temporal = yes_no = 0.5 (binary judgements with limited information content).
+
+**The principle behind the weighting rests on established practice in clinical quality assurance.** ACR RADPEER, the standard peer-review system for radiological interpretation, does not simply count discrepancies but **grades them by clinical significance** — separating clinically significant from clinically insignificant discrepancies and further classifying by the difficulty of the case [17]. The premise that not all errors carry equal weight, and that they should be differentiated by their effect on the patient's treatment pathway, is therefore not introduced here but already current in clinical quality assessment. This study's ordering — weighting an error in the diagnosis more heavily than an error in describing location or size, or a binary judgement — transposes that principle onto the axis of question type.
+
+**The individual numeric weights, however, are not themselves supported by the literature.** What RADPEER supplies is the principle and the categories of grading, not per-type values, and this study convened neither a panel of medical experts nor a Delphi consensus. These values should therefore be read as an ordinal scale expressing an ordering, not as measurements of absolute clinical importance. Whether that limitation affects the conclusions was tested separately by varying the weights (Section 4.4.4, Table 4.4a), and the conclusions drawn from WCA proved not to depend on any particular weight assignment. WCA is used only as a supplementary metric for reading error patterns, never as a replacement for accuracy.
 
 Expected Calibration Error (ECE) [16], a metric measuring how well a model's predicted confidence matches its actual accuracy, was planned for inclusion but could not be computed because the current evaluation pipeline does not store per-sample confidence (see the limitations in Section 5.3 of Chapter V).
 
@@ -292,7 +323,7 @@ Phase 1 measured the zero-shot performance of four lightweight VLMs (Gemma4-E2B,
 | SmolVLM2-2.2B | SLAKE | 0.6648 | 0.3598 | **0.4618** | 0.9130 | 774.7 | 5,991.2 |
 | SmolVLM2-2.2B | VQA-RAD | 0.6574 | 0.3150 | **0.5055** | 0.9029 | 756.7 | 5,996.2 |
 
-> Overall Acc denotes accuracy computed over closed-ended and open-ended items combined. Open items are scored by BERTScore (roberta-large backbone, threshold method) and closed items by exact string match against the gold answer.
+> Overall Acc denotes accuracy computed over closed-ended and open-ended items combined. Open items are scored by exact match after normalization or containment of the gold answer string, and closed items by exact string match against the gold answer (Section 3.8.1). The BERTScore F1 column is a companion metric that takes no part in deciding correctness; it is the mean per-item F1 on the roberta-large backbone.
 
 On pooled accuracy across all datasets, the performance of the four models is given in Table 4.1a (n = 8,231, the total number of items across the three datasets).
 
@@ -370,21 +401,23 @@ A Mixed-Effects Model estimated by pooling the four models without distinguishin
 
 #### 4.2.2 Effect of Data Size (Ablation A)
 
-Performance across training-data ratios is given in Table 4.2a.
+Performance and training time across training-data ratios are given in Table 4.2a.
 
-**Table 4.2a. Performance by training-data ratio (Qwen3-VL-2B, PathVQA, mean of 3 seeds)**
+**Table 4.2a. Performance and training time by training-data ratio (Qwen3-VL-2B, PathVQA, mean of 3 seeds)**
 
-| subset_ratio | Training samples | Overall Acc (mean) |
-|:---:|:---:|:---:|
-| 0.05 | 982 | 0.4150 |
-| 0.10 | 1,965 | 0.4309 |
-| 0.25 | 4,913 | 0.4357 |
-| 0.50 | 9,827 | 0.4628 |
-| 1.00 | 19,654 | **0.5019** |
+| subset_ratio | Training samples | Overall Acc (mean) | Training time (min, mean) | Time SD |
+|:---:|:---:|:---:|:---:|:---:|
+| 0.05 | 982 | 0.4150 | 27.6 | 0.32 |
+| 0.10 | 1,965 | 0.4309 | 28.1 | 0.25 |
+| 0.25 | 4,913 | 0.4357 | 28.4 | 0.36 |
+| 0.50 | 9,827 | 0.4628 | 28.5 | 0.21 |
+| 1.00 | 19,654 | **0.5019** | 27.9 | 0.26 |
 
 Accuracy increases monotonically with the training-data ratio, with no sign of reaching a performance ceiling over the interval from 0.05 to 1.0; within the experimental range, **using the full dataset (ratio = 1.0) is optimal**.
 
-> **Bug in the `train_time_min` field (cause identified)**: Although not included in the table above, the `train_time_min` column of `phase2_summary.csv` is unusually large for seed 42 alone under identical conditions (for example, at ratio = 1.0, seed 42 = 369.6 minutes versus about 28 minutes for seeds 123 and 456). Direct comparison against each condition's `train_result.json` showed that `train_runtime_sec`, measured internally by the Trainer, was **consistently normal at 27-29 minutes across all seeds**; the problem lay only in `train_time_min`, which the wrapping script measures by wall clock. The bug appears only in the condition that **first creates** the preprocessing cache for a (model, dataset) combination, where the one-off cost of cache creation is added to wall-clock time; the same pattern was confirmed in an exhaustive check of the 36 main conditions (for example, `qwen25-vl-3b/pathvqa/seed42` at 395.4 minutes versus 44.9 minutes actual). **Training-outcome metrics such as accuracy and loss are unaffected by this bug, and the accuracy-based conclusions of this section are unchanged.** Future analyses requiring time comparisons (such as Phase 3 cost estimation) should use `train_runtime_sec` rather than `train_time_min`.
+Training time, by contrast, stays essentially constant at 27.6–28.5 minutes even as the training data grows twentyfold (982 → 19,654 items). This follows from the `max_steps = 500` cap, which fixes samples_seen at 4,000 per condition (Section 3.6): what grows with the data ratio is not the amount of training but **the diversity of data the model encounters**. The accuracy gain in Table 4.2a (0.4150 → 0.5019, +8.7 pp) was therefore obtained through diversity alone, at no additional compute — suggesting that under a fixed budget, acquiring training data is more cost-effective than acquiring compute. This reading is confined to the fixed-step-budget condition, however; whether the same relation holds once the cap is lifted was not verified (Section 5.3 (12)).
+
+> **Basis of the training-time measurement**: The training times in the table above are `train_runtime_sec`, recorded internally by the Trainer, converted to minutes. The `train_time_min` column of `phase2_summary.csv` is a wall-clock measurement taken by the script wrapping the training run, and is therefore inflated in the condition that **first creates** the preprocessing cache for a (model, dataset) combination, where the one-off cost of cache creation is added to the elapsed time. An exhaustive check of all 75 Phase 2 conditions found 9 such conditions, **all of them seed 42** (largest discrepancy, `qwen25-vl-3b/pathvqa/seed42`: 395.4 minutes recorded versus 44.9 minutes actual). Training-outcome metrics such as accuracy and loss are independent of how time is measured, so the accuracy-based conclusions of this section are unaffected. Phase 3 records time from `train_runtime_sec` in the first place (`src/autoresearch/loop.py`), so the figures in Section 4.3 are not subject to this issue. The re-aggregation script is `scripts/recompute_phase2_train_time.py`, and the full 75-condition comparison table is in `results/phase2_finetune/train_time_corrected.csv`.
 
 #### 4.2.3 Effect of LoRA Rank (Ablation B)
 
@@ -703,6 +736,22 @@ This study therefore verified directly **whether the accuracy improvement it ach
 
 This result must not, however, be generalized to "types of high clinical value do not improve," and three qualifications should be read alongside it. First, **the sample sizes of the highest-weighted types fall short of what a judgement requires**: of the 500 evaluation items, diagnosis has 3, measurement has 4, and temporal has none. Their 0% contribution means less that they failed to improve than that the sample cannot decide whether they did. Second, **the per-type gain is in fact largest among the higher-weighted types**: location, weighted 0.8, tripled from 0.2381 to 0.7143, the largest gain of any type. Its contribution is only 15.4% because its sample is 21 items (4.2%), not because of its performance. Third, **weighting by clinical importance does not cancel the gain**: WCA rose from 0.1527 zero-shot to 0.2627 under the best configuration (+0.1099), an increase comparable to the overall accuracy increase (+0.1260).
 
+Because this third judgement could depend on how the WCA weights are chosen, it was checked separately by varying the weighting scheme — the individual weights being, as stated in Section 3.8.3, an ordinal scale not supported by the literature at the level of specific values.
+
+**Table 4.4a. Sensitivity of WCA to the weighting scheme (Qwen3-VL-2B, PathVQA, 500 evaluation items)**
+
+| Weighting scheme | Weights | Zero-shot WCA | Best config. WCA | Increase | Relative to overall increase |
+|---|---|:---:|:---:|:---:|:---:|
+| Current (3.8.3) | 1.0 / 0.8 / 0.7 / 0.6 / 0.5 | 0.1527 | 0.2627 | +0.1099 | 0.87× |
+| Uniform | 1.0 for all types | 0.1843 | 0.2837 | +0.0995 | 0.79× |
+| Strong contrast | 1.0 / 0.9 / 0.8 / 0.4 / 0.2 | 0.1119 | 0.2466 | +0.1348 | 1.07× |
+| Weak contrast | 1.0 / 0.95 / 0.9 / 0.85 / 0.8 | 0.1738 | 0.2783 | +0.1045 | 0.83× |
+| Reversed | 0.5 / 0.5 / 0.5 / 0.6 / 1.0 | 0.2166 | 0.2915 | +0.0749 | 0.59× |
+
+> Weights are listed in the order diagnosis / location / measurement / description / yes_no. The reversed scheme is not a realistic assumption but a check in the opposite direction, testing whether the conclusion depends on the ordering of the weights. The final column divides the WCA increase by the overall accuracy increase (+0.1260). The command to reproduce is `scripts/wca_weight_sensitivity.py`; the output is `results/phase3_autoresearch/wca_weight_sensitivity.json`.
+
+**WCA increased under all five schemes (+0.0749 to +0.1348), with increases in the range 0.59–1.07× the overall accuracy increase.** Sharpening the contrast in clinical importance beyond the current scheme in fact enlarges the increase (1.07×), and reversing the ordering of the weights entirely preserves it (0.59×). The judgement that weighting by clinical importance does not cancel the gain is therefore not an artifact of one particular weight assignment. What this check establishes, however, is **the conclusion's independence from the weights**, not the clinical validity of the weights themselves; and the shortage of samples noted above (diagnosis 3, measurement 4, temporal 0) is not remedied by any weighting scheme.
+
 In sum, **the concentration is real, but its cause lies in the type composition of the evaluation sample rather than in per-type learning difficulty.** The PathVQA test split places 91% of its items in yes_no and description, while diagnosis accounts for just 23 of all 6,719 items (0.34%). Judging performance on the clinically important types would require an evaluation set that deliberately oversamples them instead of using the natural distribution — a constraint at the dataset level rather than in this study's evaluation design (Sections 5.3(7), 5.4).
 
 #### 4.4.5 What Automated Search Reached, and the Limits of Autonomous Agents
@@ -722,24 +771,30 @@ The re-experiment in Section 4.3.5 decomposes this boundary one step further. **
 
 This study did not conduct direct experimental comparison with medical-specialized VLMs (Section 2.5). LLaVA-Med [9], however, reports figures on **the standard test splits of the same three datasets**, so indirect comparison is possible within that scope. Before comparing, it is necessary to define **which axes are comparable and which are not**.
 
-- **Closed-ended is comparable.** Both report simple accuracy based on exact string match against the gold answer, and the evaluation samples are identical at 1,061 items for SLAKE and 451 for VQA-RAD (only PathVQA differs, 6,761 vs 6,719, a gap of 42 items).
-- **Open-ended is not comparable.** LLaVA-Med uses as its open metric *the proportion of generated responses containing the gold token (recall)*, whereas this study uses *whether BERTScore F1 ≥ 0.7* (Section 3.8.1). The former is structurally a far more lenient measure, so placing the two figures side by side would itself be misleading. They are noted below for reference with **an explicit statement that they are not objects of comparison**.
+- **Closed-ended is comparable as it stands.** Both report simple accuracy based on exact string match against the gold answer, and the evaluation samples are identical at 1,061 items for SLAKE and 451 for VQA-RAD (only PathVQA differs, 6,761 vs 6,719, a gap of 42 items).
+- **Open-ended was made comparable by re-scoring.** LLaVA-Med uses as its open metric *the proportion of gold-answer tokens present in the generated response (recall)*, whereas the open-ended accuracy this study reports throughout Chapter IV uses *exact match after normalization, or containment of the gold answer string* (Section 3.8.1). The latter is a binary judgement that credits an answer only when the entire gold string is present, making it stricter than a recall that credits partial matches; placing the two side by side unchanged would therefore penalize this study unfairly. Accordingly, **the scoring function of LLaVA-Med v1.0.0 was reproduced and applied to this study's open-ended responses to re-score them on the same basis** (Appendix C). The evaluation itself was not re-run — only the scoring criterion was changed and reapplied to the stored generated responses — so the model, samples, and seeds are identical to the other figures in Chapter IV.
 
-**Table 4.4a. Indirect comparison with figures reported in prior work (closed-ended basis)**
+**Table 4.4b. Indirect comparison with figures reported in prior work**
 
 | Model | Scale | Training approach | PathVQA | SLAKE | VQA-RAD |
 |------|:----:|-----------|:-------:|:-----:|:-------:|
+| *Closed-ended (accuracy)* | | | | | |
 | LLaVA (general) | 7B | No domain training | 63.20 | 63.22 | 65.07 |
 | LLaVA-Med | 7B | Biomedical corpus pretraining + per-dataset fine-tuning | **91.21** | 85.34 | **84.19** |
 | **This study (Qwen3-VL-2B)** | **2B** | **QLoRA fine-tuning only** | 83.12 | **85.26** | 72.91 |
+| *Open-ended (recall, same basis)* | | | | | |
+| LLaVA-Med | 7B | Biomedical corpus pretraining + per-dataset fine-tuning | **37.95** | **83.08** | **61.52** |
+| **This study (Qwen3-VL-2B)** | **2B** | **QLoRA fine-tuning only** | 19.97 | 72.87 | 34.32 |
 
-> The LLaVA and LLaVA-Med figures are quoted from Table 4(a) of the original paper. The figures for this study are `closed_acc` for the Phase 2 main conditions (mean of 3 seeds). **Open-ended figures are excluded from the table because the measures differ** (for reference, LLaVA-Med's open figures are PathVQA 37.95 / SLAKE 83.08 / VQA-RAD 61.52 on a token-recall basis, while this study's are 17.15 / 66.95 / 26.00 on a BERTScore-threshold basis).
+> The LLaVA and LLaVA-Med figures are quoted from Table 4(a) of the original paper. This study's closed figures are `closed_acc` for the Phase 2 main conditions (mean of 3 seeds); its open figures are the mean over the same three seeds after re-scoring the generated responses of those same conditions on LLaVA-Med's basis (per-seed standard deviation 0.11–0.34; Appendix C). For reference, the match-or-containment open accuracy reported elsewhere in Chapter IV is PathVQA 17.15 / SLAKE 66.95 / VQA-RAD 26.00 — changing the criterion alters neither the ordering nor the direction of the gaps.
 
 The most noteworthy result is that **on SLAKE a 2B model reached practically the same closed accuracy as a 7B medical-specialized model** (85.26 vs 85.34). LLaVA-Med was pretrained on a biomedical corpus of PubMed Central scale and then fine-tuned per dataset, whereas this study performed only QLoRA fine-tuning on a consumer-grade GPU without large-scale domain pretraining. Since all three models greatly exceed general-purpose LLaVA without domain training (63.22), this suggests that **for tasks at the level of SLAKE, the advantage of large-scale domain pretraining can be substantially offset by QLoRA adaptation alone**.
 
 On PathVQA (83.12 vs 91.21) and VQA-RAD (72.91 vs 84.19), by contrast, a gap of 8-11%p remains. Given the character of the two datasets this gap is unsurprising: PathVQA is a highly specialized imaging domain of pathology tissue, and VQA-RAD has only 451 items, which disadvantages small-scale fine-tuning. In other words, **the advantage of large-scale domain pretraining remains clearly visible in proportion to the specialization of the task.**
 
-This comparison carries the following constraints, so its conclusions must not be over-extended. (1) The figures for this study are means over three seeds, whereas LLaVA-Med reports a single run. (2) The training budgets differ greatly (this study applies a `max_steps=500` ceiling). (3) The figures are quoted from a published paper rather than reproduced with identical code in an identical environment, so unreported differences in preprocessing, prompting, and so on may exist. Direct reproduction under an identical protocol remains future work (Section 5.3(2)).
+**On open-ended items scored on the same basis, however, that parity does not hold.** LLaVA-Med leads on all three datasets, by 17.98 pp on PathVQA (19.97 vs 37.95), 10.21 pp on SLAKE (72.87 vs 83.08), and 27.20 pp on VQA-RAD (34.32 vs 61.52). Even SLAKE, effectively a tie on closed-ended items, falls 10 pp behind on open-ended ones. The likely reason is that the two question types demand different capabilities: a closed-ended item is a discrimination among a restricted set of options, so QLoRA adaptation alone can learn much of a dataset's answer distribution, whereas an open-ended item requires generating the answer expression itself, where the domain vocabulary and phrasing conventions acquired through biomedical-corpus pretraining act directly. The reading that **"a 2B QLoRA model is on par with a 7B medical-specialized model" must therefore be confined to closed-ended items and cannot be extended to the quality of generated prose.** This marks a concrete limit of lightweight-VLM adaptation in a consumer-grade setting.
+
+This comparison carries the following constraints, so its conclusions must not be over-extended. (1) The figures for this study are means over three seeds, whereas LLaVA-Med reports a single run. (2) The training budgets differ greatly (this study applies a `max_steps=500` ceiling). (3) The figures are quoted from a published paper rather than reproduced with identical code in an identical environment, so unreported differences in preprocessing, prompting, and so on may exist. (4) The open-ended re-scoring aligns **the scoring function only**. LLaVA-Med's reported figures were produced by its own evaluation pipeline, so differences in answer-generation conditions and in the composition of the evaluation sample (PathVQA 6,761 vs 6,719) remain. Direct reproduction under an identical protocol remains future work (Section 5.3(2)).
 
 #### 4.4.7 Methodological Discussion: The Unit of Aggregation Changes the Conclusion
 
@@ -786,13 +841,15 @@ The contributions of this study are fourfold.
 
 This study did not stop at offering that diagnosis but **verified it through a separate 200-trial re-experiment** (Section 4.3.5). Removing five configuration inconsistencies between the prompt and the implementation restored unique configurations to 18.90 of 20 and eliminated the significant disadvantage against Optuna (p = .0112 → .1726). The duplicate proposals observed were thus **empirically shown to be a product of configuration rather than an intrinsic limitation of the agent**. Recovered diversity did not, however, translate into performance: the run-level mean still fell short of Optuna (0.4292 vs. 0.4490) and no improvement over the original condition was demonstrated (p = .2387). **Reporting a negative result while identifying its cause and settling the question of correctability by experiment** is the core of this contribution, and it indicates that future work on LLM-based HPO must treat prompt–implementation consistency as a controlled variable (Section 5.3(8)).
 
+This result **points in the same direction as independent work in a different domain.** Ferreira et al. [23] report that, in tuning a small language model under a fixed compute budget, classical optimizers such as CMA-ES and TPE outperformed pure LLM methods and a hybrid combining classical optimization with LLM guidance performed best. The conclusion this study reaches on a different task — QLoRA tuning of a medical VLM, where autonomous search did not surpass Optuna and no advantage appeared even after the configuration inconsistencies were corrected — agrees with theirs. That results of the same direction emerged across different domains, models, and search spaces raises the likelihood that **the counter-evidence against treating LLM agents as a replacement for established optimizers is not an accident of one task**. Both studies were nevertheless conducted under constrained budgets, so the relationship at substantially larger budgets remains open (Section 5.3(13)).
+
 **Fourth, it records two cases in which the choice of aggregation unit reversed the conclusion, together with the grounds for the judgement.** At two junctures — whether to pool models (Phase 2) and whether to treat trials as independent observations (Phase 3) — opposite conclusions followed from the aggregation unit. In particular, the fact that the variation observed when repeating an identical configuration (about 0.056) exceeds the mean difference between strategies detected here (0.031) constitutes a quantitative counterexample to the practice of comparing techniques from single-run results (Section 4.4.7).
 
 ### 5.3 Limitations
 
 **(1) Limits of contamination control.** Because the target datasets were released before the pretraining cut-off of the models, pretraining data contamination is possible. This study identified samples suspected of exposure using Min-K% Probability [15] and confirmed the robustness of its conclusions on a reduced set with those samples removed (Section 4.1.1); Min-K% is, however, only an indirect indicator, and complete control or precise quantification of contamination is not possible. In addition, absolute accuracy on the reduced set falls by 8.06%p, exceeding the 5%p band of the interpretation criteria fixed in advance in Section 3.4. This study did not treat that as grounds for reconsidering the conclusion, arguing robustness instead from the preservation of ranking and significance (Section 4.1.1); that judgement is defensible only for relative comparison between models, not for the level of absolute performance. The magnitude of contamination's effect on absolute performance could not be isolated within this study's design.
 
-**(2) Absence of direct comparison with medical-specialized VLMs.** Medical-specialized VLMs such as LLaVA-Med, Med-Flamingo, and CheXagent were not reproduced and compared directly in this study's environment (Section 2.5). Table 4.4a in Section 4.4.6 is an indirect comparison quoting figures that LLaVA-Med reports on **the standard test splits of the same three datasets**, and it carries three constraints. First, **comparison holds only for closed-ended metrics, where the scoring criteria coincide** — for open-ended metrics LLaVA-Med uses the proportion of responses containing the gold token (recall) while this study uses a BERTScore F1 threshold, so the measures differ fundamentally. Second, this study's figures are means over three seeds whereas the quoted figures are single-run reports, and the training budgets differ greatly. Third, because the figures were not reproduced with identical code in an identical environment, unreported differences in preprocessing, prompting, and so on remain. Med-Flamingo and CheXagent were excluded from the table because they do not provide figures on these three datasets under the same protocol. Direct reproduction under an identical protocol remains future work.
+**(2) Absence of direct comparison with medical-specialized VLMs.** Medical-specialized VLMs such as LLaVA-Med, Med-Flamingo, and CheXagent were not reproduced and compared directly in this study's environment (Section 2.5). Table 4.4b in Section 4.4.6 is an indirect comparison quoting figures that LLaVA-Med reports on **the standard test splits of the same three datasets**, and it carries three constraints. First, **comparison holds only to the extent that the scoring criteria have been aligned** — closed-ended items use the same accuracy criterion on both sides and compare directly, while for open-ended items the scoring function of LLaVA-Med v1.0.0 was reproduced and this study's responses were re-scored on that same basis (recall; Appendix C). Only the scoring function was aligned, however: differences in answer-generation conditions and in the composition of the evaluation sample remain. Second, this study's figures are means over three seeds whereas the quoted figures are single-run reports, and the training budgets differ greatly. Third, because the figures were not reproduced with identical code in an identical environment, unreported differences in preprocessing, prompting, and so on remain. Med-Flamingo and CheXagent were excluded from the table because they do not provide figures on these three datasets under the same protocol. Direct reproduction under an identical protocol remains future work.
 
 **(3) Confounding of effective training volume in Phase 3.** Phase 3 sought to control training volume by fixing `max_steps=200` for all trials, but **fixing the number of steps did not fix the number of training samples actually seen.** Because the search space includes `batch_size` (1/2/4) and `grad_accum_steps` (4/8/16), the effective number of training samples (= batch × grad_accum × max_steps) ranged from 800 to 12,800, **a factor of about 16**. The strategy comparison in Section 4.3 therefore mixes differences in effective training volume with hyperparameter quality. In particular, the inferiority of Manual, which used a fixed configuration (batch 1 × grad_accum 8 → 1,600 samples), may partly reflect a training-volume disadvantage. The best configurations of Optuna and Autoresearch were, however, both batch 4 × grad_accum 16 (12,800 samples), so the difference between these two strategies — the comparison central to RQ3 — is not explained by this confound. Since `results.tsv` records batch_size, grad_accum_steps, and max_steps for every trial, effective training volume can be computed post hoc, though the value itself was not reported as a column.
 
@@ -802,7 +859,7 @@ This study did not stop at offering that diagnosis but **verified it through a s
 
 **(6) Limits of statistical power.** The test of the fine-tuning effect in Phase 2 has n = 9 (3 datasets × 3 seeds), and the run-level test in Phase 3 has n = 10 per strategy. Robustness was secured through triple verification (BCa bootstrap, mixed-effects, Wilcoxon) and a repeated run-level design, but the sample sizes themselves make the confidence intervals for effect sizes wide (for example, a Cohen's d 95% CI spanning [0.932, 3.153] in Section 4.2.1).
 
-**(7) Indirectness of the clinical significance evaluation.** The per-question-type weights of Weighted Clinical Accuracy (WCA) are a provisional scale assigned by the researcher without external clinical literature or expert consensus (Section 3.8.3) and cannot be interpreted as an absolute scale of clinical importance. Expected Calibration Error (ECE) could not be computed because the current evaluation pipeline does not store per-sample confidence. The possibility raised in Section 4.4.4 — that accuracy gains were concentrated in types of low clinical value — was verified by a type-level decomposition over all 810 trials (Table 4.4), and the concentration itself is confirmed. The decisive constraint on that verification, however, lies in the type composition of the evaluation sample: among the 500 evaluation items, diagnosis has 3, measurement has 4, and temporal has none, so **performance on the highest-weighted types is effectively undetermined**. This constraint originates in the type distribution of PathVQA itself (diagnosis is 23 of all 6,719 items, 0.34%) rather than in this study's evaluation design, and removing it would require a separate evaluation set that oversamples the clinically important types (Section 5.4).
+**(7) Indirectness of the clinical significance evaluation.** The **principle** of grading errors by clinical significance in Weighted Clinical Accuracy (WCA) rests on established practice in ACR RADPEER [17], the peer-review system for radiological interpretation; the **numeric values** assigned to individual types, however, are an ordinal scale that has not passed medical-expert consensus (Section 3.8.3) and cannot be interpreted as measurements of absolute clinical importance. Whether this limitation governs the conclusions was tested across five weighting schemes, and the WCA increase held under all of them, including a reversed weighting — confirming that the conclusion does not depend on any particular weight assignment (Table 4.4a). This demonstrates the conclusion's independence from the weights, not the clinical validity of the weights themselves. Expected Calibration Error (ECE) could not be computed because the current evaluation pipeline does not store per-sample confidence. The possibility raised in Section 4.4.4 — that accuracy gains were concentrated in types of low clinical value — was verified by a type-level decomposition over all 810 trials (Table 4.4), and the concentration itself is confirmed. The decisive constraint on that verification, however, lies in the type composition of the evaluation sample: among the 500 evaluation items, diagnosis has 3, measurement has 4, and temporal has none, so **performance on the highest-weighted types is effectively undetermined**. This constraint originates in the type distribution of PathVQA itself (diagnosis is 23 of all 6,719 items, 0.34%) rather than in this study's evaluation design, and removing it would require a separate evaluation set that oversamples the clinically important types (Section 5.4).
 
 **(8) Internal inconsistencies in the autonomous agent's configuration.** The most serious limitation identified post hoc is that the Autoresearch condition contains the following four configuration inconsistencies. These are stated explicitly because they prevent the negative result of Section 4.3 from being generalized as an "intrinsic limitation of LLM agents."
 
@@ -885,7 +942,21 @@ This list contains only works actually cited in the text, formatted in IEEE styl
 
 [16] C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, "On calibration of modern neural networks," in *Proc. 34th Int. Conf. Machine Learning (ICML)*, PMLR, vol. 70, pp. 1321-1330, 2017.
 
-> **Note on style**: Entries [2], [3], [4], [9], [10], [11], and [15] have more than six authors and are therefore abbreviated with "et al." per IEEE convention; the complete author lists are available in the original sources. Entries [2], [3], [6], and [11] are technical reports or preprints with no conference version. The first version of [11] was titled "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation"; the title was changed in the December 2024 revision. The CheXagent referred to in Section 2.5 is this work.
+[17] S. Goldberg-Stein et al., "ACR RADPEER committee white paper with 2016 updates: Revised scoring system, new classifications, self-review, and subspecialized reports," *Journal of the American College of Radiology*, vol. 14, no. 8, pp. 1080-1086, 2017, doi: 10.1016/j.jacr.2017.03.023.
+
+[18] A. Shourya, M. Dumontier, and C. Sun, "Adapting lightweight vision language models for radiological visual question answering," arXiv:2506.14451, 2025.
+
+[19] R. Ma, S. Jia, H. Lyu, G. Liu, and C. Liao, "LiteMedCoT-VL: Parameter-efficient adaptation for medical visual question answering," arXiv:2605.09384, 2026.
+
+[20] Z. Rezaei, S. Safi Samghabadi, and Y. M. Banad, "Optimizing multimodal models for medical visual question answering: A comparative study of LoRA and AdaLoRA on VQA-RAD and SLAKE-VQA," *Computers in Biology and Medicine*, vol. 200, art. no. 111397, 2026, doi: 10.1016/j.compbiomed.2025.111397.
+
+[21] S. Liu, C. Gao, and Y. Li, "Large language model agent for hyper-parameter optimization," arXiv:2402.01881, 2024.
+
+[22] T. Liu, N. Astorga, N. Seedat, and M. van der Schaar, "Large language models to enhance Bayesian optimization," in *Proc. 12th Int. Conf. Learning Representations (ICLR)*, 2024, arXiv:2402.03921.
+
+[23] F. Ferreira, L. Wobbe, A. Krishnakumar, F. Hutter, and A. Zela, "Can LLMs beat classical hyperparameter optimization algorithms? A study on autoresearch," arXiv:2603.24647, 2026.
+
+> **Note on style**: Entries [2], [3], [4], [9], [10], [11], [15], and [17] have more than six authors and are therefore abbreviated with "et al." per IEEE convention; the complete author lists are available in the original sources. Entries [2], [3], [6], [11], [18], [19], [21], and [23] are technical reports or preprints with no conference version. The first version of [11] was titled "CheXagent: Towards a Foundation Model for Chest X-Ray Interpretation"; the title was changed in the December 2024 revision. The CheXagent referred to in Section 2.5 is this work. Entries [17]-[23] were verified in August 2026 against the original sources or bibliographic records (the JACR official page, arXiv abstract pages, and Crossref).
 
 ---
 
@@ -972,6 +1043,52 @@ The agent diagnosed that "all trials have only 200 steps, so this looks like und
 In repeat 8, from trial 602 onward the agent proposed the identical configuration 11 times in succession, while the measured val_accuracy varied between 0.388 and 0.444. This variation reflects the stochastic behaviour of training and evaluation rather than any difference in configuration (Sections 4.3.4, 4.4.7).
 
 > The full logs are in the `agent_reasoning` column of `results/phase3_autoresearch/results.tsv` and in `rationale.md` within each trial directory.
+
+---
+
+### Appendix C. Open-Ended Re-Scoring on LLaVA-Med's Basis
+
+This appendix documents the procedure and results of re-scoring this study's open-ended responses on the same basis as LLaVA-Med, for the open-ended comparison in Section 4.4.6.
+
+**(1) Why re-scoring is possible**
+
+This study's evaluation pipeline stores per-item records (`per_sample`) for each condition. Every record holds the question, the gold answer, **the model's generated response verbatim**, and the question type, so applying a different scoring criterion to those stored responses yields a different metric without re-running the model. No GPU run was required.
+
+**(2) Scoring criterion**
+
+The recall component of `calculate_f1score`, defined in `llava/eval/eval_metrics/evaluate_metrics.py` of LLaVA-Med v1.0.0, is used. The gold answer and the generated response are normalized by the standard VQA procedure (lowercasing, removal of punctuation and articles, standardization of contractions and number words), tokenized on whitespace, and the proportion of gold tokens appearing in the generated response is taken. The asymmetry in the original implementation — shared tokens counted with the response's multiplicity, missing tokens with the gold answer's — was preserved as-is, since the purpose is comparability and introducing a seemingly more principled variant would defeat it.
+
+Fidelity of the reproduction was confirmed by holding the original function as a reference implementation and comparing outputs. Across all 12,797 open-ended responses of the Phase 2 main conditions plus 8 boundary cases, the two implementations agreed exactly (0 mismatches).
+
+**(3) Results**
+
+**Table C.1. Open-ended re-scoring on LLaVA-Med's basis (Qwen3-VL-2B, Phase 2 main, 3 seeds)**
+
+| Dataset | Open-ended items | This study, recall (mean) | SD | LLaVA-Med reported | Gap |
+|---|:---:|:---:|:---:|:---:|:---:|
+| PathVQA | 3,357 | 19.97 | 0.11 | 37.95 | −17.98 |
+| SLAKE | 706 | 72.87 | 0.31 | 83.08 | −10.21 |
+| VQA-RAD | 200 | 34.32 | 0.34 | 61.52 | −27.20 |
+
+The between-seed standard deviation is small (0.11–0.34), confirming that the observed gaps of 10–27 pp are not explained by seed variation.
+
+**(4) Reference: open-ended figures under each scoring criterion**
+
+| Dataset | Match-or-containment (Chapter IV metric) | LLaVA-Med recall | BERTScore F1 ≥ 0.7 pass rate |
+|---|:---:|:---:|:---:|
+| PathVQA | 17.15 | 19.97 | 100.00 |
+| SLAKE | 66.95 | 72.87 | 100.00 |
+| VQA-RAD | 26.00 | 34.32 | 100.00 |
+
+The three criteria rank by leniency as BERTScore threshold > recall > match-or-containment. Because recall credits partial matches, it comes out 2.8–8.3 pp above the match-or-containment criterion, which credits an answer only when the whole gold string is present; the relative ordering across datasets (SLAKE ≫ VQA-RAD > PathVQA) is identical under both. The BERTScore pass rate, by contrast, saturates at 99.91% or above across all 36 Phase 2 main conditions, tying all three datasets at 100.00 so that no ordering forms at all. That is precisely why it cannot serve as the criterion for deciding correctness (Section 3.8.1).
+
+**(5) How to reproduce**
+
+```
+python3 scripts/rescore_open_llavamed.py
+```
+
+The scoring function is in `src/evaluate/llavamed_recall.py`, and the normalization tables are quoted with attribution in `src/evaluate/vendor/llavamed_glossary.py`. The fidelity tests are in `tests/test_llavamed_recall.py`, and the raw per-seed results in `results/phase2_finetune/llavamed_recall_rescore.json`.
 
 ---
 
