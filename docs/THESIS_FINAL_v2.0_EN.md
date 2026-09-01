@@ -266,7 +266,7 @@ In addition, a **200-trial configuration-consistency re-experiment (Autoresearch
 
 #### 3.8.1 Open-Ended Scoring Criterion and Dual Reporting of BERTScore
 
-Correctness for open-ended responses is decided by **exact match after normalization, or containment of the gold answer string** (`compute_open_accuracy` in `src/evaluate/metrics.py`). The open-ended accuracy reported in Chapter IV, the overall accuracy that incorporates it, and every statistical test built on top of them all follow this criterion.
+Correctness for open-ended responses is decided by **exact match after normalization, or containment of the gold answer string**. The open-ended accuracy reported in Chapter IV, the overall accuracy that incorporates it, and every statistical test built on top of them all follow this criterion.
 
 BERTScore F1 is a **companion metric** that takes no part in deciding correctness. The general-purpose criterion (roberta-large, threshold ≥ 0.7) is reported as primary and the medical-specialized criterion (BioBERT, dmis-lab/biobert-v1.1) as secondary; no dual gating (requiring both metrics to pass before an answer is judged correct) is applied. roberta-large is lenient towards short medical answers, however, and its threshold pass rate saturates at 99.91% or above across all 36 Phase 2 main conditions (100% in 34 of them), leaving the metric with no discriminative power between models or conditions. That is why correctness is decided by the match-or-containment criterion above rather than by whether BERTScore passes its threshold.
 
