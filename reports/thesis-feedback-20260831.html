@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>교수 피드백 반영 결과 — 2026-08-31</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --ivory:#FAF9F5; --paper:#FFFFFF; --slate:#141413;
+  --clay:#D97757; --clay-d:#B85C3E; --oat:#E3DACC; --olive:#788C5D;
+  --g100:#F0EEE6; --g300:#D1CFC5; --g500:#87867F; --g700:#3D3D3A;
+  --sans:"Pretendard",system-ui,-apple-system,sans-serif;
+  --serif:"Pretendard",ui-serif,Georgia,serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",monospace;
+  --max-width:860px; --radius-panel:12px; --radius-row:8px;
+  --border:1.5px solid var(--g300);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ivory);color:var(--slate);font-family:var(--sans);
+  font-size:15px;line-height:1.72;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--max-width);margin:0 auto;padding:48px 24px 80px}
+header{border-bottom:3px solid var(--clay);padding-bottom:20px;margin-bottom:32px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--clay);
+  font-weight:700;margin:0 0 8px}
+h1{font-family:var(--serif);font-size:29px;font-weight:800;line-height:1.3;margin:0 0 10px;
+  letter-spacing:-.02em}
+.sub{color:var(--g700);font-size:14px;margin:0}
+.sub code{font-family:var(--mono);font-size:12.5px;background:var(--g100);
+  padding:1px 6px;border-radius:4px}
+h2{font-family:var(--serif);font-size:20px;font-weight:700;margin:44px 0 14px;
+  padding-bottom:8px;border-bottom:var(--border);letter-spacing:-.01em}
+h3{font-size:15.5px;font-weight:700;margin:28px 0 8px;color:var(--g700)}
+p{margin:0 0 12px}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0 8px}
+.card{background:var(--paper);border:var(--border);border-radius:var(--radius-panel);
+  padding:16px 14px}
+.card .k{font-size:11px;color:var(--g500);font-weight:600;letter-spacing:.03em;
+  margin:0 0 6px;line-height:1.4}
+.card .v{font-family:var(--serif);font-size:23px;font-weight:800;margin:0;
+  letter-spacing:-.02em;line-height:1.15}
+.card .n{font-size:11.5px;color:var(--g500);margin:4px 0 0}
+.card.accent .v{color:var(--clay)}
+table{width:100%;border-collapse:collapse;margin:14px 0 18px;font-size:13.5px}
+th{text-align:left;background:var(--g100);font-weight:700;font-size:12.5px;
+  padding:9px 11px;border-bottom:2px solid var(--g300);vertical-align:bottom}
+td{padding:10px 11px;border-bottom:1px solid var(--g300);vertical-align:top}
+tbody tr:last-child td{border-bottom:var(--border)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:12.5px;
+  white-space:nowrap}
+th.num{font-family:var(--sans)}
+.scroll{overflow-x:auto}
+.tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;
+  border-radius:20px;white-space:nowrap}
+.tag.done{background:#E8EFE0;color:#4A5F33}
+.tag.note{background:#FBEBE4;color:var(--clay-d)}
+.was{color:var(--g500)}
+.now{font-weight:600}
+.neg{color:var(--clay-d);font-weight:600}
+.panel{background:var(--paper);border:var(--border);border-left:4px solid var(--clay);
+  border-radius:var(--radius-row);padding:16px 18px;margin:18px 0}
+.panel.olive{border-left-color:var(--olive)}
+.panel p:last-child{margin-bottom:0}
+.panel .t{font-weight:700;margin:0 0 8px;font-size:14.5px}
+code{font-family:var(--mono);font-size:12.5px;background:var(--g100);
+  padding:1px 5px;border-radius:4px}
+figure{margin:20px 0}
+figcaption{font-size:12px;color:var(--g500);margin-top:8px;text-align:center}
+ul{margin:0 0 12px;padding-left:20px}
+li{margin-bottom:6px}
+.legend{display:flex;gap:18px;justify-content:center;font-size:12px;
+  color:var(--g700);margin-top:6px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;
+  margin-right:5px;vertical-align:-1px}
+footer{margin-top:52px;padding-top:16px;border-top:var(--border);
+  font-size:12px;color:var(--g500)}
+@media (max-width:720px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media print{
+  body{background:#fff}
+  .wrap{padding:0}
+  h2{break-after:avoid}
+  table{break-inside:auto}
+  tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">학위논문 · 지도교수 피드백 반영</p>
+  <h1>교수 피드백 4건 전후 비교</h1>
+  <p class="sub">2026-08-31 · 국·영문 동시 반영 · 커밋 <code>f63f102</code> (원고) · <code>be2d06d</code> (제출본)</p>
+</header>
+
+<div class="cards">
+  <div class="card accent">
+    <p class="k">지적 반영</p>
+    <p class="v">4 / 4</p>
+    <p class="n">전건 반영 완료</p>
+  </div>
+  <div class="card">
+    <p class="k">참고문헌</p>
+    <p class="v">16 → 23</p>
+    <p class="n">6편 추가 + RADPEER</p>
+  </div>
+  <div class="card">
+    <p class="k">분량 (국문)</p>
+    <p class="v">85 → 96</p>
+    <p class="n">영문 105 → 117쪽</p>
+  </div>
+  <div class="card">
+    <p class="k">재채점 검증</p>
+    <p class="v">12,797</p>
+    <p class="n">쌍 대조, 불일치 0</p>
+  </div>
+</div>
+
+<h2>전후 비교</h2>
+
+<div class="scroll">
+<table>
+  <thead>
+    <tr>
+      <th style="width:4%">#</th>
+      <th style="width:26%">지적 사항</th>
+      <th style="width:31%">수정 전</th>
+      <th style="width:39%">수정 후</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><span class="tag done">완료</span></td>
+      <td><strong>§2.5 선행연구 요약이 빈약함.</strong> 관련 연구 5편 이상 추가하고 비교표를 만들 것</td>
+      <td class="was">본문 1문단(국문 97단어). 절 내 인용 <strong>0건</strong>. 비교표 없음</td>
+      <td class="now">3문단으로 재작성 + <strong>Table 2.1</strong> 신설(10개 연구 × 5축). 선행연구 <strong>6편</strong> 추가</td>
+    </tr>
+    <tr>
+      <td><span class="tag done">완료</span></td>
+      <td><strong>WCA 가중치의 임의성.</strong> 문헌으로 근거를 대거나 임의성을 줄일 것</td>
+      <td class="was">“외부 임상 문헌이나 Delphi 합의 없이 연구자가 임의로 설정한 것”이라고 자백만 함</td>
+      <td class="now">가중 <strong>원리</strong>는 ACR RADPEER[17]의 임상적 유의성 등급화 관행에 근거함을 명시. <strong>수치</strong>는 가중 체계 5종 민감도 검증(<strong>Table 4.4a</strong> 신설)</td>
+    </tr>
+    <tr>
+      <td><span class="tag done">완료</span></td>
+      <td><strong>학습 시간 버그.</strong> “버그가 있다”고 넘기지 말고 재계산해 반영할 것</td>
+      <td class="was">표 4.2a에 <strong>시간 열 자체가 없음</strong>. 버그는 표 아래 각주로만 서술</td>
+      <td class="now">표 4.2a에 <code>train_runtime_sec</code> 기준 시간·SD 열 추가. 각주는 측정 기준 설명으로 교체. 75조건 전수 재집계</td>
+    </tr>
+    <tr>
+      <td><span class="tag done">완료</span></td>
+      <td><strong>선행연구와 직접 비교 한계.</strong> LLaVA-Med와 동일 기준(Recall) 수치를 부록에라도 추가할 것</td>
+      <td class="was">“Open-ended는 <strong>비교할 수 없다</strong>”며 척도 차이를 이유로 비교를 회피</td>
+      <td class="now">LLaVA-Med v1.0.0 채점 함수를 재현해 재채점. <strong>표 4.4b</strong>에 open-ended 행 신설 + <strong>부록 C</strong>(재현 절차·기준별 대조)</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="panel">
+  <p class="t">3번은 전제가 사실과 달랐습니다</p>
+  <p>“본문의 통계표를 재계산하라”는 지시였으나, 표 4.2a에는 애초에 시간 열이 없었습니다(subset_ratio / 학습 샘플 수 / Overall Acc 3열). 버그는 표 아래 각주로만 서술돼 있었습니다. 그래서 재계산할 표를 만드는 방향 — 각주를 지우고 정상 수치를 표에 편입 — 으로 반영했습니다.</p>
+</div>
+
+<h2>3번 · 학습 시간 재계산</h2>
+
+<p>Ablation A 3시드 평균, <code>train_runtime_sec</code> 기준(분). 시간·SD 두 열이 새로 들어갔습니다.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>subset_ratio</th><th class="num">학습 샘플</th><th class="num">Overall Acc</th>
+      <th class="num">학습 시간(분)</th><th class="num">SD</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>0.05</td><td class="num">982</td><td class="num">0.4150</td><td class="num">27.6</td><td class="num">0.32</td></tr>
+    <tr><td>0.10</td><td class="num">1,965</td><td class="num">0.4309</td><td class="num">28.1</td><td class="num">0.25</td></tr>
+    <tr><td>0.25</td><td class="num">4,913</td><td class="num">0.4357</td><td class="num">28.4</td><td class="num">0.36</td></tr>
+    <tr><td>0.50</td><td class="num">9,827</td><td class="num">0.4628</td><td class="num">28.5</td><td class="num">0.21</td></tr>
+    <tr><td>1.00</td><td class="num">19,654</td><td class="num"><strong>0.5019</strong></td><td class="num">27.9</td><td class="num">0.26</td></tr>
+  </tbody>
+</table>
+
+<p>데이터를 20배(982→19,654건) 늘려도 학습 시간은 27.6~28.5분으로 일정합니다. <code>max_steps=500</code>으로 조건당 samples_seen이 4,000에 고정되기 때문입니다. 즉 <strong>정확도 +8.7%p는 추가 연산 없이 데이터 다양성만으로 얻어진 것</strong>이라는 해석을 새로 넣었습니다.</p>
+
+<p>오염 조건은 75개 중 9개였고 <strong>전부 seed 42</strong>였습니다. 최대 편차는 <code>qwen25-vl-3b/pathvqa/seed42</code>로 기록값 395.4분 대 실측 44.9분입니다. Phase 3은 <code>src/autoresearch/loop.py</code>에서 원래 <code>train_runtime_sec/60</code>을 쓰므로 표 4.3c의 시간 수치는 영향권 밖입니다.</p>
+
+<h2>4번 · 동일 기준 주관식 재채점</h2>
+
+<p>LLaVA-Med v1.0.0의 <code>calculate_f1score</code> recall 성분을 그대로 재현해, 저장돼 있던 예측에 채점 기준만 바꿔 적용했습니다. 모델 재실행은 없었습니다.</p>
+
+<figure>
+<svg viewBox="0 0 800 300" width="100%" role="img" aria-label="데이터셋별 주관식 recall 비교 막대그래프">
+  <line x1="60" y1="240" x2="750" y2="240" stroke="#D1CFC5" stroke-width="1.5"/>
+  <line x1="60" y1="196" x2="750" y2="196" stroke="#F0EEE6" stroke-width="1"/>
+  <line x1="60" y1="152" x2="750" y2="152" stroke="#F0EEE6" stroke-width="1"/>
+  <line x1="60" y1="108" x2="750" y2="108" stroke="#F0EEE6" stroke-width="1"/>
+  <line x1="60" y1="64" x2="750" y2="64" stroke="#F0EEE6" stroke-width="1"/>
+  <text x="52" y="245" text-anchor="end" font-size="11" fill="#87867F">0</text>
+  <text x="52" y="201" text-anchor="end" font-size="11" fill="#87867F">20</text>
+  <text x="52" y="157" text-anchor="end" font-size="11" fill="#87867F">40</text>
+  <text x="52" y="113" text-anchor="end" font-size="11" fill="#87867F">60</text>
+  <text x="52" y="69" text-anchor="end" font-size="11" fill="#87867F">80</text>
+
+  <rect x="106" y="196" width="60" height="44" fill="#D97757" rx="3"/>
+  <rect x="180" y="157" width="60" height="83" fill="#87867F" rx="3"/>
+  <text x="136" y="190" text-anchor="middle" font-size="12" font-weight="700" fill="#B85C3E">19.97</text>
+  <text x="210" y="151" text-anchor="middle" font-size="12" fill="#3D3D3A">37.95</text>
+  <text x="173" y="262" text-anchor="middle" font-size="12.5" fill="#141413">PathVQA</text>
+  <text x="173" y="279" text-anchor="middle" font-size="11" fill="#B85C3E">−17.98</text>
+
+  <rect x="332" y="80" width="60" height="160" fill="#D97757" rx="3"/>
+  <rect x="406" y="57" width="60" height="183" fill="#87867F" rx="3"/>
+  <text x="362" y="74" text-anchor="middle" font-size="12" font-weight="700" fill="#B85C3E">72.87</text>
+  <text x="436" y="51" text-anchor="middle" font-size="12" fill="#3D3D3A">83.08</text>
+  <text x="399" y="262" text-anchor="middle" font-size="12.5" fill="#141413">SLAKE</text>
+  <text x="399" y="279" text-anchor="middle" font-size="11" fill="#B85C3E">−10.21</text>
+
+  <rect x="558" y="165" width="60" height="75" fill="#D97757" rx="3"/>
+  <rect x="632" y="105" width="60" height="135" fill="#87867F" rx="3"/>
+  <text x="588" y="159" text-anchor="middle" font-size="12" font-weight="700" fill="#B85C3E">34.32</text>
+  <text x="662" y="99" text-anchor="middle" font-size="12" fill="#3D3D3A">61.52</text>
+  <text x="625" y="262" text-anchor="middle" font-size="12.5" fill="#141413">VQA-RAD</text>
+  <text x="625" y="279" text-anchor="middle" font-size="11" fill="#B85C3E">−27.20</text>
+</svg>
+<div class="legend">
+  <span><i style="background:#D97757"></i>본 연구 (Qwen3-VL-2B, 2B)</span>
+  <span><i style="background:#87867F"></i>LLaVA-Med (7B)</span>
+</div>
+<figcaption>동일 기준(token recall) 주관식 성능 · 3시드 평균 · 시드 SD 0.11~0.34</figcaption>
+</figure>
+
+<div class="panel">
+  <p class="t">결과는 본 연구에 불리합니다</p>
+  <p>척도를 맞춰 놓아도 주관식은 세 데이터셋 모두 LLaVA-Med가 <strong>10~27%p</strong> 앞섭니다. 객관식에서 SLAKE가 대등했던 것(85.26 vs 85.34)과 대비되므로, “2B 모델이 7B 의료 특화 모델과 대등하다”는 해석을 <strong>객관식에 한정</strong>해야 합니다. §4.4.6과 §5.2의 기여 서술을 그에 맞게 좁혔습니다.</p>
+  <p>다만 비교 불가라고 회피하는 것보다 열세를 수치로 제시하는 편이 심사에서 방어에 유리하다고 판단했습니다.</p>
+</div>
+
+<h3>재현 충실도</h3>
+<p>원본 <code>calculate_f1score</code>를 참조 구현으로 옮겨 두고 실제 예측 <strong>12,797쌍 + 경계 사례 8건</strong>을 차분 대조한 결과 불일치 <strong>0건</strong>이었습니다. 정규화 테이블은 출처를 밝혀 <code>src/evaluate/vendor/</code>에 인용했고, 검증 테스트 18건이 함께 커밋돼 있습니다.</p>
+
+<h2>2번 · WCA 가중치 민감도</h2>
+
+<p>가중치 수치 자체를 정당화하는 문헌은 없습니다. 그래서 원리는 문헌으로, 수치는 민감도 검증으로 나눠 방어했습니다.</p>
+
+<table>
+  <thead>
+    <tr><th>가중 체계</th><th>가중치 구성</th><th class="num">제로샷</th><th class="num">최고 설정</th><th class="num">증가폭</th><th class="num">전체 대비</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>현행 (3.8.3)</td><td>1.0 / 0.8 / 0.7 / 0.6 / 0.5</td><td class="num">0.1527</td><td class="num">0.2627</td><td class="num">+0.1099</td><td class="num">0.87배</td></tr>
+    <tr><td>균등</td><td>전 유형 1.0</td><td class="num">0.1843</td><td class="num">0.2837</td><td class="num">+0.0995</td><td class="num">0.79배</td></tr>
+    <tr><td>강한 대비</td><td>1.0 / 0.9 / 0.8 / 0.4 / 0.2</td><td class="num">0.1119</td><td class="num">0.2466</td><td class="num">+0.1348</td><td class="num">1.07배</td></tr>
+    <tr><td>약한 대비</td><td>1.0 / 0.95 / 0.9 / 0.85 / 0.8</td><td class="num">0.1738</td><td class="num">0.2783</td><td class="num">+0.1045</td><td class="num">0.83배</td></tr>
+    <tr><td>역순</td><td>0.5 / 0.5 / 0.5 / 0.6 / 1.0</td><td class="num">0.2166</td><td class="num">0.2915</td><td class="num">+0.0749</td><td class="num">0.59배</td></tr>
+  </tbody>
+</table>
+
+<p>가중치 구성은 diagnosis / location / measurement / description / yes_no 순입니다. <strong>가중치 순서를 완전히 뒤집어도 WCA는 증가합니다.</strong> §4.4.4의 “임상 중요도로 가중해도 향상이 상쇄되지 않는다”는 판단이 특정 가중치 조합의 산물이 아님을 보인 것입니다.</p>
+
+<p>다만 이 검증이 보장하는 것은 <strong>결론의 가중치 비의존성</strong>이지 가중치의 임상적 타당성이 아니며, 표본 부족(diagnosis 3건, measurement 4건, temporal 0건)은 어떤 가중 체계로도 해소되지 않습니다. 논문에도 그렇게 명시했습니다.</p>
+
+<h2>1번 · 추가 문헌 6편</h2>
+
+<table>
+  <thead><tr><th style="width:8%">번호</th><th style="width:46%">문헌</th><th>역할</th></tr></thead>
+  <tbody>
+    <tr><td>[18]</td><td>Shourya 등 (2025), arXiv:2506.14451</td><td>3B PaliGemma + LoRA 방사선 VQA</td></tr>
+    <tr><td>[19]</td><td>Ma 등 (2026), arXiv:2605.09384</td><td>2B 학생 모델 LoRA 사고연쇄 증류</td></tr>
+    <tr><td>[20]</td><td>Rezaei 등 (2026), <em>Comput. Biol. Med.</em> 200:111397</td><td><strong>VQA-RAD·SLAKE에 LoRA/AdaLoRA</strong> — 데이터셋이 겹치는 최근접 선행연구</td></tr>
+    <tr><td>[21]</td><td>Liu 등 (2024), arXiv:2402.01881</td><td>AgentHPO</td></tr>
+    <tr><td>[22]</td><td>Liu 등 (2024), ICLR</td><td>LLAMBO</td></tr>
+    <tr><td>[23]</td><td>Ferreira 등 (2026), arXiv:2603.24647</td><td>고전 HPO vs LLM 비교</td></tr>
+  </tbody>
+</table>
+
+<p>Table 2.1은 선행연구를 <strong>모델 규모 · 적응 방식 · 평가 데이터셋 · 하이퍼파라미터 결정</strong> 4축으로 배열해, 경량 VLM 계열은 적응만 다루고 HPO 계열은 탐색 전략만 다룬다는 점, 그리고 본 연구가 두 축이 만나는 지점에 있다는 점을 표에서 바로 읽히게 했습니다.</p>
+
+<div class="panel olive">
+  <p class="t">[23]은 예상 밖의 수확이었습니다</p>
+  <p>고정 예산에서 CMA-ES·TPE 같은 고전 최적화가 순수 LLM 방식을 앞섰고 하이브리드가 최선이라 결론짓는 논문입니다. 도메인·모델·탐색 공간이 전부 다른데 본 연구 RQ3와 <strong>같은 방향</strong>입니다. §2.5에 배치하고 §5.2에 대조 문단을 추가해, 본 연구의 부정적 결과가 이 과제만의 우연이 아닐 가능성을 보강했습니다.</p>
+</div>
+
+<h2>지적 목록 밖 정정 <span class="tag note">지도교수 확인 필요</span></h2>
+
+<p>4번을 반영하다 발견한 사항입니다. §3.8.1이 BERTScore F1 ≥ 0.7을 “정확도·통계 검정의 유일한 결정 지표”로 서술했으나, 실제 정답 판정은 <code>compute_open_accuracy</code>(정규화 후 완전 일치 <strong>또는</strong> 정답 문자열 포함)이고 BERTScore는 병기 지표입니다.</p>
+
+<table>
+  <thead><tr><th>데이터셋</th><th class="num">open_accuracy</th><th class="num">BERTScore 통과율</th><th class="num">논문 각주 값</th></tr></thead>
+  <tbody>
+    <tr><td>PathVQA</td><td class="num">17.15</td><td class="num">100.00</td><td class="num">17.15</td></tr>
+    <tr><td>SLAKE</td><td class="num">66.95</td><td class="num">100.00</td><td class="num">66.95</td></tr>
+    <tr><td>VQA-RAD</td><td class="num">26.00</td><td class="num">100.00</td><td class="num">26.00</td></tr>
+  </tbody>
+</table>
+
+<p>BERTScore 임계값 통과율은 Phase 2 main <strong>36조건 전부에서 99.91% 이상</strong>(34조건은 정확히 100%)으로 포화됩니다. 실제로 결정 지표였다면 주관식 정확도가 100%로 보고됐어야 하나, 논문 각주 값은 <code>open_accuracy</code>와 소수점까지 일치합니다.</p>
+
+<p>정정 범위는 §3.8.1, §3.6, 표 4.1 각주, §4.4.6, §5.3(2)입니다. 방법론 서술 수정이므로 지도교수께 별도 보고를 권합니다.</p>
+
+<h2>남은 작업</h2>
+
+<ul>
+  <li><strong>Word에서 열 폭 조정</strong> — 신규 표 4개(Table 2.1, 4.4a, C.1, 부록 C 기준 대조표)와 열이 3→5로 늘어난 Table 4.2a는 균등폭 상태입니다. 머리행 반복은 자동 적용돼 있습니다.</li>
+  <li><strong>표 번호 변경 확인</strong> — §4.4.4에 민감도 표를 4.4a로 넣으면서 기존 §4.4.6의 표 4.4a를 4.4b로 옮겼습니다. 상호참조는 국문 4곳·영문 3곳 갱신했습니다.</li>
+  <li><strong>arXiv 프리프린트 미반영</strong> — <code>arxiv/</code>는 원고와 빌드 연결이 없어 별도 수작업이 필요합니다.</li>
+</ul>
+
+<footer>
+  국·영문 원고 <code>docs/THESIS_FINAL_v2.0.md</code> · <code>docs/THESIS_FINAL_v2.0_EN.md</code> ·
+  재현 스크립트 <code>scripts/recompute_phase2_train_time.py</code> · <code>scripts/rescore_open_llavamed.py</code> · <code>scripts/wca_weight_sensitivity.py</code>
+</footer>
+
+</div>
+</body>
+</html>
