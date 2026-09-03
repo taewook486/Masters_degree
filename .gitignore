@@ -118,6 +118,7 @@ logs/*
 *.backup/
 *-backup/
 *_backup_*/
+backup/
 
 # ===========================================
 # Secrets and Credentials (CRITICAL)
