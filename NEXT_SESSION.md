@@ -1,10 +1,13 @@
-# 다음 세션 시작점 (2026-09-01 기준)
+# 다음 세션 시작점 (2026-09-03 기준)
 
 ## 최근에 한 일
 
-**8/31에 지도교수 지적 4건을 국·영문에 반영하고 제출본을 재생성했습니다.**
-그 과정에서 "docx 재빌드 금지"라는 그동안의 전제를 실측으로 뒤집었습니다.
-9/1에는 §3.8.1의 코드 경로 참조 한 건을 뺐습니다(원고만, 제출본 미반영).
+**논문 내용은 9/1 이후 바뀐 것이 없습니다.** 지도교수 회신 대기 상태 그대로입니다.
+9/3 세션은 전부 개발 환경 설정 정리였고, 원고·제출본은 건드리지 않았습니다.
+
+8/31에 지도교수 지적 4건을 국·영문에 반영하고 제출본을 재생성했으며, 그 과정에서
+"docx 재빌드 금지"라는 그동안의 전제를 실측으로 뒤집었습니다. 9/1에는 §3.8.1의
+코드 경로 참조 한 건을 뺐습니다(원고만, 제출본 미반영).
 
 ### 1. 지적 4건 반영 (커밋 f63f102)
 
@@ -47,6 +50,37 @@ BERTScore는 병기 지표입니다. BERTScore 통과율은 Phase 2 main 36조�
 
 주관식 판정 기준 문장에 병기돼 있던 `(src/evaluate/metrics.py의
 compute_open_accuracy)`를 국·영문 모두에서 뺐습니다. 기준 서술 자체는 그대로입니다.
+
+### 4. 9/3 — 설정 정리 (커밋 2a49ece, 533446f)
+
+논문과 무관한 환경 정비입니다. **다음 세션의 작업 감각이 달라지는 부분이 있어
+아래 "9/3 이후 달라진 것"을 먼저 읽으십시오.**
+
+`.claude/settings.local.json`이 `.gitignore`에 등재돼 있는데도 **공개 저장소에
+3커밋째 올라가 있었습니다.** gitignore는 이미 추적이 시작된 파일에는 효력이
+없습니다. 노출된 것은 종료된 팟의 IP(`213.192.2.86`)와 키 파일 경로뿐이고
+키·토큰 내용은 아니었습니다(`*.pem`과 `.env`는 처음부터 추적된 적 없음).
+`git rm --cached`로 추적만 끊었고 히스토리는 재작성하지 않았습니다.
+
+그 밖에 `settings.json`에서 allow 규칙 17건을 정리했습니다. 삭제·덮어쓰기·업로드가
+무인 승인되던 9건(`curl` `find` `rsync` `mv` `sed` `git stash·checkout·switch·merge`)은
+`ask`로 옮겼고, 이 저장소에 근거가 없는 8건(`npm`/`npx` 계열, `make`, `moai-adk`)은
+지웠습니다. 하드코딩된 `env.PATH`도 뺐습니다.
+
+## 9/3 이후 달라진 것
+
+| 항목 | 이전 | 지금 |
+|---|---|---|
+| RunPod SSH 키 | `/mnt/d/.../runpod_openssh.pem`을 `/tmp`로 복사 후 `chmod 600` | `~/keys/runpod_openssh.pem` (600) — `ssh -i` 한 줄로 끝 |
+| `curl` `find` `rsync` `mv` `sed` | 자동 승인 | **확인 프롬프트 1회** |
+| `git checkout·switch·merge·stash` | 자동 승인 | **확인 프롬프트 1회** |
+| `.claude/settings.local.json` | git 추적 | 추적 해제 (로컬 전용) |
+
+`/mnt/d`의 pem 원본은 **지우지 않았습니다.** git에도 없으므로 그것이 유일한
+장기 보관본입니다. WSL을 초기화하면 `~/keys`는 사라지니 그때 다시 복사하고
+`chmod 600`만 주면 됩니다. `/mnt/d`는 `metadata` 마운트 옵션이 없어 chmod가
+반영되지 않고, 그래서 거기서 직접 `ssh -i`를 쓰면 `not a key file`로 거부됩니다
+(키 손상이 아닙니다).
 
 ## 현재 상태
 
@@ -95,7 +129,26 @@ pre-commit ruff 게이트는 `SKIP_MOAI_PRECOMMIT=1`로만 우회됩니다
   8/31 수정분이 **아직 반영되지 않았습니다.** 제출 재개 시 학위논문과 대조할 것
 - `results/phase1_baseline/phase1_robustness.json` 재생성 — 하지 않기로 결정
   (커밋된 산출물을 덮어쓰므로). 대신 §4.1.1에 각주로 사유를 명시했습니다
-- `backup/석사학위논문_국문_사본.docx`(8/25)는 추적하지 않는 사용자 백업본입니다
+- `backup/석사학위논문_국문_사본.docx`(8/25)는 사용자 백업본입니다. 9/3에 `backup/`을
+  `.gitignore`에 넣어 이제 `git status`에 뜨지 않습니다(기존 `*_backup_*/` 규칙은
+  맨 이름 `backup/`을 잡지 못했습니다)
 - `/install-github-app`이 만든 `add-claude-github-actions-*` 브랜치가 원격에 있습니다
-- `moai update`를 돌리면 `.moai/config/sections/language.yaml`이 ko→en으로
-  조용히 초기화됩니다. 업데이트 직후 diff로 확인할 것 (9/1에 한 번 되돌렸음)
+- `moai update`를 돌리면 사용자 설정이 조용히 템플릿 기본값으로 초기화됩니다.
+  9/3에 확인된 범위는 `.moai/` 밖까지입니다 — 업데이트 직후 아래를 확인할 것:
+
+  ```bash
+  git diff .moai/config/sections/language.yaml .moai/config/sections/user.yaml .claude/settings.json
+  ```
+
+  | 파일 | 되돌아간 값 | 정상값 |
+  |---|---|---|
+  | `language.yaml` | `conversation_language: en` | `ko` / `Korean` |
+  | `user.yaml` | `name: ""` | `taewook` |
+  | `.claude/settings.json` | `model: sonnet` | `opus` |
+
+  `model`은 9/3에 키 자체를 삭제해 재발 지점을 없앴습니다(`settings.local.json`의
+  `opus`가 어차피 이기므로 프로젝트 파일의 값은 무의미했습니다). 같은 요령이 다른
+  회귀 키에도 쓸 만합니다 — local이 이기는 키는 프로젝트 파일에서 지우면 update가
+  되돌릴 대상 자체가 사라집니다. `language.yaml`은 여전히 매번 확인이 필요합니다
+- `docs/NEXT_SESSION.md`(173KB 누적 로그)는 8/23에 멈춰 있습니다. 실제 인계 문서는
+  이 파일이며, 둘을 합칠지 여부는 정하지 않았습니다
