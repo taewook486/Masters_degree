@@ -1,0 +1,5 @@
+# 줄바꿈을 LF로 고정 (Windows git/도구가 /mnt/d 작업 트리를 CRLF로 바꾸는 것 방지)
+* text=auto eol=lf
+
+# Windows 배치 파일은 CRLF 유지 (cmd.exe의 goto/레이블 오작동 방지)
+*.bat text eol=crlf
