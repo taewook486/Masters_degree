@@ -173,6 +173,8 @@ secret-*.*
 # Claude Code Configuration
 # ===========================================
 CLAUDE.local.md
+# 학번·서명란이 들어간 행정 서류 — 공개 저장소에 올리지 않는다
+학위논문*중간보고서*
 .claude/settings.local.json
 .claude/settings.local.*.json
 # statusline이 설정 파일을 쓸 때 남기는 잠금 잔재

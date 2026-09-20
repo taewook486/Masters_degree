@@ -38,7 +38,7 @@
 
 제로샷 성능은 모델 간 통계적으로 유의하게 달랐으며(Cochran's Q = 1904.28, df = 3, p < .001), Qwen3-VL-2B가 합산 정확도 0.3843으로 가장 높았다. 이 순위는 Min-K% Probability로 식별한 사전훈련 노출 의심 표본을 제거한 뒤에도 유지되어 데이터 오염에 강건했다. QLoRA 파인튜닝의 효과는 모델에 따라 방향이 엇갈렸다. Qwen2.5-VL-3B(Cohen's d = +2.646)와 Qwen3-VL-2B(d = +1.620)에서는 유의하게 향상된 반면 SmolVLM2-2.2B(d = -2.284)에서는 유의하게 악화되었고, 네 모델을 합산한 혼합효과모형은 상반된 효과가 상쇄되어 "효과 없음"으로 보고했다(p = .3629). 자율 하이퍼파라미터 탐색에서는 대규모 언어모델 에이전트(0.4184)가 베이지안 최적화(0.4490)보다 유의하게 낮았고(Mann-Whitney U = 16.00, p = .0112, r = -0.68) 무작위 탐색(0.4186)과도 구분되지 않았다. 다만 세 자동 탐색 전략 모두 수동 설정(0.3776)을 상회했다. 에이전트의 열세는 제안 품질이 아니라 중복 제안에 따른 실효 탐색 예산 축소에서 비롯되었다(반복당 고유 설정 12.5/20). 이 진단은 프롬프트와 구현의 설정 불일치를 제거한 재실험 200 trial로 확증되었다. 고유 설정은 18.90/20으로 회복되고 Optuna에 대한 유의한 열세도 사라졌으나(p = .1726), run-level 평균은 여전히 Optuna에 미치지 못했고(0.4292 대 0.4490) 원본 대비 개선도 입증되지 않아(p = .2387) 성능 우위는 확인되지 않았다.
 
-본 연구의 의의는 세 가지다. 첫째, 경량 VLM의 의료 도메인 적응에 관한 3단계 실증 데이터를 동일 프로토콜 아래 제공하며, 성능과 자원 소비가 단조 관계를 이루지 않음을 보여 자원 제약 환경의 모델 선택 근거를 제시한다. 둘째, 파인튜닝 효과의 모델별 이질성을 정량화하여 합산 분석이 상반된 효과를 은폐하는 과정을 실증한다. 셋째, 자율 에이전트 기반 최적화의 부정적 결과를 그 실패 기전의 검증과 함께 보고한다. 특히 동일 설정을 반복 실행할 때 관측된 변동폭(0.056)이 전략 간 평균 차이(0.031)보다 크다는 사실은 단일 실행 결과로 기법을 비교하는 관행에 대한 정량적 반례가 된다.
+본 연구의 의의는 세 가지다. 첫째, 경량 VLM의 의료 도메인 적응에 관한 3단계 실증 데이터를 동일 프로토콜 아래 제공하며, 성능과 자원 소비가 단조 관계를 이루지 않음을 보여 자원 제약 환경의 모델 선택 근거를 제시한다. 둘째, 파인튜닝 효과의 모델별 이질성을 정량화하여 합산 분석이 상반된 효과를 은폐하는 과정을 실증한다. 셋째, 자율 에이전트 기반 최적화의 부정적 결과를 그 실패 기전의 검증과 함께 보고한다. 특히 동일 설정을 반복 실행할 때 관측된 변동폭(0.056)이 전략 간 평균 차이(0.031)보다 크다는 사실은 단일 실행 결과로 기법을 비교하는 관행에 대한 정량적 반례가 된다. 아울러 선행 7B 의료 특화 모델(LLaVA-Med)과의 간접 비교에서 경량 2B 모델의 QLoRA 적응은 SLAKE 폐쇄형 질의에서 대등한 정확도(85.26% 대 85.34%)에 도달했으나, PathVQA·VQA-RAD 폐쇄형에서는 8~11%p, 동일 토큰 재현율 기준 개방형 질의에서는 10~27%p의 격차를 보여 도메인 적응의 실질적 한계 지점을 규명했다.
 
 주제어 : 의료 영상 질의응답, 시각-언어 모델, QLoRA, 파라미터 효율적 파인튜닝, 하이퍼파라미터 최적화, 대규모 언어모델 에이전트
 
@@ -187,7 +187,7 @@ Table 2.1이 드러내듯 선행 연구는 **모델 적응**과 **탐색 전략*
 
 #### 3.2.2 소프트웨어 스택
 
-모델 로딩·QLoRA 파인튜닝은 HuggingFace `transformers`와 `unsloth`(4-bit 양자화 학습 가속) 백엔드를 사용했으며, `peft` 라이브러리로 LoRA 어댑터를 구성했다. Phase 3의 베이지안 최적화 대조군은 `Optuna`(TPE sampler)를, 실험 관리·로깅은 `wandb`를 사용했다. Open-ended 응답 채점의 BERTScore 계산에는 `bert-score` 라이브러리(roberta-large / BioBERT 백본)를, 통계 분석에는 `scipy`·`statsmodels`(Mixed-Effects Model)를 사용했다. Autoresearch 전략의 LLM 에이전트는 Anthropic Claude API를 호출한다.
+모델 로딩·QLoRA 파인튜닝은 HuggingFace `transformers`와 `unsloth`(4-bit 양자화 학습 가속) 백엔드를 사용했으며, `peft` 라이브러리로 LoRA 어댑터를 구성했다. Phase 3의 베이지안 최적화 대조군은 `Optuna`(TPE sampler)를, 실험 관리·로깅은 `wandb`를 사용했다. Open-ended 응답의 보조 평가 지표인 BERTScore 계산에는 `bert-score` 라이브러리(roberta-large / BioBERT 백본)를, 통계 분석에는 `scipy`·`statsmodels`(Mixed-Effects Model)를 사용했다. Autoresearch 전략의 LLM 에이전트는 Anthropic Claude API를 호출한다.
 
 ### 3.3 대상 모델 및 선정 기준
 
@@ -360,7 +360,7 @@ McNemar 쌍별 사후검정(Bonferroni 보정)에서, **Gemma4-E2B는 pooled 기
 
 다만 절대 정확도의 하락폭은 8.06%p로, 3.4에 제시한 해석 기준의 5%p 구간을 넘어선다. 이 하락은 제거 절차 자체에서 예정된 것이다 — Min-K%는 정답 토큰의 확률이 높은 표본, 즉 모델이 상대적으로 잘 맞히던 문항을 지목하므로, 이를 제거한 축소셋은 원본보다 어려운 집합이 된다. 실제로 네 모델 모두 비슷한 폭으로 함께 하락했다(-0.0632 ~ -0.0872). 따라서 본 절의 강건성 주장은 절대 정확도 수준의 보존이 아니라 **모델 간 순위와 검정 유의성의 보존**에 근거하며, 절대 성능까지 오염에 불변이라는 주장은 아니다(5.3(1)).
 
-상세는 `results/phase1_baseline/phase1_robustness.md`에 있다. 다만 이 산출물은 BERTScore 재스코어링 이전 시점의 PathVQA 정확도(0.348)로 계산되어 pooled 값이 0.3849 → 0.3041로 기록되어 있다. 본문이 보고하는 수치는 현행 per-sample 기록으로 재계산한 값이며, 두 값의 차이는 최대 0.0015로 순위와 결론에는 영향이 없다.
+상세는 `results/phase1_baseline/phase1_robustness.md`에 있다. 다만 이 산출물은 주관식 판정 기준 정비 이전 시점의 PathVQA 정확도(0.348)로 계산되어 pooled 값이 0.3849 → 0.3041로 기록되어 있다. 본문이 보고하는 수치는 현행 per-sample 기록으로 재계산한 값이며, 두 값의 차이는 최대 0.0015로 순위와 결론에는 영향이 없다.
 
 #### 4.1.2 데이터셋별 난이도 분석
 
@@ -845,6 +845,8 @@ RQ3의 두 번째 요건인 **해석 가능한 탐색 근거**는 **4전략 비�
 
 한편 탐색 품질은 4전략 비교에서 저조했다. 에이전트는 20 trial 중 평균 12.5개의 고유 설정만 시도했고(Random·Optuna는 20/20), 동일 설정을 반복 제안하며 조기 고착하는 패턴이 10회 반복 전체에서 관측되었다(4.3.4). **이 현상은 설정 불일치의 산물이었다** — 불일치를 제거한 재실험에서 고유 설정은 18.90/20으로 회복되었고, Optuna에 대한 유의한 열세도 해소되었다(p = .0112 → .1726). 그러나 run-level 평균은 여전히 Optuna에 미치지 못했고(0.4292 vs 0.4490) 원본 대비 개선도 입증되지 않아(p = .2387), **RQ3의 첫 번째 요건에 대한 부정적 답변 자체는 유지된다**(4.3.5, 4.3.6).
 
+**선행 의료 특화 모델과의 간접 비교는 도메인 적응의 한계 지점을 과제 유형별로 갈라 보여주었다.** 선행 7B 의료 특화 모델(LLaVA-Med)과의 간접 비교에서 경량 2B 모델의 QLoRA 적응은 SLAKE 폐쇄형 질의에서 대등한 정확도(85.26% 대 85.34%)에 도달했으나, PathVQA·VQA-RAD 폐쇄형에서는 8~11%p, 동일 토큰 재현율 기준 개방형 질의에서는 10~27%p의 격차를 보였다. 따라서 대등하다는 해석은 폐쇄형 그중에서도 SLAKE에 한정되며, 정답 표현을 스스로 생성해야 하는 개방형에서는 대규모 의생명 코퍼스 사전학습의 이점이 QLoRA 적응만으로 상쇄되지 않는다(4.4.6).
+
 ### 5.2 연구 기여
 
 본 연구의 기여는 다음 네 가지다.
@@ -1135,6 +1137,6 @@ This study examines whether lightweight Vision-Language Models (VLMs) can be ada
 
 Zero-shot accuracy differed significantly across models (Cochran's Q = 1904.28, df = 3, p < .001), with Qwen3-VL-2B achieving the highest pooled accuracy (0.3843). This ranking persisted after removing samples flagged as likely pretraining exposure by Min-K% Probability, indicating robustness to data contamination. The effect of QLoRA fine-tuning was heterogeneous in direction across models: it significantly improved Qwen2.5-VL-3B (Cohen's d = +2.646) and Qwen3-VL-2B (d = +1.620), yet significantly degraded SmolVLM2-2.2B (d = -2.284). A mixed-effects model pooling all four models reported no significant effect (p = .3629) because these opposing effects cancelled in the aggregate. In autonomous hyperparameter search, the large language model agent (0.4184) performed significantly worse than Bayesian optimization (0.4490; Mann-Whitney U = 16.00, p = .0112, r = -0.68) and was statistically indistinguishable from random search (0.4186), although all three automated strategies exceeded the manual configuration (0.3776). The agent's disadvantage arose not from proposal quality but from a reduced effective search budget caused by duplicate proposals (12.5 of 20 unique configurations per repeat). This diagnosis was confirmed by a 200-trial re-experiment that removed the configuration inconsistencies between the prompt and the implementation: unique configurations recovered to 18.90 of 20 and the significant disadvantage against Optuna disappeared (p = .1726), yet the run-level mean still fell short of Optuna (0.4292 vs. 0.4490) and no improvement over the original condition was demonstrated (p = .2387), so no performance advantage was established.
 
-The study makes three contributions. First, it provides three-stage empirical evidence on medical-domain adaptation of lightweight VLMs under a single protocol, showing that performance and resource consumption are not monotonically related and thereby offering a concrete basis for model selection under resource constraints. Second, it quantifies the model-level heterogeneity of fine-tuning effects and demonstrates how pooled analysis conceals opposing effects. Third, it reports a negative result for LLM-based autonomous optimization together with a verification of its failure mechanism. Notably, the variation observed when repeating an identical configuration (0.056) exceeded the mean difference between strategies (0.031), constituting a quantitative counterexample to the practice of comparing methods from single runs.
+The study makes three contributions. First, it provides three-stage empirical evidence on medical-domain adaptation of lightweight VLMs under a single protocol, showing that performance and resource consumption are not monotonically related and thereby offering a concrete basis for model selection under resource constraints. Second, it quantifies the model-level heterogeneity of fine-tuning effects and demonstrates how pooled analysis conceals opposing effects. Third, it reports a negative result for LLM-based autonomous optimization together with a verification of its failure mechanism. Notably, the variation observed when repeating an identical configuration (0.056) exceeded the mean difference between strategies (0.031), constituting a quantitative counterexample to the practice of comparing methods from single runs. In addition, an indirect comparison with LLaVA-Med, a 7B medical-specialized model, showed that QLoRA adaptation of a lightweight 2B model reached comparable closed-ended accuracy on SLAKE (85.26% vs. 85.34%) but trailed by 8-11%p on closed-ended PathVQA and VQA-RAD and by 10-27%p on open-ended questions under a matched token-recall criterion, thereby identifying the practical limit of domain adaptation.
 
 Keywords : Medical Visual Question Answering, Vision-Language Model, QLoRA, Parameter-Efficient Fine-Tuning, Hyperparameter Optimization, Large Language Model Agent
