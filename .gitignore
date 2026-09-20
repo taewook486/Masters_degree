@@ -175,6 +175,8 @@ secret-*.*
 CLAUDE.local.md
 .claude/settings.local.json
 .claude/settings.local.*.json
+# statusline이 설정 파일을 쓸 때 남기는 잠금 잔재
+.claude/*.lock
 .claude/.env.local*
 .claude/local/
 .claude/plans/
