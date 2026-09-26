@@ -1,4 +1,4 @@
-# 다음 세션 시작점 (마지막 갱신: 2026-09-20)
+# 다음 세션 시작점 (마지막 갱신: 2026-09-26)
 
 > 이 파일이 **유일한 인계 문서**다. 최신 세션 엔트리와 상시 참조 항목만 둔다.
 > 파일이 180KB까지 불어나 2026-09-03에 지난 달 로그를 월별 아카이브로 옮겼다.
@@ -10,6 +10,93 @@
 
 > 루트에 있던 `NEXT_SESSION.md`는 2026-09-03에 삭제하고 이 파일로 합쳤다.
 > 그 파일의 8/24~8/30 중간판은 git 히스토리에만 있다 — `git log -p -- NEXT_SESSION.md`.
+
+## 🟢 2026-09-26 — 루트 파일 정리 · 회신 두 벌의 계보 확인
+
+**논문 내용은 건드리지 않았고 저장소 정리와 문서 계보 확인만 했다(HEAD `5d0532b`).**
+**중간보고서 제출 기한이 9/28~10/2로 이틀 뒤다 — 다음 세션의 첫 일이다.**
+교수님 회신은 아직 못 받았다.
+
+### 1. 루트 파일 10개를 종류별로 옮겼다 (`5d0532b`)
+
+루트에 26개가 쌓여 있었다. 하위 폴더(`docs/` `scripts/` `configs/` `data/` `results/`
+`src/` `tests/`)는 이미 정리돼 있어 루트만 손봤다. 16개로 줄었다.
+
+| 옮긴 곳 | 대상 |
+|---|---|
+| `scripts/batch/` | `run_phase1~3*.bat` 7개 |
+| `scripts/` | `check_progress.py`, `start-moai-cg.ps1` |
+| `reports/` | `QUALITY_REVIEW_REPORT.md` |
+
+`.bat`은 7개 모두 2번째 줄에서 `cd /d "D:\project\Masters_degree"`를 실행하므로 어디에
+두어도 동작이 같다. `check_progress.py`는 상대경로 `results/`를 읽으니 루트에서
+`python scripts/check_progress.py`로 돌린다.
+
+**루트에 남긴 것과 이유.** 논문 산출물 4개는 `scripts/build_thesis_docx.py:853`이
+파일명만으로 현재 디렉터리에 쓰기 때문이다 — 파일만 옮기면 다음 빌드 때 루트에 또 생겨
+두 군데로 갈라진다. 옮길 거면 스크립트의 출력 경로를 같이 고쳐야 한다. 중간보고서 2개는
+gitignore된 행정 서류, `runpod_openssh.pem`은 비밀키이며 이 문서의 SSH 절차가 루트
+경로로 참조한다. `pyproject.toml`·`conftest.py`·`uv.lock`·README/CLAUDE/CHANGELOG는
+도구 규약상 루트 고정이다.
+
+### 2. 게이트를 막은 건 ruff 부채가 아니라 pytest 미설치였다
+
+`SKIP_MOAI_PRECOMMIT=1`로 우회했는데 실패 원인이 지금까지와 다르다. `moai gate`가
+테스트 단계에서 `error: Failed to spawn: pytest / program not found`로 죽는다. PATH에도
+`.venv`에도 없고 `import pytest`가 `ModuleNotFoundError`다. **「알아둘 것」의 ruff 265건
+항목과 증상이 비슷해 보이지만 원인이 다르니 실패 메시지의 마지막 줄을 읽을 것.**
+설치하면 풀리지만 `.venv` 의존성이 바뀌므로 이번엔 건드리지 않았다.
+
+### 3. `.bat`의 "수정"은 줄바꿈이었다
+
+`git status`가 `run_phase3.bat`과 smoke 2개를 수정으로 표시했는데 CRLF↔LF 차이였다.
+`git show`로 양쪽 blob을 꺼내 `tr -d '\r'`로 정규화해 비교하니 내용이 완전히 같았다.
+9/20 §1에 적힌 `.gitattributes` `* text=auto eol=lf` 정규화의 잔여분이다.
+**실험 설정 변경으로 오인하지 말 것** — 이번에 한 번 그렇게 잘못 읽었다.
+
+### 4. index.lock 요령이 실제로 통했다
+
+9/20에 적어 둔 대로 두 번 막혔다. `ps -eo pid,etime,cmd`로 `pre-commit`·`moai gate`·`git`
+홀더가 없음을 확인한 뒤 `rm -f .git/index.lock && git <명령 하나>`로 한 줄에 붙여 실행하니
+통과했다. 중간에 다른 명령을 끼우면 그 틈에 statusline이 다시 만든다. 기록대로다.
+
+### 5. 회신 두 벌은 편지판이 먼저 나왔다
+
+`reports/보완요청_반영결과_황태욱.pdf`의 원본 md를 찾다가 계보를 확인했다.
+
+| 커밋 | 들어간 파일 |
+|---|---|
+| `14f3e02` | `docs/지도교수_회신_2026-09-20.md` 단독 (93줄 신규) |
+| `a0dc233` | 위 파일 재작성(+84/−59) + `reports/thesis-feedback-response-20260920.md` 신규 + PDF 신규 |
+| `645ef73` | 세 파일 동시 윤문 (PDF `225447`→`225296` 바이트) |
+
+편지판을 먼저 쓰고, 꼭지·항목 2단 구조로 재편할 때 보고서판과 PDF가 파생됐다. 그 뒤로는
+**나란히 유지되는 자매 문서**다 — 한쪽에서 매번 뽑아내는 관계가 아니라 내용이 바뀌면 둘 다
+고치고 PDF를 다시 찍는다. §9~§10의 "두 벌" 서술이 이 뜻이다.
+
+구분은 표의 유무다. 보고서판은 9행 요약 표에 `###` 제목 단계를 쓰고 인사말이 없다.
+편지판은 `교수님께`로 시작해 `황태욱 올림`으로 끝나고, 표 없이 굵은 문장으로 항목을 연다.
+
+### 6. 이어서 시작할 때
+
+```text
+✂──── 여기부터 복사 ────✂
+
+ultrathink. 중간보고서 제출 진입.
+docs/NEXT_SESSION.md의 2026-09-26 항목과 §11(중간보고서)을 먼저 읽을 것.
+
+전제 검증:
+1) git rev-list --count --left-right origin/master...HEAD → "0 0"
+2) docs/중간보고서_2026-09.md 존재 (기재용 초안)
+3) 중간보고서 제출 여부·기한 확인 (9/28~10/2)
+
+실행: 중간보고서를 제출한다. 초안은 docs/중간보고서_2026-09.md에 있고
+  실물 hwp/pdf는 gitignore돼 저장소에 없다 — 루트의 학위논문*중간보고서* 2개를 쓴다.
+
+후속: 교수님 회신이 오면 §12(2026-09-20)의 대조 절차로 넘어간다
+
+✂──── 여기까지 복사 ────✂
+```
 
 ## 🟢 2026-09-20 — 보완 요청 반영·재빌드·회신 작성
 
@@ -504,6 +591,9 @@ pre-commit ruff 게이트는 `SKIP_MOAI_PRECOMMIT=1`로만 우회된다
 - **`uv sync`의 하드링크가 이 네트워크 볼륨(`/workspace`)에서 가끔 깨짐(2026-07-26 실증)**: `nvidia-cusparselt-cu12`, `nvidia-nvshmem-cu12`, `scipy`가 각각 "설치됨"으로 기록돼 있는데 실제 파일은 로드 안 되는 증상이 반복됨(패키지 하나씩 `uv sync --reinstall-package <pkg>`로 개별 복구 가능하지만 계속 재발할 수 있음). 근본적으로는 `UV_LINK_MODE=copy uv sync --reinstall`로 하드링크 대신 실제 복사를 강제하는 게 더 안정적임 — 다음에 또 이런 `ModuleNotFoundError`/`ImportError: lib*.so`류가 나오면 이걸 먼저 시도할 것.
 - **bert-score + `transformers==5.5.0` 호환성 버그(2026-07-26 수정)**: `transformers` 5.5.0에서 토크나이저가 새 `TokenizersBackend`로 리팩터링되며 `build_inputs_with_special_tokens`가 빠짐 — `bert_score` 0.3.13이 이 메서드를 직접 호출해 `AttributeError`로 죽음. `src/evaluate/metrics.py`의 `_patch_tokenizers_backend_special_tokens`(커밋 `121af8e`)로 공유 베이스 클래스에 호환 shim을 패치해뒀음. 만약 다른 bert-score 계열 스크립트에서 비슷한 에러가 또 나면, 이미 고쳐져 있는지부터(`git log -- src/evaluate/metrics.py`) 확인.
 - **`git` index.lock이 이 저장소(`/mnt/d/...` WSL 마운트)에서 종종 stale하게 남음**: 느린 DrvFs 때문에 `git status`류가 오래 걸리다 index.lock을 남기고, 다음 git 명령이 "Another git process seems to be running"로 막히는 경우가 반복됨. `ps aux | grep git`+`lsof <lockfile>`로 실제 홀더가 없는 걸 확인한 뒤에만 `rm -f .git/index.lock`으로 지울 것(무작정 지우지 말 것).
+  - **범인은 statusline이고, `rm`과 git 명령 사이를 비워야 한다**(2026-09-20 실증). 렌더할 때마다 lock을 새로 만들기 때문에 `rm -f .git/index.lock && git add … && git diff --cached --stat && git commit …`처럼 중간에 명령을 끼우면 그 틈에 다시 생겨 커밋이 막힌다. 같은 날 세 번 막혔고, `rm` 직후 바로 `git commit`만 실행하니 통과했다. `git add`가 필요하면 그 앞에도 따로 `rm`을 둘 것.
+  - **백그라운드 실행이면 더 잘 막힌다.** 스케줄링 지연만큼 틈이 벌어진다. `moai gate` 때문에 커밋이 5분 걸려 백그라운드로 돌리기 쉬운데, 이 저장소에서는 전경(`timeout` 600초)이 오히려 안전하다.
+  - **증상이 "느린 게이트"와 똑같다.** 실제 게이트가 도는 중이면 자식 프로세스에 `pre-commit`과 `moai gate`가 보인다 — `ps -eo cmd | grep -E "pre-commit|/moai gate"`. 안 보이는데 `git commit`만 떠 있으면 lock이거나 stdin 대기다.
 - **`uv run python -c ...`(옵션 없이)가 `unsloth`를 조용히 지울 수 있음(2026-07-27 실증)**: 마이그레이션 후 `--extra unsloth` 없이 `uv run python`을 한 번만 실행해도 암묵적 재동기화로 unsloth가 빠짐. 증상은 unsloth 관련 에러가 아니라 한참 뒤 Qwen 모델 학습에서 `KeyError: 'images'`로 나타나 진단이 어려움. Phase 2/3 학습 전엔 `uv run python -c "import unsloth"`로 먼저 확인할 것. 복구(`uv sync --extra unsloth`)는 `statsmodels`/`pandas`를 같이 지울 수 있음 — RQ2 재분석 전엔 재설치 필요.
 - **tmux 창마다 export한 환경변수가 독립적임**: 한 창에서 `export HF_HOME=...`을 해도 다른 창/새로 연 창에는 안 먹음. 새 tmux 창을 열 때마다 `HF_HOME`/`MOAI_CHAT_CACHE_DIR`/`WANDB_API_KEY`/`ANTHROPIC_API_KEY`를 다시 export해야 함 — 안 하면 캐시가 `/workspace/.cache`로 새거나 wandb가 오프라인/에러로 돎.
 - **Phase 3 스모크 결과 파일은 `results/<output_dir>/results.tsv`임 (Phase 2의 `train_result.json` 아님)**: Phase 2와 Phase 3는 결과 저장 방식이 다름 — Phase 3는 `ExperimentTracker`가 trial마다 `results.tsv`에 한 줄씩 append. `train_time_min` 열로 실측 시간 확인.
